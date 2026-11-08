@@ -1,0 +1,10 @@
+/target
+/.gen
+**/*.rs.bk
+*.swp
+*.bak
+.DS_Store
+*.db
+*.db-shm
+*.db-wal
+config.local.toml
