@@ -48,7 +48,8 @@ mod v1_2_specific_tests {
 #[cfg(test)]
 mod v1_4_specific_tests {
     use matter_spec::{
-        EndpointError, ModeClusterExt as _, NodeError,
+        error::{EndpointError, NodeError},
+        extensions::ModeClusterExt as _,
         model::{
             AttributeId, Cluster, Command as WireCommand, CommandDirection, CommandId, DeviceTypeEntry, Endpoint,
             EndpointId, Node, NodeId, Nullable, Optional,
@@ -282,9 +283,9 @@ mod v1_4_specific_tests {
     #[test]
     fn root_node_default_endpoint_id_and_composed_validation() {
         use matter_spec::{
-            EndpointExt as _,
             error::EndpointError,
             model::{Cluster, DeviceTypeEntry, Endpoint, EndpointId},
+            traits::EndpointExt as _,
             v1_4::{
                 clusters::{
                     bridged_device_basic_information::BridgedDeviceBasicInformationCluster, on_off::OnOffCluster,

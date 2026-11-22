@@ -852,10 +852,10 @@ mod schema_impls {
             "properties": props,
             "required": required,
         });
-        if cfg!(feature = "deny-unknown-fields") {
-            if let Some(obj) = root.as_object_mut() {
-                obj.insert("additionalProperties".to_owned(), Value::Bool(false));
-            }
+        if cfg!(feature = "deny-unknown-fields")
+            && let Some(obj) = root.as_object_mut()
+        {
+            obj.insert("additionalProperties".to_owned(), Value::Bool(false));
         }
         root
     }

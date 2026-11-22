@@ -94,7 +94,7 @@ assert!((fahrenheit - 70.7).abs() < 0.1);
 
 // Transform Optional<Nullable<T>> fields cleanly
 let opt_temp: Optional<Nullable<Temperature>> = Optional::Present(Nullable::NonNull(*setpoint));
-assert_eq!(opt_temp.map_value(Temperature::to_celsius).as_value(), Some(&21.5));
+assert_eq!(opt_temp.map_nonnull(Temperature::to_celsius).as_nonnull(), Some(&21.5));
 
 // Encode to the wire representation
 let wire_val: AttributeValue = setpoint.into_value();

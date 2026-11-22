@@ -21,7 +21,7 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 - **Strict `MatterStatus` mapping:** Return `InvalidDataType` (`0x8D`) on wrong wire tags, `InvalidCommand` (`0x85`) on missing mandatory command fields, and `ConstraintError` (`0x87`) on bounds/length/enum/duplicate/unknown-field errors and missing mandatory cluster/struct/event fields.
 - **Visibility & feature hygiene:** Keep `__shared` private with `pub(crate)` buckets (`unreachable_pub` stays strict) and keep internal helpers `pub(crate)`. `default = ["std"]`; `registry` and `dispatch` are opt-in; `schemars` enables `std` + `registry`.
 - **Zero-alloc, non-mutating validation:** Validation runs over immutable `static`/`const` version-agnostic `SpecRegistry` descriptors without heap allocation or mutating valid inputs.
-- **MSRV:** `matter-data-model` and `matter-spec` target `rust-version = "1.85"` (avoid post-1.85 syntax).
+- **MSRV:** `matter-data-model` and `matter-spec` target `rust-version = "1.88"` (avoid post-1.88 syntax).
 
 ## 3. Architecture
 

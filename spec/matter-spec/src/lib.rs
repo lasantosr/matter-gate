@@ -107,7 +107,7 @@
 //! // Transform Optional<Nullable<T>> fields cleanly
 //! let opt_temp: Optional<Nullable<Temperature>> = Optional::Present(Nullable::NonNull(*setpoint));
 //! assert_eq!(
-//!     opt_temp.map_value(Temperature::to_celsius).as_value(),
+//!     opt_temp.map_nonnull(Temperature::to_celsius).as_nonnull(),
 //!     Some(&21.5)
 //! );
 //!

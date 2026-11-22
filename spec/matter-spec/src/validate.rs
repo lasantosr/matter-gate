@@ -1439,11 +1439,11 @@ fn pop_conf(stack: &[StackVal; MAX_RPN_STACK], sp: &mut usize) -> Option<Conform
 }
 
 fn pop_bool_or_true(stack: &[StackVal; MAX_RPN_STACK], sp: &mut usize) -> bool {
-    if let Some(idx) = sp.checked_sub(1) {
-        if let Some(StackVal::Bool(b)) = stack.get(idx).copied() {
-            *sp = idx;
-            return b;
-        }
+    if let Some(idx) = sp.checked_sub(1)
+        && let Some(StackVal::Bool(b)) = stack.get(idx).copied()
+    {
+        *sp = idx;
+        return b;
     }
     true
 }
@@ -1781,36 +1781,36 @@ fn validate_include_item(endpoint: &Endpoint, inc: &DeviceTypeIncludeItem) -> Re
         }
     }
 
-    if !inc.required_commands.is_empty() {
-        if let Some(accepted) = cluster.attribute(AttributeId::ACCEPTED_COMMAND_LIST) {
-            for &req_cmd in inc.required_commands {
-                if !list_contains_u32(accepted, req_cmd.raw()) {
-                    return Err(EndpointError::InvalidCluster {
-                        id: cluster.id,
-                        source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
-                            id: AttributeId::ACCEPTED_COMMAND_LIST,
-                            field_id: None,
-                            status: MatterStatus::ConstraintError,
-                        }),
-                    });
-                }
+    if !inc.required_commands.is_empty()
+        && let Some(accepted) = cluster.attribute(AttributeId::ACCEPTED_COMMAND_LIST)
+    {
+        for &req_cmd in inc.required_commands {
+            if !list_contains_u32(accepted, req_cmd.raw()) {
+                return Err(EndpointError::InvalidCluster {
+                    id: cluster.id,
+                    source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                        id: AttributeId::ACCEPTED_COMMAND_LIST,
+                        field_id: None,
+                        status: MatterStatus::ConstraintError,
+                    }),
+                });
             }
         }
     }
 
-    if !inc.required_events.is_empty() {
-        if let Some(events) = cluster.attribute(AttributeId::EVENT_LIST) {
-            for &req_ev in inc.required_events {
-                if !list_contains_u32(events, req_ev.raw()) {
-                    return Err(EndpointError::InvalidCluster {
-                        id: cluster.id,
-                        source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
-                            id: AttributeId::EVENT_LIST,
-                            field_id: None,
-                            status: MatterStatus::ConstraintError,
-                        }),
-                    });
-                }
+    if !inc.required_events.is_empty()
+        && let Some(events) = cluster.attribute(AttributeId::EVENT_LIST)
+    {
+        for &req_ev in inc.required_events {
+            if !list_contains_u32(events, req_ev.raw()) {
+                return Err(EndpointError::InvalidCluster {
+                    id: cluster.id,
+                    source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                        id: AttributeId::EVENT_LIST,
+                        field_id: None,
+                        status: MatterStatus::ConstraintError,
+                    }),
+                });
             }
         }
     }
