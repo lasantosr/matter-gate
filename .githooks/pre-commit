@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Use just pre-commit if just is installed, otherwise run standard checks
+if command -v just >/dev/null 2>&1; then
+    just pre-commit
+else
+    echo "==> Running pre-commit checks..."
+
+    # 1. Taplo TOML format check
+    echo "--> Checking TOML formatting (taplo)..."
+    if command -v taplo >/dev/null 2>&1; then
+        taplo fmt --check
+    else
+        echo "Error: 'taplo' not found in PATH. Install with: cargo install taplo-cli --locked" >&2
+        echo "       Or install 'just' to run 'just pre-commit'." >&2
+        exit 1
+    fi
+
+    # 2. Rust formatting check (Nightly as per AGENTS.md)
+    echo "--> Checking Rust code formatting (cargo +nightly fmt)..."
+    cargo +nightly fmt --all -- --check
+
+    # 3. Clippy check across default members
+    echo "--> Checking Clippy lints (cargo clippy)..."
+    cargo clippy --locked --all-targets --all-features -- -Dwarnings
+
+    echo "==> All pre-commit checks passed successfully!"
+fi
+
+

@@ -1,0 +1,32 @@
+[workspace]
+# Run cargo-semver-checks on library crates before determining version bumps
+semver_check = true
+changelog_update = true
+
+# Formatting for autonomous release pull requests
+pr_name = "chore: release {{ package }} {{ version }}"
+
+# Independent tag format per crate (e.g., matter-data-model-v0.1.0)
+git_tag_name = "{{ package }}-v{{ version }}"
+
+# Do not publish or release internal workspace crates to crates.io
+[[package]]
+name = "xtask"
+publish = false
+release = false
+git_release_enable = false
+changelog_update = false
+
+[[package]]
+name = "matter-spec-gen"
+publish = false
+release = false
+git_release_enable = false
+changelog_update = false
+
+# SemVer compatibility for matter-spec is enforced per-version-feature in ci-matter-spec.yml.
+# Pass explicit publish_features so `cargo publish` verifies without adding a default v1_* feature.
+[[package]]
+name = "matter-spec"
+semver_check = false
+publish_features = ["v1_0"]

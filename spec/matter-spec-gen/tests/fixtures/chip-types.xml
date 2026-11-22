@@ -1,0 +1,8 @@
+<configurator>
+  <atomic>
+    <type id="0x10" name="boolean" description="Boolean" size="1"/>
+    <type id="0x20" name="int8u" description="Unsigned 8-bit integer" size="1"/>
+    <type id="0x21" name="int16u" description="Unsigned 16-bit integer" size="2"/>
+    <type id="0x23" name="int32u" description="Unsigned 32-bit integer" size="4"/>
+  </atomic>
+</configurator>
