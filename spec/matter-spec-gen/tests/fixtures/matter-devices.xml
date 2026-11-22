@@ -1,0 +1,14 @@
+<configurator>
+  <deviceType>
+    <name>MA-onofflight</name>
+    <typeName>Matter On/Off Light</typeName>
+    <deviceId>0x0100</deviceId>
+    <clusters>
+      <include cluster="OnOff" server="true" client="false" serverLocked="true" clientLocked="true">
+        <features>
+          <feature code="LT" name="Lighting"/>
+        </features>
+      </include>
+    </clusters>
+  </deviceType>
+</configurator>

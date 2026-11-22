@@ -1,0 +1,230 @@
+name: Matter Spec CI
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "spec/matter-spec/**"
+      - "spec/matter-data-model/**"
+      - "spec/matter-spec-gen/**"
+      - "xtask/spec-data/**"
+      - "xtask/src/commands/codegen_spec/**"
+      - ".github/workflows/ci-matter-spec.yml"
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "spec/matter-spec/**"
+      - "spec/matter-data-model/**"
+      - "spec/matter-spec-gen/**"
+      - "xtask/spec-data/**"
+      - "xtask/src/commands/codegen_spec/**"
+      - ".github/workflows/ci-matter-spec.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  codegen:
+    name: Spec Codegen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Nightly Rust (for cargo fmt)
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: nightly
+          components: rustfmt
+
+      - name: Install Stable Rust
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: Setup Taplo
+        uses: taiki-e/install-action@fe3acb53a98b62c772db35de75ce0e4595e7ca8c # v2.90.8
+        with:
+          tool: taplo@0.10.0
+
+      - name: Setup Just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+      - name: Verify Generated Code Is Up-To-Date
+        run: |
+          just spec-codegen
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "::error::Generated code is out of date or untracked files were created. Run 'just spec-codegen' and commit the changes."
+            git status --short
+            exit 1
+          fi
+
+  data-model:
+    name: Data Model (no_std)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Stable Rust
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: stable
+          components: clippy
+          targets: thumbv7em-none-eabihf
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: Verify no_std Build & Tests (matter-data-model)
+        run: |
+          cargo check -p matter-data-model --locked --target thumbv7em-none-eabihf --no-default-features --lib
+          cargo check -p matter-data-model --locked --target thumbv7em-none-eabihf --no-default-features --features serde --lib
+          cargo test -p matter-data-model --locked --no-default-features
+          RUSTDOCFLAGS="-D warnings" cargo doc -p matter-data-model --locked --no-deps --no-default-features
+
+  spec-matrix:
+    name: Spec (${{ matrix.version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      # Explicit list of supported Matter specification version features in spec/matter-spec/Cargo.toml.
+      matrix:
+        version:
+          - v1_0
+          - v1_1
+          - v1_2
+          - v1_3
+          - v1_4
+          - v1_5
+          - v1_6
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - name: Install Stable Rust
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: stable
+          components: clippy
+          targets: thumbv7em-none-eabihf
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: ${{ matrix.version }}
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+      - name: Verify Clippy Lints (${{ matrix.version }})
+        run: just spec-clippy ${{ matrix.version }}
+
+      - name: Run Tests (${{ matrix.version }})
+        run: just spec-test ${{ matrix.version }}
+
+      - name: Verify Docs & Doc-Tests (${{ matrix.version }})
+        run: just spec-doc ${{ matrix.version }}
+
+      - name: Verify no_std (${{ matrix.version }})
+        run: cargo check -p matter-spec --locked --target thumbv7em-none-eabihf --no-default-features --features "${{ matrix.version }},general,registry,dispatch,serde,chrono,time,uom" --lib
+
+      - name: Install cargo-semver-checks
+        if: github.event_name == 'pull_request'
+        uses: taiki-e/install-action@fe3acb53a98b62c772db35de75ce0e4595e7ca8c # v2.90.8
+        with:
+          tool: cargo-semver-checks
+
+      - name: Verify SemVer Compatibility (${{ matrix.version }})
+        if: github.event_name == 'pull_request'
+        env:
+          CARGO_BUILD_JOBS: "1"
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          BASE_REF: ${{ github.base_ref }}
+          VERSION: ${{ matrix.version }}
+        run: |
+          if ! git show "origin/${BASE_REF}:spec/matter-spec/Cargo.toml" | grep -qE "^${VERSION}[[:space:]]*="; then
+            echo "::notice::Feature '${VERSION}' does not exist on origin/${BASE_REF}; skipping SemVer check for newly added version."
+            exit 0
+          fi
+
+          set +e
+          cargo semver-checks \
+            -p matter-spec \
+            --locked \
+            --features "${VERSION},all,registry,dispatch,serde,schemars,chrono,time,uom" \
+            --baseline-rev "origin/${BASE_REF}"
+          status=$?
+          set -e
+
+          if [ "$status" -eq 0 ]; then
+            exit 0
+          elif [ "$status" -eq 1 ]; then
+            if echo "$PR_TITLE" | grep -qE '^[a-z]+(\([^)]+\))?!:' || \
+               git log --format=%B "origin/${BASE_REF}..HEAD" | grep -qE '(^[a-z]+(\([^)]+\))?!:|^BREAKING CHANGE:)'; then
+              echo "Breaking API change detected and explicitly marked as breaking."
+              exit 0
+            else
+              echo "::error::Breaking API change detected in matter-spec (${VERSION}) without a Conventional Commit breaking marker ('!:' or 'BREAKING CHANGE:')."
+              exit 1
+            fi
+          else
+            echo "::error::cargo semver-checks failed with unexpected exit code ${status} (compilation error, OOM, or baseline failure)."
+            exit "$status"
+          fi
+
+  msrv:
+    name: MSRV (1.85)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install MSRV Rust (1.85.0)
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: "1.85.0"
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+        with:
+          key: msrv-matter-spec
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Setup Just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+      - name: Verify MSRV (1.85)
+        run: |
+          cargo test -p matter-data-model --locked --all-features
+          just spec-clippy --check
+
+  minimal-versions:
+    name: Minimal Versions (spec)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install Nightly Rust (for -Z direct-minimal-versions)
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: nightly
+
+      - name: Install cargo-minimal-versions
+        uses: taiki-e/install-action@fe3acb53a98b62c772db35de75ce0e4595e7ca8c # v2.90.8
+        with:
+          tool: cargo-minimal-versions
+
+      - name: Verify Minimal Direct Dependency Versions (matter-data-model & matter-spec)
+        run: |
+          sed -i -e '/^members = \[/{:a; /\]$/{s/.*/members = ["spec\/matter-data-model", "spec\/matter-spec"]/; b}; N; ba}' -e '/^default-members = \[/{:b; /\]$/d; N; bb}' Cargo.toml
+          cargo minimal-versions check -p matter-data-model --direct --all-features
+          cargo minimal-versions check -p matter-spec --direct --jobs 1 --features "v1_6,all,registry,dispatch,serde,schemars,chrono,time,uom"

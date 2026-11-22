@@ -1,0 +1,21 @@
+[package]
+name = "xtask"
+version = "0.1.0"
+publish = false
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Matter specification code generator & workspace orchestrator"
+
+[dependencies]
+anyhow          = { workspace = true }
+clap            = { workspace = true, features = ["derive", "std"] }
+genco           = { workspace = true }
+matter-spec-gen = { workspace = true }
+tempfile        = { workspace = true }
+toml_edit       = { workspace = true }
+
+[lints]
+workspace = true

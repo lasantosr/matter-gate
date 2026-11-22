@@ -1,0 +1,22 @@
+# https://taplo.tamasfe.dev/configuration/formatter-options.html
+
+[formatting]
+align_entries = false
+trailing_newline = true
+column_width = 120
+
+[[rule]]
+keys = [
+  "dependencies",
+  "dev-dependencies",
+  "build-dependencies",
+  "workspace.dependencies",
+  "lints.rust",
+  "lints.clippy",
+  "workspace.lints.rust",
+  "workspace.lints.clippy",
+]
+
+[rule.formatting]
+reorder_keys = true
+align_entries = true

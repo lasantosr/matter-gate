@@ -1,0 +1,153 @@
+[workspace]
+members = ["spec/*", "xtask"]
+default-members = ["spec/matter-data-model", "spec/matter-spec-gen", "xtask"]
+resolver = "2"
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.99"
+license = "Apache-2.0"
+repository = "https://github.com/lasantosr/matter-gate"
+homepage = "https://github.com/lasantosr/matter-gate"
+
+# Root dependencies declaration:
+# Every workspace dependency MUST be listed here without additional feature flags (core only).
+# If a crate enables multiple or broad features by default, default-features = false MUST be set.
+# Use the latest major (or 0.x) line with the minimum minor/patch needed for the APIs/features used.
+# Member crates must opt-in individually to whatever features they require.
+[workspace.dependencies]
+anyhow     = { version = "1.0.0" }
+bytes      = { version = "1.0.0", default-features = false }
+chrono     = { version = "0.4.35", default-features = false }
+clap       = { version = "4.0.0", default-features = false }
+genco      = { version = "0.20.0" }
+heck       = { version = "0.5.0" }
+quick-xml  = { version = "0.42.0" }
+schemars   = { version = "1.1.0", default-features = false }
+serde      = { version = "1.0.194", default-features = false }
+serde_json = { version = "1.0.0" }
+tempfile   = { version = "3.0.0" }
+thiserror  = { version = "2.0.0" }
+time       = { version = "0.3.5", default-features = false }
+toml_edit  = { version = "0.25.0" }
+uom        = { version = "0.38.0", default-features = false }
+
+# Internal workspace crates
+matter-data-model = { version = "0.1.0", path = "spec/matter-data-model", default-features = false }
+matter-spec       = { version = "0.1.0", path = "spec/matter-spec", default-features = false }
+matter-spec-gen   = { version = "0.1.0", path = "spec/matter-spec-gen" }
+
+# Lints: https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
+[workspace.lints.rust]
+# Standard safety/correctness
+non_ascii_idents  = "deny"
+unsafe_code       = "deny"
+unstable_features = "deny"
+
+# High-quality defaults
+ambiguous_negative_literals   = "warn"
+closure_returning_async_block = "warn"
+redundant_lifetimes           = "warn"
+unit_bindings                 = "warn"
+unreachable_pub               = "warn"
+unused_lifetimes              = "warn"
+unused_qualifications         = "warn"
+
+# Categories: https://doc.rust-lang.org/clippy/
+# Lints: https://rust-lang.github.io/rust-clippy/master/
+[workspace.lints.clippy]
+cargo    = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+
+# Add strict denials for specific dangerous practices
+dbg_macro   = "deny"
+expect_used = "deny"
+unwrap_used = "deny"
+
+# Explicitly allow noisy or stylistic lints
+assigning_clones           = "allow"
+cargo_common_metadata      = "allow"
+inline_always              = "allow"
+items_after_statements     = "allow"
+map_unwrap_or              = "allow"
+missing_errors_doc         = "allow"
+missing_panics_doc         = "allow"
+multiple_crate_versions    = "allow"
+needless_pass_by_value     = "allow"
+similar_names              = "allow"
+struct_excessive_bools     = "allow"
+unchecked_time_subtraction = "allow"
+unused_self                = "allow"
+wildcard_imports           = "allow"
+
+# Warn on some restrictions
+absolute_paths                       = "warn"
+allow_attributes                     = "warn"
+allow_attributes_without_reason      = "warn"
+arithmetic_side_effects              = "warn"
+as_conversions                       = "warn"
+as_pointer_underscore                = "warn"
+as_underscore                        = "warn"
+assertions_on_result_states          = "warn"
+cfg_not_test                         = "warn"
+clone_on_ref_ptr                     = "warn"
+create_dir                           = "warn"
+decimal_literal_representation       = "warn"
+default_union_representation         = "warn"
+doc_paragraphs_missing_punctuation   = "warn"
+else_if_without_else                 = "warn"
+empty_drop                           = "warn"
+empty_enum_variants_with_brackets    = "warn"
+empty_structs_with_brackets          = "warn"
+exit                                 = "warn"
+filetype_is_file                     = "warn"
+float_cmp_const                      = "warn"
+if_then_some_else_none               = "warn"
+indexing_slicing                     = "warn"
+infinite_loop                        = "warn"
+integer_division                     = "warn"
+let_underscore_must_use              = "warn"
+let_underscore_untyped               = "warn"
+lossy_float_literal                  = "warn"
+map_with_unused_argument_over_ranges = "warn"
+mem_forget                           = "warn"
+missing_assert_message               = "warn"
+mixed_read_write_in_expression       = "warn"
+panic                                = "warn"
+precedence_bits                      = "warn"
+print_stderr                         = "warn"
+print_stdout                         = "warn"
+rc_buffer                            = "warn"
+rc_mutex                             = "warn"
+redundant_test_prefix                = "warn"
+redundant_type_annotations           = "warn"
+ref_patterns                         = "warn"
+rest_pat_in_fully_bound_structs      = "warn"
+return_and_then                      = "warn"
+self_named_module_files              = "warn"
+semicolon_inside_block               = "warn"
+shadow_unrelated                     = "warn"
+str_to_string                        = "warn"
+string_add                           = "warn"
+string_lit_chars_any                 = "warn"
+suspicious_xor_used_as_pow           = "warn"
+tests_outside_test_module            = "warn"
+todo                                 = "warn"
+try_err                              = "warn"
+undocumented_unsafe_blocks           = "warn"
+unimplemented                        = "warn"
+unnecessary_self_imports             = "warn"
+unreachable                          = "warn"
+unseparated_literal_suffix           = "warn"
+unused_result_ok                     = "warn"
+unused_trait_names                   = "warn"
+
+[profile.dev.package.matter-spec]
+opt-level = 0
+debug = 0
+codegen-units = 16
+
+[profile.test.package.matter-spec]
+opt-level = 0
+debug = 0
+codegen-units = 16

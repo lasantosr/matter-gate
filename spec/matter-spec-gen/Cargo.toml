@@ -1,0 +1,21 @@
+[package]
+name = "matter-spec-gen"
+version = "0.1.0"
+publish = false
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+description = "Pure in-memory Matter specification code generator and AST compiler library"
+readme = "README.md"
+
+[dependencies]
+genco     = { workspace = true }
+heck      = { workspace = true }
+quick-xml = { workspace = true, features = ["serialize"] }
+serde     = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
+
+[lints]
+workspace = true

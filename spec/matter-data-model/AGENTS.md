@@ -1,0 +1,28 @@
+# AGENTS.md (`matter-data-model`)
+
+Additive to root [`AGENTS.md`](../../AGENTS.md).
+
+## 0. Invariants (CRITICAL)
+
+1. **Pure wire data model.** Include only version-independent Matter Core Data Model entities, wire primitives/identifiers, and Interaction Model status codes.
+2. **Keep `#![no_std]` + `alloc`.** Never import `std` unconditionally or add dependencies that require it.
+3. **Zero runtime coupling.** No async runtimes, network stacks, web frameworks, or protocol engines.
+4. **Maintain the public SemVer boundary.** Mark evolving public structs and `MatterStatus` `#[non_exhaustive]`, annotate pure queries/constructors/builders/wrappers `#[must_use]`, and keep `#![warn(missing_docs)]` clean.
+
+## 1. Identity
+
+- **Crate:** `matter-data-model` (`spec/matter-data-model`), publishable library, default workspace member.
+- **Role:** stable wire types, identifiers, and status codes shared across the ecosystem.
+
+## 2. Design & Constraints
+
+- **Scope exclusions:** Exclude IM message/path Information Blocks, IM session IDs, versioned cluster/device schemas, derived unit wrappers, and static conformance/access/range metadata.
+- **Infallible builders & type-only `TryFrom`:** Domain structs use `pub` fields and infallible constructors/`with_*` builders; `#[repr(transparent)]` ID newtypes keep their inner value private behind `.raw()`. Owned `TryFrom<AttributeValue>` moves payloads without cloning and checks wire type, enum discriminant, and field presence only (never spec value/length constraints): return `ConstraintError` (`0x87`) on missing mandatory fields or duplicate `FieldId`s, while tolerating distinct unknown `FieldId`s on TLV structs.
+- **Exhaustive TLV primitives:** Keep `AttributeValue` intentionally exhaustive over Matter's fixed TLV primitive set.
+- **Serde & JSON Schema:** Model wire omission (`Optional`, non-nullable) separately from wire `null` (`Nullable`). Always pair `#[serde(default)]` with `#[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]`.
+- **Feature hygiene:** Keep `bytes` unconditional; keep `std`, `serde`, and `schemars` optional.
+
+## 3. Architecture
+
+- Domain concepts live in private modules (colocating each wire struct with its identifier newtypes) and are re-exported flatly at the crate root; serde helpers live under `serde`.
+- Order `impl` methods on domain structs consistently: constructors, `with_*` builders in field order, then accessors grouped by field in field order (`has_*`, getter, `*_mut`, `set_*`, `remove_*`).

@@ -1,0 +1,15 @@
+<configurator>
+  <cluster>
+    <name>OnOff</name>
+    <domain>General</domain>
+    <code>0x0006</code>
+    <define>ON_OFF_CLUSTER</define>
+    <client init="false" tick="false">true</client>
+    <server init="false" tick="false">true</server>
+    <globalAttribute side="either" code="0xFFFD" value="6"/>
+    <attribute side="server" code="0x0000" define="ON_OFF" type="boolean" writable="false" optional="false">OnOff</attribute>
+    <command source="client" code="0x00" name="Off" optional="false">
+      <description>Turn off</description>
+    </command>
+  </cluster>
+</configurator>
