@@ -1,5 +1,7 @@
 # https://taplo.tamasfe.dev/configuration/formatter-options.html
 
+exclude = ["target/**"]
+
 [formatting]
 align_entries = false
 trailing_newline = true
