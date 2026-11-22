@@ -44122,8 +44122,7 @@ pub static SPEC_REGISTRY: SpecRegistry = SpecRegistry {
 pub struct Validator;
 
 impl Validator {
-    /// Returns a [`RegistryValidator`] configured for
-    /// [`ValidationMode::FullSnapshot`](crate::validate::ValidationMode::FullSnapshot)
+    /// Returns a [`RegistryValidator`] configured for [`ValidationMode::FullSnapshot`](crate::validate::ValidationMode::FullSnapshot)
     /// (`enforce_provisional: false`) against [`SPEC_REGISTRY`].
     #[must_use]
     #[inline]
@@ -44131,8 +44130,7 @@ impl Validator {
         RegistryValidator::full(&SPEC_REGISTRY)
     }
 
-    /// Returns a [`RegistryValidator`] configured for
-    /// [`ValidationMode::Partial`](crate::validate::ValidationMode::Partial)
+    /// Returns a [`RegistryValidator`] configured for [`ValidationMode::Partial`](crate::validate::ValidationMode::Partial)
     /// against [`SPEC_REGISTRY`].
     #[must_use]
     #[inline]

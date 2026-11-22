@@ -27,7 +27,7 @@ schemars   = { version = "1.1.0", default-features = false }
 serde      = { version = "1.0.194", default-features = false }
 serde_json = { version = "1.0.0" }
 tempfile   = { version = "3.0.0" }
-thiserror  = { version = "2.0.0" }
+thiserror  = { version = "2.0.0", default-features = false }
 time       = { version = "0.3.5", default-features = false }
 toml_edit  = { version = "0.25.0" }
 uom        = { version = "0.38.0", default-features = false }

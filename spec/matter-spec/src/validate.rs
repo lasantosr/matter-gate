@@ -312,6 +312,19 @@ pub(crate) struct ValueConstraint {
 
 /// RPN operation for evaluating CSA conformance expressions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[cfg_attr(
+    any(
+        feature = "v1_0",
+        feature = "v1_1",
+        feature = "v1_2",
+        feature = "v1_3",
+        feature = "v1_4"
+    ),
+    expect(
+        dead_code,
+        reason = "Older Matter spec versions do not emit every conformance opcode"
+    )
+)]
 pub(crate) enum ConformanceOp {
     /// Push `true` if `(feature_map & mask) != 0`.
     PushFeature(u32),

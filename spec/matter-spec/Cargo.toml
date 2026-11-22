@@ -18,8 +18,8 @@ features = ["v1_6", "all", "testing", "registry", "dispatch", "serde", "schemars
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-matter-data-model = { workspace = true, default-features = false }
-thiserror         = { workspace = true, default-features = false }
+matter-data-model = { workspace = true }
+thiserror         = { workspace = true }
 
 bytes    = { workspace = true }
 chrono   = { workspace = true, optional = true }
