@@ -212,6 +212,7 @@ jobs:
           set +e
           cargo semver-checks \
             -p matter-spec \
+            --only-explicit-features \
             --features "${VERSION},all,registry,dispatch,serde,schemars,chrono,time,uom" \
             --baseline-rev "origin/${BASE_REF}"
           status=$?
