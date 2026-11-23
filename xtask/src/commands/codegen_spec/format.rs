@@ -1,7 +1,7 @@
 use std::{
     fs,
     path::{Path, PathBuf},
-    process::Command,
+    process::{Command, Stdio},
 };
 
 use anyhow::{Context as _, Result, bail};
@@ -10,8 +10,10 @@ use toml_edit::DocumentMut;
 
 /// Formats the generated `matter-spec` crate using nightly `rustfmt` (bypassing `.rustfmt.toml`'s
 /// `ignore` list) and `taplo fmt` for `spec/matter-spec/Cargo.toml`.
-pub(super) fn format_spec_crate(root: &Path) -> Result<()> {
-    println!("\nFormatting generated code with cargo +nightly fmt...");
+pub(super) fn format_spec_crate(root: &Path, quiet: bool) -> Result<()> {
+    if !quiet {
+        println!("\nFormatting generated code with cargo +nightly fmt...");
+    }
     let (_tmp_dir, config_path) = prepare_rustfmt_config(root)?;
 
     let mut fmt_cmd = Command::new("cargo");
@@ -24,27 +26,30 @@ pub(super) fn format_spec_crate(root: &Path) -> Result<()> {
         .arg("--config-path")
         .arg(&config_path)
         .current_dir(root);
-    let status = fmt_cmd
-        .status()
-        .context("Failed to invoke cargo +nightly fmt on matter-spec")?;
-    if !status.success() {
-        bail!("cargo +nightly fmt failed with status: {:?}", status.code());
-    }
+    run_formatter(&mut fmt_cmd, quiet, "cargo +nightly fmt on matter-spec")?;
 
-    println!("Formatting spec Cargo.toml with taplo fmt...");
+    if !quiet {
+        println!("Formatting spec Cargo.toml with taplo fmt...");
+    }
     let mut taplo_cmd = Command::new("taplo");
     taplo_cmd
         .arg("fmt")
         .arg("spec/matter-spec/Cargo.toml")
         .env("RUST_LOG", "warn")
         .current_dir(root);
-    let taplo_status = taplo_cmd
-        .status()
-        .context("Failed to invoke taplo fmt on spec/matter-spec/Cargo.toml")?;
-    if !taplo_status.success() {
-        bail!("taplo fmt failed with status: {:?}", taplo_status.code());
-    }
+    run_formatter(&mut taplo_cmd, quiet, "taplo fmt on spec/matter-spec/Cargo.toml")?;
 
+    Ok(())
+}
+
+fn run_formatter(cmd: &mut Command, quiet: bool, label: &str) -> Result<()> {
+    if quiet {
+        cmd.stdout(Stdio::null());
+    }
+    let status = cmd.status().with_context(|| format!("Failed to invoke {label}"))?;
+    if !status.success() {
+        bail!("{label} failed with status: {:?}", status.code());
+    }
     Ok(())
 }
 
