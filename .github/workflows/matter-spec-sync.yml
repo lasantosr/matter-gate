@@ -11,7 +11,7 @@ permissions:
   pull-requests: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 jobs:
@@ -23,6 +23,8 @@ jobs:
       has_updates: ${{ steps.discover.outputs.has_updates }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
 
       - name: Install Stable Rust
         uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
@@ -53,6 +55,8 @@ jobs:
         update: ${{ fromJson(needs.check.outputs.updates) }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
         with:
           fetch-depth: 0
           # PRs opened/pushed with GITHUB_TOKEN do not trigger `pull_request` CI workflows.
