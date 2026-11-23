@@ -160,7 +160,6 @@ jobs:
           set +e
           cargo semver-checks \
             -p matter-spec \
-            --locked \
             --features "${VERSION},all,registry,dispatch,serde,schemars,chrono,time,uom" \
             --baseline-rev "origin/${BASE_REF}"
           status=$?
