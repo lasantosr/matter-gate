@@ -89,21 +89,73 @@ jobs:
           cargo test -p matter-data-model --locked --no-default-features
           RUSTDOCFLAGS="-D warnings" cargo doc -p matter-data-model --locked --no-deps --no-default-features
 
+  discover:
+    name: Discover Spec Versions
+    runs-on: ubuntu-latest
+    outputs:
+      versions: ${{ steps.scan.outputs.versions }}
+      latest: ${{ steps.scan.outputs.latest }}
+      run_spec: ${{ steps.scan.outputs.run_spec }}
+      run_semver: ${{ steps.scan.outputs.run_semver }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          sparse-checkout: |
+            spec/matter-spec/src
+
+      - id: scan
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          PUSH_BEFORE_SHA: ${{ github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        run: |
+          versions=$(ls -1 spec/matter-spec/src | grep -E '^v[0-9]+_[0-9]+$' | sort -V | jq -R . | jq -s -c .)
+          latest=$(ls -1 spec/matter-spec/src | grep -E '^v[0-9]+_[0-9]+$' | sort -V | tail -n 1)
+
+          run_spec="false"
+          run_semver="false"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            run_spec="true"
+            run_semver="true"
+          else
+            if [ "$EVENT_NAME" = "pull_request" ]; then
+              base_sha="$PR_BASE_SHA"
+            else
+              base_sha="$PUSH_BEFORE_SHA"
+            fi
+
+            if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
+              run_spec="true"
+              run_semver="true"
+            else
+              changed=$(git diff --name-only "${base_sha}...${HEAD_SHA}")
+              echo "Changed files:"
+              echo "$changed"
+              if echo "$changed" | grep -qE '^(spec/matter-spec/|\.github/workflows/ci-matter-spec\.yml$)'; then
+                run_spec="true"
+                run_semver="true"
+              elif echo "$changed" | grep -qE '^spec/matter-data-model/'; then
+                run_spec="true"
+              fi
+            fi
+          fi
+
+          echo "versions=${versions}" >> "$GITHUB_OUTPUT"
+          echo "latest=${latest}" >> "$GITHUB_OUTPUT"
+          echo "run_spec=${run_spec}" >> "$GITHUB_OUTPUT"
+          echo "run_semver=${run_semver}" >> "$GITHUB_OUTPUT"
+
   spec-matrix:
     name: Spec (${{ matrix.version }})
+    needs: discover
+    if: needs.discover.outputs.run_spec == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      # Explicit list of supported Matter specification version features in spec/matter-spec/Cargo.toml.
       matrix:
-        version:
-          - v1_0
-          - v1_1
-          - v1_2
-          - v1_3
-          - v1_4
-          - v1_5
-          - v1_6
+        version: ${{ fromJson(needs.discover.outputs.versions) }}
 
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -139,13 +191,13 @@ jobs:
         run: cargo check -p matter-spec --locked --target thumbv7em-none-eabihf --no-default-features --features "${{ matrix.version }},general,registry,dispatch,serde,chrono,time,uom" --lib
 
       - name: Install cargo-semver-checks
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && needs.discover.outputs.run_semver == 'true'
         uses: taiki-e/install-action@fe3acb53a98b62c772db35de75ce0e4595e7ca8c # v2.90.8
         with:
           tool: cargo-semver-checks
 
       - name: Verify SemVer Compatibility (${{ matrix.version }})
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && needs.discover.outputs.run_semver == 'true'
         env:
           CARGO_BUILD_JOBS: "1"
           PR_TITLE: ${{ github.event.pull_request.title }}
@@ -160,6 +212,7 @@ jobs:
           set +e
           cargo semver-checks \
             -p matter-spec \
+            --only-explicit-features \
             --features "${VERSION},all,registry,dispatch,serde,schemars,chrono,time,uom" \
             --baseline-rev "origin/${BASE_REF}"
           status=$?
@@ -183,6 +236,8 @@ jobs:
 
   msrv:
     name: MSRV (1.88)
+    needs: discover
+    if: needs.discover.outputs.run_spec == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -208,6 +263,8 @@ jobs:
 
   minimal-versions:
     name: Minimal Versions (spec)
+    needs: discover
+    if: needs.discover.outputs.run_spec == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -226,4 +283,4 @@ jobs:
         run: |
           sed -i -e '/^members = \[/{:a; /\]$/{s/.*/members = ["spec\/matter-data-model", "spec\/matter-spec"]/; b}; N; ba}' -e '/^default-members = \[/{:b; /\]$/d; N; bb}' Cargo.toml
           cargo minimal-versions check -p matter-data-model --direct --all-features
-          cargo minimal-versions check -p matter-spec --direct --jobs 1 --features "v1_6,all,registry,dispatch,serde,schemars,chrono,time,uom"
+          cargo minimal-versions check -p matter-spec --direct --jobs 1 --features "${{ needs.discover.outputs.latest }},all,registry,dispatch,serde,schemars,chrono,time,uom"

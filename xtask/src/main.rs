@@ -56,6 +56,9 @@ enum Commands {
         /// upstream versions) without generating code.
         #[arg(long, conflicts_with = "force")]
         list: bool,
+        /// Output results as machine-readable JSON.
+        #[arg(long)]
+        json: bool,
     },
 }
 
@@ -71,6 +74,7 @@ fn main() -> Result<()> {
             pin,
             force,
             list,
+            json,
         } => {
             let options = codegen_spec::CodegenSpecOptions {
                 repo,
@@ -79,6 +83,7 @@ fn main() -> Result<()> {
                 pin,
                 force,
                 list,
+                json,
             };
             codegen_spec::run_codegen_spec(&root, &options)?;
         }

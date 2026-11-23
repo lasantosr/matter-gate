@@ -1,0 +1,153 @@
+name: Matter Spec Sync
+
+on:
+  schedule:
+    # Run monthly on the 10th at 06:00 UTC (3 days after the security audit).
+    - cron: "0 6 10 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Check Upstream Matter Versions
+    runs-on: ubuntu-latest
+    outputs:
+      updates: ${{ steps.discover.outputs.updates }}
+      has_updates: ${{ steps.discover.outputs.has_updates }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+
+      - name: Install Stable Rust
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: Discover Upstream Matter Spec Updates
+        id: discover
+        run: |
+          cargo xtask codegen-spec --list --fetch --json > spec-versions.json
+          cat spec-versions.json
+          updates=$(jq -c '.updates' spec-versions.json)
+          has_updates=$(jq -r '(.updates | length) > 0' spec-versions.json)
+          echo "updates=${updates}" >> "$GITHUB_OUTPUT"
+          echo "has_updates=${has_updates}" >> "$GITHUB_OUTPUT"
+
+  sync:
+    name: Sync Matter ${{ matrix.update.family }} (${{ matrix.update.latest_tag }})
+    needs: check
+    if: needs.check.outputs.has_updates == 'true'
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        update: ${{ fromJson(needs.check.outputs.updates) }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+          # PRs opened/pushed with GITHUB_TOKEN do not trigger `pull_request` CI workflows.
+          # If `RELEASE_PLZ_TOKEN` is configured, it is reused here so CI runs automatically.
+          token: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+
+      - name: Install Nightly Rust (for cargo fmt)
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: nightly
+          components: rustfmt
+
+      - name: Install Stable Rust
+        uses: dtolnay/rust-toolchain@df2a88e9fe4098bad09cb42c3dec7187f15861fc # master
+        with:
+          toolchain: stable
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@d1527c8f67ef9af357290475d4af4b0fab8f12e0 # v2.9.3
+
+      - name: Setup Taplo
+        uses: taiki-e/install-action@fe3acb53a98b62c772db35de75ce0e4595e7ca8c # v2.90.8
+        with:
+          tool: taplo@0.10.0
+
+      - name: Setup Just
+        uses: extractions/setup-just@53165ef7e734c5c07cb06b3c8e7b647c5aa16db3 # v4
+
+      - name: Regenerate Matter Spec (${{ matrix.update.latest_tag }})
+        env:
+          FAMILY: ${{ matrix.update.family }}
+          MODULE: ${{ matrix.update.module }}
+          CURRENT_TAG: ${{ matrix.update.current_tag }}
+          LATEST_TAG: ${{ matrix.update.latest_tag }}
+          KIND: ${{ matrix.update.kind }}
+        run: |
+          BRANCH="chore/matter-spec-${MODULE}"
+          git checkout -B "$BRANCH" origin/main
+          just spec-codegen pin="$LATEST_TAG" force="true"
+          if [ "$KIND" = "new" ]; then
+            HIGHEST=$(ls -1 spec/matter-spec/src | grep -E '^v[0-9]+_[0-9]+$' | sort -V | tail -n 1)
+            sed -i -E "s/^latest := \"v[0-9]+_[0-9]+\"/latest := \"${HIGHEST}\"/" Justfile
+          fi
+
+      - name: Commit and Create/Update Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.RELEASE_PLZ_TOKEN || secrets.GITHUB_TOKEN }}
+          FAMILY: ${{ matrix.update.family }}
+          MODULE: ${{ matrix.update.module }}
+          CURRENT_TAG: ${{ matrix.update.current_tag }}
+          LATEST_TAG: ${{ matrix.update.latest_tag }}
+          KIND: ${{ matrix.update.kind }}
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes generated for ${LATEST_TAG}; skipping PR."
+            exit 0
+          fi
+
+          BRANCH="chore/matter-spec-${MODULE}"
+          if [ "$KIND" = "new" ]; then
+            TITLE="feat(matter-spec): add Matter ${FAMILY} (${LATEST_TAG})"
+            BODY=$(cat <<EOF
+          Automated monthly sync detected a newly stabilized upstream Matter specification release for **${FAMILY}**:
+
+          - **Upstream tag:** \`${LATEST_TAG}\`
+          - **Module/feature:** \`${MODULE}\`
+          - **\`Justfile\` \`latest\`:** updated to the highest generated version
+          EOF
+          )
+          else
+            TITLE="feat(matter-spec): update Matter ${FAMILY} (${CURRENT_TAG} -> ${LATEST_TAG})"
+            BODY=$(cat <<EOF
+          Automated monthly sync detected a newer upstream Matter specification release for **${FAMILY}**:
+
+          - **Previous tag:** \`${CURRENT_TAG}\`
+          - **Upstream tag:** \`${LATEST_TAG}\`
+          - **Module/feature:** \`${MODULE}\`
+          EOF
+          )
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "$TITLE"
+          git push --force origin "$BRANCH"
+
+          EXISTING_PR=$(gh pr list --head "$BRANCH" --base main --state open --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING_PR" ]; then
+            gh pr edit "$EXISTING_PR" --title "$TITLE" --body "$BODY"
+            echo "Updated existing PR #${EXISTING_PR} for ${BRANCH}."
+          else
+            gh pr create --base main --head "$BRANCH" --title "$TITLE" --body "$BODY"
+            echo "Created new PR for ${BRANCH}."
+          fi

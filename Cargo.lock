@@ -577,6 +577,8 @@ dependencies = [
  "clap",
  "genco",
  "matter-spec-gen",
+ "serde",
+ "serde_json",
  "tempfile",
  "toml_edit",
 ]

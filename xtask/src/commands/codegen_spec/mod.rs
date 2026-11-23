@@ -11,6 +11,7 @@ use std::{
 use anyhow::{Context as _, Result, bail};
 use git::{version_to_feature_name, version_to_module_name};
 use matter_spec_gen::{Category, Render as _, SharedKind, SharedPlan, Spec, SpecInput, XmlDocument, build};
+use serde::Serialize;
 
 use crate::util::write_if_changed;
 
@@ -22,6 +23,7 @@ pub(crate) struct CodegenSpecOptions {
     pub(crate) pin: Vec<String>,
     pub(crate) force: bool,
     pub(crate) list: bool,
+    pub(crate) json: bool,
 }
 
 /// Top-level coordinator: fetch CSA definitions for requested Matter versions and generate strongly-typed Rust models.
@@ -32,7 +34,7 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
 
     let spec_data_dir = root.join("xtask").join("spec-data");
     if options.list {
-        git::print_available_versions(&options.repo, &spec_data_dir, options.fetch)?;
+        git::print_available_versions(&options.repo, &spec_data_dir, options.fetch, options.json)?;
         return Ok(());
     }
 
@@ -62,12 +64,14 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
     for (version, tag) in &cached_versions {
         let cache_dir = spec_data_dir.join(tag);
         let docs = load_xml_documents(&cache_dir)?;
-        println!(
-            "Using cached Matter spec {version} ({tag}, {} XML definitions) from {}",
-            docs.len(),
-            cache_dir.display()
-        );
-        println!("Parsing {} CSA Matter cluster XML files for {version}...", docs.len());
+        if !options.json {
+            println!(
+                "Using cached Matter spec {version} ({tag}, {} XML definitions) from {}",
+                docs.len(),
+                cache_dir.display()
+            );
+            println!("Parsing {} CSA Matter cluster XML files for {version}...", docs.len());
+        }
         inputs.push(SpecInput::new(version, tag, docs));
     }
 
@@ -116,11 +120,33 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
     )?;
 
     // 6. Format generated spec crate code using nightly rustfmt and taplo
-    format::format_spec_crate(root)?;
+    format::format_spec_crate(root, options.json)?;
 
-    println!("\nMatter specification codegen complete! Spec crate features and models are fully up to date.");
+    if options.json {
+        let report = CodegenReport {
+            versions: version_info_list
+                .into_iter()
+                .map(|(tag, module, feature)| GeneratedVersionEntry { tag, module, feature })
+                .collect(),
+        };
+        println!("{}", serde_json::to_string_pretty(&report)?);
+    } else {
+        println!("\nMatter specification codegen complete! Spec crate features and models are fully up to date.");
+    }
 
     Ok(())
+}
+
+#[derive(Debug, Serialize)]
+struct CodegenReport {
+    versions: Vec<GeneratedVersionEntry>,
+}
+
+#[derive(Debug, Serialize)]
+struct GeneratedVersionEntry {
+    tag: String,
+    module: String,
+    feature: String,
 }
 
 fn format_any_cfg(items: &[String]) -> String {
@@ -193,23 +219,39 @@ fn prune_stale_version_dirs(src_dir: &Path, active_modules: &BTreeSet<String>) -
 fn sync_spec_cache(options: &CodegenSpecOptions, spec_data_dir: &Path) -> Result<()> {
     if options.fetch {
         let remote_versions = git::list_remote_versions(&options.repo)?;
-        println!("Upstream Matter Specification Versions ({}):", options.repo);
-        for (family, tag) in &remote_versions {
-            println!("  • {family:<6} -> {tag}");
+        if !options.json {
+            println!("Upstream Matter Specification Versions ({}):", options.repo);
+            for (family, tag) in &remote_versions {
+                println!("  • {family:<6} -> {tag}");
+            }
+            println!();
         }
-        println!();
 
         for (family, tag) in &remote_versions {
             let cache_dir = spec_data_dir.join(tag);
-            git::fetch_csa_spec_sparse(&options.repo, tag, &options.path, &cache_dir, options.force)?;
-            git::remove_other_cached_family_versions(spec_data_dir, family, tag)?;
+            git::fetch_csa_spec_sparse(
+                &options.repo,
+                tag,
+                &options.path,
+                &cache_dir,
+                options.force,
+                options.json,
+            )?;
+            git::remove_other_cached_family_versions(spec_data_dir, family, tag, options.json)?;
         }
     } else if !options.pin.is_empty() {
         for pin_str in &options.pin {
             let (family, normalized_tag) = git::validate_and_normalize_pin_version(pin_str)?;
             let cache_dir = spec_data_dir.join(&normalized_tag);
-            git::fetch_csa_spec_sparse(&options.repo, &normalized_tag, &options.path, &cache_dir, options.force)?;
-            git::remove_other_cached_family_versions(spec_data_dir, &family, &normalized_tag)?;
+            git::fetch_csa_spec_sparse(
+                &options.repo,
+                &normalized_tag,
+                &options.path,
+                &cache_dir,
+                options.force,
+                options.json,
+            )?;
+            git::remove_other_cached_family_versions(spec_data_dir, &family, &normalized_tag, options.json)?;
         }
     } else {
         // Mode B: Default run from cached XML files
@@ -583,12 +625,14 @@ fn render_single_version_artifacts(
         &repo_folder_url,
     )?;
 
-    println!(
-        "  -> Generated {} clusters and {} endpoints for {version} ({tag}) in {}",
-        ver.clusters.len(),
-        ver.device_types.len(),
-        version_src_dir.display()
-    );
+    if !ctx.options.json {
+        println!(
+            "  -> Generated {} clusters and {} endpoints for {version} ({tag}) in {}",
+            ver.clusters.len(),
+            ver.device_types.len(),
+            version_src_dir.display()
+        );
+    }
 
     Ok((tag.to_owned(), mod_name, feat_name))
 }

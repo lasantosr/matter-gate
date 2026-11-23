@@ -2,10 +2,11 @@ use std::{
     collections::BTreeMap,
     env, fs,
     path::{Path, PathBuf},
-    process::{self, Command},
+    process::{self, Command, Stdio},
 };
 
 use anyhow::{Context as _, Result, bail};
+use serde::Serialize;
 
 /// Tuple representing (major, minor, patch, build) segments of a Matter specification version.
 type VersionParts = (u32, u32, u32, u32);
@@ -42,6 +43,7 @@ pub(super) fn remove_other_cached_family_versions(
     spec_data_dir: &Path,
     family: &str,
     keep_tag: &str,
+    quiet: bool,
 ) -> Result<Vec<String>> {
     if !spec_data_dir.exists() {
         return Ok(Vec::new());
@@ -72,7 +74,9 @@ pub(super) fn remove_other_cached_family_versions(
         if dir_family == family {
             fs::remove_dir_all(&path)
                 .with_context(|| format!("Failed to remove cached directory at {}", path.display()))?;
-            println!("Removed cached spec {dir_name} (replaced by {keep_tag} for family {family})");
+            if !quiet {
+                println!("Removed cached spec {dir_name} (replaced by {keep_tag} for family {family})");
+            }
             removed.push(dir_name.to_owned());
         }
     }
@@ -194,6 +198,7 @@ pub(super) fn fetch_csa_spec_sparse(
     subfolder: &str,
     cache_dir: &Path,
     force: bool,
+    quiet: bool,
 ) -> Result<()> {
     if !force && cache_dir.exists() {
         let mut has_files = false;
@@ -219,84 +224,58 @@ pub(super) fn fetch_csa_spec_sparse(
     fs::create_dir_all(&temp_dir)?;
     let _temp_guard = TempDirGuard(temp_dir.clone());
 
-    println!("Cloning sparse definitions from {repo_url} (ref: {tag})...");
-
-    let mut git_init = Command::new("git");
-    git_init.args(["init"]).current_dir(&temp_dir);
-    let init_status = git_init.status().context("Failed to run 'git init'")?;
-    if !init_status.success() {
-        bail!("'git init' failed with status: {init_status}");
+    if !quiet {
+        println!("Cloning sparse definitions from {repo_url} (ref: {tag})...");
     }
 
-    let is_shallow_sparse_supported = {
-        let check = Command::new("git")
-            .args(["sparse-checkout", "init"])
-            .current_dir(&temp_dir)
-            .status();
-        matches!(check, Ok(exit_status) if exit_status.success())
-    };
+    if !run_git_command(&temp_dir, &["init"], quiet).context("Failed to run 'git init'")? {
+        bail!("'git init' failed");
+    }
 
-    if !is_shallow_sparse_supported {
+    if !run_git_command(&temp_dir, &["sparse-checkout", "init"], quiet)? {
         bail!("Git sparse-checkout is required to fetch upstream CSA ZCL XMLs.");
     }
 
-    let remote_status = Command::new("git")
-        .args(["remote", "add", "origin", repo_url])
-        .current_dir(&temp_dir)
-        .status()?;
-    if !remote_status.success() {
-        bail!("Failed to add git remote: {remote_status}");
+    if !run_git_command(&temp_dir, &["remote", "add", "origin", repo_url], quiet)? {
+        bail!("Failed to add git remote");
     }
 
-    let config_status = Command::new("git")
-        .args(["config", "core.sparseCheckout", "true"])
-        .current_dir(&temp_dir)
-        .status()?;
-    if !config_status.success() {
-        bail!("Failed to set core.sparseCheckout: {config_status}");
+    if !run_git_command(&temp_dir, &["config", "core.sparseCheckout", "true"], quiet)? {
+        bail!("Failed to set core.sparseCheckout");
     }
 
-    let sparse_status = Command::new("git")
-        .args(["sparse-checkout", "set", subfolder])
-        .current_dir(&temp_dir)
-        .status()?;
-    if !sparse_status.success() {
-        bail!("Failed to set sparse-checkout pattern: {sparse_status}");
+    if !run_git_command(&temp_dir, &["sparse-checkout", "set", subfolder], quiet)? {
+        bail!("Failed to set sparse-checkout pattern");
     }
 
-    println!("Fetching partial tree for {tag}...");
-    let fetch_status = Command::new("git")
-        .args([
-            "fetch",
-            "--depth",
-            "1",
-            "--filter=blob:none",
-            "origin",
-            &format!("refs/tags/{tag}:refs/tags/{tag}"),
-        ])
-        .current_dir(&temp_dir)
-        .status()?;
+    if !quiet {
+        println!("Fetching partial tree for {tag}...");
+    }
+    let tag_ref = format!("refs/tags/{tag}:refs/tags/{tag}");
+    let fetch_ok = run_git_command(
+        &temp_dir,
+        &["fetch", "--depth", "1", "--filter=blob:none", "origin", &tag_ref],
+        quiet,
+    )?;
 
-    let checkout_target = if fetch_status.success() {
+    let checkout_target = if fetch_ok {
         format!("refs/tags/{tag}")
     } else {
-        println!("Tag fetch failed, attempting branch/commit fetch...");
-        let branch_status = Command::new("git")
-            .args(["fetch", "--depth", "1", "--filter=blob:none", "origin", tag])
-            .current_dir(&temp_dir)
-            .status()?;
-        if !branch_status.success() {
+        if !quiet {
+            println!("Tag fetch failed, attempting branch/commit fetch...");
+        }
+        if !run_git_command(
+            &temp_dir,
+            &["fetch", "--depth", "1", "--filter=blob:none", "origin", tag],
+            quiet,
+        )? {
             bail!("Failed to fetch {tag} from {repo_url}");
         }
         "FETCH_HEAD".to_owned()
     };
 
-    let checkout_status = Command::new("git")
-        .args(["checkout", &checkout_target])
-        .current_dir(&temp_dir)
-        .status()?;
-    if !checkout_status.success() {
-        bail!("Failed to checkout {checkout_target}: {checkout_status}");
+    if !run_git_command(&temp_dir, &["checkout", &checkout_target], quiet)? {
+        bail!("Failed to checkout {checkout_target}");
     }
 
     let src_folder = temp_dir.join(subfolder);
@@ -339,18 +318,46 @@ pub(super) fn fetch_csa_spec_sparse(
 
     drop(fs::remove_dir_all(&temp_dir));
 
-    println!(
-        "Successfully cached {copied} XML definitions in {}",
-        cache_dir.display()
-    );
+    if !quiet {
+        println!(
+            "Successfully cached {copied} XML definitions in {}",
+            cache_dir.display()
+        );
+    }
     Ok(())
 }
 
-/// Print formatted table of local cached and remote available Matter specification versions.
-pub(super) fn print_available_versions(repo_url: &str, spec_data_dir: &Path, fetch_remote: bool) -> Result<()> {
-    println!("Matter Specification Versions:\n");
+fn run_git_command(cwd: &Path, args: &[&str], quiet: bool) -> Result<bool> {
+    let mut cmd = Command::new("git");
+    cmd.args(args).current_dir(cwd);
+    if quiet {
+        cmd.stdout(Stdio::null());
+    }
+    Ok(cmd.status()?.success())
+}
 
+/// Print formatted table of local cached and remote available Matter specification versions.
+/// Print locally cached and (optionally) remote upstream Matter specification versions.
+pub(super) fn print_available_versions(
+    repo_url: &str,
+    spec_data_dir: &Path,
+    fetch_remote: bool,
+    json: bool,
+) -> Result<()> {
     let local_versions = list_local_versions(spec_data_dir)?;
+
+    if json {
+        let remote_versions = if fetch_remote {
+            list_remote_versions(repo_url)?
+        } else {
+            Vec::new()
+        };
+        let report = build_version_list_report(&local_versions, &remote_versions);
+        println!("{}", serde_json::to_string_pretty(&report)?);
+        return Ok(());
+    }
+
+    println!("Matter Specification Versions:\n");
     println!("  Local / Cached ({}):", spec_data_dir.display());
     if local_versions.is_empty() {
         println!("    (no cached versions found)");
@@ -398,6 +405,44 @@ struct ParsedVersion {
     family: String,
     tuple: VersionParts,
     normalized_tag: String,
+}
+
+#[derive(Debug, Serialize)]
+struct VersionListReport {
+    local: Vec<LocalVersionEntry>,
+    remote: Vec<RemoteVersionEntry>,
+    updates: Vec<VersionUpdate>,
+}
+
+#[derive(Debug, Serialize)]
+struct LocalVersionEntry {
+    family: String,
+    module: String,
+    tag: String,
+    xml_count: usize,
+}
+
+#[derive(Debug, Serialize)]
+struct RemoteVersionEntry {
+    family: String,
+    module: String,
+    tag: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "snake_case")]
+enum UpdateKind {
+    Update,
+    New,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+struct VersionUpdate {
+    family: String,
+    module: String,
+    current_tag: Option<String>,
+    latest_tag: String,
+    kind: UpdateKind,
 }
 
 /// Parse major and minor version numbers for semantic sorting.
@@ -523,6 +568,87 @@ fn list_local_versions(spec_data_dir: &Path) -> Result<Vec<(String, usize)>> {
     Ok(local_versions)
 }
 
+fn build_version_list_report(
+    local_versions: &[(String, usize)],
+    remote_versions: &[(String, String)],
+) -> VersionListReport {
+    let local = local_versions
+        .iter()
+        .map(|(tag, xml_count)| {
+            let (major, minor) = parse_semver_pair(tag);
+            let family = format!("{major}.{minor}");
+            LocalVersionEntry {
+                module: version_to_module_name(&family),
+                family,
+                tag: tag.clone(),
+                xml_count: *xml_count,
+            }
+        })
+        .collect();
+
+    let remote = remote_versions
+        .iter()
+        .map(|(family, tag)| RemoteVersionEntry {
+            module: version_to_module_name(family),
+            family: family.clone(),
+            tag: tag.clone(),
+        })
+        .collect();
+
+    let updates = compute_version_updates(local_versions, remote_versions);
+
+    VersionListReport { local, remote, updates }
+}
+
+fn compute_version_updates(
+    local_versions: &[(String, usize)],
+    remote_versions: &[(String, String)],
+) -> Vec<VersionUpdate> {
+    let mut local_by_family: BTreeMap<String, (VersionParts, String)> = BTreeMap::new();
+    for (tag, _count) in local_versions {
+        let (family, tuple, normalized) = if let Some(parsed) = parse_4segment_version(tag) {
+            (parsed.family, parsed.tuple, parsed.normalized_tag)
+        } else {
+            let (maj, min) = parse_semver_pair(tag);
+            (format!("{maj}.{min}"), (maj, min, 0, 0), tag.clone())
+        };
+        match local_by_family.get(&family) {
+            Some((existing_tuple, _)) if *existing_tuple >= tuple => {}
+            _ => {
+                local_by_family.insert(family, (tuple, normalized));
+            }
+        }
+    }
+
+    let mut updates = Vec::new();
+    for (family, remote_tag) in remote_versions {
+        let Some(remote_parsed) = parse_4segment_version(remote_tag) else {
+            continue;
+        };
+        match local_by_family.get(family) {
+            None => updates.push(VersionUpdate {
+                family: family.clone(),
+                module: version_to_module_name(family),
+                current_tag: None,
+                latest_tag: remote_parsed.normalized_tag,
+                kind: UpdateKind::New,
+            }),
+            Some((local_tuple, local_tag)) if *local_tuple < remote_parsed.tuple => {
+                updates.push(VersionUpdate {
+                    family: family.clone(),
+                    module: version_to_module_name(family),
+                    current_tag: Some(local_tag.clone()),
+                    latest_tag: remote_parsed.normalized_tag,
+                    kind: UpdateKind::Update,
+                });
+            }
+            Some(_) => {}
+        }
+    }
+
+    updates
+}
+
 fn format_remote_status(tag: &str, cached_tags: Option<&Vec<String>>) -> String {
     let Some(cached_tags) = cached_tags else {
         return "[available to fetch]".to_owned();
@@ -635,7 +761,7 @@ beefbeefbeefbeefbeefbeefbeefbeefbeefbeef	refs/tags/v2.0.0.0
         fs::create_dir_all(&v1_0_0_0)?;
         fs::create_dir_all(&v1_4_2_0)?;
 
-        let removed = remove_other_cached_family_versions(&temp_dir, "1.0", "v1.0.0.0")?;
+        let removed = remove_other_cached_family_versions(&temp_dir, "1.0", "v1.0.0.0", true)?;
         assert_eq!(removed, vec!["v1.0.0.2".to_owned()]);
 
         assert!(!v1_0_0_2.exists());
@@ -644,5 +770,36 @@ beefbeefbeefbeefbeefbeefbeefbeefbeefbeef	refs/tags/v2.0.0.0
 
         fs::remove_dir_all(&temp_dir)?;
         Ok(())
+    }
+
+    #[test]
+    fn computes_version_updates_for_new_and_patch_bumps() {
+        let local = vec![("v1.5.1.0".to_owned(), 100), ("v1.6.1.0".to_owned(), 120)];
+        let remote = vec![
+            ("1.5".to_owned(), "v1.5.1.0".to_owned()),
+            ("1.6".to_owned(), "v1.6.1.2".to_owned()),
+            ("1.7".to_owned(), "v1.7.0.0".to_owned()),
+        ];
+
+        let updates = compute_version_updates(&local, &remote);
+        assert_eq!(
+            updates,
+            vec![
+                VersionUpdate {
+                    family: "1.6".to_owned(),
+                    module: "v1_6".to_owned(),
+                    current_tag: Some("v1.6.1.0".to_owned()),
+                    latest_tag: "v1.6.1.2".to_owned(),
+                    kind: UpdateKind::Update,
+                },
+                VersionUpdate {
+                    family: "1.7".to_owned(),
+                    module: "v1_7".to_owned(),
+                    current_tag: None,
+                    latest_tag: "v1.7.0.0".to_owned(),
+                    kind: UpdateKind::New,
+                },
+            ]
+        );
     }
 }
