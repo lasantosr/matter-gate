@@ -28,4 +28,4 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 - Re-exports `matter-data-model` at the crate root as `model`.
 - Hand-written modules provide core traits, wire envelopes, error types, static conformance validation, unit/address/time newtypes, mode extensions, and runtime dispatch/JSON wrappers.
 - Generated modules provide `__shared` (deduplicated cluster/global buckets) and versioned `v<major>_<minor>` trees (`globals`, `clusters`, `endpoints`, and feature-gated `dispatch` / `registry`).
-- Feature tiers cascade from `all` → product domain bundles / `unattached-clusters` → `endpoint-<name>` (plus `testing`), with `build.rs` emitting `cluster_<name>` `rustc-cfg` flags (also individually selectable via `MATTER_SPEC_CLUSTER_<NAME>` env vars).
+- Feature tiers cascade from `all` → product domain bundles → `endpoint-<name>`, plus `unattached-clusters` (included in `all`) and `testing`, with `build.rs` emitting `cluster_<name>` `rustc-cfg` flags (also individually selectable via `MATTER_SPEC_CLUSTER_<NAME>` env vars).

@@ -1406,24 +1406,29 @@ fn main() {
         }
     }
 
-    for (key, val) in env::vars() {
-        if let Some(suffix) = key.strip_prefix(CLUSTER_ENV_PREFIX)
-            && !suffix.is_empty()
-        {
-            let cluster = suffix.to_ascii_lowercase();
-            let is_known = ALL_CLUSTERS.contains(&cluster.as_str());
-            if !is_known {
-                println!("cargo:rerun-if-env-changed={key}");
-            }
-            if is_val_enabled(&val) {
-                if is_known {
-                    enabled.insert(format!("cluster_{cluster}"));
-                } else {
-                    println!(
-                        "cargo:warning=unknown Matter cluster environment variable `{key}` (no `cluster_{cluster}` in \
-                         matter-spec)"
-                    );
-                }
+    for (raw_key, raw_val) in env::vars_os() {
+        let Some(key) = raw_key.to_str() else {
+            continue;
+        };
+        let Some(suffix) = key.strip_prefix(CLUSTER_ENV_PREFIX) else {
+            continue;
+        };
+        if suffix.is_empty() {
+            continue;
+        }
+        let cluster = suffix.to_ascii_lowercase();
+        let is_known = ALL_CLUSTERS.contains(&cluster.as_str());
+        if !is_known {
+            println!("cargo:rerun-if-env-changed={key}");
+        }
+        if raw_val.to_str().is_some_and(is_val_enabled) {
+            if is_known {
+                enabled.insert(format!("cluster_{cluster}"));
+            } else {
+                println!(
+                    "cargo:warning=unknown Matter cluster environment variable `{key}` (no `cluster_{cluster}` in \
+                     matter-spec)"
+                );
             }
         }
     }
