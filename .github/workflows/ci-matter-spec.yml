@@ -31,7 +31,7 @@ concurrency:
 jobs:
   codegen:
     name: Spec Codegen
-    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-plz-')
+    if: github.event_name != 'pull_request' || github.event.pull_request.user.login != vars.RELEASE_PLZ_ACTOR || !startsWith(github.head_ref, 'release-plz-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -69,7 +69,7 @@ jobs:
 
   data-model:
     name: Data Model (no_std)
-    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-plz-')
+    if: github.event_name != 'pull_request' || github.event.pull_request.user.login != vars.RELEASE_PLZ_ACTOR || !startsWith(github.head_ref, 'release-plz-')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -93,7 +93,7 @@ jobs:
 
   discover:
     name: Discover Spec Versions
-    if: github.event_name != 'pull_request' || !startsWith(github.head_ref, 'release-plz-')
+    if: github.event_name != 'pull_request' || github.event.pull_request.user.login != vars.RELEASE_PLZ_ACTOR || !startsWith(github.head_ref, 'release-plz-')
     runs-on: ubuntu-latest
     outputs:
       versions: ${{ steps.scan.outputs.versions }}
