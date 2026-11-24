@@ -2,7 +2,7 @@
     feature = "v1_6",
     feature = "dispatch",
     feature = "serde",
-    feature = "cluster-on-off",
+    cluster_on_off,
     feature = "endpoint-on-off-light"
 ))]
 
@@ -351,7 +351,7 @@ mod tests {
         assert_eq!(dev.into_endpoint(EndpointId::new(9)), raw_ep);
     }
 
-    #[cfg(feature = "cluster-operational-state")]
+    #[cfg(cluster_operational_state)]
     #[test]
     fn byte_size_boxing_boxes_operational_state_and_keeps_on_off_unboxed() {
         use matter_spec::{

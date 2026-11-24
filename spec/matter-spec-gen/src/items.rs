@@ -23,7 +23,7 @@ pub struct ClusterItem {
     pub(crate) category: Category,
     pub(crate) module_name: String,
     pub(crate) original_name: String,
-    pub(crate) cluster_feature: String,
+    pub(crate) cluster_cfg: String,
     pub(crate) cluster_def: ClusterDef,
     pub(crate) shared: Arc<SharedClusterContext>,
 }
@@ -55,8 +55,8 @@ impl ClusterItem {
     }
 
     #[must_use]
-    pub fn cluster_feature(&self) -> &str {
-        &self.cluster_feature
+    pub fn cluster_cfg(&self) -> &str {
+        &self.cluster_cfg
     }
 
     #[must_use]
@@ -770,7 +770,7 @@ mod tests {
             category: Category::general(),
             module_name: "on_off".to_owned(),
             original_name: "OnOff".to_owned(),
-            cluster_feature: "cluster-on-off".to_owned(),
+            cluster_cfg: "cluster_on_off".to_owned(),
             cluster_def: ClusterDef {
                 name: "OnOff".to_owned(),
                 attributes: vec![
@@ -800,7 +800,7 @@ mod tests {
             category: Category::general(),
             module_name: "operational_state".to_owned(),
             original_name: "OperationalState".to_owned(),
-            cluster_feature: "cluster-operational-state".to_owned(),
+            cluster_cfg: "cluster_operational_state".to_owned(),
             cluster_def: ClusterDef {
                 name: "OperationalState".to_owned(),
                 structs: vec![StructDef {
@@ -874,7 +874,7 @@ mod tests {
             original_name: "SmallDev".to_owned(),
             feature_name: "endpoint-small-dev".to_owned(),
             device_id: 0x0100,
-            cluster_dependencies: BTreeSet::from(["cluster-on-off".to_owned()]),
+            cluster_dependencies: BTreeSet::from(["cluster_on_off".to_owned()]),
             device_type: ParsedDeviceType {
                 mandatory_server_clusters: vec!["OnOff".to_owned()],
                 ..Default::default()
@@ -890,7 +890,7 @@ mod tests {
             original_name: "LargeDev".to_owned(),
             feature_name: "endpoint-large-dev".to_owned(),
             device_id: 0x0101,
-            cluster_dependencies: BTreeSet::from(["cluster-operational-state".to_owned()]),
+            cluster_dependencies: BTreeSet::from(["cluster_operational_state".to_owned()]),
             device_type: ParsedDeviceType {
                 mandatory_server_clusters: vec!["OperationalState".to_owned()],
                 ..Default::default()

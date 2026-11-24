@@ -6,7 +6,7 @@ use std::{
 use genco::{
     lang::Rust,
     quote,
-    tokens::{FormatInto, from_fn, quoted},
+    tokens::{FormatInto, from_fn},
 };
 
 use crate::{
@@ -86,13 +86,19 @@ pub(super) fn format_doc_comment(raw: &str) -> String {
     out
 }
 
-pub(super) fn cfg_feature_gate(features: Option<&Vec<String>>) -> Tokens {
-    let Some(feats) = features.filter(|f| !f.is_empty()) else {
+pub(super) fn cluster_cfg_gate(cfgs: Option<&Vec<String>>) -> Tokens {
+    let Some(gates) = cfgs.filter(|g| !g.is_empty()) else {
         return Tokens::new();
     };
+    if let [single] = gates.as_slice() {
+        return quote! {
+            #[cfg($(single.as_str()))]
+            $['\r']
+        };
+    }
     quote! {
         #[cfg(any(
-            $(for feat in feats join (, ) => feature = $(quoted(feat)))
+            $(for gate in gates join (, ) => $(gate.as_str()))
         ))]
         $['\r']
     }

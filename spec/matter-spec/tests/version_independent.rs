@@ -156,7 +156,7 @@ mod tests {
         assert!(EventError::UnsupportedEvent(EventId::new(0)).source().is_none());
     }
 
-    #[cfg(all(feature = "v1_6", feature = "dispatch", feature = "cluster-on-off"))]
+    #[cfg(all(feature = "v1_6", feature = "dispatch", cluster_on_off))]
     #[test]
     fn cluster_attribute_from_wire_routes_on_off() {
         use matter_spec::{

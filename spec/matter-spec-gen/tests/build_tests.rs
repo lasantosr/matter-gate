@@ -33,7 +33,7 @@ mod tests {
         assert_eq!(cl.name(), "OnOff");
         assert_eq!(cl.category().as_str(), "general");
         assert_eq!(cl.module_name(), "on_off");
-        assert_eq!(cl.cluster_feature(), "cluster-on-off");
+        assert_eq!(cl.cluster_cfg(), "cluster_on_off");
         assert_eq!(cl.exact_tag(), "v1.4");
 
         let cl_code = cl.render().expect("render cluster");
@@ -70,7 +70,7 @@ mod tests {
         assert_eq!(dt_item.module_name(), "on_off_light");
         assert_eq!(dt_item.feature_name(), "endpoint-on-off-light");
         assert_eq!(dt_item.device_id(), 0x0100);
-        assert!(dt_item.cluster_dependencies().contains("cluster-on-off"));
+        assert!(dt_item.cluster_dependencies().contains("cluster_on_off"));
 
         let dt_single_code = dt_item.render().expect("render single device type");
         assert!(dt_single_code.contains("pub struct OnOffLight"));
@@ -221,7 +221,7 @@ mod tests {
         );
         assert_eq!(
             cluster_buckets[0].cfg_gate,
-            r#"all(feature = "cluster-on-off", any(feature = "v1_0", feature = "v1_1"))"#
+            r#"all(cluster_on_off, any(feature = "v1_0", feature = "v1_1"))"#
         );
     }
 

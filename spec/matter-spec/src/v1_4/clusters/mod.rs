@@ -4,422 +4,422 @@
 pub use super::globals;
 
 /// AccessControl cluster domain models.
-#[cfg(feature = "cluster-access-control")]
+#[cfg(cluster_access_control)]
 pub mod access_control;
 /// AccountLogin cluster domain models.
-#[cfg(feature = "cluster-account-login")]
+#[cfg(cluster_account_login)]
 pub mod account_login;
 /// Actions cluster domain models.
-#[cfg(feature = "cluster-actions")]
+#[cfg(cluster_actions)]
 pub mod actions;
 /// ActivatedCarbonFilterMonitoring cluster domain models.
-#[cfg(feature = "cluster-activated-carbon-filter-monitoring")]
+#[cfg(cluster_activated_carbon_filter_monitoring)]
 pub mod activated_carbon_filter_monitoring;
 /// AdministratorCommissioning cluster domain models.
-#[cfg(feature = "cluster-administrator-commissioning")]
+#[cfg(cluster_administrator_commissioning)]
 pub mod administrator_commissioning;
 /// AirQuality cluster domain models.
-#[cfg(feature = "cluster-air-quality")]
+#[cfg(cluster_air_quality)]
 pub mod air_quality;
 /// ApplicationBasic cluster domain models.
-#[cfg(feature = "cluster-application-basic")]
+#[cfg(cluster_application_basic)]
 pub mod application_basic;
 /// ApplicationLauncher cluster domain models.
-#[cfg(feature = "cluster-application-launcher")]
+#[cfg(cluster_application_launcher)]
 pub mod application_launcher;
 /// AudioOutput cluster domain models.
-#[cfg(feature = "cluster-audio-output")]
+#[cfg(cluster_audio_output)]
 pub mod audio_output;
 /// BallastConfiguration cluster domain models.
-#[cfg(feature = "cluster-ballast-configuration")]
+#[cfg(cluster_ballast_configuration)]
 pub mod ballast_configuration;
 /// BasicInformation cluster domain models.
-#[cfg(feature = "cluster-basic-information")]
+#[cfg(cluster_basic_information)]
 pub mod basic_information;
 /// Binding cluster domain models.
-#[cfg(feature = "cluster-binding")]
+#[cfg(cluster_binding)]
 pub mod binding;
 /// BooleanState cluster domain models.
-#[cfg(feature = "cluster-boolean-state")]
+#[cfg(cluster_boolean_state)]
 pub mod boolean_state;
 /// BooleanStateConfiguration cluster domain models.
-#[cfg(feature = "cluster-boolean-state-configuration")]
+#[cfg(cluster_boolean_state_configuration)]
 pub mod boolean_state_configuration;
 /// BridgedDeviceBasicInformation cluster domain models.
-#[cfg(feature = "cluster-bridged-device-basic-information")]
+#[cfg(cluster_bridged_device_basic_information)]
 pub mod bridged_device_basic_information;
 /// CameraAvSettingsUserLevelManagement cluster domain models.
-#[cfg(feature = "cluster-camera-av-settings-user-level-management")]
+#[cfg(cluster_camera_av_settings_user_level_management)]
 pub mod camera_av_settings_user_level_management;
 /// CameraAvStreamManagement cluster domain models.
-#[cfg(feature = "cluster-camera-av-stream-management")]
+#[cfg(cluster_camera_av_stream_management)]
 pub mod camera_av_stream_management;
 /// CarbonDioxideConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-carbon-dioxide-concentration-measurement")]
+#[cfg(cluster_carbon_dioxide_concentration_measurement)]
 pub mod carbon_dioxide_concentration_measurement;
 /// CarbonMonoxideConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-carbon-monoxide-concentration-measurement")]
+#[cfg(cluster_carbon_monoxide_concentration_measurement)]
 pub mod carbon_monoxide_concentration_measurement;
 /// Channel cluster domain models.
-#[cfg(feature = "cluster-channel")]
+#[cfg(cluster_channel)]
 pub mod channel;
 /// Chime cluster domain models.
-#[cfg(feature = "cluster-chime")]
+#[cfg(cluster_chime)]
 pub mod chime;
 /// ClosureControl cluster domain models.
-#[cfg(feature = "cluster-closure-control")]
+#[cfg(cluster_closure_control)]
 pub mod closure_control;
 /// ClosureDimension cluster domain models.
-#[cfg(feature = "cluster-closure-dimension")]
+#[cfg(cluster_closure_dimension)]
 pub mod closure_dimension;
 /// ColorControl cluster domain models.
-#[cfg(feature = "cluster-color-control")]
+#[cfg(cluster_color_control)]
 pub mod color_control;
 /// CommissionerControl cluster domain models.
-#[cfg(feature = "cluster-commissioner-control")]
+#[cfg(cluster_commissioner_control)]
 pub mod commissioner_control;
 /// CommodityMetering cluster domain models.
-#[cfg(feature = "cluster-commodity-metering")]
+#[cfg(cluster_commodity_metering)]
 pub mod commodity_metering;
 /// CommodityPrice cluster domain models.
-#[cfg(feature = "cluster-commodity-price")]
+#[cfg(cluster_commodity_price)]
 pub mod commodity_price;
 /// CommodityTariff cluster domain models.
-#[cfg(feature = "cluster-commodity-tariff")]
+#[cfg(cluster_commodity_tariff)]
 pub mod commodity_tariff;
 /// ContentAppObserver cluster domain models.
-#[cfg(feature = "cluster-content-app-observer")]
+#[cfg(cluster_content_app_observer)]
 pub mod content_app_observer;
 /// ContentControl cluster domain models.
-#[cfg(feature = "cluster-content-control")]
+#[cfg(cluster_content_control)]
 pub mod content_control;
 /// ContentLauncher cluster domain models.
-#[cfg(feature = "cluster-content-launcher")]
+#[cfg(cluster_content_launcher)]
 pub mod content_launcher;
 /// Descriptor cluster domain models.
-#[cfg(feature = "cluster-descriptor")]
+#[cfg(cluster_descriptor)]
 pub mod descriptor;
 /// DeviceEnergyManagement cluster domain models.
-#[cfg(feature = "cluster-device-energy-management")]
+#[cfg(cluster_device_energy_management)]
 pub mod device_energy_management;
 /// DeviceEnergyManagementMode cluster domain models.
-#[cfg(feature = "cluster-device-energy-management-mode")]
+#[cfg(cluster_device_energy_management_mode)]
 pub mod device_energy_management_mode;
 /// DiagnosticLogs cluster domain models.
-#[cfg(feature = "cluster-diagnostic-logs")]
+#[cfg(cluster_diagnostic_logs)]
 pub mod diagnostic_logs;
 /// DishwasherAlarm cluster domain models.
-#[cfg(feature = "cluster-dishwasher-alarm")]
+#[cfg(cluster_dishwasher_alarm)]
 pub mod dishwasher_alarm;
 /// DishwasherMode cluster domain models.
-#[cfg(feature = "cluster-dishwasher-mode")]
+#[cfg(cluster_dishwasher_mode)]
 pub mod dishwasher_mode;
 /// DoorLock cluster domain models.
-#[cfg(feature = "cluster-door-lock")]
+#[cfg(cluster_door_lock)]
 pub mod door_lock;
 /// EcosystemInformation cluster domain models.
-#[cfg(feature = "cluster-ecosystem-information")]
+#[cfg(cluster_ecosystem_information)]
 pub mod ecosystem_information;
 /// ElectricalEnergyMeasurement cluster domain models.
-#[cfg(feature = "cluster-electrical-energy-measurement")]
+#[cfg(cluster_electrical_energy_measurement)]
 pub mod electrical_energy_measurement;
 /// ElectricalGridConditions cluster domain models.
-#[cfg(feature = "cluster-electrical-grid-conditions")]
+#[cfg(cluster_electrical_grid_conditions)]
 pub mod electrical_grid_conditions;
 /// ElectricalPowerMeasurement cluster domain models.
-#[cfg(feature = "cluster-electrical-power-measurement")]
+#[cfg(cluster_electrical_power_measurement)]
 pub mod electrical_power_measurement;
 /// EnergyEvse cluster domain models.
-#[cfg(feature = "cluster-energy-evse")]
+#[cfg(cluster_energy_evse)]
 pub mod energy_evse;
 /// EnergyEvseMode cluster domain models.
-#[cfg(feature = "cluster-energy-evse-mode")]
+#[cfg(cluster_energy_evse_mode)]
 pub mod energy_evse_mode;
 /// EnergyPreference cluster domain models.
-#[cfg(feature = "cluster-energy-preference")]
+#[cfg(cluster_energy_preference)]
 pub mod energy_preference;
 /// EthernetNetworkDiagnostics cluster domain models.
-#[cfg(feature = "cluster-ethernet-network-diagnostics")]
+#[cfg(cluster_ethernet_network_diagnostics)]
 pub mod ethernet_network_diagnostics;
 /// FanControl cluster domain models.
-#[cfg(feature = "cluster-fan-control")]
+#[cfg(cluster_fan_control)]
 pub mod fan_control;
 /// FaultInjection cluster domain models.
-#[cfg(feature = "cluster-fault-injection")]
+#[cfg(cluster_fault_injection)]
 pub mod fault_injection;
 /// FixedLabel cluster domain models.
-#[cfg(feature = "cluster-fixed-label")]
+#[cfg(cluster_fixed_label)]
 pub mod fixed_label;
 /// FlowMeasurement cluster domain models.
-#[cfg(feature = "cluster-flow-measurement")]
+#[cfg(cluster_flow_measurement)]
 pub mod flow_measurement;
 /// FormaldehydeConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-formaldehyde-concentration-measurement")]
+#[cfg(cluster_formaldehyde_concentration_measurement)]
 pub mod formaldehyde_concentration_measurement;
 /// GeneralCommissioning cluster domain models.
-#[cfg(feature = "cluster-general-commissioning")]
+#[cfg(cluster_general_commissioning)]
 pub mod general_commissioning;
 /// GeneralDiagnostics cluster domain models.
-#[cfg(feature = "cluster-general-diagnostics")]
+#[cfg(cluster_general_diagnostics)]
 pub mod general_diagnostics;
 /// GroupKeyManagement cluster domain models.
-#[cfg(feature = "cluster-group-key-management")]
+#[cfg(cluster_group_key_management)]
 pub mod group_key_management;
 /// Groups cluster domain models.
-#[cfg(feature = "cluster-groups")]
+#[cfg(cluster_groups)]
 pub mod groups;
 /// HepaFilterMonitoring cluster domain models.
-#[cfg(feature = "cluster-hepa-filter-monitoring")]
+#[cfg(cluster_hepa_filter_monitoring)]
 pub mod hepa_filter_monitoring;
 /// IcdManagement cluster domain models.
-#[cfg(feature = "cluster-icd-management")]
+#[cfg(cluster_icd_management)]
 pub mod icd_management;
 /// Identify cluster domain models.
-#[cfg(feature = "cluster-identify")]
+#[cfg(cluster_identify)]
 pub mod identify;
 /// IlluminanceMeasurement cluster domain models.
-#[cfg(feature = "cluster-illuminance-measurement")]
+#[cfg(cluster_illuminance_measurement)]
 pub mod illuminance_measurement;
 /// JointFabricAdministrator cluster domain models.
-#[cfg(feature = "cluster-joint-fabric-administrator")]
+#[cfg(cluster_joint_fabric_administrator)]
 pub mod joint_fabric_administrator;
 /// JointFabricDatastore cluster domain models.
-#[cfg(feature = "cluster-joint-fabric-datastore")]
+#[cfg(cluster_joint_fabric_datastore)]
 pub mod joint_fabric_datastore;
 /// KeypadInput cluster domain models.
-#[cfg(feature = "cluster-keypad-input")]
+#[cfg(cluster_keypad_input)]
 pub mod keypad_input;
 /// LaundryDryerControls cluster domain models.
-#[cfg(feature = "cluster-laundry-dryer-controls")]
+#[cfg(cluster_laundry_dryer_controls)]
 pub mod laundry_dryer_controls;
 /// LaundryWasherControls cluster domain models.
-#[cfg(feature = "cluster-laundry-washer-controls")]
+#[cfg(cluster_laundry_washer_controls)]
 pub mod laundry_washer_controls;
 /// LaundryWasherMode cluster domain models.
-#[cfg(feature = "cluster-laundry-washer-mode")]
+#[cfg(cluster_laundry_washer_mode)]
 pub mod laundry_washer_mode;
 /// LevelControl cluster domain models.
-#[cfg(feature = "cluster-level-control")]
+#[cfg(cluster_level_control)]
 pub mod level_control;
 /// LocalizationConfiguration cluster domain models.
-#[cfg(feature = "cluster-localization-configuration")]
+#[cfg(cluster_localization_configuration)]
 pub mod localization_configuration;
 /// LowPower cluster domain models.
-#[cfg(feature = "cluster-low-power")]
+#[cfg(cluster_low_power)]
 pub mod low_power;
 /// MediaInput cluster domain models.
-#[cfg(feature = "cluster-media-input")]
+#[cfg(cluster_media_input)]
 pub mod media_input;
 /// MediaPlayback cluster domain models.
-#[cfg(feature = "cluster-media-playback")]
+#[cfg(cluster_media_playback)]
 pub mod media_playback;
 /// Messages cluster domain models.
-#[cfg(feature = "cluster-messages")]
+#[cfg(cluster_messages)]
 pub mod messages;
 /// MeterIdentification cluster domain models.
-#[cfg(feature = "cluster-meter-identification")]
+#[cfg(cluster_meter_identification)]
 pub mod meter_identification;
 /// MicrowaveOvenControl cluster domain models.
-#[cfg(feature = "cluster-microwave-oven-control")]
+#[cfg(cluster_microwave_oven_control)]
 pub mod microwave_oven_control;
 /// MicrowaveOvenMode cluster domain models.
-#[cfg(feature = "cluster-microwave-oven-mode")]
+#[cfg(cluster_microwave_oven_mode)]
 pub mod microwave_oven_mode;
 /// ModeSelect cluster domain models.
-#[cfg(feature = "cluster-mode-select")]
+#[cfg(cluster_mode_select)]
 pub mod mode_select;
 /// NetworkCommissioning cluster domain models.
-#[cfg(feature = "cluster-network-commissioning")]
+#[cfg(cluster_network_commissioning)]
 pub mod network_commissioning;
 /// NitrogenDioxideConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-nitrogen-dioxide-concentration-measurement")]
+#[cfg(cluster_nitrogen_dioxide_concentration_measurement)]
 pub mod nitrogen_dioxide_concentration_measurement;
 /// OccupancySensing cluster domain models.
-#[cfg(feature = "cluster-occupancy-sensing")]
+#[cfg(cluster_occupancy_sensing)]
 pub mod occupancy_sensing;
 /// OnOff cluster domain models.
-#[cfg(feature = "cluster-on-off")]
+#[cfg(cluster_on_off)]
 pub mod on_off;
 /// OperationalCredentials cluster domain models.
-#[cfg(feature = "cluster-operational-credentials")]
+#[cfg(cluster_operational_credentials)]
 pub mod operational_credentials;
 /// OperationalState cluster domain models.
-#[cfg(feature = "cluster-operational-state")]
+#[cfg(cluster_operational_state)]
 pub mod operational_state;
 /// OtaSoftwareUpdateProvider cluster domain models.
-#[cfg(feature = "cluster-ota-software-update-provider")]
+#[cfg(cluster_ota_software_update_provider)]
 pub mod ota_software_update_provider;
 /// OtaSoftwareUpdateRequestor cluster domain models.
-#[cfg(feature = "cluster-ota-software-update-requestor")]
+#[cfg(cluster_ota_software_update_requestor)]
 pub mod ota_software_update_requestor;
 /// OvenCavityOperationalState cluster domain models.
-#[cfg(feature = "cluster-oven-cavity-operational-state")]
+#[cfg(cluster_oven_cavity_operational_state)]
 pub mod oven_cavity_operational_state;
 /// OvenMode cluster domain models.
-#[cfg(feature = "cluster-oven-mode")]
+#[cfg(cluster_oven_mode)]
 pub mod oven_mode;
 /// OzoneConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-ozone-concentration-measurement")]
+#[cfg(cluster_ozone_concentration_measurement)]
 pub mod ozone_concentration_measurement;
 /// Pm10ConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-pm10-concentration-measurement")]
+#[cfg(cluster_pm10_concentration_measurement)]
 pub mod pm10_concentration_measurement;
 /// Pm1ConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-pm1-concentration-measurement")]
+#[cfg(cluster_pm1_concentration_measurement)]
 pub mod pm1_concentration_measurement;
 /// Pm25ConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-pm25-concentration-measurement")]
+#[cfg(cluster_pm25_concentration_measurement)]
 pub mod pm25_concentration_measurement;
 /// PowerSource cluster domain models.
-#[cfg(feature = "cluster-power-source")]
+#[cfg(cluster_power_source)]
 pub mod power_source;
 /// PowerSourceConfiguration cluster domain models.
-#[cfg(feature = "cluster-power-source-configuration")]
+#[cfg(cluster_power_source_configuration)]
 pub mod power_source_configuration;
 /// PowerTopology cluster domain models.
-#[cfg(feature = "cluster-power-topology")]
+#[cfg(cluster_power_topology)]
 pub mod power_topology;
 /// PressureMeasurement cluster domain models.
-#[cfg(feature = "cluster-pressure-measurement")]
+#[cfg(cluster_pressure_measurement)]
 pub mod pressure_measurement;
 /// ProxyConfiguration cluster domain models.
-#[cfg(feature = "cluster-proxy-configuration")]
+#[cfg(cluster_proxy_configuration)]
 pub mod proxy_configuration;
 /// ProxyDiscovery cluster domain models.
-#[cfg(feature = "cluster-proxy-discovery")]
+#[cfg(cluster_proxy_discovery)]
 pub mod proxy_discovery;
 /// ProxyValid cluster domain models.
-#[cfg(feature = "cluster-proxy-valid")]
+#[cfg(cluster_proxy_valid)]
 pub mod proxy_valid;
 /// PulseWidthModulation cluster domain models.
-#[cfg(feature = "cluster-pulse-width-modulation")]
+#[cfg(cluster_pulse_width_modulation)]
 pub mod pulse_width_modulation;
 /// PumpConfigurationAndControl cluster domain models.
-#[cfg(feature = "cluster-pump-configuration-and-control")]
+#[cfg(cluster_pump_configuration_and_control)]
 pub mod pump_configuration_and_control;
 /// PushAvStreamTransport cluster domain models.
-#[cfg(feature = "cluster-push-av-stream-transport")]
+#[cfg(cluster_push_av_stream_transport)]
 pub mod push_av_stream_transport;
 /// RadonConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-radon-concentration-measurement")]
+#[cfg(cluster_radon_concentration_measurement)]
 pub mod radon_concentration_measurement;
 /// RefrigeratorAlarm cluster domain models.
-#[cfg(feature = "cluster-refrigerator-alarm")]
+#[cfg(cluster_refrigerator_alarm)]
 pub mod refrigerator_alarm;
 /// RefrigeratorAndTemperatureControlledCabinetMode cluster domain models.
-#[cfg(feature = "cluster-refrigerator-and-temperature-controlled-cabinet-mode")]
+#[cfg(cluster_refrigerator_and_temperature_controlled_cabinet_mode)]
 pub mod refrigerator_and_temperature_controlled_cabinet_mode;
 /// RelativeHumidityMeasurement cluster domain models.
-#[cfg(feature = "cluster-relative-humidity-measurement")]
+#[cfg(cluster_relative_humidity_measurement)]
 pub mod relative_humidity_measurement;
 /// RvcCleanMode cluster domain models.
-#[cfg(feature = "cluster-rvc-clean-mode")]
+#[cfg(cluster_rvc_clean_mode)]
 pub mod rvc_clean_mode;
 /// RvcOperationalState cluster domain models.
-#[cfg(feature = "cluster-rvc-operational-state")]
+#[cfg(cluster_rvc_operational_state)]
 pub mod rvc_operational_state;
 /// RvcRunMode cluster domain models.
-#[cfg(feature = "cluster-rvc-run-mode")]
+#[cfg(cluster_rvc_run_mode)]
 pub mod rvc_run_mode;
 /// SampleMei cluster domain models.
-#[cfg(feature = "cluster-sample-mei")]
+#[cfg(cluster_sample_mei)]
 pub mod sample_mei;
 /// ScenesManagement cluster domain models.
-#[cfg(feature = "cluster-scenes-management")]
+#[cfg(cluster_scenes_management)]
 pub mod scenes_management;
 /// ServiceArea cluster domain models.
-#[cfg(feature = "cluster-service-area")]
+#[cfg(cluster_service_area)]
 pub mod service_area;
 /// SmokeCoAlarm cluster domain models.
-#[cfg(feature = "cluster-smoke-co-alarm")]
+#[cfg(cluster_smoke_co_alarm)]
 pub mod smoke_co_alarm;
 /// SoftwareDiagnostics cluster domain models.
-#[cfg(feature = "cluster-software-diagnostics")]
+#[cfg(cluster_software_diagnostics)]
 pub mod software_diagnostics;
 /// SoilMeasurement cluster domain models.
-#[cfg(feature = "cluster-soil-measurement")]
+#[cfg(cluster_soil_measurement)]
 pub mod soil_measurement;
 /// Switch cluster domain models.
-#[cfg(feature = "cluster-switch")]
+#[cfg(cluster_switch)]
 pub mod switch;
 /// TargetNavigator cluster domain models.
-#[cfg(feature = "cluster-target-navigator")]
+#[cfg(cluster_target_navigator)]
 pub mod target_navigator;
 /// TemperatureControl cluster domain models.
-#[cfg(feature = "cluster-temperature-control")]
+#[cfg(cluster_temperature_control)]
 pub mod temperature_control;
 /// TemperatureMeasurement cluster domain models.
-#[cfg(feature = "cluster-temperature-measurement")]
+#[cfg(cluster_temperature_measurement)]
 pub mod temperature_measurement;
 /// Thermostat cluster domain models.
-#[cfg(feature = "cluster-thermostat")]
+#[cfg(cluster_thermostat)]
 pub mod thermostat;
 /// ThermostatUserInterfaceConfiguration cluster domain models.
-#[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+#[cfg(cluster_thermostat_user_interface_configuration)]
 pub mod thermostat_user_interface_configuration;
 /// ThreadBorderRouterManagement cluster domain models.
-#[cfg(feature = "cluster-thread-border-router-management")]
+#[cfg(cluster_thread_border_router_management)]
 pub mod thread_border_router_management;
 /// ThreadNetworkDiagnostics cluster domain models.
-#[cfg(feature = "cluster-thread-network-diagnostics")]
+#[cfg(cluster_thread_network_diagnostics)]
 pub mod thread_network_diagnostics;
 /// ThreadNetworkDirectory cluster domain models.
-#[cfg(feature = "cluster-thread-network-directory")]
+#[cfg(cluster_thread_network_directory)]
 pub mod thread_network_directory;
 /// TimeFormatLocalization cluster domain models.
-#[cfg(feature = "cluster-time-format-localization")]
+#[cfg(cluster_time_format_localization)]
 pub mod time_format_localization;
 /// TimeSynchronization cluster domain models.
-#[cfg(feature = "cluster-time-synchronization")]
+#[cfg(cluster_time_synchronization)]
 pub mod time_synchronization;
 /// Timer cluster domain models.
-#[cfg(feature = "cluster-timer")]
+#[cfg(cluster_timer)]
 pub mod timer;
 /// TlsCertificateManagement cluster domain models.
-#[cfg(feature = "cluster-tls-certificate-management")]
+#[cfg(cluster_tls_certificate_management)]
 pub mod tls_certificate_management;
 /// TlsClientManagement cluster domain models.
-#[cfg(feature = "cluster-tls-client-management")]
+#[cfg(cluster_tls_client_management)]
 pub mod tls_client_management;
 /// TotalVolatileOrganicCompoundsConcentrationMeasurement cluster domain models.
-#[cfg(feature = "cluster-total-volatile-organic-compounds-concentration-measurement")]
+#[cfg(cluster_total_volatile_organic_compounds_concentration_measurement)]
 pub mod total_volatile_organic_compounds_concentration_measurement;
 /// UnitLocalization cluster domain models.
-#[cfg(feature = "cluster-unit-localization")]
+#[cfg(cluster_unit_localization)]
 pub mod unit_localization;
 /// UnitTesting cluster domain models.
-#[cfg(feature = "cluster-unit-testing")]
+#[cfg(cluster_unit_testing)]
 pub mod unit_testing;
 /// UserLabel cluster domain models.
-#[cfg(feature = "cluster-user-label")]
+#[cfg(cluster_user_label)]
 pub mod user_label;
 /// ValveConfigurationAndControl cluster domain models.
-#[cfg(feature = "cluster-valve-configuration-and-control")]
+#[cfg(cluster_valve_configuration_and_control)]
 pub mod valve_configuration_and_control;
 /// WakeOnLan cluster domain models.
-#[cfg(feature = "cluster-wake-on-lan")]
+#[cfg(cluster_wake_on_lan)]
 pub mod wake_on_lan;
 /// WaterHeaterManagement cluster domain models.
-#[cfg(feature = "cluster-water-heater-management")]
+#[cfg(cluster_water_heater_management)]
 pub mod water_heater_management;
 /// WaterHeaterMode cluster domain models.
-#[cfg(feature = "cluster-water-heater-mode")]
+#[cfg(cluster_water_heater_mode)]
 pub mod water_heater_mode;
 /// WebRtcTransportProvider cluster domain models.
-#[cfg(feature = "cluster-web-rtc-transport-provider")]
+#[cfg(cluster_web_rtc_transport_provider)]
 pub mod web_rtc_transport_provider;
 /// WebRtcTransportRequestor cluster domain models.
-#[cfg(feature = "cluster-web-rtc-transport-requestor")]
+#[cfg(cluster_web_rtc_transport_requestor)]
 pub mod web_rtc_transport_requestor;
 /// WiFiNetworkDiagnostics cluster domain models.
-#[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+#[cfg(cluster_wi_fi_network_diagnostics)]
 pub mod wi_fi_network_diagnostics;
 /// WiFiNetworkManagement cluster domain models.
-#[cfg(feature = "cluster-wi-fi-network-management")]
+#[cfg(cluster_wi_fi_network_management)]
 pub mod wi_fi_network_management;
 /// WindowCovering cluster domain models.
-#[cfg(feature = "cluster-window-covering")]
+#[cfg(cluster_window_covering)]
 pub mod window_covering;
 /// ZoneManagement cluster domain models.
-#[cfg(feature = "cluster-zone-management")]
+#[cfg(cluster_zone_management)]
 pub mod zone_management;

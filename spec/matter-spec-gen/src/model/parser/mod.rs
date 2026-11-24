@@ -150,8 +150,8 @@ pub(crate) struct GlobalDefs {
     pub(crate) attributes: Vec<AttributeDef>,
     /// Whether `EventList` (`0xFFFA`) is present in this spec version (`v1.1`..=`v1.3` only).
     pub(crate) has_event_list: bool,
-    /// Optional `cluster-*` feature gates for auto-promoted shared cross-cluster types.
-    pub(crate) feature_gates: BTreeMap<String, Vec<String>>,
+    /// Optional `cluster_*` cfg gates for auto-promoted shared cross-cluster types.
+    pub(crate) cfg_gates: BTreeMap<String, Vec<String>>,
 }
 
 impl GlobalDefs {

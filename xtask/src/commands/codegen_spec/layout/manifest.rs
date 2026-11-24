@@ -10,6 +10,8 @@ use toml_edit::{Array, DocumentMut, Item, Table, Value};
 
 use crate::util::write_if_changed;
 
+const UNATTACHED_CLUSTERS_FEATURE: &str = "unattached-clusters";
+
 pub(in super::super) fn update_spec_cargo_toml(
     cargo_toml_path: &Path,
     versions: &[(String, String, String)],
@@ -17,7 +19,6 @@ pub(in super::super) fn update_spec_cargo_toml(
     family_to_clusters: &BTreeMap<String, BTreeSet<String>>,
     family_to_endpoints: &BTreeMap<String, BTreeSet<String>>,
     endpoint_to_clusters: &BTreeMap<String, BTreeSet<String>>,
-    all_cluster_features: &BTreeSet<String>,
 ) -> Result<()> {
     let content =
         fs::read_to_string(cargo_toml_path).with_context(|| format!("Failed to read {}", cargo_toml_path.display()))?;
@@ -25,6 +26,9 @@ pub(in super::super) fn update_spec_cargo_toml(
     let mut doc: DocumentMut = content
         .parse()
         .with_context(|| format!("Failed to parse {}", cargo_toml_path.display()))?;
+
+    let unattached_clusters = compute_unattached_clusters(family_to_clusters, endpoint_to_clusters);
+    let has_unattached = !unattached_clusters.is_empty();
 
     let mut features_table = Table::new();
     features_table.decor_mut().set_prefix(
@@ -120,6 +124,9 @@ pub(in super::super) fn update_spec_cargo_toml(
             all_arr.push(family.as_str());
         }
     }
+    if has_unattached {
+        all_arr.push(UNATTACHED_CLUSTERS_FEATURE);
+    }
     insert_feature(
         &mut features_table,
         "all",
@@ -129,47 +136,229 @@ pub(in super::super) fn update_spec_cargo_toml(
 
     for family in domain_families {
         let fam_str = family.as_str();
+        if fam_str == "testing" && has_unattached {
+            insert_feature(&mut features_table, UNATTACHED_CLUSTERS_FEATURE, Array::new(), None);
+        }
         let mut fam_arr = Array::new();
-
         if let Some(endpoints) = family_to_endpoints.get(fam_str) {
             for ep_feat in endpoints {
                 fam_arr.push(ep_feat.as_str());
             }
         }
-        if let Some(clusters) = family_to_clusters.get(fam_str) {
-            for cl_feat in clusters {
-                fam_arr.push(cl_feat.as_str());
-            }
-        }
-
         insert_feature(&mut features_table, fam_str, fam_arr, None);
     }
+    if has_unattached && !domain_families.iter().any(|f| f.as_str() == "testing") {
+        insert_feature(&mut features_table, UNATTACHED_CLUSTERS_FEATURE, Array::new(), None);
+    }
 
-    // 6. Granular Device Endpoints (autowires required clusters)
+    // 6. Granular Device Endpoints (autowires required clusters via build.rs)
     let mut first_ep = true;
-    for (ep_feat, clusters) in endpoint_to_clusters {
+    for ep_feat in endpoint_to_clusters.keys() {
         let prefix = first_ep.then(|| {
             first_ep = false;
             "\n# Granular Device Endpoints (autowires required clusters)\n"
         });
-        let mut ep_deps_arr = Array::new();
-        for dep in clusters {
-            ep_deps_arr.push(dep.as_str());
-        }
-        insert_feature(&mut features_table, ep_feat, ep_deps_arr, prefix);
-    }
-
-    // 7. Granular Cluster Models & Primitives
-    let mut first_cl = true;
-    for cl in all_cluster_features {
-        let prefix = first_cl.then(|| {
-            first_cl = false;
-            "\n# Granular Cluster Models & Primitives\n"
-        });
-        insert_feature(&mut features_table, cl.as_str(), Array::new(), prefix);
+        insert_feature(&mut features_table, ep_feat, Array::new(), prefix);
     }
 
     let _old = doc.as_table_mut().insert("features", Item::Table(features_table));
     write_if_changed(cargo_toml_path, &doc.to_string())?;
     Ok(())
+}
+
+pub(in super::super) fn generate_spec_build_rs(
+    build_rs_path: &Path,
+    domain_families: &[Category],
+    family_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+    endpoint_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+    all_cluster_cfgs: &BTreeSet<String>,
+) -> Result<()> {
+    let code = render_spec_build_rs(
+        domain_families,
+        family_to_clusters,
+        endpoint_to_clusters,
+        all_cluster_cfgs,
+    );
+    write_if_changed(build_rs_path, &code)?;
+    Ok(())
+}
+
+fn compute_unattached_clusters(
+    family_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+    endpoint_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+) -> BTreeSet<String> {
+    let attached: BTreeSet<&str> = endpoint_to_clusters
+        .values()
+        .flat_map(|clusters| clusters.iter().map(String::as_str))
+        .collect();
+
+    family_to_clusters
+        .iter()
+        .filter(|(fam, _)| fam.as_str() != "testing")
+        .flat_map(|(_, clusters)| clusters.iter())
+        .filter(|cl| !attached.contains(cl.as_str()))
+        .cloned()
+        .collect()
+}
+
+fn feature_to_cargo_env(feature: &str) -> String {
+    format!("CARGO_FEATURE_{}", feature.replace('-', "_").to_ascii_uppercase())
+}
+
+fn render_spec_build_rs(
+    domain_families: &[Category],
+    family_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+    endpoint_to_clusters: &BTreeMap<String, BTreeSet<String>>,
+    all_cluster_cfgs: &BTreeSet<String>,
+) -> String {
+    let unattached_clusters = compute_unattached_clusters(family_to_clusters, endpoint_to_clusters);
+
+    let mut out = String::from(concat!(
+        "// AUTO-GENERATED BY cargo xtask codegen-spec (xtask/src/commands/codegen_spec/layout/manifest.rs) - DO NOT \
+         EDIT MANUALLY\n",
+        "//! Build script mapping Cargo endpoint/domain features and `MATTER_SPEC_CLUSTER_*` environment variables to \
+         `cluster_*` rustc cfgs.\n\n",
+        "use std::{collections::BTreeSet, env};\n\n",
+        "type ClusterTrigger = (&'static str, &'static [&'static str]);\n\n",
+        "const CLUSTER_ENV_PREFIX: &str = \"MATTER_SPEC_CLUSTER_\";\n\n",
+        "const ALL_CLUSTERS: &[&str] = &[\n",
+    ));
+
+    for cl in all_cluster_cfgs {
+        let suffix = cl.strip_prefix("cluster_").unwrap_or(cl);
+        out.push_str("    \"");
+        out.push_str(suffix);
+        out.push_str("\",\n");
+    }
+    out.push_str("];\n\nconst FEATURE_TO_CLUSTERS: &[ClusterTrigger] = &[\n");
+
+    for family in domain_families {
+        let fam_str = family.as_str();
+        if fam_str == "testing" && !unattached_clusters.is_empty() {
+            append_trigger_entry(&mut out, UNATTACHED_CLUSTERS_FEATURE, &unattached_clusters);
+        }
+        if let Some(clusters) = family_to_clusters.get(fam_str)
+            && !clusters.is_empty()
+        {
+            append_trigger_entry(&mut out, fam_str, clusters);
+        }
+    }
+    if !unattached_clusters.is_empty() && !domain_families.iter().any(|f| f.as_str() == "testing") {
+        append_trigger_entry(&mut out, UNATTACHED_CLUSTERS_FEATURE, &unattached_clusters);
+    }
+
+    for (ep_feat, clusters) in endpoint_to_clusters {
+        if !clusters.is_empty() {
+            append_trigger_entry(&mut out, ep_feat, clusters);
+        }
+    }
+
+    out.push_str(concat!(
+        "];\n\n",
+        "fn main() {\n",
+        "    println!(\"cargo:rerun-if-changed=build.rs\");\n\n",
+        "    for &cluster in ALL_CLUSTERS {\n",
+        "        println!(\"cargo:rustc-check-cfg=cfg(cluster_{cluster})\");\n",
+        "        println!(\"cargo:rerun-if-env-changed={CLUSTER_ENV_PREFIX}{}\", cluster.to_ascii_uppercase());\n",
+        "    }\n\n",
+        "    let mut enabled: BTreeSet<String> = BTreeSet::new();\n\n",
+        "    for &(feat_env, clusters) in FEATURE_TO_CLUSTERS {\n",
+        "        if env::var_os(feat_env).is_some() {\n",
+        "            enabled.extend(clusters.iter().map(|&c| c.to_owned()));\n",
+        "        }\n",
+        "    }\n\n",
+        "    for (raw_key, raw_val) in env::vars_os() {\n",
+        "        let Some(key) = raw_key.to_str() else {\n",
+        "            continue;\n",
+        "        };\n",
+        "        let Some(suffix) = key.strip_prefix(CLUSTER_ENV_PREFIX) else {\n",
+        "            continue;\n",
+        "        };\n",
+        "        if suffix.is_empty() {\n",
+        "            continue;\n",
+        "        }\n",
+        "        let cluster = suffix.to_ascii_lowercase();\n",
+        "        let is_known = ALL_CLUSTERS.contains(&cluster.as_str());\n",
+        "        if !is_known {\n",
+        "            println!(\"cargo:rerun-if-env-changed={key}\");\n",
+        "        }\n",
+        "        if raw_val.to_str().is_some_and(is_val_enabled) {\n",
+        "            if is_known {\n",
+        "                enabled.insert(format!(\"cluster_{cluster}\"));\n",
+        "            } else {\n",
+        "                println!(\n",
+        "                    \"cargo:warning=unknown Matter cluster environment variable `{key}` (no \
+         `cluster_{cluster}` in matter-spec)\"\n",
+        "                );\n",
+        "            }\n",
+        "        }\n",
+        "    }\n\n",
+        "    for cluster_cfg in enabled {\n",
+        "        println!(\"cargo:rustc-cfg={cluster_cfg}\");\n",
+        "    }\n",
+        "}\n\n",
+        "fn is_val_enabled(val: &str) -> bool {\n",
+        "    !val.is_empty() && val != \"0\" && !val.eq_ignore_ascii_case(\"false\")\n",
+        "}\n",
+    ));
+
+    out
+}
+
+fn append_trigger_entry(out: &mut String, feature: &str, clusters: &BTreeSet<String>) {
+    let feat_env = feature_to_cargo_env(feature);
+    out.push_str("    (\"");
+    out.push_str(&feat_env);
+    out.push_str("\", &[\n");
+    for cl in clusters {
+        out.push_str("        \"");
+        out.push_str(cl);
+        out.push_str("\",\n");
+    }
+    out.push_str("    ]),\n");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn computes_unattached_clusters_dynamically_excluding_testing() {
+        let family_to_clusters = BTreeMap::from([
+            (
+                "lighting".to_owned(),
+                BTreeSet::from(["cluster_on_off".to_owned(), "cluster_dynamic_lighting".to_owned()]),
+            ),
+            (
+                "testing".to_owned(),
+                BTreeSet::from(["cluster_unit_testing".to_owned()]),
+            ),
+        ]);
+        let endpoint_to_clusters = BTreeMap::from([(
+            "endpoint-on-off-light".to_owned(),
+            BTreeSet::from(["cluster_on_off".to_owned()]),
+        )]);
+
+        let unattached = compute_unattached_clusters(&family_to_clusters, &endpoint_to_clusters);
+        assert_eq!(unattached, BTreeSet::from(["cluster_dynamic_lighting".to_owned()]));
+
+        let build_rs = render_spec_build_rs(
+            &[
+                Category::from_xml_domain("Lighting").expect("lighting"),
+                Category::testing(),
+            ],
+            &family_to_clusters,
+            &endpoint_to_clusters,
+            &BTreeSet::from([
+                "cluster_dynamic_lighting".to_owned(),
+                "cluster_on_off".to_owned(),
+                "cluster_unit_testing".to_owned(),
+            ]),
+        );
+        assert!(build_rs.contains("const CLUSTER_ENV_PREFIX: &str = \"MATTER_SPEC_CLUSTER_\";"));
+        assert!(build_rs.contains("\"on_off\","));
+        assert!(build_rs.contains("\"CARGO_FEATURE_UNATTACHED_CLUSTERS\""));
+        assert!(build_rs.contains("\"CARGO_FEATURE_ENDPOINT_ON_OFF_LIGHT\""));
+        assert!(build_rs.contains("\"CARGO_FEATURE_TESTING\""));
+    }
 }

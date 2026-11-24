@@ -124,7 +124,7 @@ pub(crate) fn generate_globals_tokens(
         bitmaps,
         structs,
         attributes,
-        feature_gates,
+        cfg_gates,
         ..
     } = global_defs;
     let mut out = Tokens::new();
@@ -189,7 +189,7 @@ pub(crate) fn generate_globals_tokens(
         .chain(structs.iter().map(|s| s.name.as_str()))
     {
         if let Some(ident) = is_shared(name) {
-            let gate_attr = feature_gates.get(name).and_then(|g| emit_feature_gate_attr(g));
+            let gate_attr = cfg_gates.get(name).and_then(|g| emit_cfg_gate_attr(g));
             out.append(quote! {
                 $gate_attr
                 pub use crate::__shared::globals::$ident::*;
@@ -199,10 +199,10 @@ pub(crate) fn generate_globals_tokens(
     out.push_blank();
 
     if !local_bitmaps.is_empty() {
-        emit_bitmaps(&mut out, &local_bitmaps, Some(feature_gates))?;
+        emit_bitmaps(&mut out, &local_bitmaps, Some(cfg_gates))?;
     }
     if !local_enums.is_empty() {
-        emit_enums(&mut out, &local_enums, Some(feature_gates))?;
+        emit_enums(&mut out, &local_enums, Some(cfg_gates))?;
     }
     if !local_structs.is_empty() {
         let all_enums_map: BTreeMap<String, EnumDef> = enums.iter().map(|e| (e.name.clone(), e.clone())).collect();
@@ -220,7 +220,7 @@ pub(crate) fn generate_globals_tokens(
             &all_bitmaps_map,
             &all_structs_map,
         );
-        emit_structs(&mut out, &local_structs, false, &ctx, Some(feature_gates))?;
+        emit_structs(&mut out, &local_structs, false, &ctx, Some(cfg_gates))?;
     }
 
     // Global Attributes
@@ -608,12 +608,12 @@ fn emit_global_attributes_submodule(has_event_list: bool) -> Tokens {
     }
 }
 
-fn emit_feature_gate_attr(gates: &[String]) -> Option<Tokens> {
+fn emit_cfg_gate_attr(gates: &[String]) -> Option<Tokens> {
     if gates.is_empty() {
         return None;
     }
     if let [single] = gates {
-        return Some(quote!(#[cfg(feature = $(quoted(single)))]));
+        return Some(quote!(#[cfg($(single.as_str()))]));
     }
-    Some(quote!(#[cfg(any($(for g in gates join (, ) => feature = $(quoted(g)))))]))
+    Some(quote!(#[cfg(any($(for g in gates join (, ) => $(g.as_str()))))]))
 }

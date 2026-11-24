@@ -43,13 +43,13 @@ pub(in super::super) fn generate_version_dispatch_command_rs(
         sorted_clusters.iter().filter(|c| c.has_client_commands).collect();
     let server_clusters: Vec<&DispatchClusterEntry> =
         sorted_clusters.iter().filter(|c| c.has_server_commands).collect();
-    let (cli_any_cfg, cli_not_any_cfg) = make_any_cfgs(client_clusters.iter().map(|c| c.feature.as_str()));
-    let (srv_any_cfg, srv_not_any_cfg) = make_any_cfgs(server_clusters.iter().map(|c| c.feature.as_str()));
+    let (cli_any_cfg, cli_not_any_cfg) = make_any_cfgs(client_clusters.iter().map(|c| c.cfg.as_str()));
+    let (srv_any_cfg, srv_not_any_cfg) = make_any_cfgs(server_clusters.iter().map(|c| c.cfg.as_str()));
     let (any_cmd_cfg, _) = make_any_cfgs(
         sorted_clusters
             .iter()
             .filter(|c| c.has_client_commands || c.has_server_commands)
-            .map(|c| c.feature.as_str()),
+            .map(|c| c.cfg.as_str()),
     );
 
     let tokens: Tokens = quote! {
@@ -109,7 +109,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
 
     let sorted_clusters = sorted_unique_clusters(clusters);
     let attr_clusters: Vec<&DispatchClusterEntry> = sorted_clusters.iter().filter(|c| c.has_attributes).collect();
-    let (attr_any_cfg, attr_not_any_cfg) = make_any_cfgs(attr_clusters.iter().map(|c| c.feature.as_str()));
+    let (attr_any_cfg, attr_not_any_cfg) = make_any_cfgs(attr_clusters.iter().map(|c| c.cfg.as_str()));
     let v_mod = format!("v{}", version.replace('.', "_"));
 
     let tokens: Tokens = quote! {
@@ -145,7 +145,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
         #[non_exhaustive]
         pub enum ClusterAttribute {
             $(for c in &attr_clusters join ($['\r']) =>
-                #[cfg(feature = $(quoted(&c.feature)))]
+                #[cfg($(c.cfg.as_str()))]
                 $(c.name.as_str())(clusters::$(c.module_name.as_str())::Attribute),
             )
             /// Forward-compatible fallback for unrecognized clusters.
@@ -161,7 +161,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
             ) -> Result<Self, AttributeError> {
                 match cluster_id.raw() {
                     $(for c in &attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
                             clusters::$(c.module_name.as_str())::Attribute::try_from_pair(attribute_id, val)
                                 .map(Self::$(c.name.as_str()))
@@ -182,7 +182,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
             fn from(attr: ClusterAttribute) -> Self {
                 match attr {
                     $(for c in &attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         ClusterAttribute::$(c.name.as_str())(inner) => Self::from(inner),
                     )
                     ClusterAttribute::Unknown(_, id, val) => Self::new(id, val),
@@ -207,7 +207,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
 
     let sorted_clusters = sorted_unique_clusters(clusters);
     let ev_clusters: Vec<&DispatchClusterEntry> = sorted_clusters.iter().filter(|c| c.has_events).collect();
-    let (ev_any_cfg, ev_not_any_cfg) = make_any_cfgs(ev_clusters.iter().map(|c| c.feature.as_str()));
+    let (ev_any_cfg, ev_not_any_cfg) = make_any_cfgs(ev_clusters.iter().map(|c| c.cfg.as_str()));
     let v_mod = format!("v{}", version.replace('.', "_"));
 
     let tokens: Tokens = quote! {
@@ -241,7 +241,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
         #[non_exhaustive]
         pub enum ClusterEvent {
             $(for c in &ev_clusters join ($['\r']) =>
-                #[cfg(feature = $(quoted(&c.feature)))]
+                #[cfg($(c.cfg.as_str()))]
                 $(c.name.as_str())(clusters::$(c.module_name.as_str())::Event),
             )
             /// Forward-compatible fallback for unrecognized clusters.
@@ -253,7 +253,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             pub fn from_wire(ev: WireEvent) -> Result<Self, EventError> {
                 match ev.cluster_id.raw() {
                     $(for c in &ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
                             clusters::$(c.module_name.as_str())::Event::try_from(ev)
                                 .map(Self::$(c.name.as_str()))
@@ -268,7 +268,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             fn from(ev: ClusterEvent) -> Self {
                 match ev {
                     $(for c in &ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         ClusterEvent::$(c.name.as_str())(inner) => Self::from(inner),
                     )
                     ClusterEvent::Unknown(wire) => wire,
@@ -282,7 +282,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
                 match ev.cluster_id.raw() {
                     $(for c in &ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
                             clusters::$(c.module_name.as_str())::Event::try_from(ev)
                                 .map(Self::$(c.name.as_str()))
@@ -293,7 +293,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             }
         }
 
-        $(dispatch_event_meta_tokens(&ev_clusters, &ev_any_cfg, &ev_not_any_cfg))
+        $(dispatch_event_meta_tokens(&ev_clusters))
         $(dispatch_event_describe_tokens(&ev_clusters, &ev_any_cfg, &ev_not_any_cfg))
     };
 
@@ -309,18 +309,18 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
     let intro = "//! Version-scoped polymorphic [`ClusterSnapshot`] and [`ClusterPatch`] enums.";
 
     let sorted_clusters = sorted_unique_clusters(clusters);
-    let (snap_any_cfg, snap_not_any_cfg) = make_any_cfgs(sorted_clusters.iter().map(|c| c.feature.as_str()));
+    let (snap_any_cfg, snap_not_any_cfg) = make_any_cfgs(sorted_clusters.iter().map(|c| c.cfg.as_str()));
     let (attr_any_cfg, _) = make_any_cfgs(
         sorted_clusters
             .iter()
             .filter(|c| c.has_attributes)
-            .map(|c| c.feature.as_str()),
+            .map(|c| c.cfg.as_str()),
     );
     let (box_any_cfg, _) = make_any_cfgs(
         sorted_clusters
             .iter()
             .filter(|c| c.has_attributes && (c.is_large_state || c.is_large_patch))
-            .map(|c| c.feature.as_str()),
+            .map(|c| c.cfg.as_str()),
     );
     let v_mod = format!("v{}", version.replace('.', "_"));
 
@@ -362,7 +362,7 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
         #[rustfmt::skip]
         pub enum ClusterSnapshot {
             $(for c in &sorted_clusters join ($['\r']) =>
-                #[cfg(feature = $(quoted(&c.feature)))]
+                #[cfg($(c.cfg.as_str()))]
                 $(if c.has_attributes && c.is_large_state =>
                     $(c.name.as_str())(Box<clusters::$(c.module_name.as_str())::$(c.struct_name.as_str())>),
                 )
@@ -381,7 +381,7 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
             fn from(snapshot: ClusterSnapshot) -> Self {
                 match snapshot {
                     $(for c in &sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes && c.is_large_state =>
                             ClusterSnapshot::$(c.name.as_str())(inner) => Self::from(*inner),
                         )
@@ -406,7 +406,7 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
             fn try_from(cluster: Cluster) -> Result<Self, Self::Error> {
                 match cluster.id.raw() {
                     $(for c in &sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
                             $(if c.module_name.len().saturating_add(c.struct_name.len()) > 75 => #[rustfmt::skip])
                             type C = clusters::$(c.module_name.as_str())::$(c.struct_name.as_str());
@@ -441,7 +441,7 @@ pub(in super::super) fn generate_version_dispatch_endpoint_rs(
     let intro = "//! Version-scoped polymorphic [`EndpointDevice`] enum.";
 
     let sorted_endpoints = sorted_unique_endpoints(endpoints);
-    let (ep_any_cfg, ep_not_any_cfg) = make_any_cfgs(sorted_endpoints.iter().map(|e| e.feature.as_str()));
+    let (ep_any_cfg, ep_not_any_cfg) = make_any_endpoint_cfgs(sorted_endpoints.iter().map(|e| e.feature.as_str()));
     let v_mod = format!("v{}", version.replace('.', "_"));
 
     let tokens: Tokens = quote! {
@@ -565,7 +565,12 @@ fn sorted_unique_endpoints(endpoints: &[DispatchEndpointEntry]) -> Vec<DispatchE
     sorted
 }
 
-fn make_any_cfgs<'a>(feats: impl Iterator<Item = &'a str>) -> (String, String) {
+fn make_any_cfgs<'a>(cfgs: impl Iterator<Item = &'a str>) -> (String, String) {
+    let joined = cfgs.collect::<Vec<_>>().join(", ");
+    (format!("#[cfg(any({joined}))]"), format!("#[cfg(not(any({joined})))]"))
+}
+
+fn make_any_endpoint_cfgs<'a>(feats: impl Iterator<Item = &'a str>) -> (String, String) {
     let joined = feats
         .map(|f| format!("feature = \"{f}\""))
         .collect::<Vec<_>>()
@@ -613,7 +618,7 @@ fn emit_command_enum_impl(
         #[non_exhaustive]
         pub enum $enum_name {
             $(for c in clusters join ($['\r']) =>
-                #[cfg(feature = $(quoted(&c.feature)))]
+                #[cfg($(c.cfg.as_str()))]
                 $(c.name.as_str())(clusters::$(c.module_name.as_str())::$member_ty),
             )
             /// Forward-compatible fallback for unrecognized clusters.
@@ -625,7 +630,7 @@ fn emit_command_enum_impl(
             pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
                 match cmd.cluster_id.raw() {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
                             clusters::$(c.module_name.as_str())::$member_ty::from_wire(cmd)
                                 .map(Self::$(c.name.as_str()))
@@ -640,7 +645,7 @@ fn emit_command_enum_impl(
             fn from(cmd: $enum_name) -> Self {
                 match cmd {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $enum_name::$(c.name.as_str())(inner) => Self::from(inner),
                     )
                     $enum_name::Unknown(wire) => wire,
@@ -662,7 +667,7 @@ fn emit_command_enum_impl(
             fn cluster_id(&self) -> ClusterId {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_id(),
                     )
                     Self::Unknown(wire) => wire.cluster_id,
@@ -674,7 +679,7 @@ fn emit_command_enum_impl(
             fn cluster_name(&self) -> &'static str {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_name(),
                     )
                     Self::Unknown(_) => "Unknown",
@@ -685,7 +690,7 @@ fn emit_command_enum_impl(
             fn command_id(&self) -> CommandId {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.command_id(),
                     )
                     Self::Unknown(wire) => wire.command_id,
@@ -696,7 +701,7 @@ fn emit_command_enum_impl(
             fn command_name(&self) -> &'static str {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.command_name(),
                     )
                     Self::Unknown(_) => "Unknown",
@@ -707,7 +712,7 @@ fn emit_command_enum_impl(
             fn direction(&self) -> CommandDirection {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.direction(),
                     )
                     Self::Unknown(wire) => wire.direction,
@@ -718,7 +723,7 @@ fn emit_command_enum_impl(
             fn is_empty_payload(&self) -> bool {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => CommandMeta::is_empty_payload(inner),
                     )
                     Self::Unknown(_) => false,
@@ -765,14 +770,14 @@ fn emit_command_enum_describe_impl(
                 #[derive(Clone, Copy, PartialEq, Eq)]
                 enum ClusterVariant {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(c.name.as_str()),
                     )
                 }
 
                 let by_name = match scope_name {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Some($(quoted(&c.name))) => Some(ClusterVariant::$(c.name.as_str())),
                     )
                     Some(other) => return Err(format!("unknown cluster '{other}'")),
@@ -781,7 +786,7 @@ fn emit_command_enum_describe_impl(
 
                 let by_id = match scope_id {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Some($(format_hex_u32(c.cluster_id))) => Some(ClusterVariant::$(c.name.as_str())),
                     )
                     Some(other) => return Err(format!("unknown cluster_id {other}")),
@@ -796,7 +801,7 @@ fn emit_command_enum_describe_impl(
 
                 match selected {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         ClusterVariant::$(c.name.as_str()) => {
                             clusters::$(c.module_name.as_str())::$member_ty::select_described(
                                 item_name,
@@ -817,7 +822,7 @@ fn emit_command_enum_describe_impl(
             fn descriptor(&self) -> EntityDescriptor {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.descriptor(),
                     )
                     Self::Unknown(wire) => EntityDescriptor::Command {
@@ -841,7 +846,7 @@ fn emit_command_enum_describe_impl(
             {
                 match self {
                     $(for c in clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.serialize_payload(serializer),
                     )
                     Self::Unknown(wire) => Serialize::serialize(wire, serializer),
@@ -876,7 +881,7 @@ fn dispatch_attribute_meta_tokens(attr_clusters: &[&DispatchClusterEntry]) -> To
             fn cluster_id(&self) -> ClusterId {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_id(),
                     )
                     Self::Unknown(cid, _, _) => *cid,
@@ -888,7 +893,7 @@ fn dispatch_attribute_meta_tokens(attr_clusters: &[&DispatchClusterEntry]) -> To
             fn cluster_name(&self) -> &'static str {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_name(),
                     )
                     Self::Unknown(_, _, _) => "Unknown",
@@ -899,7 +904,7 @@ fn dispatch_attribute_meta_tokens(attr_clusters: &[&DispatchClusterEntry]) -> To
             fn attribute_id(&self) -> AttributeId {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.attribute_id(),
                     )
                     Self::Unknown(_, aid, _) => *aid,
@@ -910,7 +915,7 @@ fn dispatch_attribute_meta_tokens(attr_clusters: &[&DispatchClusterEntry]) -> To
             fn attribute_name(&self) -> &'static str {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.attribute_name(),
                     )
                     Self::Unknown(_, _, _) => "Unknown",
@@ -954,14 +959,14 @@ fn dispatch_attribute_describe_tokens(
             #[derive(Clone, Copy, PartialEq, Eq)]
             enum ClusterVariant {
                 $(for c in attr_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     $(c.name.as_str()),
                 )
             }
 
             let by_name = match scope_name {
                 $(for c in attr_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(quoted(&c.name))) => Some(ClusterVariant::$(c.name.as_str())),
                 )
                 Some(other) => return Err(format!("unknown cluster '{other}'")),
@@ -970,7 +975,7 @@ fn dispatch_attribute_describe_tokens(
 
             let by_id = match scope_id {
                 $(for c in attr_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(format_hex_u32(c.cluster_id))) => {
                         Some(ClusterVariant::$(c.name.as_str()))
                     }
@@ -987,7 +992,7 @@ fn dispatch_attribute_describe_tokens(
 
             match selected {
                 $(for c in attr_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     ClusterVariant::$(c.name.as_str()) => {
                         clusters::$(c.module_name.as_str())::Attribute::select_described(
                             item_name,
@@ -1008,7 +1013,7 @@ fn dispatch_attribute_describe_tokens(
             fn descriptor(&self) -> EntityDescriptor {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.descriptor(),
                     )
                     Self::Unknown(cid, aid, _) => EntityDescriptor::Attribute {
@@ -1027,7 +1032,7 @@ fn dispatch_attribute_describe_tokens(
             {
                 match self {
                     $(for c in attr_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.serialize_payload(serializer),
                     )
                     Self::Unknown(_, _, val) => Serialize::serialize(val, serializer),
@@ -1045,14 +1050,14 @@ fn dispatch_attribute_describe_tokens(
     }
 }
 
-fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg: &str, ev_not_any_cfg: &str) -> Tokens {
+fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry]) -> Tokens {
     quote! {
         impl EventMeta for ClusterEvent {
             #[inline]
             fn cluster_id(&self) -> ClusterId {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_id(),
                     )
                     Self::Unknown(wire) => wire.cluster_id,
@@ -1064,7 +1069,7 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
             fn cluster_name(&self) -> &'static str {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.cluster_name(),
                     )
                     Self::Unknown(_) => "Unknown",
@@ -1075,7 +1080,7 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
             fn event_id(&self) -> EventId {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.event_id(),
                     )
                     Self::Unknown(wire) => wire.event_id,
@@ -1086,7 +1091,7 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
             fn event_name(&self) -> &'static str {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.event_name(),
                     )
                     Self::Unknown(_) => "Unknown",
@@ -1095,12 +1100,9 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
 
             #[inline]
             fn priority(&self) -> EventPriority {
-                $(ev_not_any_cfg)
-                match *self {}
-                $(ev_any_cfg)
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.priority(),
                     )
                     Self::Unknown(wire) => wire.priority,
@@ -1109,12 +1111,9 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
 
             #[inline]
             fn is_empty_payload(&self) -> bool {
-                $(ev_not_any_cfg)
-                match *self {}
-                $(ev_any_cfg)
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => EventMeta::is_empty_payload(inner),
                     )
                     Self::Unknown(_) => false,
@@ -1155,14 +1154,14 @@ fn dispatch_event_describe_tokens(
             #[derive(Clone, Copy, PartialEq, Eq)]
             enum ClusterVariant {
                 $(for c in ev_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     $(c.name.as_str()),
                 )
             }
 
             let by_name = match scope_name {
                 $(for c in ev_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(quoted(&c.name))) => Some(ClusterVariant::$(c.name.as_str())),
                 )
                 Some(other) => return Err(format!("unknown cluster '{other}'")),
@@ -1171,7 +1170,7 @@ fn dispatch_event_describe_tokens(
 
             let by_id = match scope_id {
                 $(for c in ev_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(format_hex_u32(c.cluster_id))) => {
                         Some(ClusterVariant::$(c.name.as_str()))
                     }
@@ -1188,7 +1187,7 @@ fn dispatch_event_describe_tokens(
 
             match selected {
                 $(for c in ev_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     ClusterVariant::$(c.name.as_str()) => {
                         clusters::$(c.module_name.as_str())::Event::select_described(item_name, item_id, payload)
                             .map(ClusterEvent::$(c.name.as_str()))
@@ -1205,7 +1204,7 @@ fn dispatch_event_describe_tokens(
             fn descriptor(&self) -> EntityDescriptor {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.descriptor(),
                     )
                     Self::Unknown(wire) => EntityDescriptor::Event {
@@ -1229,7 +1228,7 @@ fn dispatch_event_describe_tokens(
             {
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         Self::$(c.name.as_str())(inner) => inner.serialize_payload(serializer),
                     )
                     Self::Unknown(wire) => Serialize::serialize(wire, serializer),
@@ -1254,7 +1253,7 @@ fn dispatch_cluster_meta_tokens(sorted_clusters: &[DispatchClusterEntry]) -> Tok
             fn cluster_id(&self) -> ClusterId {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(inner) => inner.cluster_id(),
                         )
@@ -1273,7 +1272,7 @@ fn dispatch_cluster_meta_tokens(sorted_clusters: &[DispatchClusterEntry]) -> Tok
             fn cluster_name(&self) -> &'static str {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(inner) => inner.cluster_name(),
                         )
@@ -1292,7 +1291,7 @@ fn dispatch_cluster_meta_tokens(sorted_clusters: &[DispatchClusterEntry]) -> Tok
             fn is_empty_payload(&self) -> bool {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes && c.is_large_state =>
                             Self::$(c.name.as_str())(inner) => ClusterMeta::is_empty_payload(inner.as_ref()),
                         )
@@ -1344,14 +1343,14 @@ fn dispatch_cluster_describe_tokens(
             #[derive(Clone, Copy, PartialEq, Eq)]
             enum ClusterVariant {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     $(c.name.as_str()),
                 )
             }
 
             let by_name = match scope_name {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(quoted(&c.name))) => Some(ClusterVariant::$(c.name.as_str())),
                 )
                 Some(other) => return Err(format!("unknown cluster '{other}'")),
@@ -1360,7 +1359,7 @@ fn dispatch_cluster_describe_tokens(
 
             let by_id = match scope_id {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(format_hex_u32(c.cluster_id))) => {
                         Some(ClusterVariant::$(c.name.as_str()))
                     }
@@ -1377,7 +1376,7 @@ fn dispatch_cluster_describe_tokens(
 
             match selected {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     ClusterVariant::$(c.name.as_str()) => {
                         $(if c.module_name.len().saturating_add(c.struct_name.len()) > 75 => #[rustfmt::skip])
                         type C = clusters::$(c.module_name.as_str())::$(c.struct_name.as_str());
@@ -1418,7 +1417,7 @@ fn dispatch_cluster_describe_tokens(
                 let _: &S = &serializer;
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(inner) => Serialize::serialize(inner, serializer),
                         )
@@ -1459,7 +1458,7 @@ fn dispatch_cluster_patch_tokens(
         #[rustfmt::skip]
         pub enum ClusterPatch {
             $(for c in sorted_clusters join ($['\r']) =>
-                #[cfg(feature = $(quoted(&c.feature)))]
+                #[cfg($(c.cfg.as_str()))]
                 $(if c.has_attributes && c.is_large_patch =>
                     $(c.name.as_str())(Box<clusters::$(c.module_name.as_str())::$(c.struct_name.as_str())Patch>),
                 )
@@ -1478,7 +1477,7 @@ fn dispatch_cluster_patch_tokens(
             fn from(patch: ClusterPatch) -> Self {
                 match patch {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes && c.is_large_patch =>
                             ClusterPatch::$(c.name.as_str())(inner) => Self::new(
                                 ClusterId::new($(format_hex_u32(c.cluster_id))),
@@ -1514,7 +1513,7 @@ fn dispatch_cluster_patch_tokens(
             fn cluster_id(&self) -> ClusterId {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(_) => ClusterId::new($(format_hex_u32(c.cluster_id))),
                         )
@@ -1531,7 +1530,7 @@ fn dispatch_cluster_patch_tokens(
             fn cluster_name(&self) -> &'static str {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(_) => {
                                 clusters::$(c.module_name.as_str())::$(c.struct_name.as_str())::NAME
@@ -1552,7 +1551,7 @@ fn dispatch_cluster_patch_tokens(
             fn is_empty_payload(&self) -> bool {
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes && c.is_large_patch =>
                             Self::$(c.name.as_str())(inner) => {
                                 PartialCluster::into_attributes((**inner).clone()).is_empty()
@@ -1610,14 +1609,14 @@ fn dispatch_cluster_patch_describe_tokens(
             #[derive(Clone, Copy, PartialEq, Eq)]
             enum ClusterVariant {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     $(c.name.as_str()),
                 )
             }
 
             let by_name = match scope_name {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(quoted(&c.name))) => Some(ClusterVariant::$(c.name.as_str())),
                 )
                 Some(other) => return Err(format!("unknown cluster '{other}'")),
@@ -1626,7 +1625,7 @@ fn dispatch_cluster_patch_describe_tokens(
 
             let by_id = match scope_id {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     Some($(format_hex_u32(c.cluster_id))) => Some(ClusterVariant::$(c.name.as_str())),
                 )
                 Some(other) => return Err(format!("unknown cluster_id {other}")),
@@ -1641,7 +1640,7 @@ fn dispatch_cluster_patch_describe_tokens(
 
             match selected {
                 $(for c in sorted_clusters join ($['\r']) =>
-                    #[cfg(feature = $(quoted(&c.feature)))]
+                    #[cfg($(c.cfg.as_str()))]
                     ClusterVariant::$(c.name.as_str()) => {
                         $(if c.module_name.len().saturating_add(c.struct_name.len()) > 70 => #[rustfmt::skip])
                         type P = clusters::$(c.module_name.as_str())::$(c.struct_name.as_str())Patch;
@@ -1682,7 +1681,7 @@ fn dispatch_cluster_patch_describe_tokens(
                 let _: &S = &serializer;
                 match self {
                     $(for c in sorted_clusters join ($['\r']) =>
-                        #[cfg(feature = $(quoted(&c.feature)))]
+                        #[cfg($(c.cfg.as_str()))]
                         $(if c.has_attributes =>
                             Self::$(c.name.as_str())(inner) => Serialize::serialize(inner, serializer),
                         )
@@ -1914,5 +1913,36 @@ fn dispatch_endpoint_describe_tokens(
                 deserialize_enum_described(deserializer, EntityKind::Device, None, select_endpoint_device)
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dispatch_event_meta_handles_zero_enabled_event_clusters() -> Result<()> {
+        let clusters = [DispatchClusterEntry {
+            cluster_id: 0x0028,
+            module_name: "basic_information".to_owned(),
+            name: "BasicInformation".to_owned(),
+            struct_name: "BasicInformationCluster".to_owned(),
+            cfg: "cluster_basic_information".to_owned(),
+            has_attributes: true,
+            has_client_commands: false,
+            has_server_commands: false,
+            has_events: true,
+            is_large_state: true,
+            is_large_patch: true,
+        }];
+
+        let rendered = generate_version_dispatch_event_rs(&clusters, "1.6")?;
+        assert!(
+            !rendered.contains("match *self {}"),
+            "EventMeta must always cover ClusterEvent::Unknown even when no event clusters are enabled"
+        );
+        assert!(rendered.contains("Self::Unknown(wire) => wire.priority"));
+        assert!(rendered.contains("Self::Unknown(_) => false"));
+        Ok(())
     }
 }

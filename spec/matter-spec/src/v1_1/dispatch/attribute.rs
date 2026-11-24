@@ -10,125 +10,125 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "serde")]
 use crate::dispatch::{BufferedPayload, deserialize_enum_described};
 #[cfg(any(
-    feature = "cluster-identify",
-    feature = "cluster-groups",
-    feature = "cluster-scenes",
-    feature = "cluster-on-off",
-    feature = "cluster-level-control",
-    feature = "cluster-descriptor",
-    feature = "cluster-binding",
-    feature = "cluster-access-control",
-    feature = "cluster-actions",
-    feature = "cluster-basic-information",
-    feature = "cluster-ota-software-update-requestor",
-    feature = "cluster-localization-configuration",
-    feature = "cluster-time-format-localization",
-    feature = "cluster-unit-localization",
-    feature = "cluster-power-source-configuration",
-    feature = "cluster-power-source",
-    feature = "cluster-general-commissioning",
-    feature = "cluster-network-commissioning",
-    feature = "cluster-general-diagnostics",
-    feature = "cluster-software-diagnostics",
-    feature = "cluster-thread-network-diagnostics",
-    feature = "cluster-wi-fi-network-diagnostics",
-    feature = "cluster-ethernet-network-diagnostics",
-    feature = "cluster-time-synchronization",
-    feature = "cluster-bridged-device-basic-information",
-    feature = "cluster-switch",
-    feature = "cluster-administrator-commissioning",
-    feature = "cluster-operational-credentials",
-    feature = "cluster-group-key-management",
-    feature = "cluster-fixed-label",
-    feature = "cluster-user-label",
-    feature = "cluster-boolean-state",
-    feature = "cluster-mode-select",
-    feature = "cluster-door-lock",
-    feature = "cluster-window-covering",
-    feature = "cluster-pump-configuration-and-control",
-    feature = "cluster-thermostat",
-    feature = "cluster-fan-control",
-    feature = "cluster-thermostat-user-interface-configuration",
-    feature = "cluster-color-control",
-    feature = "cluster-ballast-configuration",
-    feature = "cluster-illuminance-measurement",
-    feature = "cluster-temperature-measurement",
-    feature = "cluster-pressure-measurement",
-    feature = "cluster-flow-measurement",
-    feature = "cluster-relative-humidity-measurement",
-    feature = "cluster-occupancy-sensing",
-    feature = "cluster-wake-on-lan",
-    feature = "cluster-channel",
-    feature = "cluster-target-navigator",
-    feature = "cluster-media-playback",
-    feature = "cluster-media-input",
-    feature = "cluster-content-launcher",
-    feature = "cluster-audio-output",
-    feature = "cluster-application-launcher",
-    feature = "cluster-application-basic",
-    feature = "cluster-client-monitoring",
-    feature = "cluster-unit-testing"
+    cluster_identify,
+    cluster_groups,
+    cluster_scenes,
+    cluster_on_off,
+    cluster_level_control,
+    cluster_descriptor,
+    cluster_binding,
+    cluster_access_control,
+    cluster_actions,
+    cluster_basic_information,
+    cluster_ota_software_update_requestor,
+    cluster_localization_configuration,
+    cluster_time_format_localization,
+    cluster_unit_localization,
+    cluster_power_source_configuration,
+    cluster_power_source,
+    cluster_general_commissioning,
+    cluster_network_commissioning,
+    cluster_general_diagnostics,
+    cluster_software_diagnostics,
+    cluster_thread_network_diagnostics,
+    cluster_wi_fi_network_diagnostics,
+    cluster_ethernet_network_diagnostics,
+    cluster_time_synchronization,
+    cluster_bridged_device_basic_information,
+    cluster_switch,
+    cluster_administrator_commissioning,
+    cluster_operational_credentials,
+    cluster_group_key_management,
+    cluster_fixed_label,
+    cluster_user_label,
+    cluster_boolean_state,
+    cluster_mode_select,
+    cluster_door_lock,
+    cluster_window_covering,
+    cluster_pump_configuration_and_control,
+    cluster_thermostat,
+    cluster_fan_control,
+    cluster_thermostat_user_interface_configuration,
+    cluster_color_control,
+    cluster_ballast_configuration,
+    cluster_illuminance_measurement,
+    cluster_temperature_measurement,
+    cluster_pressure_measurement,
+    cluster_flow_measurement,
+    cluster_relative_humidity_measurement,
+    cluster_occupancy_sensing,
+    cluster_wake_on_lan,
+    cluster_channel,
+    cluster_target_navigator,
+    cluster_media_playback,
+    cluster_media_input,
+    cluster_content_launcher,
+    cluster_audio_output,
+    cluster_application_launcher,
+    cluster_application_basic,
+    cluster_client_monitoring,
+    cluster_unit_testing
 ))]
 use crate::model::MatterStatus;
 #[cfg(any(
-    feature = "cluster-identify",
-    feature = "cluster-groups",
-    feature = "cluster-scenes",
-    feature = "cluster-on-off",
-    feature = "cluster-level-control",
-    feature = "cluster-descriptor",
-    feature = "cluster-binding",
-    feature = "cluster-access-control",
-    feature = "cluster-actions",
-    feature = "cluster-basic-information",
-    feature = "cluster-ota-software-update-requestor",
-    feature = "cluster-localization-configuration",
-    feature = "cluster-time-format-localization",
-    feature = "cluster-unit-localization",
-    feature = "cluster-power-source-configuration",
-    feature = "cluster-power-source",
-    feature = "cluster-general-commissioning",
-    feature = "cluster-network-commissioning",
-    feature = "cluster-general-diagnostics",
-    feature = "cluster-software-diagnostics",
-    feature = "cluster-thread-network-diagnostics",
-    feature = "cluster-wi-fi-network-diagnostics",
-    feature = "cluster-ethernet-network-diagnostics",
-    feature = "cluster-time-synchronization",
-    feature = "cluster-bridged-device-basic-information",
-    feature = "cluster-switch",
-    feature = "cluster-administrator-commissioning",
-    feature = "cluster-operational-credentials",
-    feature = "cluster-group-key-management",
-    feature = "cluster-fixed-label",
-    feature = "cluster-user-label",
-    feature = "cluster-boolean-state",
-    feature = "cluster-mode-select",
-    feature = "cluster-door-lock",
-    feature = "cluster-window-covering",
-    feature = "cluster-pump-configuration-and-control",
-    feature = "cluster-thermostat",
-    feature = "cluster-fan-control",
-    feature = "cluster-thermostat-user-interface-configuration",
-    feature = "cluster-color-control",
-    feature = "cluster-ballast-configuration",
-    feature = "cluster-illuminance-measurement",
-    feature = "cluster-temperature-measurement",
-    feature = "cluster-pressure-measurement",
-    feature = "cluster-flow-measurement",
-    feature = "cluster-relative-humidity-measurement",
-    feature = "cluster-occupancy-sensing",
-    feature = "cluster-wake-on-lan",
-    feature = "cluster-channel",
-    feature = "cluster-target-navigator",
-    feature = "cluster-media-playback",
-    feature = "cluster-media-input",
-    feature = "cluster-content-launcher",
-    feature = "cluster-audio-output",
-    feature = "cluster-application-launcher",
-    feature = "cluster-application-basic",
-    feature = "cluster-client-monitoring",
-    feature = "cluster-unit-testing"
+    cluster_identify,
+    cluster_groups,
+    cluster_scenes,
+    cluster_on_off,
+    cluster_level_control,
+    cluster_descriptor,
+    cluster_binding,
+    cluster_access_control,
+    cluster_actions,
+    cluster_basic_information,
+    cluster_ota_software_update_requestor,
+    cluster_localization_configuration,
+    cluster_time_format_localization,
+    cluster_unit_localization,
+    cluster_power_source_configuration,
+    cluster_power_source,
+    cluster_general_commissioning,
+    cluster_network_commissioning,
+    cluster_general_diagnostics,
+    cluster_software_diagnostics,
+    cluster_thread_network_diagnostics,
+    cluster_wi_fi_network_diagnostics,
+    cluster_ethernet_network_diagnostics,
+    cluster_time_synchronization,
+    cluster_bridged_device_basic_information,
+    cluster_switch,
+    cluster_administrator_commissioning,
+    cluster_operational_credentials,
+    cluster_group_key_management,
+    cluster_fixed_label,
+    cluster_user_label,
+    cluster_boolean_state,
+    cluster_mode_select,
+    cluster_door_lock,
+    cluster_window_covering,
+    cluster_pump_configuration_and_control,
+    cluster_thermostat,
+    cluster_fan_control,
+    cluster_thermostat_user_interface_configuration,
+    cluster_color_control,
+    cluster_ballast_configuration,
+    cluster_illuminance_measurement,
+    cluster_temperature_measurement,
+    cluster_pressure_measurement,
+    cluster_flow_measurement,
+    cluster_relative_humidity_measurement,
+    cluster_occupancy_sensing,
+    cluster_wake_on_lan,
+    cluster_channel,
+    cluster_target_navigator,
+    cluster_media_playback,
+    cluster_media_input,
+    cluster_content_launcher,
+    cluster_audio_output,
+    cluster_application_launcher,
+    cluster_application_basic,
+    cluster_client_monitoring,
+    cluster_unit_testing
 ))]
 use crate::v1_1::clusters;
 use crate::{
@@ -144,121 +144,121 @@ use crate::{
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[non_exhaustive]
 pub enum ClusterAttribute {
-    #[cfg(feature = "cluster-identify")]
+    #[cfg(cluster_identify)]
     Identify(clusters::identify::Attribute),
-    #[cfg(feature = "cluster-groups")]
+    #[cfg(cluster_groups)]
     Groups(clusters::groups::Attribute),
-    #[cfg(feature = "cluster-scenes")]
+    #[cfg(cluster_scenes)]
     Scenes(clusters::scenes::Attribute),
-    #[cfg(feature = "cluster-on-off")]
+    #[cfg(cluster_on_off)]
     OnOff(clusters::on_off::Attribute),
-    #[cfg(feature = "cluster-level-control")]
+    #[cfg(cluster_level_control)]
     LevelControl(clusters::level_control::Attribute),
-    #[cfg(feature = "cluster-descriptor")]
+    #[cfg(cluster_descriptor)]
     Descriptor(clusters::descriptor::Attribute),
-    #[cfg(feature = "cluster-binding")]
+    #[cfg(cluster_binding)]
     Binding(clusters::binding::Attribute),
-    #[cfg(feature = "cluster-access-control")]
+    #[cfg(cluster_access_control)]
     AccessControl(clusters::access_control::Attribute),
-    #[cfg(feature = "cluster-actions")]
+    #[cfg(cluster_actions)]
     Actions(clusters::actions::Attribute),
-    #[cfg(feature = "cluster-basic-information")]
+    #[cfg(cluster_basic_information)]
     BasicInformation(clusters::basic_information::Attribute),
-    #[cfg(feature = "cluster-ota-software-update-requestor")]
+    #[cfg(cluster_ota_software_update_requestor)]
     OtaSoftwareUpdateRequestor(clusters::ota_software_update_requestor::Attribute),
-    #[cfg(feature = "cluster-localization-configuration")]
+    #[cfg(cluster_localization_configuration)]
     LocalizationConfiguration(clusters::localization_configuration::Attribute),
-    #[cfg(feature = "cluster-time-format-localization")]
+    #[cfg(cluster_time_format_localization)]
     TimeFormatLocalization(clusters::time_format_localization::Attribute),
-    #[cfg(feature = "cluster-unit-localization")]
+    #[cfg(cluster_unit_localization)]
     UnitLocalization(clusters::unit_localization::Attribute),
-    #[cfg(feature = "cluster-power-source-configuration")]
+    #[cfg(cluster_power_source_configuration)]
     PowerSourceConfiguration(clusters::power_source_configuration::Attribute),
-    #[cfg(feature = "cluster-power-source")]
+    #[cfg(cluster_power_source)]
     PowerSource(clusters::power_source::Attribute),
-    #[cfg(feature = "cluster-general-commissioning")]
+    #[cfg(cluster_general_commissioning)]
     GeneralCommissioning(clusters::general_commissioning::Attribute),
-    #[cfg(feature = "cluster-network-commissioning")]
+    #[cfg(cluster_network_commissioning)]
     NetworkCommissioning(clusters::network_commissioning::Attribute),
-    #[cfg(feature = "cluster-general-diagnostics")]
+    #[cfg(cluster_general_diagnostics)]
     GeneralDiagnostics(clusters::general_diagnostics::Attribute),
-    #[cfg(feature = "cluster-software-diagnostics")]
+    #[cfg(cluster_software_diagnostics)]
     SoftwareDiagnostics(clusters::software_diagnostics::Attribute),
-    #[cfg(feature = "cluster-thread-network-diagnostics")]
+    #[cfg(cluster_thread_network_diagnostics)]
     ThreadNetworkDiagnostics(clusters::thread_network_diagnostics::Attribute),
-    #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+    #[cfg(cluster_wi_fi_network_diagnostics)]
     WiFiNetworkDiagnostics(clusters::wi_fi_network_diagnostics::Attribute),
-    #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+    #[cfg(cluster_ethernet_network_diagnostics)]
     EthernetNetworkDiagnostics(clusters::ethernet_network_diagnostics::Attribute),
-    #[cfg(feature = "cluster-time-synchronization")]
+    #[cfg(cluster_time_synchronization)]
     TimeSynchronization(clusters::time_synchronization::Attribute),
-    #[cfg(feature = "cluster-bridged-device-basic-information")]
+    #[cfg(cluster_bridged_device_basic_information)]
     BridgedDeviceBasicInformation(clusters::bridged_device_basic_information::Attribute),
-    #[cfg(feature = "cluster-switch")]
+    #[cfg(cluster_switch)]
     Switch(clusters::switch::Attribute),
-    #[cfg(feature = "cluster-administrator-commissioning")]
+    #[cfg(cluster_administrator_commissioning)]
     AdministratorCommissioning(clusters::administrator_commissioning::Attribute),
-    #[cfg(feature = "cluster-operational-credentials")]
+    #[cfg(cluster_operational_credentials)]
     OperationalCredentials(clusters::operational_credentials::Attribute),
-    #[cfg(feature = "cluster-group-key-management")]
+    #[cfg(cluster_group_key_management)]
     GroupKeyManagement(clusters::group_key_management::Attribute),
-    #[cfg(feature = "cluster-fixed-label")]
+    #[cfg(cluster_fixed_label)]
     FixedLabel(clusters::fixed_label::Attribute),
-    #[cfg(feature = "cluster-user-label")]
+    #[cfg(cluster_user_label)]
     UserLabel(clusters::user_label::Attribute),
-    #[cfg(feature = "cluster-boolean-state")]
+    #[cfg(cluster_boolean_state)]
     BooleanState(clusters::boolean_state::Attribute),
-    #[cfg(feature = "cluster-mode-select")]
+    #[cfg(cluster_mode_select)]
     ModeSelect(clusters::mode_select::Attribute),
-    #[cfg(feature = "cluster-door-lock")]
+    #[cfg(cluster_door_lock)]
     DoorLock(clusters::door_lock::Attribute),
-    #[cfg(feature = "cluster-window-covering")]
+    #[cfg(cluster_window_covering)]
     WindowCovering(clusters::window_covering::Attribute),
-    #[cfg(feature = "cluster-pump-configuration-and-control")]
+    #[cfg(cluster_pump_configuration_and_control)]
     PumpConfigurationAndControl(clusters::pump_configuration_and_control::Attribute),
-    #[cfg(feature = "cluster-thermostat")]
+    #[cfg(cluster_thermostat)]
     Thermostat(clusters::thermostat::Attribute),
-    #[cfg(feature = "cluster-fan-control")]
+    #[cfg(cluster_fan_control)]
     FanControl(clusters::fan_control::Attribute),
-    #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+    #[cfg(cluster_thermostat_user_interface_configuration)]
     ThermostatUserInterfaceConfiguration(clusters::thermostat_user_interface_configuration::Attribute),
-    #[cfg(feature = "cluster-color-control")]
+    #[cfg(cluster_color_control)]
     ColorControl(clusters::color_control::Attribute),
-    #[cfg(feature = "cluster-ballast-configuration")]
+    #[cfg(cluster_ballast_configuration)]
     BallastConfiguration(clusters::ballast_configuration::Attribute),
-    #[cfg(feature = "cluster-illuminance-measurement")]
+    #[cfg(cluster_illuminance_measurement)]
     IlluminanceMeasurement(clusters::illuminance_measurement::Attribute),
-    #[cfg(feature = "cluster-temperature-measurement")]
+    #[cfg(cluster_temperature_measurement)]
     TemperatureMeasurement(clusters::temperature_measurement::Attribute),
-    #[cfg(feature = "cluster-pressure-measurement")]
+    #[cfg(cluster_pressure_measurement)]
     PressureMeasurement(clusters::pressure_measurement::Attribute),
-    #[cfg(feature = "cluster-flow-measurement")]
+    #[cfg(cluster_flow_measurement)]
     FlowMeasurement(clusters::flow_measurement::Attribute),
-    #[cfg(feature = "cluster-relative-humidity-measurement")]
+    #[cfg(cluster_relative_humidity_measurement)]
     RelativeHumidityMeasurement(clusters::relative_humidity_measurement::Attribute),
-    #[cfg(feature = "cluster-occupancy-sensing")]
+    #[cfg(cluster_occupancy_sensing)]
     OccupancySensing(clusters::occupancy_sensing::Attribute),
-    #[cfg(feature = "cluster-wake-on-lan")]
+    #[cfg(cluster_wake_on_lan)]
     WakeOnLan(clusters::wake_on_lan::Attribute),
-    #[cfg(feature = "cluster-channel")]
+    #[cfg(cluster_channel)]
     Channel(clusters::channel::Attribute),
-    #[cfg(feature = "cluster-target-navigator")]
+    #[cfg(cluster_target_navigator)]
     TargetNavigator(clusters::target_navigator::Attribute),
-    #[cfg(feature = "cluster-media-playback")]
+    #[cfg(cluster_media_playback)]
     MediaPlayback(clusters::media_playback::Attribute),
-    #[cfg(feature = "cluster-media-input")]
+    #[cfg(cluster_media_input)]
     MediaInput(clusters::media_input::Attribute),
-    #[cfg(feature = "cluster-content-launcher")]
+    #[cfg(cluster_content_launcher)]
     ContentLauncher(clusters::content_launcher::Attribute),
-    #[cfg(feature = "cluster-audio-output")]
+    #[cfg(cluster_audio_output)]
     AudioOutput(clusters::audio_output::Attribute),
-    #[cfg(feature = "cluster-application-launcher")]
+    #[cfg(cluster_application_launcher)]
     ApplicationLauncher(clusters::application_launcher::Attribute),
-    #[cfg(feature = "cluster-application-basic")]
+    #[cfg(cluster_application_basic)]
     ApplicationBasic(clusters::application_basic::Attribute),
-    #[cfg(feature = "cluster-client-monitoring")]
+    #[cfg(cluster_client_monitoring)]
     ClientMonitoring(clusters::client_monitoring::Attribute),
-    #[cfg(feature = "cluster-unit-testing")]
+    #[cfg(cluster_unit_testing)]
     UnitTesting(clusters::unit_testing::Attribute),
     /// Forward-compatible fallback for unrecognized clusters.
     Unknown(ClusterId, AttributeId, AttributeValue),
@@ -272,7 +272,7 @@ impl ClusterAttribute {
         val: AttributeValue,
     ) -> Result<Self, AttributeError> {
         match cluster_id.raw() {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             0x0003 => clusters::identify::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Identify)
                 .map_err(|status| match status {
@@ -283,7 +283,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             0x0004 => clusters::groups::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Groups)
                 .map_err(|status| match status {
@@ -294,7 +294,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             0x0005 => clusters::scenes::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Scenes)
                 .map_err(|status| match status {
@@ -305,7 +305,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             0x0006 => clusters::on_off::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::OnOff)
                 .map_err(|status| match status {
@@ -316,7 +316,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             0x0008 => clusters::level_control::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::LevelControl)
                 .map_err(|status| match status {
@@ -327,7 +327,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             0x001D => clusters::descriptor::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Descriptor)
                 .map_err(|status| match status {
@@ -338,7 +338,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             0x001E => clusters::binding::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Binding)
                 .map_err(|status| match status {
@@ -349,7 +349,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             0x001F => clusters::access_control::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::AccessControl)
                 .map_err(|status| match status {
@@ -360,7 +360,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             0x0025 => clusters::actions::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Actions)
                 .map_err(|status| match status {
@@ -371,7 +371,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             0x0028 => clusters::basic_information::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::BasicInformation)
                 .map_err(|status| match status {
@@ -382,7 +382,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             0x002A => clusters::ota_software_update_requestor::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::OtaSoftwareUpdateRequestor)
                 .map_err(|status| match status {
@@ -393,7 +393,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             0x002B => clusters::localization_configuration::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::LocalizationConfiguration)
                 .map_err(|status| match status {
@@ -404,7 +404,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             0x002C => clusters::time_format_localization::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::TimeFormatLocalization)
                 .map_err(|status| match status {
@@ -415,7 +415,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             0x002D => clusters::unit_localization::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::UnitLocalization)
                 .map_err(|status| match status {
@@ -426,7 +426,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             0x002E => clusters::power_source_configuration::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::PowerSourceConfiguration)
                 .map_err(|status| match status {
@@ -437,7 +437,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             0x002F => clusters::power_source::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::PowerSource)
                 .map_err(|status| match status {
@@ -448,7 +448,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             0x0030 => clusters::general_commissioning::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::GeneralCommissioning)
                 .map_err(|status| match status {
@@ -459,7 +459,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             0x0031 => clusters::network_commissioning::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::NetworkCommissioning)
                 .map_err(|status| match status {
@@ -470,7 +470,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             0x0033 => clusters::general_diagnostics::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::GeneralDiagnostics)
                 .map_err(|status| match status {
@@ -481,7 +481,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             0x0034 => clusters::software_diagnostics::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::SoftwareDiagnostics)
                 .map_err(|status| match status {
@@ -492,7 +492,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             0x0035 => clusters::thread_network_diagnostics::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ThreadNetworkDiagnostics)
                 .map_err(|status| match status {
@@ -503,7 +503,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             0x0036 => clusters::wi_fi_network_diagnostics::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::WiFiNetworkDiagnostics)
                 .map_err(|status| match status {
@@ -514,7 +514,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             0x0037 => clusters::ethernet_network_diagnostics::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::EthernetNetworkDiagnostics)
                 .map_err(|status| match status {
@@ -525,7 +525,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             0x0038 => clusters::time_synchronization::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::TimeSynchronization)
                 .map_err(|status| match status {
@@ -536,7 +536,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             0x0039 => clusters::bridged_device_basic_information::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::BridgedDeviceBasicInformation)
                 .map_err(|status| match status {
@@ -547,7 +547,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             0x003B => clusters::switch::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Switch)
                 .map_err(|status| match status {
@@ -558,7 +558,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             0x003C => clusters::administrator_commissioning::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::AdministratorCommissioning)
                 .map_err(|status| match status {
@@ -569,7 +569,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             0x003E => clusters::operational_credentials::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::OperationalCredentials)
                 .map_err(|status| match status {
@@ -580,7 +580,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             0x003F => clusters::group_key_management::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::GroupKeyManagement)
                 .map_err(|status| match status {
@@ -591,7 +591,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             0x0040 => clusters::fixed_label::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::FixedLabel)
                 .map_err(|status| match status {
@@ -602,7 +602,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             0x0041 => clusters::user_label::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::UserLabel)
                 .map_err(|status| match status {
@@ -613,7 +613,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             0x0045 => clusters::boolean_state::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::BooleanState)
                 .map_err(|status| match status {
@@ -624,7 +624,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             0x0050 => clusters::mode_select::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ModeSelect)
                 .map_err(|status| match status {
@@ -635,7 +635,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             0x0101 => clusters::door_lock::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::DoorLock)
                 .map_err(|status| match status {
@@ -646,7 +646,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             0x0102 => clusters::window_covering::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::WindowCovering)
                 .map_err(|status| match status {
@@ -657,7 +657,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             0x0200 => clusters::pump_configuration_and_control::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::PumpConfigurationAndControl)
                 .map_err(|status| match status {
@@ -668,7 +668,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             0x0201 => clusters::thermostat::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Thermostat)
                 .map_err(|status| match status {
@@ -679,7 +679,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             0x0202 => clusters::fan_control::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::FanControl)
                 .map_err(|status| match status {
@@ -690,7 +690,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             0x0204 => clusters::thermostat_user_interface_configuration::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ThermostatUserInterfaceConfiguration)
                 .map_err(|status| match status {
@@ -701,7 +701,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             0x0300 => clusters::color_control::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ColorControl)
                 .map_err(|status| match status {
@@ -712,7 +712,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             0x0301 => clusters::ballast_configuration::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::BallastConfiguration)
                 .map_err(|status| match status {
@@ -723,7 +723,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             0x0400 => clusters::illuminance_measurement::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::IlluminanceMeasurement)
                 .map_err(|status| match status {
@@ -734,7 +734,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             0x0402 => clusters::temperature_measurement::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::TemperatureMeasurement)
                 .map_err(|status| match status {
@@ -745,7 +745,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             0x0403 => clusters::pressure_measurement::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::PressureMeasurement)
                 .map_err(|status| match status {
@@ -756,7 +756,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             0x0404 => clusters::flow_measurement::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::FlowMeasurement)
                 .map_err(|status| match status {
@@ -767,7 +767,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             0x0405 => clusters::relative_humidity_measurement::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::RelativeHumidityMeasurement)
                 .map_err(|status| match status {
@@ -778,7 +778,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             0x0406 => clusters::occupancy_sensing::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::OccupancySensing)
                 .map_err(|status| match status {
@@ -789,7 +789,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             0x0503 => clusters::wake_on_lan::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::WakeOnLan)
                 .map_err(|status| match status {
@@ -800,7 +800,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             0x0504 => clusters::channel::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::Channel)
                 .map_err(|status| match status {
@@ -811,7 +811,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             0x0505 => clusters::target_navigator::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::TargetNavigator)
                 .map_err(|status| match status {
@@ -822,7 +822,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             0x0506 => clusters::media_playback::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::MediaPlayback)
                 .map_err(|status| match status {
@@ -833,7 +833,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             0x0507 => clusters::media_input::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::MediaInput)
                 .map_err(|status| match status {
@@ -844,7 +844,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             0x050A => clusters::content_launcher::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ContentLauncher)
                 .map_err(|status| match status {
@@ -855,7 +855,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             0x050B => clusters::audio_output::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::AudioOutput)
                 .map_err(|status| match status {
@@ -866,7 +866,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             0x050C => clusters::application_launcher::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ApplicationLauncher)
                 .map_err(|status| match status {
@@ -877,7 +877,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             0x050D => clusters::application_basic::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ApplicationBasic)
                 .map_err(|status| match status {
@@ -888,7 +888,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             0x1046 => clusters::client_monitoring::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::ClientMonitoring)
                 .map_err(|status| match status {
@@ -899,7 +899,7 @@ impl ClusterAttribute {
                         status,
                     },
                 }),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             0xFFF1_FC05 => clusters::unit_testing::Attribute::try_from_pair(attribute_id, val)
                 .map(Self::UnitTesting)
                 .map_err(|status| match status {
@@ -918,121 +918,121 @@ impl ClusterAttribute {
 impl From<ClusterAttribute> for WireAttribute {
     fn from(attr: ClusterAttribute) -> Self {
         match attr {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             ClusterAttribute::Identify(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             ClusterAttribute::Groups(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             ClusterAttribute::Scenes(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             ClusterAttribute::OnOff(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             ClusterAttribute::LevelControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             ClusterAttribute::Descriptor(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             ClusterAttribute::Binding(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             ClusterAttribute::AccessControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             ClusterAttribute::Actions(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             ClusterAttribute::BasicInformation(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             ClusterAttribute::OtaSoftwareUpdateRequestor(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             ClusterAttribute::LocalizationConfiguration(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             ClusterAttribute::TimeFormatLocalization(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             ClusterAttribute::UnitLocalization(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             ClusterAttribute::PowerSourceConfiguration(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             ClusterAttribute::PowerSource(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             ClusterAttribute::GeneralCommissioning(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             ClusterAttribute::NetworkCommissioning(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             ClusterAttribute::GeneralDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             ClusterAttribute::SoftwareDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ClusterAttribute::ThreadNetworkDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             ClusterAttribute::WiFiNetworkDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             ClusterAttribute::EthernetNetworkDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             ClusterAttribute::TimeSynchronization(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             ClusterAttribute::BridgedDeviceBasicInformation(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             ClusterAttribute::Switch(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             ClusterAttribute::AdministratorCommissioning(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             ClusterAttribute::OperationalCredentials(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             ClusterAttribute::GroupKeyManagement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             ClusterAttribute::FixedLabel(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             ClusterAttribute::UserLabel(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             ClusterAttribute::BooleanState(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             ClusterAttribute::ModeSelect(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             ClusterAttribute::DoorLock(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             ClusterAttribute::WindowCovering(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             ClusterAttribute::PumpConfigurationAndControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             ClusterAttribute::Thermostat(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             ClusterAttribute::FanControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             ClusterAttribute::ThermostatUserInterfaceConfiguration(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             ClusterAttribute::ColorControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             ClusterAttribute::BallastConfiguration(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             ClusterAttribute::IlluminanceMeasurement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             ClusterAttribute::TemperatureMeasurement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             ClusterAttribute::PressureMeasurement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             ClusterAttribute::FlowMeasurement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             ClusterAttribute::RelativeHumidityMeasurement(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             ClusterAttribute::OccupancySensing(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             ClusterAttribute::WakeOnLan(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             ClusterAttribute::Channel(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             ClusterAttribute::TargetNavigator(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             ClusterAttribute::MediaPlayback(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             ClusterAttribute::MediaInput(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             ClusterAttribute::ContentLauncher(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             ClusterAttribute::AudioOutput(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             ClusterAttribute::ApplicationLauncher(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             ClusterAttribute::ApplicationBasic(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             ClusterAttribute::ClientMonitoring(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             ClusterAttribute::UnitTesting(inner) => Self::from(inner),
             ClusterAttribute::Unknown(_, id, val) => Self::new(id, val),
         }
@@ -1043,121 +1043,121 @@ impl AttributeMeta for ClusterAttribute {
     #[inline]
     fn cluster_id(&self) -> ClusterId {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.cluster_id(),
             Self::Unknown(cid, _, _) => *cid,
         }
@@ -1167,121 +1167,121 @@ impl AttributeMeta for ClusterAttribute {
     #[rustfmt::skip]
     fn cluster_name(&self) -> &'static str {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.cluster_name(),
             Self::Unknown(_, _, _) => "Unknown",
         }
@@ -1290,121 +1290,121 @@ impl AttributeMeta for ClusterAttribute {
     #[inline]
     fn attribute_id(&self) -> AttributeId {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.attribute_id(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.attribute_id(),
             Self::Unknown(_, aid, _) => *aid,
         }
@@ -1413,121 +1413,121 @@ impl AttributeMeta for ClusterAttribute {
     #[inline]
     fn attribute_name(&self) -> &'static str {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.attribute_name(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.attribute_name(),
             Self::Unknown(_, _, _) => "Unknown",
         }
@@ -1553,64 +1553,64 @@ fn select_cluster_attribute(
     }
     let (_, _, _) = (item_name, item_id, &payload);
     #[cfg(not(any(
-        feature = "cluster-identify",
-        feature = "cluster-groups",
-        feature = "cluster-scenes",
-        feature = "cluster-on-off",
-        feature = "cluster-level-control",
-        feature = "cluster-descriptor",
-        feature = "cluster-binding",
-        feature = "cluster-access-control",
-        feature = "cluster-actions",
-        feature = "cluster-basic-information",
-        feature = "cluster-ota-software-update-requestor",
-        feature = "cluster-localization-configuration",
-        feature = "cluster-time-format-localization",
-        feature = "cluster-unit-localization",
-        feature = "cluster-power-source-configuration",
-        feature = "cluster-power-source",
-        feature = "cluster-general-commissioning",
-        feature = "cluster-network-commissioning",
-        feature = "cluster-general-diagnostics",
-        feature = "cluster-software-diagnostics",
-        feature = "cluster-thread-network-diagnostics",
-        feature = "cluster-wi-fi-network-diagnostics",
-        feature = "cluster-ethernet-network-diagnostics",
-        feature = "cluster-time-synchronization",
-        feature = "cluster-bridged-device-basic-information",
-        feature = "cluster-switch",
-        feature = "cluster-administrator-commissioning",
-        feature = "cluster-operational-credentials",
-        feature = "cluster-group-key-management",
-        feature = "cluster-fixed-label",
-        feature = "cluster-user-label",
-        feature = "cluster-boolean-state",
-        feature = "cluster-mode-select",
-        feature = "cluster-door-lock",
-        feature = "cluster-window-covering",
-        feature = "cluster-pump-configuration-and-control",
-        feature = "cluster-thermostat",
-        feature = "cluster-fan-control",
-        feature = "cluster-thermostat-user-interface-configuration",
-        feature = "cluster-color-control",
-        feature = "cluster-ballast-configuration",
-        feature = "cluster-illuminance-measurement",
-        feature = "cluster-temperature-measurement",
-        feature = "cluster-pressure-measurement",
-        feature = "cluster-flow-measurement",
-        feature = "cluster-relative-humidity-measurement",
-        feature = "cluster-occupancy-sensing",
-        feature = "cluster-wake-on-lan",
-        feature = "cluster-channel",
-        feature = "cluster-target-navigator",
-        feature = "cluster-media-playback",
-        feature = "cluster-media-input",
-        feature = "cluster-content-launcher",
-        feature = "cluster-audio-output",
-        feature = "cluster-application-launcher",
-        feature = "cluster-application-basic",
-        feature = "cluster-client-monitoring",
-        feature = "cluster-unit-testing"
+        cluster_identify,
+        cluster_groups,
+        cluster_scenes,
+        cluster_on_off,
+        cluster_level_control,
+        cluster_descriptor,
+        cluster_binding,
+        cluster_access_control,
+        cluster_actions,
+        cluster_basic_information,
+        cluster_ota_software_update_requestor,
+        cluster_localization_configuration,
+        cluster_time_format_localization,
+        cluster_unit_localization,
+        cluster_power_source_configuration,
+        cluster_power_source,
+        cluster_general_commissioning,
+        cluster_network_commissioning,
+        cluster_general_diagnostics,
+        cluster_software_diagnostics,
+        cluster_thread_network_diagnostics,
+        cluster_wi_fi_network_diagnostics,
+        cluster_ethernet_network_diagnostics,
+        cluster_time_synchronization,
+        cluster_bridged_device_basic_information,
+        cluster_switch,
+        cluster_administrator_commissioning,
+        cluster_operational_credentials,
+        cluster_group_key_management,
+        cluster_fixed_label,
+        cluster_user_label,
+        cluster_boolean_state,
+        cluster_mode_select,
+        cluster_door_lock,
+        cluster_window_covering,
+        cluster_pump_configuration_and_control,
+        cluster_thermostat,
+        cluster_fan_control,
+        cluster_thermostat_user_interface_configuration,
+        cluster_color_control,
+        cluster_ballast_configuration,
+        cluster_illuminance_measurement,
+        cluster_temperature_measurement,
+        cluster_pressure_measurement,
+        cluster_flow_measurement,
+        cluster_relative_humidity_measurement,
+        cluster_occupancy_sensing,
+        cluster_wake_on_lan,
+        cluster_channel,
+        cluster_target_navigator,
+        cluster_media_playback,
+        cluster_media_input,
+        cluster_content_launcher,
+        cluster_audio_output,
+        cluster_application_launcher,
+        cluster_application_basic,
+        cluster_client_monitoring,
+        cluster_unit_testing
     )))]
     {
         match (scope_name, scope_id) {
@@ -1622,423 +1622,423 @@ fn select_cluster_attribute(
         }
     }
     #[cfg(any(
-        feature = "cluster-identify",
-        feature = "cluster-groups",
-        feature = "cluster-scenes",
-        feature = "cluster-on-off",
-        feature = "cluster-level-control",
-        feature = "cluster-descriptor",
-        feature = "cluster-binding",
-        feature = "cluster-access-control",
-        feature = "cluster-actions",
-        feature = "cluster-basic-information",
-        feature = "cluster-ota-software-update-requestor",
-        feature = "cluster-localization-configuration",
-        feature = "cluster-time-format-localization",
-        feature = "cluster-unit-localization",
-        feature = "cluster-power-source-configuration",
-        feature = "cluster-power-source",
-        feature = "cluster-general-commissioning",
-        feature = "cluster-network-commissioning",
-        feature = "cluster-general-diagnostics",
-        feature = "cluster-software-diagnostics",
-        feature = "cluster-thread-network-diagnostics",
-        feature = "cluster-wi-fi-network-diagnostics",
-        feature = "cluster-ethernet-network-diagnostics",
-        feature = "cluster-time-synchronization",
-        feature = "cluster-bridged-device-basic-information",
-        feature = "cluster-switch",
-        feature = "cluster-administrator-commissioning",
-        feature = "cluster-operational-credentials",
-        feature = "cluster-group-key-management",
-        feature = "cluster-fixed-label",
-        feature = "cluster-user-label",
-        feature = "cluster-boolean-state",
-        feature = "cluster-mode-select",
-        feature = "cluster-door-lock",
-        feature = "cluster-window-covering",
-        feature = "cluster-pump-configuration-and-control",
-        feature = "cluster-thermostat",
-        feature = "cluster-fan-control",
-        feature = "cluster-thermostat-user-interface-configuration",
-        feature = "cluster-color-control",
-        feature = "cluster-ballast-configuration",
-        feature = "cluster-illuminance-measurement",
-        feature = "cluster-temperature-measurement",
-        feature = "cluster-pressure-measurement",
-        feature = "cluster-flow-measurement",
-        feature = "cluster-relative-humidity-measurement",
-        feature = "cluster-occupancy-sensing",
-        feature = "cluster-wake-on-lan",
-        feature = "cluster-channel",
-        feature = "cluster-target-navigator",
-        feature = "cluster-media-playback",
-        feature = "cluster-media-input",
-        feature = "cluster-content-launcher",
-        feature = "cluster-audio-output",
-        feature = "cluster-application-launcher",
-        feature = "cluster-application-basic",
-        feature = "cluster-client-monitoring",
-        feature = "cluster-unit-testing"
+        cluster_identify,
+        cluster_groups,
+        cluster_scenes,
+        cluster_on_off,
+        cluster_level_control,
+        cluster_descriptor,
+        cluster_binding,
+        cluster_access_control,
+        cluster_actions,
+        cluster_basic_information,
+        cluster_ota_software_update_requestor,
+        cluster_localization_configuration,
+        cluster_time_format_localization,
+        cluster_unit_localization,
+        cluster_power_source_configuration,
+        cluster_power_source,
+        cluster_general_commissioning,
+        cluster_network_commissioning,
+        cluster_general_diagnostics,
+        cluster_software_diagnostics,
+        cluster_thread_network_diagnostics,
+        cluster_wi_fi_network_diagnostics,
+        cluster_ethernet_network_diagnostics,
+        cluster_time_synchronization,
+        cluster_bridged_device_basic_information,
+        cluster_switch,
+        cluster_administrator_commissioning,
+        cluster_operational_credentials,
+        cluster_group_key_management,
+        cluster_fixed_label,
+        cluster_user_label,
+        cluster_boolean_state,
+        cluster_mode_select,
+        cluster_door_lock,
+        cluster_window_covering,
+        cluster_pump_configuration_and_control,
+        cluster_thermostat,
+        cluster_fan_control,
+        cluster_thermostat_user_interface_configuration,
+        cluster_color_control,
+        cluster_ballast_configuration,
+        cluster_illuminance_measurement,
+        cluster_temperature_measurement,
+        cluster_pressure_measurement,
+        cluster_flow_measurement,
+        cluster_relative_humidity_measurement,
+        cluster_occupancy_sensing,
+        cluster_wake_on_lan,
+        cluster_channel,
+        cluster_target_navigator,
+        cluster_media_playback,
+        cluster_media_input,
+        cluster_content_launcher,
+        cluster_audio_output,
+        cluster_application_launcher,
+        cluster_application_basic,
+        cluster_client_monitoring,
+        cluster_unit_testing
     ))]
     {
         #[derive(Clone, Copy, PartialEq, Eq)]
         enum ClusterVariant {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Identify,
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Groups,
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Scenes,
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             OnOff,
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             LevelControl,
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Descriptor,
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Binding,
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             AccessControl,
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Actions,
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             BasicInformation,
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             OtaSoftwareUpdateRequestor,
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             LocalizationConfiguration,
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             TimeFormatLocalization,
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             UnitLocalization,
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             PowerSourceConfiguration,
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             PowerSource,
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             GeneralCommissioning,
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             NetworkCommissioning,
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             GeneralDiagnostics,
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             SoftwareDiagnostics,
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ThreadNetworkDiagnostics,
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             WiFiNetworkDiagnostics,
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             EthernetNetworkDiagnostics,
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             TimeSynchronization,
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             BridgedDeviceBasicInformation,
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Switch,
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             AdministratorCommissioning,
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             OperationalCredentials,
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             GroupKeyManagement,
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             FixedLabel,
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             UserLabel,
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             BooleanState,
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             ModeSelect,
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             DoorLock,
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             WindowCovering,
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             PumpConfigurationAndControl,
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Thermostat,
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             FanControl,
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             ThermostatUserInterfaceConfiguration,
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             ColorControl,
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             BallastConfiguration,
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             IlluminanceMeasurement,
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             TemperatureMeasurement,
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             PressureMeasurement,
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             FlowMeasurement,
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             RelativeHumidityMeasurement,
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             OccupancySensing,
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             WakeOnLan,
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Channel,
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             TargetNavigator,
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             MediaPlayback,
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             MediaInput,
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             ContentLauncher,
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             AudioOutput,
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             ApplicationLauncher,
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             ApplicationBasic,
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             ClientMonitoring,
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             UnitTesting,
         }
 
         let by_name = match scope_name {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Some("Identify") => Some(ClusterVariant::Identify),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Some("Groups") => Some(ClusterVariant::Groups),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Some("Scenes") => Some(ClusterVariant::Scenes),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Some("OnOff") => Some(ClusterVariant::OnOff),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Some("LevelControl") => Some(ClusterVariant::LevelControl),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Some("Descriptor") => Some(ClusterVariant::Descriptor),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Some("Binding") => Some(ClusterVariant::Binding),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Some("AccessControl") => Some(ClusterVariant::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Some("Actions") => Some(ClusterVariant::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Some("BasicInformation") => Some(ClusterVariant::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Some("OtaSoftwareUpdateRequestor") => Some(ClusterVariant::OtaSoftwareUpdateRequestor),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Some("LocalizationConfiguration") => Some(ClusterVariant::LocalizationConfiguration),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Some("TimeFormatLocalization") => Some(ClusterVariant::TimeFormatLocalization),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Some("UnitLocalization") => Some(ClusterVariant::UnitLocalization),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Some("PowerSourceConfiguration") => Some(ClusterVariant::PowerSourceConfiguration),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Some("PowerSource") => Some(ClusterVariant::PowerSource),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Some("GeneralCommissioning") => Some(ClusterVariant::GeneralCommissioning),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Some("NetworkCommissioning") => Some(ClusterVariant::NetworkCommissioning),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Some("GeneralDiagnostics") => Some(ClusterVariant::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Some("SoftwareDiagnostics") => Some(ClusterVariant::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Some("ThreadNetworkDiagnostics") => Some(ClusterVariant::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Some("WiFiNetworkDiagnostics") => Some(ClusterVariant::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Some("EthernetNetworkDiagnostics") => Some(ClusterVariant::EthernetNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Some("TimeSynchronization") => Some(ClusterVariant::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Some("BridgedDeviceBasicInformation") => Some(ClusterVariant::BridgedDeviceBasicInformation),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Some("Switch") => Some(ClusterVariant::Switch),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Some("AdministratorCommissioning") => Some(ClusterVariant::AdministratorCommissioning),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Some("OperationalCredentials") => Some(ClusterVariant::OperationalCredentials),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Some("GroupKeyManagement") => Some(ClusterVariant::GroupKeyManagement),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Some("FixedLabel") => Some(ClusterVariant::FixedLabel),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Some("UserLabel") => Some(ClusterVariant::UserLabel),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Some("BooleanState") => Some(ClusterVariant::BooleanState),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Some("ModeSelect") => Some(ClusterVariant::ModeSelect),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Some("DoorLock") => Some(ClusterVariant::DoorLock),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Some("WindowCovering") => Some(ClusterVariant::WindowCovering),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Some("PumpConfigurationAndControl") => Some(ClusterVariant::PumpConfigurationAndControl),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Some("Thermostat") => Some(ClusterVariant::Thermostat),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Some("FanControl") => Some(ClusterVariant::FanControl),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Some("ThermostatUserInterfaceConfiguration") => Some(ClusterVariant::ThermostatUserInterfaceConfiguration),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Some("ColorControl") => Some(ClusterVariant::ColorControl),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Some("BallastConfiguration") => Some(ClusterVariant::BallastConfiguration),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Some("IlluminanceMeasurement") => Some(ClusterVariant::IlluminanceMeasurement),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Some("TemperatureMeasurement") => Some(ClusterVariant::TemperatureMeasurement),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Some("PressureMeasurement") => Some(ClusterVariant::PressureMeasurement),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Some("FlowMeasurement") => Some(ClusterVariant::FlowMeasurement),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Some("RelativeHumidityMeasurement") => Some(ClusterVariant::RelativeHumidityMeasurement),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Some("OccupancySensing") => Some(ClusterVariant::OccupancySensing),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Some("WakeOnLan") => Some(ClusterVariant::WakeOnLan),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Some("Channel") => Some(ClusterVariant::Channel),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Some("TargetNavigator") => Some(ClusterVariant::TargetNavigator),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Some("MediaPlayback") => Some(ClusterVariant::MediaPlayback),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Some("MediaInput") => Some(ClusterVariant::MediaInput),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Some("ContentLauncher") => Some(ClusterVariant::ContentLauncher),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Some("AudioOutput") => Some(ClusterVariant::AudioOutput),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Some("ApplicationLauncher") => Some(ClusterVariant::ApplicationLauncher),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Some("ApplicationBasic") => Some(ClusterVariant::ApplicationBasic),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Some("ClientMonitoring") => Some(ClusterVariant::ClientMonitoring),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Some("UnitTesting") => Some(ClusterVariant::UnitTesting),
             Some(other) => return Err(format!("unknown cluster '{other}'")),
             None => None,
         };
 
         let by_id = match scope_id {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Some(0x0003) => Some(ClusterVariant::Identify),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Some(0x0004) => Some(ClusterVariant::Groups),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Some(0x0005) => Some(ClusterVariant::Scenes),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Some(0x0006) => Some(ClusterVariant::OnOff),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Some(0x0008) => Some(ClusterVariant::LevelControl),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Some(0x001D) => Some(ClusterVariant::Descriptor),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Some(0x001E) => Some(ClusterVariant::Binding),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Some(0x001F) => Some(ClusterVariant::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Some(0x0025) => Some(ClusterVariant::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Some(0x0028) => Some(ClusterVariant::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Some(0x002A) => Some(ClusterVariant::OtaSoftwareUpdateRequestor),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Some(0x002B) => Some(ClusterVariant::LocalizationConfiguration),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Some(0x002C) => Some(ClusterVariant::TimeFormatLocalization),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Some(0x002D) => Some(ClusterVariant::UnitLocalization),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Some(0x002E) => Some(ClusterVariant::PowerSourceConfiguration),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Some(0x002F) => Some(ClusterVariant::PowerSource),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Some(0x0030) => Some(ClusterVariant::GeneralCommissioning),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Some(0x0031) => Some(ClusterVariant::NetworkCommissioning),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Some(0x0033) => Some(ClusterVariant::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Some(0x0034) => Some(ClusterVariant::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Some(0x0035) => Some(ClusterVariant::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Some(0x0036) => Some(ClusterVariant::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Some(0x0037) => Some(ClusterVariant::EthernetNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Some(0x0038) => Some(ClusterVariant::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Some(0x0039) => Some(ClusterVariant::BridgedDeviceBasicInformation),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Some(0x003B) => Some(ClusterVariant::Switch),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Some(0x003C) => Some(ClusterVariant::AdministratorCommissioning),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Some(0x003E) => Some(ClusterVariant::OperationalCredentials),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Some(0x003F) => Some(ClusterVariant::GroupKeyManagement),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Some(0x0040) => Some(ClusterVariant::FixedLabel),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Some(0x0041) => Some(ClusterVariant::UserLabel),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Some(0x0045) => Some(ClusterVariant::BooleanState),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Some(0x0050) => Some(ClusterVariant::ModeSelect),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Some(0x0101) => Some(ClusterVariant::DoorLock),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Some(0x0102) => Some(ClusterVariant::WindowCovering),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Some(0x0200) => Some(ClusterVariant::PumpConfigurationAndControl),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Some(0x0201) => Some(ClusterVariant::Thermostat),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Some(0x0202) => Some(ClusterVariant::FanControl),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Some(0x0204) => Some(ClusterVariant::ThermostatUserInterfaceConfiguration),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Some(0x0300) => Some(ClusterVariant::ColorControl),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Some(0x0301) => Some(ClusterVariant::BallastConfiguration),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Some(0x0400) => Some(ClusterVariant::IlluminanceMeasurement),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Some(0x0402) => Some(ClusterVariant::TemperatureMeasurement),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Some(0x0403) => Some(ClusterVariant::PressureMeasurement),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Some(0x0404) => Some(ClusterVariant::FlowMeasurement),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Some(0x0405) => Some(ClusterVariant::RelativeHumidityMeasurement),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Some(0x0406) => Some(ClusterVariant::OccupancySensing),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Some(0x0503) => Some(ClusterVariant::WakeOnLan),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Some(0x0504) => Some(ClusterVariant::Channel),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Some(0x0505) => Some(ClusterVariant::TargetNavigator),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Some(0x0506) => Some(ClusterVariant::MediaPlayback),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Some(0x0507) => Some(ClusterVariant::MediaInput),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Some(0x050A) => Some(ClusterVariant::ContentLauncher),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Some(0x050B) => Some(ClusterVariant::AudioOutput),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Some(0x050C) => Some(ClusterVariant::ApplicationLauncher),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Some(0x050D) => Some(ClusterVariant::ApplicationBasic),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Some(0x1046) => Some(ClusterVariant::ClientMonitoring),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Some(0xFFF1_FC05) => Some(ClusterVariant::UnitTesting),
             Some(other) => return Err(format!("unknown cluster_id {other}")),
             None => None,
@@ -2055,278 +2055,278 @@ fn select_cluster_attribute(
         };
 
         match selected {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             ClusterVariant::Identify => clusters::identify::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::Identify),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             ClusterVariant::Groups => {
                 clusters::groups::Attribute::select_described(item_name, item_id, payload).map(ClusterAttribute::Groups)
             }
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             ClusterVariant::Scenes => {
                 clusters::scenes::Attribute::select_described(item_name, item_id, payload).map(ClusterAttribute::Scenes)
             }
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             ClusterVariant::OnOff => {
                 clusters::on_off::Attribute::select_described(item_name, item_id, payload).map(ClusterAttribute::OnOff)
             }
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             ClusterVariant::LevelControl => {
                 clusters::level_control::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::LevelControl)
             }
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             ClusterVariant::Descriptor => {
                 clusters::descriptor::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::Descriptor)
             }
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             ClusterVariant::Binding => clusters::binding::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::Binding),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             ClusterVariant::AccessControl => {
                 clusters::access_control::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::AccessControl)
             }
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             ClusterVariant::Actions => clusters::actions::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             ClusterVariant::BasicInformation => {
                 clusters::basic_information::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::BasicInformation)
             }
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             ClusterVariant::OtaSoftwareUpdateRequestor => {
                 clusters::ota_software_update_requestor::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::OtaSoftwareUpdateRequestor)
             }
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             ClusterVariant::LocalizationConfiguration => {
                 clusters::localization_configuration::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::LocalizationConfiguration)
             }
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             ClusterVariant::TimeFormatLocalization => {
                 clusters::time_format_localization::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::TimeFormatLocalization)
             }
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             ClusterVariant::UnitLocalization => {
                 clusters::unit_localization::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::UnitLocalization)
             }
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             ClusterVariant::PowerSourceConfiguration => {
                 clusters::power_source_configuration::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::PowerSourceConfiguration)
             }
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             ClusterVariant::PowerSource => {
                 clusters::power_source::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::PowerSource)
             }
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             ClusterVariant::GeneralCommissioning => {
                 clusters::general_commissioning::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::GeneralCommissioning)
             }
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             ClusterVariant::NetworkCommissioning => {
                 clusters::network_commissioning::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::NetworkCommissioning)
             }
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             ClusterVariant::GeneralDiagnostics => {
                 clusters::general_diagnostics::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::GeneralDiagnostics)
             }
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             ClusterVariant::SoftwareDiagnostics => {
                 clusters::software_diagnostics::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::SoftwareDiagnostics)
             }
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ClusterVariant::ThreadNetworkDiagnostics => {
                 clusters::thread_network_diagnostics::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ThreadNetworkDiagnostics)
             }
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             ClusterVariant::WiFiNetworkDiagnostics => {
                 clusters::wi_fi_network_diagnostics::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::WiFiNetworkDiagnostics)
             }
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             ClusterVariant::EthernetNetworkDiagnostics => {
                 clusters::ethernet_network_diagnostics::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::EthernetNetworkDiagnostics)
             }
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             ClusterVariant::TimeSynchronization => {
                 clusters::time_synchronization::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::TimeSynchronization)
             }
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             ClusterVariant::BridgedDeviceBasicInformation => {
                 clusters::bridged_device_basic_information::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::BridgedDeviceBasicInformation)
             }
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             ClusterVariant::Switch => {
                 clusters::switch::Attribute::select_described(item_name, item_id, payload).map(ClusterAttribute::Switch)
             }
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             ClusterVariant::AdministratorCommissioning => {
                 clusters::administrator_commissioning::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::AdministratorCommissioning)
             }
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             ClusterVariant::OperationalCredentials => {
                 clusters::operational_credentials::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::OperationalCredentials)
             }
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             ClusterVariant::GroupKeyManagement => {
                 clusters::group_key_management::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::GroupKeyManagement)
             }
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             ClusterVariant::FixedLabel => {
                 clusters::fixed_label::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::FixedLabel)
             }
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             ClusterVariant::UserLabel => clusters::user_label::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::UserLabel),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             ClusterVariant::BooleanState => {
                 clusters::boolean_state::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::BooleanState)
             }
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             ClusterVariant::ModeSelect => {
                 clusters::mode_select::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ModeSelect)
             }
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             ClusterVariant::DoorLock => clusters::door_lock::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::DoorLock),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             ClusterVariant::WindowCovering => {
                 clusters::window_covering::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::WindowCovering)
             }
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             ClusterVariant::PumpConfigurationAndControl => {
                 clusters::pump_configuration_and_control::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::PumpConfigurationAndControl)
             }
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             ClusterVariant::Thermostat => {
                 clusters::thermostat::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::Thermostat)
             }
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             ClusterVariant::FanControl => {
                 clusters::fan_control::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::FanControl)
             }
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             ClusterVariant::ThermostatUserInterfaceConfiguration => {
                 clusters::thermostat_user_interface_configuration::Attribute::select_described(
                     item_name, item_id, payload,
                 )
                 .map(ClusterAttribute::ThermostatUserInterfaceConfiguration)
             }
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             ClusterVariant::ColorControl => {
                 clusters::color_control::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ColorControl)
             }
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             ClusterVariant::BallastConfiguration => {
                 clusters::ballast_configuration::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::BallastConfiguration)
             }
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             ClusterVariant::IlluminanceMeasurement => {
                 clusters::illuminance_measurement::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::IlluminanceMeasurement)
             }
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             ClusterVariant::TemperatureMeasurement => {
                 clusters::temperature_measurement::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::TemperatureMeasurement)
             }
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             ClusterVariant::PressureMeasurement => {
                 clusters::pressure_measurement::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::PressureMeasurement)
             }
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             ClusterVariant::FlowMeasurement => {
                 clusters::flow_measurement::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::FlowMeasurement)
             }
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             ClusterVariant::RelativeHumidityMeasurement => {
                 clusters::relative_humidity_measurement::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::RelativeHumidityMeasurement)
             }
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             ClusterVariant::OccupancySensing => {
                 clusters::occupancy_sensing::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::OccupancySensing)
             }
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             ClusterVariant::WakeOnLan => {
                 clusters::wake_on_lan::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::WakeOnLan)
             }
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             ClusterVariant::Channel => clusters::channel::Attribute::select_described(item_name, item_id, payload)
                 .map(ClusterAttribute::Channel),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             ClusterVariant::TargetNavigator => {
                 clusters::target_navigator::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::TargetNavigator)
             }
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             ClusterVariant::MediaPlayback => {
                 clusters::media_playback::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::MediaPlayback)
             }
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             ClusterVariant::MediaInput => {
                 clusters::media_input::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::MediaInput)
             }
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             ClusterVariant::ContentLauncher => {
                 clusters::content_launcher::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ContentLauncher)
             }
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             ClusterVariant::AudioOutput => {
                 clusters::audio_output::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::AudioOutput)
             }
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             ClusterVariant::ApplicationLauncher => {
                 clusters::application_launcher::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ApplicationLauncher)
             }
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             ClusterVariant::ApplicationBasic => {
                 clusters::application_basic::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ApplicationBasic)
             }
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             ClusterVariant::ClientMonitoring => {
                 clusters::client_monitoring::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::ClientMonitoring)
             }
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             ClusterVariant::UnitTesting => {
                 clusters::unit_testing::Attribute::select_described(item_name, item_id, payload)
                     .map(ClusterAttribute::UnitTesting)
@@ -2341,121 +2341,121 @@ impl MatterDescribe for ClusterAttribute {
     #[inline]
     fn descriptor(&self) -> EntityDescriptor {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.descriptor(),
             Self::Unknown(cid, aid, _) => EntityDescriptor::Attribute {
                 cluster: "Unknown",
@@ -2472,121 +2472,121 @@ impl MatterDescribe for ClusterAttribute {
         S: serde::Serializer,
     {
         match self {
-            #[cfg(feature = "cluster-identify")]
+            #[cfg(cluster_identify)]
             Self::Identify(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-groups")]
+            #[cfg(cluster_groups)]
             Self::Groups(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-scenes")]
+            #[cfg(cluster_scenes)]
             Self::Scenes(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-on-off")]
+            #[cfg(cluster_on_off)]
             Self::OnOff(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-level-control")]
+            #[cfg(cluster_level_control)]
             Self::LevelControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-descriptor")]
+            #[cfg(cluster_descriptor)]
             Self::Descriptor(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-binding")]
+            #[cfg(cluster_binding)]
             Self::Binding(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-localization-configuration")]
+            #[cfg(cluster_localization_configuration)]
             Self::LocalizationConfiguration(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-time-format-localization")]
+            #[cfg(cluster_time_format_localization)]
             Self::TimeFormatLocalization(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-unit-localization")]
+            #[cfg(cluster_unit_localization)]
             Self::UnitLocalization(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-power-source-configuration")]
+            #[cfg(cluster_power_source_configuration)]
             Self::PowerSourceConfiguration(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-general-commissioning")]
+            #[cfg(cluster_general_commissioning)]
             Self::GeneralCommissioning(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-network-commissioning")]
+            #[cfg(cluster_network_commissioning)]
             Self::NetworkCommissioning(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+            #[cfg(cluster_ethernet_network_diagnostics)]
             Self::EthernetNetworkDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-administrator-commissioning")]
+            #[cfg(cluster_administrator_commissioning)]
             Self::AdministratorCommissioning(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-operational-credentials")]
+            #[cfg(cluster_operational_credentials)]
             Self::OperationalCredentials(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-group-key-management")]
+            #[cfg(cluster_group_key_management)]
             Self::GroupKeyManagement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-fixed-label")]
+            #[cfg(cluster_fixed_label)]
             Self::FixedLabel(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-user-label")]
+            #[cfg(cluster_user_label)]
             Self::UserLabel(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-mode-select")]
+            #[cfg(cluster_mode_select)]
             Self::ModeSelect(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-window-covering")]
+            #[cfg(cluster_window_covering)]
             Self::WindowCovering(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-thermostat")]
+            #[cfg(cluster_thermostat)]
             Self::Thermostat(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-fan-control")]
+            #[cfg(cluster_fan_control)]
             Self::FanControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+            #[cfg(cluster_thermostat_user_interface_configuration)]
             Self::ThermostatUserInterfaceConfiguration(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-color-control")]
+            #[cfg(cluster_color_control)]
             Self::ColorControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-ballast-configuration")]
+            #[cfg(cluster_ballast_configuration)]
             Self::BallastConfiguration(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-illuminance-measurement")]
+            #[cfg(cluster_illuminance_measurement)]
             Self::IlluminanceMeasurement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-temperature-measurement")]
+            #[cfg(cluster_temperature_measurement)]
             Self::TemperatureMeasurement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-pressure-measurement")]
+            #[cfg(cluster_pressure_measurement)]
             Self::PressureMeasurement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-flow-measurement")]
+            #[cfg(cluster_flow_measurement)]
             Self::FlowMeasurement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-relative-humidity-measurement")]
+            #[cfg(cluster_relative_humidity_measurement)]
             Self::RelativeHumidityMeasurement(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-occupancy-sensing")]
+            #[cfg(cluster_occupancy_sensing)]
             Self::OccupancySensing(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-wake-on-lan")]
+            #[cfg(cluster_wake_on_lan)]
             Self::WakeOnLan(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-channel")]
+            #[cfg(cluster_channel)]
             Self::Channel(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-target-navigator")]
+            #[cfg(cluster_target_navigator)]
             Self::TargetNavigator(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-media-playback")]
+            #[cfg(cluster_media_playback)]
             Self::MediaPlayback(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-media-input")]
+            #[cfg(cluster_media_input)]
             Self::MediaInput(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-content-launcher")]
+            #[cfg(cluster_content_launcher)]
             Self::ContentLauncher(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-audio-output")]
+            #[cfg(cluster_audio_output)]
             Self::AudioOutput(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-application-launcher")]
+            #[cfg(cluster_application_launcher)]
             Self::ApplicationLauncher(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-application-basic")]
+            #[cfg(cluster_application_basic)]
             Self::ApplicationBasic(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-client-monitoring")]
+            #[cfg(cluster_client_monitoring)]
             Self::ClientMonitoring(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.serialize_payload(serializer),
             Self::Unknown(_, _, val) => Serialize::serialize(val, serializer),
         }

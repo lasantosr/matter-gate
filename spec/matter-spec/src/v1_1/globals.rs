@@ -9,29 +9,17 @@ use alloc::{string::String, vec::Vec};
 use serde::{Deserialize, Serialize};
 
 // Global attributes defined: 8
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::color_enum::*;
-#[cfg(any(
-    feature = "cluster-thread-network-diagnostics",
-    feature = "cluster-wi-fi-network-diagnostics"
-))]
+#[cfg(any(cluster_thread_network_diagnostics, cluster_wi_fi_network_diagnostics))]
 pub use crate::__shared::globals::connection_status_enum::*;
-#[cfg(any(feature = "cluster-fixed-label", feature = "cluster-user-label"))]
+#[cfg(any(cluster_fixed_label, cluster_user_label))]
 pub use crate::__shared::globals::label_struct_v1_0_v1_1::*;
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::product_appearance_struct_v1_1_v1_3::*;
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::product_finish_enum::*;
-#[cfg(any(feature = "cluster-access-control", feature = "cluster-binding"))]
+#[cfg(any(cluster_access_control, cluster_binding))]
 pub use crate::__shared::globals::target::*;
 #[allow(unused_imports, reason = "Generated global imports")]
 use crate::{
@@ -44,10 +32,7 @@ use crate::{
     types,
 };
 
-#[cfg(any(
-    feature = "cluster-general-diagnostics",
-    feature = "cluster-thread-network-diagnostics"
-))]
+#[cfg(any(cluster_general_diagnostics, cluster_thread_network_diagnostics))]
 crate::define_matter_enum! {
     /// NetworkFault exhaustive specification enum.
     pub enum NetworkFault {
@@ -61,7 +46,7 @@ crate::define_matter_enum! {
     default = Unspecified;
 }
 
-#[cfg(any(feature = "cluster-application-basic", feature = "cluster-application-launcher"))]
+#[cfg(any(cluster_application_basic, cluster_application_launcher))]
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -75,7 +60,7 @@ pub struct ApplicationStruct {
     pub application_id: String,
 }
 
-#[cfg(any(feature = "cluster-application-basic", feature = "cluster-application-launcher"))]
+#[cfg(any(cluster_application_basic, cluster_application_launcher))]
 impl ApplicationStruct {
     pub const FIELD_APPLICATION_ID: FieldId = FieldId::new(0x1);
     pub const FIELD_CATALOG_VENDOR_ID: FieldId = FieldId::new(0x0);
@@ -137,7 +122,7 @@ impl ApplicationStruct {
     }
 }
 
-#[cfg(any(feature = "cluster-application-basic", feature = "cluster-application-launcher"))]
+#[cfg(any(cluster_application_basic, cluster_application_launcher))]
 impl From<ApplicationStruct> for AttributeValue {
     #[inline]
     fn from(val: ApplicationStruct) -> Self {
@@ -145,7 +130,7 @@ impl From<ApplicationStruct> for AttributeValue {
     }
 }
 
-#[cfg(any(feature = "cluster-application-basic", feature = "cluster-application-launcher"))]
+#[cfg(any(cluster_application_basic, cluster_application_launcher))]
 impl TryFrom<AttributeValue> for ApplicationStruct {
     type Error = MatterStatus;
 

@@ -8,7 +8,7 @@ use crate::{
     model::{
         AccessFlags, BitmapDef, ClusterDef, CommandDef, CommandDirection, ConformanceOp, EnumDef, FieldDef, GlobalDefs,
         ParsedDeviceType, ResolvedType, StructDef, is_legacy_device_include_ignored, resolve_include_target,
-        to_kebab_case, to_shouty_snake_case,
+        to_kebab_case, to_shouty_snake_case, to_snake_case,
     },
 };
 
@@ -528,7 +528,7 @@ fn render_cluster_descriptor(
         all_structs,
     );
     let mut visiting = BTreeSet::new();
-    let cluster_feat = format!("cluster-{}", to_kebab_case(&c.name));
+    let cluster_cfg = format!("cluster_{}", to_snake_case(&c.name));
     let cid_hex = format_hex(u64::from(c.code), 4);
 
     let choice_tokens: Vec<Tokens> = c
@@ -595,7 +595,7 @@ fn render_cluster_descriptor(
     }
 
     Ok(quote! {
-        #[cfg(feature = $(quoted(&cluster_feat)))]
+        #[cfg($(cluster_cfg.as_str()))]
         ClusterDescriptor {
             id: ClusterId::new($cid_hex),
             name: $(quoted(&c.name)),

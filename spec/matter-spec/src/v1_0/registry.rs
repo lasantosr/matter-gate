@@ -14,7 +14,7 @@ use crate::{
 #[doc=" Static cluster descriptors sorted by [`ClusterId`]."]
 #[rustfmt::skip]
 static CLUSTERS: &[ClusterDescriptor] = &[
-    #[cfg(feature = "cluster-identify")]
+    #[cfg(cluster_identify)]
     ClusterDescriptor {
         id: ClusterId::new(0x0003),
         name: "Identify",
@@ -85,7 +85,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-scenes")]
+    #[cfg(cluster_scenes)]
     ClusterDescriptor {
         id: ClusterId::new(0x0005),
         name: "Scenes",
@@ -933,7 +933,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-on-off")]
+    #[cfg(cluster_on_off)]
     ClusterDescriptor {
         id: ClusterId::new(0x0006),
         name: "OnOff",
@@ -1080,7 +1080,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-pulse-width-modulation")]
+    #[cfg(cluster_pulse_width_modulation)]
     ClusterDescriptor {
         id: ClusterId::new(0x001C),
         name: "PulseWidthModulation",
@@ -1089,7 +1089,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-descriptor")]
+    #[cfg(cluster_descriptor)]
     ClusterDescriptor {
         id: ClusterId::new(0x001D),
         name: "Descriptor",
@@ -1181,7 +1181,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-binding")]
+    #[cfg(cluster_binding)]
     ClusterDescriptor {
         id: ClusterId::new(0x001E),
         name: "Binding",
@@ -1237,7 +1237,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-access-control")]
+    #[cfg(cluster_access_control)]
     ClusterDescriptor {
         id: ClusterId::new(0x001F),
         name: "AccessControl",
@@ -1558,7 +1558,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-actions")]
+    #[cfg(cluster_actions)]
     ClusterDescriptor {
         id: ClusterId::new(0x0025),
         name: "Actions",
@@ -2060,7 +2060,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-basic-information")]
+    #[cfg(cluster_basic_information)]
     ClusterDescriptor {
         id: ClusterId::new(0x0028),
         name: "BasicInformation",
@@ -2311,7 +2311,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-ota-software-update-provider")]
+    #[cfg(cluster_ota_software_update_provider)]
     ClusterDescriptor {
         id: ClusterId::new(0x0029),
         name: "OtaSoftwareUpdateProvider",
@@ -2518,7 +2518,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-ota-software-update-requestor")]
+    #[cfg(cluster_ota_software_update_requestor)]
     ClusterDescriptor {
         id: ClusterId::new(0x002A),
         name: "OtaSoftwareUpdateRequestor",
@@ -2734,7 +2734,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-localization-configuration")]
+    #[cfg(cluster_localization_configuration)]
     ClusterDescriptor {
         id: ClusterId::new(0x002B),
         name: "LocalizationConfiguration",
@@ -2768,7 +2768,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-time-format-localization")]
+    #[cfg(cluster_time_format_localization)]
     ClusterDescriptor {
         id: ClusterId::new(0x002C),
         name: "TimeFormatLocalization",
@@ -2822,7 +2822,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-unit-localization")]
+    #[cfg(cluster_unit_localization)]
     ClusterDescriptor {
         id: ClusterId::new(0x002D),
         name: "UnitLocalization",
@@ -2844,7 +2844,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-power-source-configuration")]
+    #[cfg(cluster_power_source_configuration)]
     ClusterDescriptor {
         id: ClusterId::new(0x002E),
         name: "PowerSourceConfiguration",
@@ -2870,7 +2870,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-power-source")]
+    #[cfg(cluster_power_source)]
     ClusterDescriptor {
         id: ClusterId::new(0x002F),
         name: "PowerSource",
@@ -3184,7 +3184,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-general-commissioning")]
+    #[cfg(cluster_general_commissioning)]
     ClusterDescriptor {
         id: ClusterId::new(0x0030),
         name: "GeneralCommissioning",
@@ -3396,7 +3396,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-network-commissioning")]
+    #[cfg(cluster_network_commissioning)]
     ClusterDescriptor {
         id: ClusterId::new(0x0031),
         name: "NetworkCommissioning",
@@ -3858,7 +3858,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-diagnostic-logs")]
+    #[cfg(cluster_diagnostic_logs)]
     ClusterDescriptor {
         id: ClusterId::new(0x0032),
         name: "DiagnosticLogs",
@@ -3940,7 +3940,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-general-diagnostics")]
+    #[cfg(cluster_general_diagnostics)]
     ClusterDescriptor {
         id: ClusterId::new(0x0033),
         name: "GeneralDiagnostics",
@@ -4305,7 +4305,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-software-diagnostics")]
+    #[cfg(cluster_software_diagnostics)]
     ClusterDescriptor {
         id: ClusterId::new(0x0034),
         name: "SoftwareDiagnostics",
@@ -4428,7 +4428,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-thread-network-diagnostics")]
+    #[cfg(cluster_thread_network_diagnostics)]
     ClusterDescriptor {
         id: ClusterId::new(0x0035),
         name: "ThreadNetworkDiagnostics",
@@ -5300,7 +5300,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+    #[cfg(cluster_wi_fi_network_diagnostics)]
     ClusterDescriptor {
         id: ClusterId::new(0x0036),
         name: "WiFiNetworkDiagnostics",
@@ -5491,7 +5491,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+    #[cfg(cluster_ethernet_network_diagnostics)]
     ClusterDescriptor {
         id: ClusterId::new(0x0037),
         name: "EthernetNetworkDiagnostics",
@@ -5586,7 +5586,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-time-synchronization")]
+    #[cfg(cluster_time_synchronization)]
     ClusterDescriptor {
         id: ClusterId::new(0x0038),
         name: "TimeSynchronization",
@@ -5784,7 +5784,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-bridged-device-basic")]
+    #[cfg(cluster_bridged_device_basic)]
     ClusterDescriptor {
         id: ClusterId::new(0x0039),
         name: "BridgedDeviceBasic",
@@ -5961,7 +5961,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-switch")]
+    #[cfg(cluster_switch)]
     ClusterDescriptor {
         id: ClusterId::new(0x003B),
         name: "Switch",
@@ -6113,7 +6113,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-administrator-commissioning")]
+    #[cfg(cluster_administrator_commissioning)]
     ClusterDescriptor {
         id: ClusterId::new(0x003C),
         name: "AdministratorCommissioning",
@@ -6214,7 +6214,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-operational-credentials")]
+    #[cfg(cluster_operational_credentials)]
     ClusterDescriptor {
         id: ClusterId::new(0x003E),
         name: "OperationalCredentials",
@@ -6595,7 +6595,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-group-key-management")]
+    #[cfg(cluster_group_key_management)]
     ClusterDescriptor {
         id: ClusterId::new(0x003F),
         name: "GroupKeyManagement",
@@ -6926,7 +6926,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-fixed-label")]
+    #[cfg(cluster_fixed_label)]
     ClusterDescriptor {
         id: ClusterId::new(0x0040),
         name: "FixedLabel",
@@ -6970,7 +6970,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-user-label")]
+    #[cfg(cluster_user_label)]
     ClusterDescriptor {
         id: ClusterId::new(0x0041),
         name: "UserLabel",
@@ -7014,7 +7014,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-proxy-configuration")]
+    #[cfg(cluster_proxy_configuration)]
     ClusterDescriptor {
         id: ClusterId::new(0x0042),
         name: "ProxyConfiguration",
@@ -7023,7 +7023,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-proxy-discovery")]
+    #[cfg(cluster_proxy_discovery)]
     ClusterDescriptor {
         id: ClusterId::new(0x0043),
         name: "ProxyDiscovery",
@@ -7032,7 +7032,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-proxy-valid")]
+    #[cfg(cluster_proxy_valid)]
     ClusterDescriptor {
         id: ClusterId::new(0x0044),
         name: "ProxyValid",
@@ -7041,7 +7041,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-boolean-state")]
+    #[cfg(cluster_boolean_state)]
     ClusterDescriptor {
         id: ClusterId::new(0x0045),
         name: "BooleanState",
@@ -7075,7 +7075,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-mode-select")]
+    #[cfg(cluster_mode_select)]
     ClusterDescriptor {
         id: ClusterId::new(0x0050),
         name: "ModeSelect",
@@ -7207,7 +7207,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-door-lock")]
+    #[cfg(cluster_door_lock)]
     ClusterDescriptor {
         id: ClusterId::new(0x0101),
         name: "DoorLock",
@@ -8692,7 +8692,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-window-covering")]
+    #[cfg(cluster_window_covering)]
     ClusterDescriptor {
         id: ClusterId::new(0x0102),
         name: "WindowCovering",
@@ -8987,7 +8987,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-pump-configuration-and-control")]
+    #[cfg(cluster_pump_configuration_and_control)]
     ClusterDescriptor {
         id: ClusterId::new(0x0200),
         name: "PumpConfigurationAndControl",
@@ -9338,7 +9338,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-thermostat")]
+    #[cfg(cluster_thermostat)]
     ClusterDescriptor {
         id: ClusterId::new(0x0201),
         name: "Thermostat",
@@ -9921,7 +9921,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-illuminance-measurement")]
+    #[cfg(cluster_illuminance_measurement)]
     ClusterDescriptor {
         id: ClusterId::new(0x0400),
         name: "IlluminanceMeasurement",
@@ -9971,7 +9971,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-temperature-measurement")]
+    #[cfg(cluster_temperature_measurement)]
     ClusterDescriptor {
         id: ClusterId::new(0x0402),
         name: "TemperatureMeasurement",
@@ -10013,7 +10013,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-pressure-measurement")]
+    #[cfg(cluster_pressure_measurement)]
     ClusterDescriptor {
         id: ClusterId::new(0x0403),
         name: "PressureMeasurement",
@@ -10095,7 +10095,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-flow-measurement")]
+    #[cfg(cluster_flow_measurement)]
     ClusterDescriptor {
         id: ClusterId::new(0x0404),
         name: "FlowMeasurement",
@@ -10137,7 +10137,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-relative-humidity-measurement")]
+    #[cfg(cluster_relative_humidity_measurement)]
     ClusterDescriptor {
         id: ClusterId::new(0x0405),
         name: "RelativeHumidityMeasurement",
@@ -10179,7 +10179,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-wake-on-lan")]
+    #[cfg(cluster_wake_on_lan)]
     ClusterDescriptor {
         id: ClusterId::new(0x0503),
         name: "WakeOnLan",
@@ -10197,7 +10197,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-channel")]
+    #[cfg(cluster_channel)]
     ClusterDescriptor {
         id: ClusterId::new(0x0504),
         name: "Channel",
@@ -10422,7 +10422,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-target-navigator")]
+    #[cfg(cluster_target_navigator)]
     ClusterDescriptor {
         id: ClusterId::new(0x0505),
         name: "TargetNavigator",
@@ -10521,7 +10521,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-media-playback")]
+    #[cfg(cluster_media_playback)]
     ClusterDescriptor {
         id: ClusterId::new(0x0506),
         name: "MediaPlayback",
@@ -10744,7 +10744,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-media-input")]
+    #[cfg(cluster_media_input)]
     ClusterDescriptor {
         id: ClusterId::new(0x0507),
         name: "MediaInput",
@@ -10865,7 +10865,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-low-power")]
+    #[cfg(cluster_low_power)]
     ClusterDescriptor {
         id: ClusterId::new(0x0508),
         name: "LowPower",
@@ -10883,7 +10883,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-keypad-input")]
+    #[cfg(cluster_keypad_input)]
     ClusterDescriptor {
         id: ClusterId::new(0x0509),
         name: "KeypadInput",
@@ -10931,7 +10931,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-content-launcher")]
+    #[cfg(cluster_content_launcher)]
     ClusterDescriptor {
         id: ClusterId::new(0x050A),
         name: "ContentLauncher",
@@ -11421,7 +11421,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-audio-output")]
+    #[cfg(cluster_audio_output)]
     ClusterDescriptor {
         id: ClusterId::new(0x050B),
         name: "AudioOutput",
@@ -11520,7 +11520,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-application-launcher")]
+    #[cfg(cluster_application_launcher)]
     ClusterDescriptor {
         id: ClusterId::new(0x050C),
         name: "ApplicationLauncher",
@@ -11721,7 +11721,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-application-basic")]
+    #[cfg(cluster_application_basic)]
     ClusterDescriptor {
         id: ClusterId::new(0x050D),
         name: "ApplicationBasic",
@@ -11825,7 +11825,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-account-login")]
+    #[cfg(cluster_account_login)]
     ClusterDescriptor {
         id: ClusterId::new(0x050E),
         name: "AccountLogin",
@@ -11894,7 +11894,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-client-monitoring")]
+    #[cfg(cluster_client_monitoring)]
     ClusterDescriptor {
         id: ClusterId::new(0x1046),
         name: "ClientMonitoring",
@@ -11992,7 +11992,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         events: &[],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-unit-testing")]
+    #[cfg(cluster_unit_testing)]
     ClusterDescriptor {
         id: ClusterId::new(0xFFF1_FC05),
         name: "UnitTesting",
@@ -16170,7 +16170,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
         ],
         choice_groups: &[],
     },
-    #[cfg(feature = "cluster-fault-injection")]
+    #[cfg(cluster_fault_injection)]
     ClusterDescriptor {
         id: ClusterId::new(0xFFF1_FC06),
         name: "FaultInjection",

@@ -4,7 +4,7 @@ use genco::{quote, tokens::quoted};
 
 use super::{
     attributes::bound_primitive_type,
-    context::{PushLine as _, Tokens, TypeContext, cfg_feature_gate, doc_comment, to_rust_field_name},
+    context::{PushLine as _, Tokens, TypeContext, cluster_cfg_gate, doc_comment, to_rust_field_name},
     record::{
         FieldBounds, IdPrefix, MemberFlags, MemberPartition, RecordConstructors, RecordStructDef, ResolvedMember,
         SingleMandatoryFrom, StructAttrs,
@@ -362,10 +362,10 @@ pub(super) fn emit_structs(
     structs: &[StructDef],
     in_submodule: bool,
     ctx: &TypeContext<'_>,
-    feature_gates: Option<&BTreeMap<String, Vec<String>>>,
+    cfg_gates: Option<&BTreeMap<String, Vec<String>>>,
 ) -> Result<()> {
     for st in structs {
-        let gate = feature_gates.and_then(|gates| gates.get(&st.name));
+        let gate = cfg_gates.and_then(|gates| gates.get(&st.name));
         let tokens = single_struct_tokens(st, in_submodule, ctx, gate)?;
         out.append(tokens);
         out.push_blank();
@@ -585,7 +585,7 @@ fn single_struct_tokens(
 
     let short_field_count = partition.short_field_count();
     let many_single_char_reason = "Specification struct contains multiple CSA single-character field names";
-    let cfg_gate = cfg_feature_gate(gate);
+    let cfg_gate = cluster_cfg_gate(gate);
 
     let tokens: Tokens = quote! {
         $struct_def

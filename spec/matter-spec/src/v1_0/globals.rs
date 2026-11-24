@@ -5,9 +5,9 @@
 use alloc::{string::String, vec::Vec};
 
 // Global attributes defined: 7
-#[cfg(any(feature = "cluster-fixed-label", feature = "cluster-user-label"))]
+#[cfg(any(cluster_fixed_label, cluster_user_label))]
 pub use crate::__shared::globals::label_struct_v1_0_v1_1::*;
-#[cfg(any(feature = "cluster-access-control", feature = "cluster-binding"))]
+#[cfg(any(cluster_access_control, cluster_binding))]
 pub use crate::__shared::globals::target::*;
 #[allow(unused_imports, reason = "Generated global imports")]
 use crate::{

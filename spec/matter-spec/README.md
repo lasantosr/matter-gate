@@ -37,12 +37,13 @@ Enable at least one version feature (`v1_X`, e.g. `v1_4`); building without one 
 
 Features are layered from coarse to fine. Pick the narrowest tier that fits your use case to keep compile times fast and binaries small:
 
-| Tier | Feature Pattern | Enables |
+| Tier | Feature / Variable Pattern | Enables |
 | :--- | :--- | :--- |
-| All | `all` | Every product domain |
+| All | `all` | Every product domain and unattached cluster |
 | Product domain (recommended) | `appliances`, `cameras`, `closures`, `energy-management`, `general`, `hvac`, `lighting`, `measurement-and-sensing`, `media`, `network-infrastructure`, `robots` | The domain's endpoints and required clusters |
+| Unattached clusters | `unattached-clusters` | Standalone and cross-cutting clusters not bound to a specific device type |
 | Single endpoint | `endpoint-<name>` (e.g. `endpoint-on-off-light`) | One endpoint and its required clusters |
-| Single cluster | `cluster-<name>` (e.g. `cluster-on-off`) | One cluster |
+| Single cluster (env) | `MATTER_SPEC_CLUSTER_<NAME>=1` (e.g. `MATTER_SPEC_CLUSTER_ON_OFF=1`) | One cluster via build environment or `.cargo/config.toml` `[env]` |
 
 ### 3. Capabilities
 

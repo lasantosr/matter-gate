@@ -938,7 +938,7 @@ mod v1_6_regression_tests {
     feature = "v1_0",
     feature = "v1_2",
     feature = "v1_4",
-    feature = "cluster-basic-information",
+    cluster_basic_information,
     feature = "registry"
 ))]
 #[cfg(test)]
