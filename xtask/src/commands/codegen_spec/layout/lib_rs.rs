@@ -66,12 +66,13 @@ pub(in super::super) fn generate_top_lib_rs(path: &Path, versions: &[(String, St
 //! Features are layered from coarse to fine. Pick the narrowest tier that fits your use case to keep compile times
 //! fast and binaries small:
 //!
-//! | Tier | Feature Pattern | Enables |
+//! | Tier | Feature / Variable Pattern | Enables |
 //! | :--- | :--- | :--- |
-//! | All | `all` | Every product domain |
+//! | All | `all` | Every product domain and unattached cluster |
 //! | Product domain (recommended) | `appliances`, `cameras`, `closures`, `energy-management`, `general`, `hvac`, `lighting`, `measurement-and-sensing`, `media`, `network-infrastructure`, `robots` | The domain's endpoints and required clusters |
+//! | Unattached clusters | `unattached-clusters` | Standalone and cross-cutting clusters not bound to a specific device type |
 //! | Single endpoint | `endpoint-<name>` (e.g. `endpoint-on-off-light`) | One endpoint and its required clusters |
-//! | Single cluster | `cluster-<name>` (e.g. `cluster-on-off`) | One cluster |
+//! | Single cluster (env) | `MATTER_SPEC_CLUSTER_<NAME>=1` (e.g. `MATTER_SPEC_CLUSTER_ON_OFF=1`) | One cluster via build environment or `.cargo/config.toml` `[env]` |
 //!
 //! ### 3. Capabilities
 //!
@@ -133,7 +134,7 @@ pub(in super::super) fn generate_top_lib_rs(path: &Path, versions: &[(String, St
 //! ### Sparse Delta Patches & Lossless Wire Wrappers
 //!
 //! ```rust
-//! # #[cfg(all(feature = "v1_4", feature = "cluster-on-off"))]
+//! # #[cfg(all(feature = "v1_4", cluster_on_off))]
 //! # fn main() {
 //! use matter_spec::{
 //!     prelude::*,
@@ -153,7 +154,7 @@ pub(in super::super) fn generate_top_lib_rs(path: &Path, versions: &[(String, St
 //! let model_cluster = matter_spec::model::Cluster::from(wire);
 //! assert_eq!(model_cluster.data_version, Optional::Present(DataVersion::new(42)));
 //! # }
-//! # #[cfg(not(all(feature = "v1_4", feature = "cluster-on-off")))]
+//! # #[cfg(not(all(feature = "v1_4", cluster_on_off)))]
 //! # fn main() {}
 //! ```
 //!

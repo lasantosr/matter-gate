@@ -152,7 +152,7 @@ impl Spec {
                     kind: SharedKind::Global,
                     module_name: gname.clone(),
                     versions: BTreeSet::new(),
-                    cluster_features: BTreeSet::new(),
+                    cluster_cfgs: BTreeSet::new(),
                     version_cluster_pairs: BTreeSet::new(),
                     cfg_gate: String::new(),
                 });
@@ -160,11 +160,11 @@ impl Spec {
                 let gates = ver
                     .globals
                     .global_defs
-                    .feature_gates
+                    .cfg_gates
                     .get(gname)
                     .map_or(&[][..], Vec::as_slice);
                 for gate in gates {
-                    bucket.cluster_features.insert(gate.clone());
+                    bucket.cluster_cfgs.insert(gate.clone());
                     bucket.version_cluster_pairs.insert((ver.version.clone(), gate.clone()));
                 }
             }
@@ -177,12 +177,12 @@ impl Spec {
                     kind: SharedKind::Cluster,
                     module_name: cluster.module_name().to_owned(),
                     versions: BTreeSet::new(),
-                    cluster_features: BTreeSet::new(),
+                    cluster_cfgs: BTreeSet::new(),
                     version_cluster_pairs: BTreeSet::new(),
                     cfg_gate: String::new(),
                 });
                 bucket.versions.insert(ver.version.clone());
-                bucket.cluster_features.insert(cluster.cluster_feature().to_owned());
+                bucket.cluster_cfgs.insert(cluster.cluster_cfg().to_owned());
                 bucket
                     .version_cluster_pairs
                     .insert((ver.version.clone(), cluster.module_name().to_owned()));
@@ -414,7 +414,7 @@ where
     Ok(data)
 }
 
-fn record_type_ref(type_str: &str, cluster_feat: &str, refs: &mut BTreeMap<String, BTreeSet<String>>) {
+fn record_type_ref(type_str: &str, cluster_cfg: &str, refs: &mut BTreeMap<String, BTreeSet<String>>) {
     let clean = type_str
         .strip_suffix("Struct")
         .or_else(|| type_str.strip_suffix("Enum"))
@@ -422,52 +422,52 @@ fn record_type_ref(type_str: &str, cluster_feat: &str, refs: &mut BTreeMap<Strin
         .unwrap_or(type_str);
     refs.entry(type_str.to_lowercase())
         .or_default()
-        .insert(cluster_feat.to_owned());
+        .insert(cluster_cfg.to_owned());
     refs.entry(clean.to_lowercase())
         .or_default()
-        .insert(cluster_feat.to_owned());
+        .insert(cluster_cfg.to_owned());
 }
 
 fn collect_cluster_type_refs(clusters: &[ClusterDef]) -> BTreeMap<String, BTreeSet<String>> {
     let mut refs: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     for cluster in clusters {
-        let feat = format!("cluster-{}", to_kebab_case(&cluster.name));
+        let cluster_cfg = format!("cluster_{}", to_snake_case(&cluster.name));
         for attr in &cluster.attributes {
-            record_type_ref(&attr.type_str, &feat, &mut refs);
+            record_type_ref(&attr.type_str, &cluster_cfg, &mut refs);
             if let Some(et) = &attr.entry_type {
-                record_type_ref(et, &feat, &mut refs);
+                record_type_ref(et, &cluster_cfg, &mut refs);
             }
         }
         for cmd in &cluster.commands {
             for arg in &cmd.args {
-                record_type_ref(&arg.type_str, &feat, &mut refs);
+                record_type_ref(&arg.type_str, &cluster_cfg, &mut refs);
                 if let Some(et) = &arg.entry_type {
-                    record_type_ref(et, &feat, &mut refs);
+                    record_type_ref(et, &cluster_cfg, &mut refs);
                 }
             }
         }
         for ev in &cluster.events {
             for field in &ev.fields {
-                record_type_ref(&field.type_str, &feat, &mut refs);
+                record_type_ref(&field.type_str, &cluster_cfg, &mut refs);
                 if let Some(et) = &field.entry_type {
-                    record_type_ref(et, &feat, &mut refs);
+                    record_type_ref(et, &cluster_cfg, &mut refs);
                 }
             }
         }
         for st in &cluster.structs {
-            record_type_ref(&st.name, &feat, &mut refs);
+            record_type_ref(&st.name, &cluster_cfg, &mut refs);
             for field in &st.fields {
-                record_type_ref(&field.type_str, &feat, &mut refs);
+                record_type_ref(&field.type_str, &cluster_cfg, &mut refs);
                 if let Some(et) = &field.entry_type {
-                    record_type_ref(et, &feat, &mut refs);
+                    record_type_ref(et, &cluster_cfg, &mut refs);
                 }
             }
         }
         for enm in &cluster.enums {
-            record_type_ref(&enm.name, &feat, &mut refs);
+            record_type_ref(&enm.name, &cluster_cfg, &mut refs);
         }
         for bm in &cluster.bitmaps {
-            record_type_ref(&bm.name, &feat, &mut refs);
+            record_type_ref(&bm.name, &cluster_cfg, &mut refs);
         }
     }
     refs
@@ -546,7 +546,7 @@ fn promote_shared_cluster_types(clusters: &mut [ClusterDef], global_defs: &mut G
         {
             global_defs.enums.push(first.clone());
             global_defs
-                .feature_gates
+                .cfg_gates
                 .insert(first.name.clone(), users.iter().cloned().collect());
             promoted_enums.insert(lower_name);
         }
@@ -583,7 +583,7 @@ fn promote_shared_cluster_types(clusters: &mut [ClusterDef], global_defs: &mut G
         {
             global_defs.bitmaps.push(first.clone());
             global_defs
-                .feature_gates
+                .cfg_gates
                 .insert(first.name.clone(), users.iter().cloned().collect());
             promoted_bitmaps.insert(lower_name);
         }
@@ -625,7 +625,7 @@ fn promote_shared_cluster_types(clusters: &mut [ClusterDef], global_defs: &mut G
             {
                 global_defs.structs.push(first.clone());
                 global_defs
-                    .feature_gates
+                    .cfg_gates
                     .insert(first.name.clone(), users.iter().cloned().collect());
                 promoted_structs.insert(lower_name);
                 progress = true;
@@ -643,25 +643,21 @@ fn promote_shared_cluster_types(clusters: &mut [ClusterDef], global_defs: &mut G
         }
     }
 
-    propagate_feature_gates(global_defs);
+    propagate_cfg_gates(global_defs);
 }
 
 fn merge_parent_gates_into(
-    feature_gates: &mut BTreeMap<String, Vec<String>>,
+    cfg_gates: &mut BTreeMap<String, Vec<String>>,
     type_name: &str,
     parent_gates: &[String],
 ) -> bool {
     if type_name.is_empty() {
         return false;
     }
-    let Some(target_key) = feature_gates
-        .keys()
-        .find(|k| k.eq_ignore_ascii_case(type_name))
-        .cloned()
-    else {
+    let Some(target_key) = cfg_gates.keys().find(|k| k.eq_ignore_ascii_case(type_name)).cloned() else {
         return false;
     };
-    let Some(target_gates) = feature_gates.get_mut(&target_key) else {
+    let Some(target_gates) = cfg_gates.get_mut(&target_key) else {
         return false;
     };
     let mut changed = false;
@@ -677,18 +673,17 @@ fn merge_parent_gates_into(
     changed
 }
 
-fn propagate_feature_gates(global_defs: &mut GlobalDefs) {
+fn propagate_cfg_gates(global_defs: &mut GlobalDefs) {
     loop {
         let mut gate_progress = false;
         for st in &global_defs.structs {
-            let Some(parent_gates) = global_defs.feature_gates.get(&st.name).cloned() else {
+            let Some(parent_gates) = global_defs.cfg_gates.get(&st.name).cloned() else {
                 continue;
             };
             for field in &st.fields {
-                gate_progress |=
-                    merge_parent_gates_into(&mut global_defs.feature_gates, &field.type_str, &parent_gates);
+                gate_progress |= merge_parent_gates_into(&mut global_defs.cfg_gates, &field.type_str, &parent_gates);
                 if let Some(et) = field.entry_type.as_deref() {
-                    gate_progress |= merge_parent_gates_into(&mut global_defs.feature_gates, et, &parent_gates);
+                    gate_progress |= merge_parent_gates_into(&mut global_defs.cfg_gates, et, &parent_gates);
                 }
             }
         }
@@ -768,8 +763,7 @@ fn build_cluster_items(
             Category::from_xml_domain(&cluster.domain)?
         };
         let snake_name = to_snake_case(&cluster.name);
-        let kebab_name = to_kebab_case(&cluster.name);
-        let cluster_feat = format!("cluster-{kebab_name}");
+        let cluster_cfg = format!("cluster_{snake_name}");
 
         cluster_names.push(cluster.name.clone());
         cluster_items.push(ClusterItem {
@@ -778,7 +772,7 @@ fn build_cluster_items(
             category,
             module_name: snake_name,
             original_name: cluster.name.clone(),
-            cluster_feature: cluster_feat,
+            cluster_cfg,
             cluster_def: cluster,
             shared: Arc::clone(shared_cluster_ctx),
         });
@@ -798,7 +792,7 @@ fn resolve_single_device_cluster_deps(dt: &ParsedDeviceType, cluster_items: &[Cl
     {
         let clean = sanitize_identifier(cluster_name);
         if let Some(matching_cluster) = cluster_items.iter().find(|cl| cl.name().eq_ignore_ascii_case(&clean)) {
-            dt_deps.insert(matching_cluster.cluster_feature().to_owned());
+            dt_deps.insert(matching_cluster.cluster_cfg().to_owned());
         }
     }
     dt_deps

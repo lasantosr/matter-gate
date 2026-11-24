@@ -4,89 +4,65 @@
 #[allow(unused_imports, reason = "Generated global imports")]
 use alloc::{string::String, vec::Vec};
 
-#[cfg(any(feature = "cluster-application-basic", feature = "cluster-application-launcher"))]
+#[cfg(any(cluster_application_basic, cluster_application_launcher))]
 pub use crate::__shared::globals::application_struct::*;
 // Global attributes defined: 8
-#[cfg(any(
-    feature = "cluster-activated-carbon-filter-monitoring",
-    feature = "cluster-hepa-filter-monitoring"
-))]
+#[cfg(any(cluster_activated_carbon_filter_monitoring, cluster_hepa_filter_monitoring))]
 pub use crate::__shared::globals::change_indication_enum::*;
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::color_enum::*;
-#[cfg(any(
-    feature = "cluster-thread-network-diagnostics",
-    feature = "cluster-wi-fi-network-diagnostics"
-))]
+#[cfg(any(cluster_thread_network_diagnostics, cluster_wi_fi_network_diagnostics))]
 pub use crate::__shared::globals::connection_status_enum::*;
-#[cfg(any(
-    feature = "cluster-activated-carbon-filter-monitoring",
-    feature = "cluster-hepa-filter-monitoring"
-))]
+#[cfg(any(cluster_activated_carbon_filter_monitoring, cluster_hepa_filter_monitoring))]
 pub use crate::__shared::globals::degradation_direction_enum::*;
-#[cfg(any(feature = "cluster-fixed-label", feature = "cluster-user-label"))]
+#[cfg(any(cluster_fixed_label, cluster_user_label))]
 pub use crate::__shared::globals::label_struct_v1_2_v1_6::*;
 #[cfg(any(
-    feature = "cluster-carbon-dioxide-concentration-measurement",
-    feature = "cluster-carbon-monoxide-concentration-measurement",
-    feature = "cluster-formaldehyde-concentration-measurement",
-    feature = "cluster-nitrogen-dioxide-concentration-measurement",
-    feature = "cluster-ozone-concentration-measurement",
-    feature = "cluster-pm1-concentration-measurement",
-    feature = "cluster-pm10-concentration-measurement",
-    feature = "cluster-pm25-concentration-measurement",
-    feature = "cluster-radon-concentration-measurement",
-    feature = "cluster-total-volatile-organic-compounds-concentration-measurement"
+    cluster_carbon_dioxide_concentration_measurement,
+    cluster_carbon_monoxide_concentration_measurement,
+    cluster_formaldehyde_concentration_measurement,
+    cluster_nitrogen_dioxide_concentration_measurement,
+    cluster_ozone_concentration_measurement,
+    cluster_pm10_concentration_measurement,
+    cluster_pm1_concentration_measurement,
+    cluster_pm25_concentration_measurement,
+    cluster_radon_concentration_measurement,
+    cluster_total_volatile_organic_compounds_concentration_measurement
 ))]
 pub use crate::__shared::globals::level_value_enum::*;
 #[cfg(any(
-    feature = "cluster-carbon-dioxide-concentration-measurement",
-    feature = "cluster-carbon-monoxide-concentration-measurement",
-    feature = "cluster-formaldehyde-concentration-measurement",
-    feature = "cluster-nitrogen-dioxide-concentration-measurement",
-    feature = "cluster-ozone-concentration-measurement",
-    feature = "cluster-pm1-concentration-measurement",
-    feature = "cluster-pm10-concentration-measurement",
-    feature = "cluster-pm25-concentration-measurement",
-    feature = "cluster-radon-concentration-measurement",
-    feature = "cluster-total-volatile-organic-compounds-concentration-measurement"
+    cluster_carbon_dioxide_concentration_measurement,
+    cluster_carbon_monoxide_concentration_measurement,
+    cluster_formaldehyde_concentration_measurement,
+    cluster_nitrogen_dioxide_concentration_measurement,
+    cluster_ozone_concentration_measurement,
+    cluster_pm10_concentration_measurement,
+    cluster_pm1_concentration_measurement,
+    cluster_pm25_concentration_measurement,
+    cluster_radon_concentration_measurement,
+    cluster_total_volatile_organic_compounds_concentration_measurement
 ))]
 pub use crate::__shared::globals::measurement_medium_enum::*;
 #[cfg(any(
-    feature = "cluster-carbon-dioxide-concentration-measurement",
-    feature = "cluster-carbon-monoxide-concentration-measurement",
-    feature = "cluster-formaldehyde-concentration-measurement",
-    feature = "cluster-nitrogen-dioxide-concentration-measurement",
-    feature = "cluster-ozone-concentration-measurement",
-    feature = "cluster-pm1-concentration-measurement",
-    feature = "cluster-pm10-concentration-measurement",
-    feature = "cluster-pm25-concentration-measurement",
-    feature = "cluster-radon-concentration-measurement",
-    feature = "cluster-total-volatile-organic-compounds-concentration-measurement"
+    cluster_carbon_dioxide_concentration_measurement,
+    cluster_carbon_monoxide_concentration_measurement,
+    cluster_formaldehyde_concentration_measurement,
+    cluster_nitrogen_dioxide_concentration_measurement,
+    cluster_ozone_concentration_measurement,
+    cluster_pm10_concentration_measurement,
+    cluster_pm1_concentration_measurement,
+    cluster_pm25_concentration_measurement,
+    cluster_radon_concentration_measurement,
+    cluster_total_volatile_organic_compounds_concentration_measurement
 ))]
 pub use crate::__shared::globals::measurement_unit_enum::*;
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::product_appearance_struct_v1_1_v1_3::*;
-#[cfg(any(
-    feature = "cluster-basic-information",
-    feature = "cluster-bridged-device-basic-information"
-))]
+#[cfg(any(cluster_basic_information, cluster_bridged_device_basic_information))]
 pub use crate::__shared::globals::product_finish_enum::*;
-#[cfg(any(
-    feature = "cluster-activated-carbon-filter-monitoring",
-    feature = "cluster-hepa-filter-monitoring"
-))]
+#[cfg(any(cluster_activated_carbon_filter_monitoring, cluster_hepa_filter_monitoring))]
 pub use crate::__shared::globals::product_identifier_type_enum::*;
-#[cfg(any(
-    feature = "cluster-activated-carbon-filter-monitoring",
-    feature = "cluster-hepa-filter-monitoring"
-))]
+#[cfg(any(cluster_activated_carbon_filter_monitoring, cluster_hepa_filter_monitoring))]
 pub use crate::__shared::globals::replacement_product_struct_v1_2_v1_4::*;
 #[allow(unused_imports, reason = "Generated global imports")]
 use crate::{

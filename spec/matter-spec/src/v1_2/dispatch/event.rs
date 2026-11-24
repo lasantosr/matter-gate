@@ -10,27 +10,27 @@ use serde::{Deserialize, Serialize};
 #[cfg(feature = "serde")]
 use crate::dispatch::{BufferedPayload, deserialize_enum_described};
 #[cfg(any(
-    feature = "cluster-access-control",
-    feature = "cluster-actions",
-    feature = "cluster-basic-information",
-    feature = "cluster-ota-software-update-requestor",
-    feature = "cluster-power-source",
-    feature = "cluster-general-diagnostics",
-    feature = "cluster-software-diagnostics",
-    feature = "cluster-thread-network-diagnostics",
-    feature = "cluster-wi-fi-network-diagnostics",
-    feature = "cluster-time-synchronization",
-    feature = "cluster-bridged-device-basic-information",
-    feature = "cluster-switch",
-    feature = "cluster-boolean-state",
-    feature = "cluster-refrigerator-alarm",
-    feature = "cluster-smoke-co-alarm",
-    feature = "cluster-dishwasher-alarm",
-    feature = "cluster-operational-state",
-    feature = "cluster-rvc-operational-state",
-    feature = "cluster-door-lock",
-    feature = "cluster-pump-configuration-and-control",
-    feature = "cluster-unit-testing"
+    cluster_access_control,
+    cluster_actions,
+    cluster_basic_information,
+    cluster_ota_software_update_requestor,
+    cluster_power_source,
+    cluster_general_diagnostics,
+    cluster_software_diagnostics,
+    cluster_thread_network_diagnostics,
+    cluster_wi_fi_network_diagnostics,
+    cluster_time_synchronization,
+    cluster_bridged_device_basic_information,
+    cluster_switch,
+    cluster_boolean_state,
+    cluster_refrigerator_alarm,
+    cluster_smoke_co_alarm,
+    cluster_dishwasher_alarm,
+    cluster_operational_state,
+    cluster_rvc_operational_state,
+    cluster_door_lock,
+    cluster_pump_configuration_and_control,
+    cluster_unit_testing
 ))]
 use crate::v1_2::clusters;
 use crate::{
@@ -46,47 +46,47 @@ use crate::{
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[non_exhaustive]
 pub enum ClusterEvent {
-    #[cfg(feature = "cluster-access-control")]
+    #[cfg(cluster_access_control)]
     AccessControl(clusters::access_control::Event),
-    #[cfg(feature = "cluster-actions")]
+    #[cfg(cluster_actions)]
     Actions(clusters::actions::Event),
-    #[cfg(feature = "cluster-basic-information")]
+    #[cfg(cluster_basic_information)]
     BasicInformation(clusters::basic_information::Event),
-    #[cfg(feature = "cluster-ota-software-update-requestor")]
+    #[cfg(cluster_ota_software_update_requestor)]
     OtaSoftwareUpdateRequestor(clusters::ota_software_update_requestor::Event),
-    #[cfg(feature = "cluster-power-source")]
+    #[cfg(cluster_power_source)]
     PowerSource(clusters::power_source::Event),
-    #[cfg(feature = "cluster-general-diagnostics")]
+    #[cfg(cluster_general_diagnostics)]
     GeneralDiagnostics(clusters::general_diagnostics::Event),
-    #[cfg(feature = "cluster-software-diagnostics")]
+    #[cfg(cluster_software_diagnostics)]
     SoftwareDiagnostics(clusters::software_diagnostics::Event),
-    #[cfg(feature = "cluster-thread-network-diagnostics")]
+    #[cfg(cluster_thread_network_diagnostics)]
     ThreadNetworkDiagnostics(clusters::thread_network_diagnostics::Event),
-    #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+    #[cfg(cluster_wi_fi_network_diagnostics)]
     WiFiNetworkDiagnostics(clusters::wi_fi_network_diagnostics::Event),
-    #[cfg(feature = "cluster-time-synchronization")]
+    #[cfg(cluster_time_synchronization)]
     TimeSynchronization(clusters::time_synchronization::Event),
-    #[cfg(feature = "cluster-bridged-device-basic-information")]
+    #[cfg(cluster_bridged_device_basic_information)]
     BridgedDeviceBasicInformation(clusters::bridged_device_basic_information::Event),
-    #[cfg(feature = "cluster-switch")]
+    #[cfg(cluster_switch)]
     Switch(clusters::switch::Event),
-    #[cfg(feature = "cluster-boolean-state")]
+    #[cfg(cluster_boolean_state)]
     BooleanState(clusters::boolean_state::Event),
-    #[cfg(feature = "cluster-refrigerator-alarm")]
+    #[cfg(cluster_refrigerator_alarm)]
     RefrigeratorAlarm(clusters::refrigerator_alarm::Event),
-    #[cfg(feature = "cluster-smoke-co-alarm")]
+    #[cfg(cluster_smoke_co_alarm)]
     SmokeCoAlarm(clusters::smoke_co_alarm::Event),
-    #[cfg(feature = "cluster-dishwasher-alarm")]
+    #[cfg(cluster_dishwasher_alarm)]
     DishwasherAlarm(clusters::dishwasher_alarm::Event),
-    #[cfg(feature = "cluster-operational-state")]
+    #[cfg(cluster_operational_state)]
     OperationalState(clusters::operational_state::Event),
-    #[cfg(feature = "cluster-rvc-operational-state")]
+    #[cfg(cluster_rvc_operational_state)]
     RvcOperationalState(clusters::rvc_operational_state::Event),
-    #[cfg(feature = "cluster-door-lock")]
+    #[cfg(cluster_door_lock)]
     DoorLock(clusters::door_lock::Event),
-    #[cfg(feature = "cluster-pump-configuration-and-control")]
+    #[cfg(cluster_pump_configuration_and_control)]
     PumpConfigurationAndControl(clusters::pump_configuration_and_control::Event),
-    #[cfg(feature = "cluster-unit-testing")]
+    #[cfg(cluster_unit_testing)]
     UnitTesting(clusters::unit_testing::Event),
     /// Forward-compatible fallback for unrecognized clusters.
     Unknown(WireEvent),
@@ -96,53 +96,53 @@ impl ClusterEvent {
     /// Decodes an owned [`WireEvent`] into a [`ClusterEvent`].
     pub fn from_wire(ev: WireEvent) -> Result<Self, EventError> {
         match ev.cluster_id.raw() {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             0x001F => clusters::access_control::Event::try_from(ev).map(Self::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             0x0025 => clusters::actions::Event::try_from(ev).map(Self::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             0x0028 => clusters::basic_information::Event::try_from(ev).map(Self::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             0x002A => {
                 clusters::ota_software_update_requestor::Event::try_from(ev).map(Self::OtaSoftwareUpdateRequestor)
             }
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             0x002F => clusters::power_source::Event::try_from(ev).map(Self::PowerSource),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             0x0033 => clusters::general_diagnostics::Event::try_from(ev).map(Self::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             0x0034 => clusters::software_diagnostics::Event::try_from(ev).map(Self::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             0x0035 => clusters::thread_network_diagnostics::Event::try_from(ev).map(Self::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             0x0036 => clusters::wi_fi_network_diagnostics::Event::try_from(ev).map(Self::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             0x0038 => clusters::time_synchronization::Event::try_from(ev).map(Self::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             0x0039 => {
                 clusters::bridged_device_basic_information::Event::try_from(ev).map(Self::BridgedDeviceBasicInformation)
             }
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             0x003B => clusters::switch::Event::try_from(ev).map(Self::Switch),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             0x0045 => clusters::boolean_state::Event::try_from(ev).map(Self::BooleanState),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             0x0057 => clusters::refrigerator_alarm::Event::try_from(ev).map(Self::RefrigeratorAlarm),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             0x005C => clusters::smoke_co_alarm::Event::try_from(ev).map(Self::SmokeCoAlarm),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             0x005D => clusters::dishwasher_alarm::Event::try_from(ev).map(Self::DishwasherAlarm),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             0x0060 => clusters::operational_state::Event::try_from(ev).map(Self::OperationalState),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             0x0061 => clusters::rvc_operational_state::Event::try_from(ev).map(Self::RvcOperationalState),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             0x0101 => clusters::door_lock::Event::try_from(ev).map(Self::DoorLock),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             0x0200 => {
                 clusters::pump_configuration_and_control::Event::try_from(ev).map(Self::PumpConfigurationAndControl)
             }
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             0xFFF1_FC05 => clusters::unit_testing::Event::try_from(ev).map(Self::UnitTesting),
             _ => Ok(Self::Unknown(ev)),
         }
@@ -152,47 +152,47 @@ impl ClusterEvent {
 impl From<ClusterEvent> for WireEvent {
     fn from(ev: ClusterEvent) -> Self {
         match ev {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             ClusterEvent::AccessControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             ClusterEvent::Actions(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             ClusterEvent::BasicInformation(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             ClusterEvent::OtaSoftwareUpdateRequestor(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             ClusterEvent::PowerSource(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             ClusterEvent::GeneralDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             ClusterEvent::SoftwareDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ClusterEvent::ThreadNetworkDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             ClusterEvent::WiFiNetworkDiagnostics(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             ClusterEvent::TimeSynchronization(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             ClusterEvent::BridgedDeviceBasicInformation(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             ClusterEvent::Switch(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             ClusterEvent::BooleanState(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             ClusterEvent::RefrigeratorAlarm(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             ClusterEvent::SmokeCoAlarm(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             ClusterEvent::DishwasherAlarm(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             ClusterEvent::OperationalState(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             ClusterEvent::RvcOperationalState(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             ClusterEvent::DoorLock(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             ClusterEvent::PumpConfigurationAndControl(inner) => Self::from(inner),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             ClusterEvent::UnitTesting(inner) => Self::from(inner),
             ClusterEvent::Unknown(wire) => wire,
         }
@@ -204,53 +204,53 @@ impl TryFrom<WireEvent> for ClusterEvent {
 
     fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
         match ev.cluster_id.raw() {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             0x001F => clusters::access_control::Event::try_from(ev).map(Self::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             0x0025 => clusters::actions::Event::try_from(ev).map(Self::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             0x0028 => clusters::basic_information::Event::try_from(ev).map(Self::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             0x002A => {
                 clusters::ota_software_update_requestor::Event::try_from(ev).map(Self::OtaSoftwareUpdateRequestor)
             }
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             0x002F => clusters::power_source::Event::try_from(ev).map(Self::PowerSource),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             0x0033 => clusters::general_diagnostics::Event::try_from(ev).map(Self::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             0x0034 => clusters::software_diagnostics::Event::try_from(ev).map(Self::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             0x0035 => clusters::thread_network_diagnostics::Event::try_from(ev).map(Self::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             0x0036 => clusters::wi_fi_network_diagnostics::Event::try_from(ev).map(Self::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             0x0038 => clusters::time_synchronization::Event::try_from(ev).map(Self::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             0x0039 => {
                 clusters::bridged_device_basic_information::Event::try_from(ev).map(Self::BridgedDeviceBasicInformation)
             }
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             0x003B => clusters::switch::Event::try_from(ev).map(Self::Switch),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             0x0045 => clusters::boolean_state::Event::try_from(ev).map(Self::BooleanState),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             0x0057 => clusters::refrigerator_alarm::Event::try_from(ev).map(Self::RefrigeratorAlarm),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             0x005C => clusters::smoke_co_alarm::Event::try_from(ev).map(Self::SmokeCoAlarm),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             0x005D => clusters::dishwasher_alarm::Event::try_from(ev).map(Self::DishwasherAlarm),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             0x0060 => clusters::operational_state::Event::try_from(ev).map(Self::OperationalState),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             0x0061 => clusters::rvc_operational_state::Event::try_from(ev).map(Self::RvcOperationalState),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             0x0101 => clusters::door_lock::Event::try_from(ev).map(Self::DoorLock),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             0x0200 => {
                 clusters::pump_configuration_and_control::Event::try_from(ev).map(Self::PumpConfigurationAndControl)
             }
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             0xFFF1_FC05 => clusters::unit_testing::Event::try_from(ev).map(Self::UnitTesting),
             _ => Err(EventError::UnsupportedCluster(ev.cluster_id)),
         }
@@ -261,47 +261,47 @@ impl EventMeta for ClusterEvent {
     #[inline]
     fn cluster_id(&self) -> ClusterId {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.cluster_id(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.cluster_id(),
             Self::Unknown(wire) => wire.cluster_id,
         }
@@ -311,47 +311,47 @@ impl EventMeta for ClusterEvent {
     #[rustfmt::skip]
     fn cluster_name(&self) -> &'static str {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.cluster_name(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.cluster_name(),
             Self::Unknown(_) => "Unknown",
         }
@@ -360,47 +360,47 @@ impl EventMeta for ClusterEvent {
     #[inline]
     fn event_id(&self) -> EventId {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.event_id(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.event_id(),
             Self::Unknown(wire) => wire.event_id,
         }
@@ -409,47 +409,47 @@ impl EventMeta for ClusterEvent {
     #[inline]
     fn event_name(&self) -> &'static str {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.event_name(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.event_name(),
             Self::Unknown(_) => "Unknown",
         }
@@ -458,94 +458,94 @@ impl EventMeta for ClusterEvent {
     #[inline]
     fn priority(&self) -> EventPriority {
         #[cfg(not(any(
-            feature = "cluster-access-control",
-            feature = "cluster-actions",
-            feature = "cluster-basic-information",
-            feature = "cluster-ota-software-update-requestor",
-            feature = "cluster-power-source",
-            feature = "cluster-general-diagnostics",
-            feature = "cluster-software-diagnostics",
-            feature = "cluster-thread-network-diagnostics",
-            feature = "cluster-wi-fi-network-diagnostics",
-            feature = "cluster-time-synchronization",
-            feature = "cluster-bridged-device-basic-information",
-            feature = "cluster-switch",
-            feature = "cluster-boolean-state",
-            feature = "cluster-refrigerator-alarm",
-            feature = "cluster-smoke-co-alarm",
-            feature = "cluster-dishwasher-alarm",
-            feature = "cluster-operational-state",
-            feature = "cluster-rvc-operational-state",
-            feature = "cluster-door-lock",
-            feature = "cluster-pump-configuration-and-control",
-            feature = "cluster-unit-testing"
+            cluster_access_control,
+            cluster_actions,
+            cluster_basic_information,
+            cluster_ota_software_update_requestor,
+            cluster_power_source,
+            cluster_general_diagnostics,
+            cluster_software_diagnostics,
+            cluster_thread_network_diagnostics,
+            cluster_wi_fi_network_diagnostics,
+            cluster_time_synchronization,
+            cluster_bridged_device_basic_information,
+            cluster_switch,
+            cluster_boolean_state,
+            cluster_refrigerator_alarm,
+            cluster_smoke_co_alarm,
+            cluster_dishwasher_alarm,
+            cluster_operational_state,
+            cluster_rvc_operational_state,
+            cluster_door_lock,
+            cluster_pump_configuration_and_control,
+            cluster_unit_testing
         )))]
         match *self {}
         #[cfg(any(
-            feature = "cluster-access-control",
-            feature = "cluster-actions",
-            feature = "cluster-basic-information",
-            feature = "cluster-ota-software-update-requestor",
-            feature = "cluster-power-source",
-            feature = "cluster-general-diagnostics",
-            feature = "cluster-software-diagnostics",
-            feature = "cluster-thread-network-diagnostics",
-            feature = "cluster-wi-fi-network-diagnostics",
-            feature = "cluster-time-synchronization",
-            feature = "cluster-bridged-device-basic-information",
-            feature = "cluster-switch",
-            feature = "cluster-boolean-state",
-            feature = "cluster-refrigerator-alarm",
-            feature = "cluster-smoke-co-alarm",
-            feature = "cluster-dishwasher-alarm",
-            feature = "cluster-operational-state",
-            feature = "cluster-rvc-operational-state",
-            feature = "cluster-door-lock",
-            feature = "cluster-pump-configuration-and-control",
-            feature = "cluster-unit-testing"
+            cluster_access_control,
+            cluster_actions,
+            cluster_basic_information,
+            cluster_ota_software_update_requestor,
+            cluster_power_source,
+            cluster_general_diagnostics,
+            cluster_software_diagnostics,
+            cluster_thread_network_diagnostics,
+            cluster_wi_fi_network_diagnostics,
+            cluster_time_synchronization,
+            cluster_bridged_device_basic_information,
+            cluster_switch,
+            cluster_boolean_state,
+            cluster_refrigerator_alarm,
+            cluster_smoke_co_alarm,
+            cluster_dishwasher_alarm,
+            cluster_operational_state,
+            cluster_rvc_operational_state,
+            cluster_door_lock,
+            cluster_pump_configuration_and_control,
+            cluster_unit_testing
         ))]
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.priority(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.priority(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.priority(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.priority(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.priority(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.priority(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.priority(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.priority(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.priority(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.priority(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.priority(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.priority(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.priority(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.priority(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.priority(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.priority(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.priority(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.priority(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.priority(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.priority(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.priority(),
             Self::Unknown(wire) => wire.priority,
         }
@@ -554,94 +554,94 @@ impl EventMeta for ClusterEvent {
     #[inline]
     fn is_empty_payload(&self) -> bool {
         #[cfg(not(any(
-            feature = "cluster-access-control",
-            feature = "cluster-actions",
-            feature = "cluster-basic-information",
-            feature = "cluster-ota-software-update-requestor",
-            feature = "cluster-power-source",
-            feature = "cluster-general-diagnostics",
-            feature = "cluster-software-diagnostics",
-            feature = "cluster-thread-network-diagnostics",
-            feature = "cluster-wi-fi-network-diagnostics",
-            feature = "cluster-time-synchronization",
-            feature = "cluster-bridged-device-basic-information",
-            feature = "cluster-switch",
-            feature = "cluster-boolean-state",
-            feature = "cluster-refrigerator-alarm",
-            feature = "cluster-smoke-co-alarm",
-            feature = "cluster-dishwasher-alarm",
-            feature = "cluster-operational-state",
-            feature = "cluster-rvc-operational-state",
-            feature = "cluster-door-lock",
-            feature = "cluster-pump-configuration-and-control",
-            feature = "cluster-unit-testing"
+            cluster_access_control,
+            cluster_actions,
+            cluster_basic_information,
+            cluster_ota_software_update_requestor,
+            cluster_power_source,
+            cluster_general_diagnostics,
+            cluster_software_diagnostics,
+            cluster_thread_network_diagnostics,
+            cluster_wi_fi_network_diagnostics,
+            cluster_time_synchronization,
+            cluster_bridged_device_basic_information,
+            cluster_switch,
+            cluster_boolean_state,
+            cluster_refrigerator_alarm,
+            cluster_smoke_co_alarm,
+            cluster_dishwasher_alarm,
+            cluster_operational_state,
+            cluster_rvc_operational_state,
+            cluster_door_lock,
+            cluster_pump_configuration_and_control,
+            cluster_unit_testing
         )))]
         match *self {}
         #[cfg(any(
-            feature = "cluster-access-control",
-            feature = "cluster-actions",
-            feature = "cluster-basic-information",
-            feature = "cluster-ota-software-update-requestor",
-            feature = "cluster-power-source",
-            feature = "cluster-general-diagnostics",
-            feature = "cluster-software-diagnostics",
-            feature = "cluster-thread-network-diagnostics",
-            feature = "cluster-wi-fi-network-diagnostics",
-            feature = "cluster-time-synchronization",
-            feature = "cluster-bridged-device-basic-information",
-            feature = "cluster-switch",
-            feature = "cluster-boolean-state",
-            feature = "cluster-refrigerator-alarm",
-            feature = "cluster-smoke-co-alarm",
-            feature = "cluster-dishwasher-alarm",
-            feature = "cluster-operational-state",
-            feature = "cluster-rvc-operational-state",
-            feature = "cluster-door-lock",
-            feature = "cluster-pump-configuration-and-control",
-            feature = "cluster-unit-testing"
+            cluster_access_control,
+            cluster_actions,
+            cluster_basic_information,
+            cluster_ota_software_update_requestor,
+            cluster_power_source,
+            cluster_general_diagnostics,
+            cluster_software_diagnostics,
+            cluster_thread_network_diagnostics,
+            cluster_wi_fi_network_diagnostics,
+            cluster_time_synchronization,
+            cluster_bridged_device_basic_information,
+            cluster_switch,
+            cluster_boolean_state,
+            cluster_refrigerator_alarm,
+            cluster_smoke_co_alarm,
+            cluster_dishwasher_alarm,
+            cluster_operational_state,
+            cluster_rvc_operational_state,
+            cluster_door_lock,
+            cluster_pump_configuration_and_control,
+            cluster_unit_testing
         ))]
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => EventMeta::is_empty_payload(inner),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => EventMeta::is_empty_payload(inner),
             Self::Unknown(_) => false,
         }
@@ -660,27 +660,27 @@ fn select_cluster_event(
     }
     let (_, _, _) = (item_name, item_id, &payload);
     #[cfg(not(any(
-        feature = "cluster-access-control",
-        feature = "cluster-actions",
-        feature = "cluster-basic-information",
-        feature = "cluster-ota-software-update-requestor",
-        feature = "cluster-power-source",
-        feature = "cluster-general-diagnostics",
-        feature = "cluster-software-diagnostics",
-        feature = "cluster-thread-network-diagnostics",
-        feature = "cluster-wi-fi-network-diagnostics",
-        feature = "cluster-time-synchronization",
-        feature = "cluster-bridged-device-basic-information",
-        feature = "cluster-switch",
-        feature = "cluster-boolean-state",
-        feature = "cluster-refrigerator-alarm",
-        feature = "cluster-smoke-co-alarm",
-        feature = "cluster-dishwasher-alarm",
-        feature = "cluster-operational-state",
-        feature = "cluster-rvc-operational-state",
-        feature = "cluster-door-lock",
-        feature = "cluster-pump-configuration-and-control",
-        feature = "cluster-unit-testing"
+        cluster_access_control,
+        cluster_actions,
+        cluster_basic_information,
+        cluster_ota_software_update_requestor,
+        cluster_power_source,
+        cluster_general_diagnostics,
+        cluster_software_diagnostics,
+        cluster_thread_network_diagnostics,
+        cluster_wi_fi_network_diagnostics,
+        cluster_time_synchronization,
+        cluster_bridged_device_basic_information,
+        cluster_switch,
+        cluster_boolean_state,
+        cluster_refrigerator_alarm,
+        cluster_smoke_co_alarm,
+        cluster_dishwasher_alarm,
+        cluster_operational_state,
+        cluster_rvc_operational_state,
+        cluster_door_lock,
+        cluster_pump_configuration_and_control,
+        cluster_unit_testing
     )))]
     {
         match (scope_name, scope_id) {
@@ -692,164 +692,164 @@ fn select_cluster_event(
         }
     }
     #[cfg(any(
-        feature = "cluster-access-control",
-        feature = "cluster-actions",
-        feature = "cluster-basic-information",
-        feature = "cluster-ota-software-update-requestor",
-        feature = "cluster-power-source",
-        feature = "cluster-general-diagnostics",
-        feature = "cluster-software-diagnostics",
-        feature = "cluster-thread-network-diagnostics",
-        feature = "cluster-wi-fi-network-diagnostics",
-        feature = "cluster-time-synchronization",
-        feature = "cluster-bridged-device-basic-information",
-        feature = "cluster-switch",
-        feature = "cluster-boolean-state",
-        feature = "cluster-refrigerator-alarm",
-        feature = "cluster-smoke-co-alarm",
-        feature = "cluster-dishwasher-alarm",
-        feature = "cluster-operational-state",
-        feature = "cluster-rvc-operational-state",
-        feature = "cluster-door-lock",
-        feature = "cluster-pump-configuration-and-control",
-        feature = "cluster-unit-testing"
+        cluster_access_control,
+        cluster_actions,
+        cluster_basic_information,
+        cluster_ota_software_update_requestor,
+        cluster_power_source,
+        cluster_general_diagnostics,
+        cluster_software_diagnostics,
+        cluster_thread_network_diagnostics,
+        cluster_wi_fi_network_diagnostics,
+        cluster_time_synchronization,
+        cluster_bridged_device_basic_information,
+        cluster_switch,
+        cluster_boolean_state,
+        cluster_refrigerator_alarm,
+        cluster_smoke_co_alarm,
+        cluster_dishwasher_alarm,
+        cluster_operational_state,
+        cluster_rvc_operational_state,
+        cluster_door_lock,
+        cluster_pump_configuration_and_control,
+        cluster_unit_testing
     ))]
     {
         #[derive(Clone, Copy, PartialEq, Eq)]
         enum ClusterVariant {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             AccessControl,
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Actions,
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             BasicInformation,
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             OtaSoftwareUpdateRequestor,
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             PowerSource,
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             GeneralDiagnostics,
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             SoftwareDiagnostics,
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ThreadNetworkDiagnostics,
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             WiFiNetworkDiagnostics,
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             TimeSynchronization,
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             BridgedDeviceBasicInformation,
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Switch,
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             BooleanState,
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             RefrigeratorAlarm,
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             SmokeCoAlarm,
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             DishwasherAlarm,
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             OperationalState,
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             RvcOperationalState,
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             DoorLock,
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             PumpConfigurationAndControl,
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             UnitTesting,
         }
 
         let by_name = match scope_name {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Some("AccessControl") => Some(ClusterVariant::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Some("Actions") => Some(ClusterVariant::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Some("BasicInformation") => Some(ClusterVariant::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Some("OtaSoftwareUpdateRequestor") => Some(ClusterVariant::OtaSoftwareUpdateRequestor),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Some("PowerSource") => Some(ClusterVariant::PowerSource),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Some("GeneralDiagnostics") => Some(ClusterVariant::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Some("SoftwareDiagnostics") => Some(ClusterVariant::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Some("ThreadNetworkDiagnostics") => Some(ClusterVariant::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Some("WiFiNetworkDiagnostics") => Some(ClusterVariant::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Some("TimeSynchronization") => Some(ClusterVariant::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Some("BridgedDeviceBasicInformation") => Some(ClusterVariant::BridgedDeviceBasicInformation),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Some("Switch") => Some(ClusterVariant::Switch),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Some("BooleanState") => Some(ClusterVariant::BooleanState),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Some("RefrigeratorAlarm") => Some(ClusterVariant::RefrigeratorAlarm),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Some("SmokeCoAlarm") => Some(ClusterVariant::SmokeCoAlarm),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Some("DishwasherAlarm") => Some(ClusterVariant::DishwasherAlarm),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Some("OperationalState") => Some(ClusterVariant::OperationalState),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Some("RvcOperationalState") => Some(ClusterVariant::RvcOperationalState),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Some("DoorLock") => Some(ClusterVariant::DoorLock),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Some("PumpConfigurationAndControl") => Some(ClusterVariant::PumpConfigurationAndControl),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Some("UnitTesting") => Some(ClusterVariant::UnitTesting),
             Some(other) => return Err(format!("unknown cluster '{other}'")),
             None => None,
         };
 
         let by_id = match scope_id {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Some(0x001F) => Some(ClusterVariant::AccessControl),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Some(0x0025) => Some(ClusterVariant::Actions),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Some(0x0028) => Some(ClusterVariant::BasicInformation),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Some(0x002A) => Some(ClusterVariant::OtaSoftwareUpdateRequestor),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Some(0x002F) => Some(ClusterVariant::PowerSource),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Some(0x0033) => Some(ClusterVariant::GeneralDiagnostics),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Some(0x0034) => Some(ClusterVariant::SoftwareDiagnostics),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Some(0x0035) => Some(ClusterVariant::ThreadNetworkDiagnostics),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Some(0x0036) => Some(ClusterVariant::WiFiNetworkDiagnostics),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Some(0x0038) => Some(ClusterVariant::TimeSynchronization),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Some(0x0039) => Some(ClusterVariant::BridgedDeviceBasicInformation),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Some(0x003B) => Some(ClusterVariant::Switch),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Some(0x0045) => Some(ClusterVariant::BooleanState),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Some(0x0057) => Some(ClusterVariant::RefrigeratorAlarm),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Some(0x005C) => Some(ClusterVariant::SmokeCoAlarm),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Some(0x005D) => Some(ClusterVariant::DishwasherAlarm),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Some(0x0060) => Some(ClusterVariant::OperationalState),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Some(0x0061) => Some(ClusterVariant::RvcOperationalState),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Some(0x0101) => Some(ClusterVariant::DoorLock),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Some(0x0200) => Some(ClusterVariant::PumpConfigurationAndControl),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Some(0xFFF1_FC05) => Some(ClusterVariant::UnitTesting),
             Some(other) => return Err(format!("unknown cluster_id {other}")),
             None => None,
@@ -866,102 +866,102 @@ fn select_cluster_event(
         };
 
         match selected {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             ClusterVariant::AccessControl => {
                 clusters::access_control::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::AccessControl)
             }
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             ClusterVariant::Actions => {
                 clusters::actions::Event::select_described(item_name, item_id, payload).map(ClusterEvent::Actions)
             }
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             ClusterVariant::BasicInformation => {
                 clusters::basic_information::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::BasicInformation)
             }
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             ClusterVariant::OtaSoftwareUpdateRequestor => {
                 clusters::ota_software_update_requestor::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::OtaSoftwareUpdateRequestor)
             }
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             ClusterVariant::PowerSource => clusters::power_source::Event::select_described(item_name, item_id, payload)
                 .map(ClusterEvent::PowerSource),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             ClusterVariant::GeneralDiagnostics => {
                 clusters::general_diagnostics::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::GeneralDiagnostics)
             }
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             ClusterVariant::SoftwareDiagnostics => {
                 clusters::software_diagnostics::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::SoftwareDiagnostics)
             }
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             ClusterVariant::ThreadNetworkDiagnostics => {
                 clusters::thread_network_diagnostics::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::ThreadNetworkDiagnostics)
             }
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             ClusterVariant::WiFiNetworkDiagnostics => {
                 clusters::wi_fi_network_diagnostics::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::WiFiNetworkDiagnostics)
             }
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             ClusterVariant::TimeSynchronization => {
                 clusters::time_synchronization::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::TimeSynchronization)
             }
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             ClusterVariant::BridgedDeviceBasicInformation => {
                 clusters::bridged_device_basic_information::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::BridgedDeviceBasicInformation)
             }
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             ClusterVariant::Switch => {
                 clusters::switch::Event::select_described(item_name, item_id, payload).map(ClusterEvent::Switch)
             }
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             ClusterVariant::BooleanState => {
                 clusters::boolean_state::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::BooleanState)
             }
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             ClusterVariant::RefrigeratorAlarm => {
                 clusters::refrigerator_alarm::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::RefrigeratorAlarm)
             }
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             ClusterVariant::SmokeCoAlarm => {
                 clusters::smoke_co_alarm::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::SmokeCoAlarm)
             }
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             ClusterVariant::DishwasherAlarm => {
                 clusters::dishwasher_alarm::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::DishwasherAlarm)
             }
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             ClusterVariant::OperationalState => {
                 clusters::operational_state::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::OperationalState)
             }
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             ClusterVariant::RvcOperationalState => {
                 clusters::rvc_operational_state::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::RvcOperationalState)
             }
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             ClusterVariant::DoorLock => {
                 clusters::door_lock::Event::select_described(item_name, item_id, payload).map(ClusterEvent::DoorLock)
             }
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             ClusterVariant::PumpConfigurationAndControl => {
                 clusters::pump_configuration_and_control::Event::select_described(item_name, item_id, payload)
                     .map(ClusterEvent::PumpConfigurationAndControl)
             }
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             ClusterVariant::UnitTesting => clusters::unit_testing::Event::select_described(item_name, item_id, payload)
                 .map(ClusterEvent::UnitTesting),
         }
@@ -974,47 +974,47 @@ impl MatterDescribe for ClusterEvent {
     #[inline]
     fn descriptor(&self) -> EntityDescriptor {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.descriptor(),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.descriptor(),
             Self::Unknown(wire) => EntityDescriptor::Event {
                 cluster: "Unknown",
@@ -1036,47 +1036,47 @@ impl MatterDescribe for ClusterEvent {
         S: serde::Serializer,
     {
         match self {
-            #[cfg(feature = "cluster-access-control")]
+            #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-actions")]
+            #[cfg(cluster_actions)]
             Self::Actions(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-basic-information")]
+            #[cfg(cluster_basic_information)]
             Self::BasicInformation(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-ota-software-update-requestor")]
+            #[cfg(cluster_ota_software_update_requestor)]
             Self::OtaSoftwareUpdateRequestor(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-power-source")]
+            #[cfg(cluster_power_source)]
             Self::PowerSource(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-general-diagnostics")]
+            #[cfg(cluster_general_diagnostics)]
             Self::GeneralDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-software-diagnostics")]
+            #[cfg(cluster_software_diagnostics)]
             Self::SoftwareDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-thread-network-diagnostics")]
+            #[cfg(cluster_thread_network_diagnostics)]
             Self::ThreadNetworkDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+            #[cfg(cluster_wi_fi_network_diagnostics)]
             Self::WiFiNetworkDiagnostics(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-time-synchronization")]
+            #[cfg(cluster_time_synchronization)]
             Self::TimeSynchronization(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-bridged-device-basic-information")]
+            #[cfg(cluster_bridged_device_basic_information)]
             Self::BridgedDeviceBasicInformation(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-switch")]
+            #[cfg(cluster_switch)]
             Self::Switch(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-boolean-state")]
+            #[cfg(cluster_boolean_state)]
             Self::BooleanState(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-refrigerator-alarm")]
+            #[cfg(cluster_refrigerator_alarm)]
             Self::RefrigeratorAlarm(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-smoke-co-alarm")]
+            #[cfg(cluster_smoke_co_alarm)]
             Self::SmokeCoAlarm(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-dishwasher-alarm")]
+            #[cfg(cluster_dishwasher_alarm)]
             Self::DishwasherAlarm(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-operational-state")]
+            #[cfg(cluster_operational_state)]
             Self::OperationalState(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-rvc-operational-state")]
+            #[cfg(cluster_rvc_operational_state)]
             Self::RvcOperationalState(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-door-lock")]
+            #[cfg(cluster_door_lock)]
             Self::DoorLock(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-pump-configuration-and-control")]
+            #[cfg(cluster_pump_configuration_and_control)]
             Self::PumpConfigurationAndControl(inner) => inner.serialize_payload(serializer),
-            #[cfg(feature = "cluster-unit-testing")]
+            #[cfg(cluster_unit_testing)]
             Self::UnitTesting(inner) => inner.serialize_payload(serializer),
             Self::Unknown(wire) => Serialize::serialize(wire, serializer),
         }

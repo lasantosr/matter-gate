@@ -18,7 +18,7 @@ Additive to [`xtask/AGENTS.md`](../../../AGENTS.md).
 ## 2. Design & Constraints
 
 - **Responsibility boundary:** Manages git sparse-checkout caching, module/manifest layout, file emission, stale-output pruning, and formatting—never XML parsing or Rust AST modeling.
-- **Generated crate layout:** Emits `__shared/` buckets (for items shared across 2+ versions), versioned `v<major>_<minor>` modules (no `latest` alias), `dispatch` submodules with `> 64B` threshold-boxed variants, top-level `src/lib.rs`, and the `[features]` table in `spec/matter-spec/Cargo.toml`.
+- **Generated crate layout:** Emits `__shared/` buckets (for items shared across 2+ versions), versioned `v<major>_<minor>` modules (no `latest` alias), `dispatch` submodules with `> 64B` threshold-boxed variants, top-level `src/lib.rs`, `build.rs` (mapping features and `MATTER_SPEC_CLUSTER_*` env vars to `cluster_*` cfgs), and the `[features]` table in `spec/matter-spec/Cargo.toml`.
 
 ## 3. Architecture
 

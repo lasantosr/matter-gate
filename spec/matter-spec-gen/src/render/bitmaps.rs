@@ -5,7 +5,7 @@ use std::{
 
 use genco::{quote, tokens::quoted};
 
-use super::context::{PushLine as _, Tokens, cfg_feature_gate, doc_comment, format_hex};
+use super::context::{PushLine as _, Tokens, cluster_cfg_gate, doc_comment, format_hex};
 use crate::{
     error::Error,
     model::{BitmapDef, FeatureDef, to_shouty_snake_case, to_snake_case},
@@ -24,7 +24,7 @@ pub(super) fn emit_bitmap_struct(
     let (attr_variant, width_digits) = resolve_bitmap_width_info(name, width)?;
     let display_fmt = format!("{{:#0{width_digits}x}}");
     let flags = emit_bitmap_flags(fields);
-    let cfg_gate = cfg_feature_gate(gate);
+    let cfg_gate = cluster_cfg_gate(gate);
 
     let tokens: Tokens = quote! {
         $cfg_gate
@@ -83,7 +83,7 @@ pub(super) fn emit_feature_map(out: &mut Tokens, features: &[FeatureDef]) -> Res
 pub(super) fn emit_bitmaps(
     out: &mut Tokens,
     bitmaps: &[BitmapDef],
-    feature_gates: Option<&BTreeMap<String, Vec<String>>>,
+    cfg_gates: Option<&BTreeMap<String, Vec<String>>>,
 ) -> Result<()> {
     for bitmap in bitmaps {
         let BitmapDef { name, type_str, fields } = bitmap;
@@ -104,7 +104,7 @@ pub(super) fn emit_bitmaps(
             .iter()
             .map(|(f_name, mask)| (f_name.as_str(), *mask, ""))
             .collect();
-        let gate = feature_gates.and_then(|gates| gates.get(name));
+        let gate = cfg_gates.and_then(|gates| gates.get(name));
         emit_bitmap_struct(out, name, width, &doc, &fields, gate)?;
     }
     Ok(())

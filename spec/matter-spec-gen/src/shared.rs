@@ -22,7 +22,7 @@ pub struct SharedBucket {
     pub kind: SharedKind,
     pub module_name: String,
     pub versions: BTreeSet<String>,
-    pub cluster_features: BTreeSet<String>,
+    pub cluster_cfgs: BTreeSet<String>,
     pub version_cluster_pairs: BTreeSet<(String, String)>,
     pub cfg_gate: String,
 }
@@ -289,7 +289,7 @@ pub(crate) fn format_bucket_cfg(bucket: &SharedBucket) -> String {
     let version_expr = format_any_features(&bucket.versions);
     match bucket.kind {
         SharedKind::Cluster => {
-            let cluster_expr = format_any_features(&bucket.cluster_features);
+            let cluster_expr = format_any_cfgs(&bucket.cluster_cfgs);
             match (cluster_expr.is_empty(), version_expr.is_empty()) {
                 (false, false) => format!("all({cluster_expr}, {version_expr})"),
                 (false, true) => cluster_expr,
@@ -307,7 +307,7 @@ pub(crate) fn format_bucket_cfg(bucket: &SharedBucket) -> String {
             }
             let mut per_ver = Vec::with_capacity(by_version.len());
             for (v, clusters) in by_version {
-                let c_expr = format_any_features_ref(&clusters);
+                let c_expr = format_any_cfgs_ref(&clusters);
                 per_ver.push(format!("all(feature = \"{v}\", {c_expr})"));
             }
             if per_ver.len() == 1 {
@@ -599,5 +599,21 @@ fn format_any_features_ref(features: &BTreeSet<&str>) -> String {
         return format!("feature = \"{f}\"");
     }
     let inner: Vec<String> = features.iter().map(|f| format!("feature = \"{f}\"")).collect();
+    format!("any({})", inner.join(", "))
+}
+
+fn format_any_cfgs(cfgs: &BTreeSet<String>) -> String {
+    let refs: BTreeSet<&str> = cfgs.iter().map(String::as_str).collect();
+    format_any_cfgs_ref(&refs)
+}
+
+fn format_any_cfgs_ref(cfgs: &BTreeSet<&str>) -> String {
+    if cfgs.is_empty() {
+        return String::new();
+    }
+    if cfgs.len() == 1 {
+        return cfgs.iter().next().copied().unwrap_or_default().to_owned();
+    }
+    let inner: Vec<&str> = cfgs.iter().copied().collect();
     format!("any({})", inner.join(", "))
 }

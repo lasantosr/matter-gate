@@ -112,7 +112,7 @@ macro_rules! test_version_behavior {
                     Err(MatterStatus::ConstraintError)
                 );
 
-                #[cfg(feature = "cluster-unit-testing")]
+                #[cfg(cluster_unit_testing)]
                 {
                     use ver::clusters::unit_testing::TestListStructOctet;
 
@@ -161,7 +161,7 @@ macro_rules! test_version_behavior {
                     Err(MatterStatus::InvalidDataType)
                 );
 
-                #[cfg(feature = "cluster-unit-testing")]
+                #[cfg(cluster_unit_testing)]
                 {
                     use ver::clusters::unit_testing::TestListStructOctet;
 
@@ -191,7 +191,7 @@ macro_rules! test_version_behavior {
                 assert_eq!(parsed_val.raw(), Nullable::NonNull(2150));
 
                 // Optional chaining & wire roundtrip
-                #[cfg(feature = "cluster-unit-testing")]
+                #[cfg(cluster_unit_testing)]
                 {
                     use ver::clusters::unit_testing::NullablesAndOptionalsStruct;
 

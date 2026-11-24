@@ -5,7 +5,7 @@ use genco::{
 };
 
 use super::context::{
-    Tokens, TypeContext, cfg_feature_gate, compute_field_type_string, format_hex, to_rust_field_name, with_method_name,
+    Tokens, TypeContext, cluster_cfg_gate, compute_field_type_string, format_hex, to_rust_field_name, with_method_name,
 };
 use crate::model::{ResolvedType, to_shouty_snake_case};
 
@@ -288,7 +288,7 @@ impl FormatInto<Rust> for RecordStructDef<'_> {
         let partition = self.partition;
         let doc = self.doc;
         let attrs = self.attrs;
-        let gate = cfg_feature_gate(self.cfg_gate);
+        let gate = cluster_cfg_gate(self.cfg_gate);
 
         if partition.is_empty() {
             quote_in! { *tokens =>
@@ -436,7 +436,7 @@ impl FormatInto<Rust> for SingleMandatoryFrom<'_> {
         let target = self.target_type;
         let mand_type = &self.mand.field_type;
         let mand_path = &self.mand.type_path;
-        let gate = cfg_feature_gate(self.cfg_gate);
+        let gate = cluster_cfg_gate(self.cfg_gate);
 
         quote_in! { *tokens =>
             $(&gate)

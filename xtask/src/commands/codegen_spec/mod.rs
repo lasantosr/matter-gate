@@ -57,7 +57,7 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
     let mut family_to_endpoints: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let mut endpoint_to_clusters: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
     let mut all_domain_categories: BTreeSet<Category> = BTreeSet::new();
-    let mut all_cluster_features: BTreeSet<String> = BTreeSet::new();
+    let mut all_cluster_cfgs: BTreeSet<String> = BTreeSet::new();
     let mut version_info_list = Vec::new();
 
     let mut inputs = Vec::new();
@@ -91,7 +91,7 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
         family_to_clusters: &mut family_to_clusters,
         family_to_endpoints: &mut family_to_endpoints,
         endpoint_to_clusters: &mut endpoint_to_clusters,
-        all_cluster_features: &mut all_cluster_features,
+        all_cluster_cfgs: &mut all_cluster_cfgs,
         shared_plan: &shared_plan,
         cluster_hashes: &cluster_hashes,
     };
@@ -104,7 +104,7 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
     // 4. Generate top-level src/lib.rs
     layout::generate_top_lib_rs(&spec_crate_dir.join("src").join("lib.rs"), &version_info_list)?;
 
-    // 5. Update spec/matter-spec/Cargo.toml features table
+    // 5. Update spec/matter-spec/Cargo.toml features table and spec/matter-spec/build.rs
     if family_to_clusters.contains_key("testing") {
         all_domain_categories.insert(Category::testing());
     }
@@ -116,7 +116,13 @@ pub(crate) fn run_codegen_spec(root: &Path, options: &CodegenSpecOptions) -> Res
         &family_to_clusters,
         &family_to_endpoints,
         &endpoint_to_clusters,
-        &all_cluster_features,
+    )?;
+    layout::generate_spec_build_rs(
+        &spec_crate_dir.join("build.rs"),
+        &domain_families,
+        &family_to_clusters,
+        &endpoint_to_clusters,
+        &all_cluster_cfgs,
     )?;
 
     // 6. Format generated spec crate code using nightly rustfmt and taplo
@@ -267,7 +273,7 @@ struct GenerationContext<'a> {
     family_to_clusters: &'a mut BTreeMap<String, BTreeSet<String>>,
     family_to_endpoints: &'a mut BTreeMap<String, BTreeSet<String>>,
     endpoint_to_clusters: &'a mut BTreeMap<String, BTreeSet<String>>,
-    all_cluster_features: &'a mut BTreeSet<String>,
+    all_cluster_cfgs: &'a mut BTreeSet<String>,
     shared_plan: &'a SharedPlan,
     cluster_hashes: &'a BTreeMap<(String, String), String>,
 }
@@ -389,7 +395,7 @@ fn emit_shared_modules(
                         .into_iter()
                         .map(|(v, clusters)| {
                             let v_feat = version_to_feature_name(v);
-                            let c_cfgs: Vec<String> = clusters.iter().map(|c| format!("feature = \"{c}\"")).collect();
+                            let c_cfgs: Vec<String> = clusters.iter().map(|&c| c.to_owned()).collect();
                             let c_expr = format_any_cfg(&c_cfgs);
                             format!("all(feature = \"{v_feat}\", {c_expr})")
                         })
@@ -426,11 +432,7 @@ fn emit_shared_modules(
                 write_if_changed(&clusters_dir.join(format!("{}.rs", bucket.ident)), &code)?;
                 expected_cluster_files.insert(format!("{}.rs", bucket.ident));
 
-                let cluster_cfgs: Vec<String> = bucket
-                    .cluster_features
-                    .iter()
-                    .map(|f| format!("feature = \"{f}\""))
-                    .collect();
+                let cluster_cfgs: Vec<String> = bucket.cluster_cfgs.iter().cloned().collect();
                 let ver_cfgs: Vec<String> = bucket
                     .versions
                     .iter()
@@ -502,14 +504,14 @@ fn render_single_version_artifacts(
     for cluster in &ver.clusters {
         let family_str = cluster.category().as_str();
         let snake_name = cluster.module_name();
-        let cluster_feat = cluster.cluster_feature();
+        let cluster_cfg = cluster.cluster_cfg();
 
         ctx.all_domain_categories.insert(cluster.category().clone());
-        ctx.all_cluster_features.insert(cluster_feat.to_owned());
+        ctx.all_cluster_cfgs.insert(cluster_cfg.to_owned());
         ctx.family_to_clusters
             .entry(family_str.to_owned())
             .or_default()
-            .insert(cluster_feat.to_owned());
+            .insert(cluster_cfg.to_owned());
 
         let mod_file = clusters_dir.join(format!("{snake_name}.rs"));
         let code = if let Some(ident) = ctx.cluster_hashes.get(&(mod_name.clone(), snake_name.to_owned())) {
@@ -523,18 +525,14 @@ fn render_single_version_artifacts(
         write_if_changed(&mod_file, &code)?;
 
         expected_cluster_files.insert(format!("{snake_name}.rs"));
-        cluster_modules.push((
-            snake_name.to_owned(),
-            cluster_feat.to_owned(),
-            cluster.name().to_owned(),
-        ));
+        cluster_modules.push((snake_name.to_owned(), cluster_cfg.to_owned(), cluster.name().to_owned()));
 
         dispatch_clusters.push(layout::DispatchClusterEntry {
             cluster_id: cluster.cluster_id(),
             module_name: snake_name.to_owned(),
             name: cluster.name().to_owned(),
             struct_name: format!("{}Cluster", cluster.name()),
-            feature: cluster_feat.to_owned(),
+            cfg: cluster_cfg.to_owned(),
             has_attributes: cluster.has_attributes(),
             has_client_commands: cluster.has_client_commands(),
             has_server_commands: cluster.has_server_commands(),

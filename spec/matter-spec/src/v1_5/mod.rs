@@ -127,673 +127,673 @@ pub use dispatch::{
 };
 
 pub(crate) mod shortcuts {
-    #[cfg(feature = "cluster-access-control")]
+    #[cfg(cluster_access_control)]
     pub use super::clusters::access_control;
-    #[cfg(feature = "cluster-access-control")]
+    #[cfg(cluster_access_control)]
     pub use super::clusters::access_control::{AccessControlCluster, AccessControlClusterPatch};
-    #[cfg(feature = "cluster-account-login")]
+    #[cfg(cluster_account_login)]
     pub use super::clusters::account_login;
-    #[cfg(feature = "cluster-account-login")]
+    #[cfg(cluster_account_login)]
     pub use super::clusters::account_login::{AccountLoginCluster, AccountLoginClusterPatch};
-    #[cfg(feature = "cluster-actions")]
+    #[cfg(cluster_actions)]
     pub use super::clusters::actions;
-    #[cfg(feature = "cluster-actions")]
+    #[cfg(cluster_actions)]
     pub use super::clusters::actions::{ActionsCluster, ActionsClusterPatch};
-    #[cfg(feature = "cluster-activated-carbon-filter-monitoring")]
+    #[cfg(cluster_activated_carbon_filter_monitoring)]
     pub use super::clusters::activated_carbon_filter_monitoring;
-    #[cfg(feature = "cluster-activated-carbon-filter-monitoring")]
+    #[cfg(cluster_activated_carbon_filter_monitoring)]
     pub use super::clusters::activated_carbon_filter_monitoring::{
         ActivatedCarbonFilterMonitoringCluster, ActivatedCarbonFilterMonitoringClusterPatch,
     };
-    #[cfg(feature = "cluster-administrator-commissioning")]
+    #[cfg(cluster_administrator_commissioning)]
     pub use super::clusters::administrator_commissioning;
-    #[cfg(feature = "cluster-administrator-commissioning")]
+    #[cfg(cluster_administrator_commissioning)]
     pub use super::clusters::administrator_commissioning::{
         AdministratorCommissioningCluster, AdministratorCommissioningClusterPatch,
     };
-    #[cfg(feature = "cluster-air-quality")]
+    #[cfg(cluster_air_quality)]
     pub use super::clusters::air_quality;
-    #[cfg(feature = "cluster-air-quality")]
+    #[cfg(cluster_air_quality)]
     pub use super::clusters::air_quality::{AirQualityCluster, AirQualityClusterPatch};
-    #[cfg(feature = "cluster-application-basic")]
+    #[cfg(cluster_application_basic)]
     pub use super::clusters::application_basic;
-    #[cfg(feature = "cluster-application-basic")]
+    #[cfg(cluster_application_basic)]
     pub use super::clusters::application_basic::{ApplicationBasicCluster, ApplicationBasicClusterPatch};
-    #[cfg(feature = "cluster-application-launcher")]
+    #[cfg(cluster_application_launcher)]
     pub use super::clusters::application_launcher;
-    #[cfg(feature = "cluster-application-launcher")]
+    #[cfg(cluster_application_launcher)]
     pub use super::clusters::application_launcher::{ApplicationLauncherCluster, ApplicationLauncherClusterPatch};
-    #[cfg(feature = "cluster-audio-output")]
+    #[cfg(cluster_audio_output)]
     pub use super::clusters::audio_output;
-    #[cfg(feature = "cluster-audio-output")]
+    #[cfg(cluster_audio_output)]
     pub use super::clusters::audio_output::{AudioOutputCluster, AudioOutputClusterPatch};
-    #[cfg(feature = "cluster-ballast-configuration")]
+    #[cfg(cluster_ballast_configuration)]
     pub use super::clusters::ballast_configuration;
-    #[cfg(feature = "cluster-ballast-configuration")]
+    #[cfg(cluster_ballast_configuration)]
     pub use super::clusters::ballast_configuration::{BallastConfigurationCluster, BallastConfigurationClusterPatch};
-    #[cfg(feature = "cluster-basic-information")]
+    #[cfg(cluster_basic_information)]
     pub use super::clusters::basic_information;
-    #[cfg(feature = "cluster-basic-information")]
+    #[cfg(cluster_basic_information)]
     pub use super::clusters::basic_information::{BasicInformationCluster, BasicInformationClusterPatch};
-    #[cfg(feature = "cluster-binding")]
+    #[cfg(cluster_binding)]
     pub use super::clusters::binding;
-    #[cfg(feature = "cluster-binding")]
+    #[cfg(cluster_binding)]
     pub use super::clusters::binding::{BindingCluster, BindingClusterPatch};
-    #[cfg(feature = "cluster-boolean-state")]
+    #[cfg(cluster_boolean_state)]
     pub use super::clusters::boolean_state;
-    #[cfg(feature = "cluster-boolean-state")]
+    #[cfg(cluster_boolean_state)]
     pub use super::clusters::boolean_state::{BooleanStateCluster, BooleanStateClusterPatch};
-    #[cfg(feature = "cluster-boolean-state-configuration")]
+    #[cfg(cluster_boolean_state_configuration)]
     pub use super::clusters::boolean_state_configuration;
-    #[cfg(feature = "cluster-boolean-state-configuration")]
+    #[cfg(cluster_boolean_state_configuration)]
     pub use super::clusters::boolean_state_configuration::{
         BooleanStateConfigurationCluster, BooleanStateConfigurationClusterPatch,
     };
-    #[cfg(feature = "cluster-bridged-device-basic-information")]
+    #[cfg(cluster_bridged_device_basic_information)]
     pub use super::clusters::bridged_device_basic_information;
-    #[cfg(feature = "cluster-bridged-device-basic-information")]
+    #[cfg(cluster_bridged_device_basic_information)]
     pub use super::clusters::bridged_device_basic_information::{
         BridgedDeviceBasicInformationCluster, BridgedDeviceBasicInformationClusterPatch,
     };
-    #[cfg(feature = "cluster-camera-av-settings-user-level-management")]
+    #[cfg(cluster_camera_av_settings_user_level_management)]
     pub use super::clusters::camera_av_settings_user_level_management;
-    #[cfg(feature = "cluster-camera-av-settings-user-level-management")]
+    #[cfg(cluster_camera_av_settings_user_level_management)]
     pub use super::clusters::camera_av_settings_user_level_management::{
         CameraAvSettingsUserLevelManagementCluster, CameraAvSettingsUserLevelManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-camera-av-stream-management")]
+    #[cfg(cluster_camera_av_stream_management)]
     pub use super::clusters::camera_av_stream_management;
-    #[cfg(feature = "cluster-camera-av-stream-management")]
+    #[cfg(cluster_camera_av_stream_management)]
     pub use super::clusters::camera_av_stream_management::{
         CameraAvStreamManagementCluster, CameraAvStreamManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-carbon-dioxide-concentration-measurement")]
+    #[cfg(cluster_carbon_dioxide_concentration_measurement)]
     pub use super::clusters::carbon_dioxide_concentration_measurement;
-    #[cfg(feature = "cluster-carbon-dioxide-concentration-measurement")]
+    #[cfg(cluster_carbon_dioxide_concentration_measurement)]
     pub use super::clusters::carbon_dioxide_concentration_measurement::{
         CarbonDioxideConcentrationMeasurementCluster, CarbonDioxideConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-carbon-monoxide-concentration-measurement")]
+    #[cfg(cluster_carbon_monoxide_concentration_measurement)]
     pub use super::clusters::carbon_monoxide_concentration_measurement;
-    #[cfg(feature = "cluster-carbon-monoxide-concentration-measurement")]
+    #[cfg(cluster_carbon_monoxide_concentration_measurement)]
     pub use super::clusters::carbon_monoxide_concentration_measurement::{
         CarbonMonoxideConcentrationMeasurementCluster, CarbonMonoxideConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-channel")]
+    #[cfg(cluster_channel)]
     pub use super::clusters::channel;
-    #[cfg(feature = "cluster-channel")]
+    #[cfg(cluster_channel)]
     pub use super::clusters::channel::{ChannelCluster, ChannelClusterPatch};
-    #[cfg(feature = "cluster-chime")]
+    #[cfg(cluster_chime)]
     pub use super::clusters::chime;
-    #[cfg(feature = "cluster-chime")]
+    #[cfg(cluster_chime)]
     pub use super::clusters::chime::{ChimeCluster, ChimeClusterPatch};
-    #[cfg(feature = "cluster-closure-control")]
+    #[cfg(cluster_closure_control)]
     pub use super::clusters::closure_control;
-    #[cfg(feature = "cluster-closure-control")]
+    #[cfg(cluster_closure_control)]
     pub use super::clusters::closure_control::{ClosureControlCluster, ClosureControlClusterPatch};
-    #[cfg(feature = "cluster-closure-dimension")]
+    #[cfg(cluster_closure_dimension)]
     pub use super::clusters::closure_dimension;
-    #[cfg(feature = "cluster-closure-dimension")]
+    #[cfg(cluster_closure_dimension)]
     pub use super::clusters::closure_dimension::{ClosureDimensionCluster, ClosureDimensionClusterPatch};
-    #[cfg(feature = "cluster-color-control")]
+    #[cfg(cluster_color_control)]
     pub use super::clusters::color_control;
-    #[cfg(feature = "cluster-color-control")]
+    #[cfg(cluster_color_control)]
     pub use super::clusters::color_control::{ColorControlCluster, ColorControlClusterPatch};
-    #[cfg(feature = "cluster-commissioner-control")]
+    #[cfg(cluster_commissioner_control)]
     pub use super::clusters::commissioner_control;
-    #[cfg(feature = "cluster-commissioner-control")]
+    #[cfg(cluster_commissioner_control)]
     pub use super::clusters::commissioner_control::{CommissionerControlCluster, CommissionerControlClusterPatch};
-    #[cfg(feature = "cluster-commodity-metering")]
+    #[cfg(cluster_commodity_metering)]
     pub use super::clusters::commodity_metering;
-    #[cfg(feature = "cluster-commodity-metering")]
+    #[cfg(cluster_commodity_metering)]
     pub use super::clusters::commodity_metering::{CommodityMeteringCluster, CommodityMeteringClusterPatch};
-    #[cfg(feature = "cluster-commodity-price")]
+    #[cfg(cluster_commodity_price)]
     pub use super::clusters::commodity_price;
-    #[cfg(feature = "cluster-commodity-price")]
+    #[cfg(cluster_commodity_price)]
     pub use super::clusters::commodity_price::{CommodityPriceCluster, CommodityPriceClusterPatch};
-    #[cfg(feature = "cluster-commodity-tariff")]
+    #[cfg(cluster_commodity_tariff)]
     pub use super::clusters::commodity_tariff;
-    #[cfg(feature = "cluster-commodity-tariff")]
+    #[cfg(cluster_commodity_tariff)]
     pub use super::clusters::commodity_tariff::{CommodityTariffCluster, CommodityTariffClusterPatch};
-    #[cfg(feature = "cluster-content-app-observer")]
+    #[cfg(cluster_content_app_observer)]
     pub use super::clusters::content_app_observer;
-    #[cfg(feature = "cluster-content-app-observer")]
+    #[cfg(cluster_content_app_observer)]
     pub use super::clusters::content_app_observer::{ContentAppObserverCluster, ContentAppObserverClusterPatch};
-    #[cfg(feature = "cluster-content-control")]
+    #[cfg(cluster_content_control)]
     pub use super::clusters::content_control;
-    #[cfg(feature = "cluster-content-control")]
+    #[cfg(cluster_content_control)]
     pub use super::clusters::content_control::{ContentControlCluster, ContentControlClusterPatch};
-    #[cfg(feature = "cluster-content-launcher")]
+    #[cfg(cluster_content_launcher)]
     pub use super::clusters::content_launcher;
-    #[cfg(feature = "cluster-content-launcher")]
+    #[cfg(cluster_content_launcher)]
     pub use super::clusters::content_launcher::{ContentLauncherCluster, ContentLauncherClusterPatch};
-    #[cfg(feature = "cluster-descriptor")]
+    #[cfg(cluster_descriptor)]
     pub use super::clusters::descriptor;
-    #[cfg(feature = "cluster-descriptor")]
+    #[cfg(cluster_descriptor)]
     pub use super::clusters::descriptor::{DescriptorCluster, DescriptorClusterPatch};
-    #[cfg(feature = "cluster-device-energy-management")]
+    #[cfg(cluster_device_energy_management)]
     pub use super::clusters::device_energy_management;
-    #[cfg(feature = "cluster-device-energy-management")]
+    #[cfg(cluster_device_energy_management)]
     pub use super::clusters::device_energy_management::{
         DeviceEnergyManagementCluster, DeviceEnergyManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-device-energy-management-mode")]
+    #[cfg(cluster_device_energy_management_mode)]
     pub use super::clusters::device_energy_management_mode;
-    #[cfg(feature = "cluster-device-energy-management-mode")]
+    #[cfg(cluster_device_energy_management_mode)]
     pub use super::clusters::device_energy_management_mode::{
         DeviceEnergyManagementModeCluster, DeviceEnergyManagementModeClusterPatch,
     };
-    #[cfg(feature = "cluster-diagnostic-logs")]
+    #[cfg(cluster_diagnostic_logs)]
     pub use super::clusters::diagnostic_logs;
-    #[cfg(feature = "cluster-diagnostic-logs")]
+    #[cfg(cluster_diagnostic_logs)]
     pub use super::clusters::diagnostic_logs::{DiagnosticLogsCluster, DiagnosticLogsClusterPatch};
-    #[cfg(feature = "cluster-dishwasher-alarm")]
+    #[cfg(cluster_dishwasher_alarm)]
     pub use super::clusters::dishwasher_alarm;
-    #[cfg(feature = "cluster-dishwasher-alarm")]
+    #[cfg(cluster_dishwasher_alarm)]
     pub use super::clusters::dishwasher_alarm::{DishwasherAlarmCluster, DishwasherAlarmClusterPatch};
-    #[cfg(feature = "cluster-dishwasher-mode")]
+    #[cfg(cluster_dishwasher_mode)]
     pub use super::clusters::dishwasher_mode;
-    #[cfg(feature = "cluster-dishwasher-mode")]
+    #[cfg(cluster_dishwasher_mode)]
     pub use super::clusters::dishwasher_mode::{DishwasherModeCluster, DishwasherModeClusterPatch};
-    #[cfg(feature = "cluster-door-lock")]
+    #[cfg(cluster_door_lock)]
     pub use super::clusters::door_lock;
-    #[cfg(feature = "cluster-door-lock")]
+    #[cfg(cluster_door_lock)]
     pub use super::clusters::door_lock::{DoorLockCluster, DoorLockClusterPatch};
-    #[cfg(feature = "cluster-ecosystem-information")]
+    #[cfg(cluster_ecosystem_information)]
     pub use super::clusters::ecosystem_information;
-    #[cfg(feature = "cluster-ecosystem-information")]
+    #[cfg(cluster_ecosystem_information)]
     pub use super::clusters::ecosystem_information::{EcosystemInformationCluster, EcosystemInformationClusterPatch};
-    #[cfg(feature = "cluster-electrical-energy-measurement")]
+    #[cfg(cluster_electrical_energy_measurement)]
     pub use super::clusters::electrical_energy_measurement;
-    #[cfg(feature = "cluster-electrical-energy-measurement")]
+    #[cfg(cluster_electrical_energy_measurement)]
     pub use super::clusters::electrical_energy_measurement::{
         ElectricalEnergyMeasurementCluster, ElectricalEnergyMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-electrical-grid-conditions")]
+    #[cfg(cluster_electrical_grid_conditions)]
     pub use super::clusters::electrical_grid_conditions;
-    #[cfg(feature = "cluster-electrical-grid-conditions")]
+    #[cfg(cluster_electrical_grid_conditions)]
     pub use super::clusters::electrical_grid_conditions::{
         ElectricalGridConditionsCluster, ElectricalGridConditionsClusterPatch,
     };
-    #[cfg(feature = "cluster-electrical-power-measurement")]
+    #[cfg(cluster_electrical_power_measurement)]
     pub use super::clusters::electrical_power_measurement;
-    #[cfg(feature = "cluster-electrical-power-measurement")]
+    #[cfg(cluster_electrical_power_measurement)]
     pub use super::clusters::electrical_power_measurement::{
         ElectricalPowerMeasurementCluster, ElectricalPowerMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-energy-evse")]
+    #[cfg(cluster_energy_evse)]
     pub use super::clusters::energy_evse;
-    #[cfg(feature = "cluster-energy-evse")]
+    #[cfg(cluster_energy_evse)]
     pub use super::clusters::energy_evse::{EnergyEvseCluster, EnergyEvseClusterPatch};
-    #[cfg(feature = "cluster-energy-evse-mode")]
+    #[cfg(cluster_energy_evse_mode)]
     pub use super::clusters::energy_evse_mode;
-    #[cfg(feature = "cluster-energy-evse-mode")]
+    #[cfg(cluster_energy_evse_mode)]
     pub use super::clusters::energy_evse_mode::{EnergyEvseModeCluster, EnergyEvseModeClusterPatch};
-    #[cfg(feature = "cluster-energy-preference")]
+    #[cfg(cluster_energy_preference)]
     pub use super::clusters::energy_preference;
-    #[cfg(feature = "cluster-energy-preference")]
+    #[cfg(cluster_energy_preference)]
     pub use super::clusters::energy_preference::{EnergyPreferenceCluster, EnergyPreferenceClusterPatch};
-    #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+    #[cfg(cluster_ethernet_network_diagnostics)]
     pub use super::clusters::ethernet_network_diagnostics;
-    #[cfg(feature = "cluster-ethernet-network-diagnostics")]
+    #[cfg(cluster_ethernet_network_diagnostics)]
     pub use super::clusters::ethernet_network_diagnostics::{
         EthernetNetworkDiagnosticsCluster, EthernetNetworkDiagnosticsClusterPatch,
     };
-    #[cfg(feature = "cluster-fan-control")]
+    #[cfg(cluster_fan_control)]
     pub use super::clusters::fan_control;
-    #[cfg(feature = "cluster-fan-control")]
+    #[cfg(cluster_fan_control)]
     pub use super::clusters::fan_control::{FanControlCluster, FanControlClusterPatch};
-    #[cfg(feature = "cluster-fault-injection")]
+    #[cfg(cluster_fault_injection)]
     pub use super::clusters::fault_injection;
-    #[cfg(feature = "cluster-fault-injection")]
+    #[cfg(cluster_fault_injection)]
     pub use super::clusters::fault_injection::{FaultInjectionCluster, FaultInjectionClusterPatch};
-    #[cfg(feature = "cluster-fixed-label")]
+    #[cfg(cluster_fixed_label)]
     pub use super::clusters::fixed_label;
-    #[cfg(feature = "cluster-fixed-label")]
+    #[cfg(cluster_fixed_label)]
     pub use super::clusters::fixed_label::{FixedLabelCluster, FixedLabelClusterPatch};
-    #[cfg(feature = "cluster-flow-measurement")]
+    #[cfg(cluster_flow_measurement)]
     pub use super::clusters::flow_measurement;
-    #[cfg(feature = "cluster-flow-measurement")]
+    #[cfg(cluster_flow_measurement)]
     pub use super::clusters::flow_measurement::{FlowMeasurementCluster, FlowMeasurementClusterPatch};
-    #[cfg(feature = "cluster-formaldehyde-concentration-measurement")]
+    #[cfg(cluster_formaldehyde_concentration_measurement)]
     pub use super::clusters::formaldehyde_concentration_measurement;
-    #[cfg(feature = "cluster-formaldehyde-concentration-measurement")]
+    #[cfg(cluster_formaldehyde_concentration_measurement)]
     pub use super::clusters::formaldehyde_concentration_measurement::{
         FormaldehydeConcentrationMeasurementCluster, FormaldehydeConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-general-commissioning")]
+    #[cfg(cluster_general_commissioning)]
     pub use super::clusters::general_commissioning;
-    #[cfg(feature = "cluster-general-commissioning")]
+    #[cfg(cluster_general_commissioning)]
     pub use super::clusters::general_commissioning::{GeneralCommissioningCluster, GeneralCommissioningClusterPatch};
-    #[cfg(feature = "cluster-general-diagnostics")]
+    #[cfg(cluster_general_diagnostics)]
     pub use super::clusters::general_diagnostics;
-    #[cfg(feature = "cluster-general-diagnostics")]
+    #[cfg(cluster_general_diagnostics)]
     pub use super::clusters::general_diagnostics::{GeneralDiagnosticsCluster, GeneralDiagnosticsClusterPatch};
-    #[cfg(feature = "cluster-group-key-management")]
+    #[cfg(cluster_group_key_management)]
     pub use super::clusters::group_key_management;
-    #[cfg(feature = "cluster-group-key-management")]
+    #[cfg(cluster_group_key_management)]
     pub use super::clusters::group_key_management::{GroupKeyManagementCluster, GroupKeyManagementClusterPatch};
-    #[cfg(feature = "cluster-groupcast")]
+    #[cfg(cluster_groupcast)]
     pub use super::clusters::groupcast;
-    #[cfg(feature = "cluster-groupcast")]
+    #[cfg(cluster_groupcast)]
     pub use super::clusters::groupcast::{GroupcastCluster, GroupcastClusterPatch};
-    #[cfg(feature = "cluster-groups")]
+    #[cfg(cluster_groups)]
     pub use super::clusters::groups;
-    #[cfg(feature = "cluster-groups")]
+    #[cfg(cluster_groups)]
     pub use super::clusters::groups::{GroupsCluster, GroupsClusterPatch};
-    #[cfg(feature = "cluster-hepa-filter-monitoring")]
+    #[cfg(cluster_hepa_filter_monitoring)]
     pub use super::clusters::hepa_filter_monitoring;
-    #[cfg(feature = "cluster-hepa-filter-monitoring")]
+    #[cfg(cluster_hepa_filter_monitoring)]
     pub use super::clusters::hepa_filter_monitoring::{HepaFilterMonitoringCluster, HepaFilterMonitoringClusterPatch};
-    #[cfg(feature = "cluster-icd-management")]
+    #[cfg(cluster_icd_management)]
     pub use super::clusters::icd_management;
-    #[cfg(feature = "cluster-icd-management")]
+    #[cfg(cluster_icd_management)]
     pub use super::clusters::icd_management::{IcdManagementCluster, IcdManagementClusterPatch};
-    #[cfg(feature = "cluster-identify")]
+    #[cfg(cluster_identify)]
     pub use super::clusters::identify;
-    #[cfg(feature = "cluster-identify")]
+    #[cfg(cluster_identify)]
     pub use super::clusters::identify::{IdentifyCluster, IdentifyClusterPatch};
-    #[cfg(feature = "cluster-illuminance-measurement")]
+    #[cfg(cluster_illuminance_measurement)]
     pub use super::clusters::illuminance_measurement;
-    #[cfg(feature = "cluster-illuminance-measurement")]
+    #[cfg(cluster_illuminance_measurement)]
     pub use super::clusters::illuminance_measurement::{
         IlluminanceMeasurementCluster, IlluminanceMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-joint-fabric-administrator")]
+    #[cfg(cluster_joint_fabric_administrator)]
     pub use super::clusters::joint_fabric_administrator;
-    #[cfg(feature = "cluster-joint-fabric-administrator")]
+    #[cfg(cluster_joint_fabric_administrator)]
     pub use super::clusters::joint_fabric_administrator::{
         JointFabricAdministratorCluster, JointFabricAdministratorClusterPatch,
     };
-    #[cfg(feature = "cluster-joint-fabric-datastore")]
+    #[cfg(cluster_joint_fabric_datastore)]
     pub use super::clusters::joint_fabric_datastore;
-    #[cfg(feature = "cluster-joint-fabric-datastore")]
+    #[cfg(cluster_joint_fabric_datastore)]
     pub use super::clusters::joint_fabric_datastore::{JointFabricDatastoreCluster, JointFabricDatastoreClusterPatch};
-    #[cfg(feature = "cluster-keypad-input")]
+    #[cfg(cluster_keypad_input)]
     pub use super::clusters::keypad_input;
-    #[cfg(feature = "cluster-keypad-input")]
+    #[cfg(cluster_keypad_input)]
     pub use super::clusters::keypad_input::{KeypadInputCluster, KeypadInputClusterPatch};
-    #[cfg(feature = "cluster-laundry-dryer-controls")]
+    #[cfg(cluster_laundry_dryer_controls)]
     pub use super::clusters::laundry_dryer_controls;
-    #[cfg(feature = "cluster-laundry-dryer-controls")]
+    #[cfg(cluster_laundry_dryer_controls)]
     pub use super::clusters::laundry_dryer_controls::{LaundryDryerControlsCluster, LaundryDryerControlsClusterPatch};
-    #[cfg(feature = "cluster-laundry-washer-controls")]
+    #[cfg(cluster_laundry_washer_controls)]
     pub use super::clusters::laundry_washer_controls;
-    #[cfg(feature = "cluster-laundry-washer-controls")]
+    #[cfg(cluster_laundry_washer_controls)]
     pub use super::clusters::laundry_washer_controls::{
         LaundryWasherControlsCluster, LaundryWasherControlsClusterPatch,
     };
-    #[cfg(feature = "cluster-laundry-washer-mode")]
+    #[cfg(cluster_laundry_washer_mode)]
     pub use super::clusters::laundry_washer_mode;
-    #[cfg(feature = "cluster-laundry-washer-mode")]
+    #[cfg(cluster_laundry_washer_mode)]
     pub use super::clusters::laundry_washer_mode::{LaundryWasherModeCluster, LaundryWasherModeClusterPatch};
-    #[cfg(feature = "cluster-level-control")]
+    #[cfg(cluster_level_control)]
     pub use super::clusters::level_control;
-    #[cfg(feature = "cluster-level-control")]
+    #[cfg(cluster_level_control)]
     pub use super::clusters::level_control::{LevelControlCluster, LevelControlClusterPatch};
-    #[cfg(feature = "cluster-localization-configuration")]
+    #[cfg(cluster_localization_configuration)]
     pub use super::clusters::localization_configuration;
-    #[cfg(feature = "cluster-localization-configuration")]
+    #[cfg(cluster_localization_configuration)]
     pub use super::clusters::localization_configuration::{
         LocalizationConfigurationCluster, LocalizationConfigurationClusterPatch,
     };
-    #[cfg(feature = "cluster-low-power")]
+    #[cfg(cluster_low_power)]
     pub use super::clusters::low_power;
-    #[cfg(feature = "cluster-low-power")]
+    #[cfg(cluster_low_power)]
     pub use super::clusters::low_power::{LowPowerCluster, LowPowerClusterPatch};
-    #[cfg(feature = "cluster-media-input")]
+    #[cfg(cluster_media_input)]
     pub use super::clusters::media_input;
-    #[cfg(feature = "cluster-media-input")]
+    #[cfg(cluster_media_input)]
     pub use super::clusters::media_input::{MediaInputCluster, MediaInputClusterPatch};
-    #[cfg(feature = "cluster-media-playback")]
+    #[cfg(cluster_media_playback)]
     pub use super::clusters::media_playback;
-    #[cfg(feature = "cluster-media-playback")]
+    #[cfg(cluster_media_playback)]
     pub use super::clusters::media_playback::{MediaPlaybackCluster, MediaPlaybackClusterPatch};
-    #[cfg(feature = "cluster-messages")]
+    #[cfg(cluster_messages)]
     pub use super::clusters::messages;
-    #[cfg(feature = "cluster-messages")]
+    #[cfg(cluster_messages)]
     pub use super::clusters::messages::{MessagesCluster, MessagesClusterPatch};
-    #[cfg(feature = "cluster-meter-identification")]
+    #[cfg(cluster_meter_identification)]
     pub use super::clusters::meter_identification;
-    #[cfg(feature = "cluster-meter-identification")]
+    #[cfg(cluster_meter_identification)]
     pub use super::clusters::meter_identification::{MeterIdentificationCluster, MeterIdentificationClusterPatch};
-    #[cfg(feature = "cluster-microwave-oven-control")]
+    #[cfg(cluster_microwave_oven_control)]
     pub use super::clusters::microwave_oven_control;
-    #[cfg(feature = "cluster-microwave-oven-control")]
+    #[cfg(cluster_microwave_oven_control)]
     pub use super::clusters::microwave_oven_control::{MicrowaveOvenControlCluster, MicrowaveOvenControlClusterPatch};
-    #[cfg(feature = "cluster-microwave-oven-mode")]
+    #[cfg(cluster_microwave_oven_mode)]
     pub use super::clusters::microwave_oven_mode;
-    #[cfg(feature = "cluster-microwave-oven-mode")]
+    #[cfg(cluster_microwave_oven_mode)]
     pub use super::clusters::microwave_oven_mode::{MicrowaveOvenModeCluster, MicrowaveOvenModeClusterPatch};
-    #[cfg(feature = "cluster-mode-select")]
+    #[cfg(cluster_mode_select)]
     pub use super::clusters::mode_select;
-    #[cfg(feature = "cluster-mode-select")]
+    #[cfg(cluster_mode_select)]
     pub use super::clusters::mode_select::{ModeSelectCluster, ModeSelectClusterPatch};
-    #[cfg(feature = "cluster-network-commissioning")]
+    #[cfg(cluster_network_commissioning)]
     pub use super::clusters::network_commissioning;
-    #[cfg(feature = "cluster-network-commissioning")]
+    #[cfg(cluster_network_commissioning)]
     pub use super::clusters::network_commissioning::{NetworkCommissioningCluster, NetworkCommissioningClusterPatch};
-    #[cfg(feature = "cluster-nitrogen-dioxide-concentration-measurement")]
+    #[cfg(cluster_nitrogen_dioxide_concentration_measurement)]
     pub use super::clusters::nitrogen_dioxide_concentration_measurement;
-    #[cfg(feature = "cluster-nitrogen-dioxide-concentration-measurement")]
+    #[cfg(cluster_nitrogen_dioxide_concentration_measurement)]
     pub use super::clusters::nitrogen_dioxide_concentration_measurement::{
         NitrogenDioxideConcentrationMeasurementCluster, NitrogenDioxideConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-occupancy-sensing")]
+    #[cfg(cluster_occupancy_sensing)]
     pub use super::clusters::occupancy_sensing;
-    #[cfg(feature = "cluster-occupancy-sensing")]
+    #[cfg(cluster_occupancy_sensing)]
     pub use super::clusters::occupancy_sensing::{OccupancySensingCluster, OccupancySensingClusterPatch};
-    #[cfg(feature = "cluster-on-off")]
+    #[cfg(cluster_on_off)]
     pub use super::clusters::on_off;
-    #[cfg(feature = "cluster-on-off")]
+    #[cfg(cluster_on_off)]
     pub use super::clusters::on_off::{OnOffCluster, OnOffClusterPatch};
-    #[cfg(feature = "cluster-operational-credentials")]
+    #[cfg(cluster_operational_credentials)]
     pub use super::clusters::operational_credentials;
-    #[cfg(feature = "cluster-operational-credentials")]
+    #[cfg(cluster_operational_credentials)]
     pub use super::clusters::operational_credentials::{
         OperationalCredentialsCluster, OperationalCredentialsClusterPatch,
     };
-    #[cfg(feature = "cluster-operational-state")]
+    #[cfg(cluster_operational_state)]
     pub use super::clusters::operational_state;
-    #[cfg(feature = "cluster-operational-state")]
+    #[cfg(cluster_operational_state)]
     pub use super::clusters::operational_state::{OperationalStateCluster, OperationalStateClusterPatch};
-    #[cfg(feature = "cluster-ota-software-update-provider")]
+    #[cfg(cluster_ota_software_update_provider)]
     pub use super::clusters::ota_software_update_provider;
-    #[cfg(feature = "cluster-ota-software-update-provider")]
+    #[cfg(cluster_ota_software_update_provider)]
     pub use super::clusters::ota_software_update_provider::{
         OtaSoftwareUpdateProviderCluster, OtaSoftwareUpdateProviderClusterPatch,
     };
-    #[cfg(feature = "cluster-ota-software-update-requestor")]
+    #[cfg(cluster_ota_software_update_requestor)]
     pub use super::clusters::ota_software_update_requestor;
-    #[cfg(feature = "cluster-ota-software-update-requestor")]
+    #[cfg(cluster_ota_software_update_requestor)]
     pub use super::clusters::ota_software_update_requestor::{
         OtaSoftwareUpdateRequestorCluster, OtaSoftwareUpdateRequestorClusterPatch,
     };
-    #[cfg(feature = "cluster-oven-cavity-operational-state")]
+    #[cfg(cluster_oven_cavity_operational_state)]
     pub use super::clusters::oven_cavity_operational_state;
-    #[cfg(feature = "cluster-oven-cavity-operational-state")]
+    #[cfg(cluster_oven_cavity_operational_state)]
     pub use super::clusters::oven_cavity_operational_state::{
         OvenCavityOperationalStateCluster, OvenCavityOperationalStateClusterPatch,
     };
-    #[cfg(feature = "cluster-oven-mode")]
+    #[cfg(cluster_oven_mode)]
     pub use super::clusters::oven_mode;
-    #[cfg(feature = "cluster-oven-mode")]
+    #[cfg(cluster_oven_mode)]
     pub use super::clusters::oven_mode::{OvenModeCluster, OvenModeClusterPatch};
-    #[cfg(feature = "cluster-ozone-concentration-measurement")]
+    #[cfg(cluster_ozone_concentration_measurement)]
     pub use super::clusters::ozone_concentration_measurement;
-    #[cfg(feature = "cluster-ozone-concentration-measurement")]
+    #[cfg(cluster_ozone_concentration_measurement)]
     pub use super::clusters::ozone_concentration_measurement::{
         OzoneConcentrationMeasurementCluster, OzoneConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-pm1-concentration-measurement")]
+    #[cfg(cluster_pm1_concentration_measurement)]
     pub use super::clusters::pm1_concentration_measurement;
-    #[cfg(feature = "cluster-pm1-concentration-measurement")]
+    #[cfg(cluster_pm1_concentration_measurement)]
     pub use super::clusters::pm1_concentration_measurement::{
         Pm1ConcentrationMeasurementCluster, Pm1ConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-pm10-concentration-measurement")]
+    #[cfg(cluster_pm10_concentration_measurement)]
     pub use super::clusters::pm10_concentration_measurement;
-    #[cfg(feature = "cluster-pm10-concentration-measurement")]
+    #[cfg(cluster_pm10_concentration_measurement)]
     pub use super::clusters::pm10_concentration_measurement::{
         Pm10ConcentrationMeasurementCluster, Pm10ConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-pm25-concentration-measurement")]
+    #[cfg(cluster_pm25_concentration_measurement)]
     pub use super::clusters::pm25_concentration_measurement;
-    #[cfg(feature = "cluster-pm25-concentration-measurement")]
+    #[cfg(cluster_pm25_concentration_measurement)]
     pub use super::clusters::pm25_concentration_measurement::{
         Pm25ConcentrationMeasurementCluster, Pm25ConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-power-source")]
+    #[cfg(cluster_power_source)]
     pub use super::clusters::power_source;
-    #[cfg(feature = "cluster-power-source")]
+    #[cfg(cluster_power_source)]
     pub use super::clusters::power_source::{PowerSourceCluster, PowerSourceClusterPatch};
-    #[cfg(feature = "cluster-power-source-configuration")]
+    #[cfg(cluster_power_source_configuration)]
     pub use super::clusters::power_source_configuration;
-    #[cfg(feature = "cluster-power-source-configuration")]
+    #[cfg(cluster_power_source_configuration)]
     pub use super::clusters::power_source_configuration::{
         PowerSourceConfigurationCluster, PowerSourceConfigurationClusterPatch,
     };
-    #[cfg(feature = "cluster-power-topology")]
+    #[cfg(cluster_power_topology)]
     pub use super::clusters::power_topology;
-    #[cfg(feature = "cluster-power-topology")]
+    #[cfg(cluster_power_topology)]
     pub use super::clusters::power_topology::{PowerTopologyCluster, PowerTopologyClusterPatch};
-    #[cfg(feature = "cluster-pressure-measurement")]
+    #[cfg(cluster_pressure_measurement)]
     pub use super::clusters::pressure_measurement;
-    #[cfg(feature = "cluster-pressure-measurement")]
+    #[cfg(cluster_pressure_measurement)]
     pub use super::clusters::pressure_measurement::{PressureMeasurementCluster, PressureMeasurementClusterPatch};
-    #[cfg(feature = "cluster-proxy-configuration")]
+    #[cfg(cluster_proxy_configuration)]
     pub use super::clusters::proxy_configuration;
-    #[cfg(feature = "cluster-proxy-configuration")]
+    #[cfg(cluster_proxy_configuration)]
     pub use super::clusters::proxy_configuration::{ProxyConfigurationCluster, ProxyConfigurationClusterPatch};
-    #[cfg(feature = "cluster-proxy-discovery")]
+    #[cfg(cluster_proxy_discovery)]
     pub use super::clusters::proxy_discovery;
-    #[cfg(feature = "cluster-proxy-discovery")]
+    #[cfg(cluster_proxy_discovery)]
     pub use super::clusters::proxy_discovery::{ProxyDiscoveryCluster, ProxyDiscoveryClusterPatch};
-    #[cfg(feature = "cluster-proxy-valid")]
+    #[cfg(cluster_proxy_valid)]
     pub use super::clusters::proxy_valid;
-    #[cfg(feature = "cluster-proxy-valid")]
+    #[cfg(cluster_proxy_valid)]
     pub use super::clusters::proxy_valid::{ProxyValidCluster, ProxyValidClusterPatch};
-    #[cfg(feature = "cluster-pulse-width-modulation")]
+    #[cfg(cluster_pulse_width_modulation)]
     pub use super::clusters::pulse_width_modulation;
-    #[cfg(feature = "cluster-pulse-width-modulation")]
+    #[cfg(cluster_pulse_width_modulation)]
     pub use super::clusters::pulse_width_modulation::{PulseWidthModulationCluster, PulseWidthModulationClusterPatch};
-    #[cfg(feature = "cluster-pump-configuration-and-control")]
+    #[cfg(cluster_pump_configuration_and_control)]
     pub use super::clusters::pump_configuration_and_control;
-    #[cfg(feature = "cluster-pump-configuration-and-control")]
+    #[cfg(cluster_pump_configuration_and_control)]
     pub use super::clusters::pump_configuration_and_control::{
         PumpConfigurationAndControlCluster, PumpConfigurationAndControlClusterPatch,
     };
-    #[cfg(feature = "cluster-push-av-stream-transport")]
+    #[cfg(cluster_push_av_stream_transport)]
     pub use super::clusters::push_av_stream_transport;
-    #[cfg(feature = "cluster-push-av-stream-transport")]
+    #[cfg(cluster_push_av_stream_transport)]
     pub use super::clusters::push_av_stream_transport::{
         PushAvStreamTransportCluster, PushAvStreamTransportClusterPatch,
     };
-    #[cfg(feature = "cluster-radon-concentration-measurement")]
+    #[cfg(cluster_radon_concentration_measurement)]
     pub use super::clusters::radon_concentration_measurement;
-    #[cfg(feature = "cluster-radon-concentration-measurement")]
+    #[cfg(cluster_radon_concentration_measurement)]
     pub use super::clusters::radon_concentration_measurement::{
         RadonConcentrationMeasurementCluster, RadonConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-refrigerator-alarm")]
+    #[cfg(cluster_refrigerator_alarm)]
     pub use super::clusters::refrigerator_alarm;
-    #[cfg(feature = "cluster-refrigerator-alarm")]
+    #[cfg(cluster_refrigerator_alarm)]
     pub use super::clusters::refrigerator_alarm::{RefrigeratorAlarmCluster, RefrigeratorAlarmClusterPatch};
-    #[cfg(feature = "cluster-refrigerator-and-temperature-controlled-cabinet-mode")]
+    #[cfg(cluster_refrigerator_and_temperature_controlled_cabinet_mode)]
     pub use super::clusters::refrigerator_and_temperature_controlled_cabinet_mode;
-    #[cfg(feature = "cluster-refrigerator-and-temperature-controlled-cabinet-mode")]
+    #[cfg(cluster_refrigerator_and_temperature_controlled_cabinet_mode)]
     pub use super::clusters::refrigerator_and_temperature_controlled_cabinet_mode::{
         RefrigeratorAndTemperatureControlledCabinetModeCluster,
         RefrigeratorAndTemperatureControlledCabinetModeClusterPatch,
     };
-    #[cfg(feature = "cluster-relative-humidity-measurement")]
+    #[cfg(cluster_relative_humidity_measurement)]
     pub use super::clusters::relative_humidity_measurement;
-    #[cfg(feature = "cluster-relative-humidity-measurement")]
+    #[cfg(cluster_relative_humidity_measurement)]
     pub use super::clusters::relative_humidity_measurement::{
         RelativeHumidityMeasurementCluster, RelativeHumidityMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-rvc-clean-mode")]
+    #[cfg(cluster_rvc_clean_mode)]
     pub use super::clusters::rvc_clean_mode;
-    #[cfg(feature = "cluster-rvc-clean-mode")]
+    #[cfg(cluster_rvc_clean_mode)]
     pub use super::clusters::rvc_clean_mode::{RvcCleanModeCluster, RvcCleanModeClusterPatch};
-    #[cfg(feature = "cluster-rvc-operational-state")]
+    #[cfg(cluster_rvc_operational_state)]
     pub use super::clusters::rvc_operational_state;
-    #[cfg(feature = "cluster-rvc-operational-state")]
+    #[cfg(cluster_rvc_operational_state)]
     pub use super::clusters::rvc_operational_state::{RvcOperationalStateCluster, RvcOperationalStateClusterPatch};
-    #[cfg(feature = "cluster-rvc-run-mode")]
+    #[cfg(cluster_rvc_run_mode)]
     pub use super::clusters::rvc_run_mode;
-    #[cfg(feature = "cluster-rvc-run-mode")]
+    #[cfg(cluster_rvc_run_mode)]
     pub use super::clusters::rvc_run_mode::{RvcRunModeCluster, RvcRunModeClusterPatch};
-    #[cfg(feature = "cluster-sample-mei")]
+    #[cfg(cluster_sample_mei)]
     pub use super::clusters::sample_mei;
-    #[cfg(feature = "cluster-sample-mei")]
+    #[cfg(cluster_sample_mei)]
     pub use super::clusters::sample_mei::{SampleMeiCluster, SampleMeiClusterPatch};
-    #[cfg(feature = "cluster-scenes-management")]
+    #[cfg(cluster_scenes_management)]
     pub use super::clusters::scenes_management;
-    #[cfg(feature = "cluster-scenes-management")]
+    #[cfg(cluster_scenes_management)]
     pub use super::clusters::scenes_management::{ScenesManagementCluster, ScenesManagementClusterPatch};
-    #[cfg(feature = "cluster-service-area")]
+    #[cfg(cluster_service_area)]
     pub use super::clusters::service_area;
-    #[cfg(feature = "cluster-service-area")]
+    #[cfg(cluster_service_area)]
     pub use super::clusters::service_area::{ServiceAreaCluster, ServiceAreaClusterPatch};
-    #[cfg(feature = "cluster-smoke-co-alarm")]
+    #[cfg(cluster_smoke_co_alarm)]
     pub use super::clusters::smoke_co_alarm;
-    #[cfg(feature = "cluster-smoke-co-alarm")]
+    #[cfg(cluster_smoke_co_alarm)]
     pub use super::clusters::smoke_co_alarm::{SmokeCoAlarmCluster, SmokeCoAlarmClusterPatch};
-    #[cfg(feature = "cluster-software-diagnostics")]
+    #[cfg(cluster_software_diagnostics)]
     pub use super::clusters::software_diagnostics;
-    #[cfg(feature = "cluster-software-diagnostics")]
+    #[cfg(cluster_software_diagnostics)]
     pub use super::clusters::software_diagnostics::{SoftwareDiagnosticsCluster, SoftwareDiagnosticsClusterPatch};
-    #[cfg(feature = "cluster-soil-measurement")]
+    #[cfg(cluster_soil_measurement)]
     pub use super::clusters::soil_measurement;
-    #[cfg(feature = "cluster-soil-measurement")]
+    #[cfg(cluster_soil_measurement)]
     pub use super::clusters::soil_measurement::{SoilMeasurementCluster, SoilMeasurementClusterPatch};
-    #[cfg(feature = "cluster-switch")]
+    #[cfg(cluster_switch)]
     pub use super::clusters::switch;
-    #[cfg(feature = "cluster-switch")]
+    #[cfg(cluster_switch)]
     pub use super::clusters::switch::{SwitchCluster, SwitchClusterPatch};
-    #[cfg(feature = "cluster-target-navigator")]
+    #[cfg(cluster_target_navigator)]
     pub use super::clusters::target_navigator;
-    #[cfg(feature = "cluster-target-navigator")]
+    #[cfg(cluster_target_navigator)]
     pub use super::clusters::target_navigator::{TargetNavigatorCluster, TargetNavigatorClusterPatch};
-    #[cfg(feature = "cluster-temperature-control")]
+    #[cfg(cluster_temperature_control)]
     pub use super::clusters::temperature_control;
-    #[cfg(feature = "cluster-temperature-control")]
+    #[cfg(cluster_temperature_control)]
     pub use super::clusters::temperature_control::{TemperatureControlCluster, TemperatureControlClusterPatch};
-    #[cfg(feature = "cluster-temperature-measurement")]
+    #[cfg(cluster_temperature_measurement)]
     pub use super::clusters::temperature_measurement;
-    #[cfg(feature = "cluster-temperature-measurement")]
+    #[cfg(cluster_temperature_measurement)]
     pub use super::clusters::temperature_measurement::{
         TemperatureMeasurementCluster, TemperatureMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-thermostat")]
+    #[cfg(cluster_thermostat)]
     pub use super::clusters::thermostat;
-    #[cfg(feature = "cluster-thermostat")]
+    #[cfg(cluster_thermostat)]
     pub use super::clusters::thermostat::{ThermostatCluster, ThermostatClusterPatch};
-    #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+    #[cfg(cluster_thermostat_user_interface_configuration)]
     pub use super::clusters::thermostat_user_interface_configuration;
-    #[cfg(feature = "cluster-thermostat-user-interface-configuration")]
+    #[cfg(cluster_thermostat_user_interface_configuration)]
     pub use super::clusters::thermostat_user_interface_configuration::{
         ThermostatUserInterfaceConfigurationCluster, ThermostatUserInterfaceConfigurationClusterPatch,
     };
-    #[cfg(feature = "cluster-thread-border-router-management")]
+    #[cfg(cluster_thread_border_router_management)]
     pub use super::clusters::thread_border_router_management;
-    #[cfg(feature = "cluster-thread-border-router-management")]
+    #[cfg(cluster_thread_border_router_management)]
     pub use super::clusters::thread_border_router_management::{
         ThreadBorderRouterManagementCluster, ThreadBorderRouterManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-thread-network-diagnostics")]
+    #[cfg(cluster_thread_network_diagnostics)]
     pub use super::clusters::thread_network_diagnostics;
-    #[cfg(feature = "cluster-thread-network-diagnostics")]
+    #[cfg(cluster_thread_network_diagnostics)]
     pub use super::clusters::thread_network_diagnostics::{
         ThreadNetworkDiagnosticsCluster, ThreadNetworkDiagnosticsClusterPatch,
     };
-    #[cfg(feature = "cluster-thread-network-directory")]
+    #[cfg(cluster_thread_network_directory)]
     pub use super::clusters::thread_network_directory;
-    #[cfg(feature = "cluster-thread-network-directory")]
+    #[cfg(cluster_thread_network_directory)]
     pub use super::clusters::thread_network_directory::{
         ThreadNetworkDirectoryCluster, ThreadNetworkDirectoryClusterPatch,
     };
-    #[cfg(feature = "cluster-time-format-localization")]
+    #[cfg(cluster_time_format_localization)]
     pub use super::clusters::time_format_localization;
-    #[cfg(feature = "cluster-time-format-localization")]
+    #[cfg(cluster_time_format_localization)]
     pub use super::clusters::time_format_localization::{
         TimeFormatLocalizationCluster, TimeFormatLocalizationClusterPatch,
     };
-    #[cfg(feature = "cluster-time-synchronization")]
+    #[cfg(cluster_time_synchronization)]
     pub use super::clusters::time_synchronization;
-    #[cfg(feature = "cluster-time-synchronization")]
+    #[cfg(cluster_time_synchronization)]
     pub use super::clusters::time_synchronization::{TimeSynchronizationCluster, TimeSynchronizationClusterPatch};
-    #[cfg(feature = "cluster-timer")]
+    #[cfg(cluster_timer)]
     pub use super::clusters::timer;
-    #[cfg(feature = "cluster-timer")]
+    #[cfg(cluster_timer)]
     pub use super::clusters::timer::{TimerCluster, TimerClusterPatch};
-    #[cfg(feature = "cluster-tls-certificate-management")]
+    #[cfg(cluster_tls_certificate_management)]
     pub use super::clusters::tls_certificate_management;
-    #[cfg(feature = "cluster-tls-certificate-management")]
+    #[cfg(cluster_tls_certificate_management)]
     pub use super::clusters::tls_certificate_management::{
         TlsCertificateManagementCluster, TlsCertificateManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-tls-client-management")]
+    #[cfg(cluster_tls_client_management)]
     pub use super::clusters::tls_client_management;
-    #[cfg(feature = "cluster-tls-client-management")]
+    #[cfg(cluster_tls_client_management)]
     pub use super::clusters::tls_client_management::{TlsClientManagementCluster, TlsClientManagementClusterPatch};
-    #[cfg(feature = "cluster-total-volatile-organic-compounds-concentration-measurement")]
+    #[cfg(cluster_total_volatile_organic_compounds_concentration_measurement)]
     pub use super::clusters::total_volatile_organic_compounds_concentration_measurement;
-    #[cfg(feature = "cluster-total-volatile-organic-compounds-concentration-measurement")]
+    #[cfg(cluster_total_volatile_organic_compounds_concentration_measurement)]
     pub use super::clusters::total_volatile_organic_compounds_concentration_measurement::{
         TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
         TotalVolatileOrganicCompoundsConcentrationMeasurementClusterPatch,
     };
-    #[cfg(feature = "cluster-unit-localization")]
+    #[cfg(cluster_unit_localization)]
     pub use super::clusters::unit_localization;
-    #[cfg(feature = "cluster-unit-localization")]
+    #[cfg(cluster_unit_localization)]
     pub use super::clusters::unit_localization::{UnitLocalizationCluster, UnitLocalizationClusterPatch};
-    #[cfg(feature = "cluster-unit-testing")]
+    #[cfg(cluster_unit_testing)]
     pub use super::clusters::unit_testing;
-    #[cfg(feature = "cluster-unit-testing")]
+    #[cfg(cluster_unit_testing)]
     pub use super::clusters::unit_testing::{UnitTestingCluster, UnitTestingClusterPatch};
-    #[cfg(feature = "cluster-user-label")]
+    #[cfg(cluster_user_label)]
     pub use super::clusters::user_label;
-    #[cfg(feature = "cluster-user-label")]
+    #[cfg(cluster_user_label)]
     pub use super::clusters::user_label::{UserLabelCluster, UserLabelClusterPatch};
-    #[cfg(feature = "cluster-valve-configuration-and-control")]
+    #[cfg(cluster_valve_configuration_and_control)]
     pub use super::clusters::valve_configuration_and_control;
-    #[cfg(feature = "cluster-valve-configuration-and-control")]
+    #[cfg(cluster_valve_configuration_and_control)]
     pub use super::clusters::valve_configuration_and_control::{
         ValveConfigurationAndControlCluster, ValveConfigurationAndControlClusterPatch,
     };
-    #[cfg(feature = "cluster-wake-on-lan")]
+    #[cfg(cluster_wake_on_lan)]
     pub use super::clusters::wake_on_lan;
-    #[cfg(feature = "cluster-wake-on-lan")]
+    #[cfg(cluster_wake_on_lan)]
     pub use super::clusters::wake_on_lan::{WakeOnLanCluster, WakeOnLanClusterPatch};
-    #[cfg(feature = "cluster-water-heater-management")]
+    #[cfg(cluster_water_heater_management)]
     pub use super::clusters::water_heater_management;
-    #[cfg(feature = "cluster-water-heater-management")]
+    #[cfg(cluster_water_heater_management)]
     pub use super::clusters::water_heater_management::{
         WaterHeaterManagementCluster, WaterHeaterManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-water-heater-mode")]
+    #[cfg(cluster_water_heater_mode)]
     pub use super::clusters::water_heater_mode;
-    #[cfg(feature = "cluster-water-heater-mode")]
+    #[cfg(cluster_water_heater_mode)]
     pub use super::clusters::water_heater_mode::{WaterHeaterModeCluster, WaterHeaterModeClusterPatch};
-    #[cfg(feature = "cluster-water-tank-level-monitoring")]
+    #[cfg(cluster_water_tank_level_monitoring)]
     pub use super::clusters::water_tank_level_monitoring;
-    #[cfg(feature = "cluster-water-tank-level-monitoring")]
+    #[cfg(cluster_water_tank_level_monitoring)]
     pub use super::clusters::water_tank_level_monitoring::{
         WaterTankLevelMonitoringCluster, WaterTankLevelMonitoringClusterPatch,
     };
-    #[cfg(feature = "cluster-web-rtc-transport-provider")]
+    #[cfg(cluster_web_rtc_transport_provider)]
     pub use super::clusters::web_rtc_transport_provider;
-    #[cfg(feature = "cluster-web-rtc-transport-provider")]
+    #[cfg(cluster_web_rtc_transport_provider)]
     pub use super::clusters::web_rtc_transport_provider::{
         WebRtcTransportProviderCluster, WebRtcTransportProviderClusterPatch,
     };
-    #[cfg(feature = "cluster-web-rtc-transport-requestor")]
+    #[cfg(cluster_web_rtc_transport_requestor)]
     pub use super::clusters::web_rtc_transport_requestor;
-    #[cfg(feature = "cluster-web-rtc-transport-requestor")]
+    #[cfg(cluster_web_rtc_transport_requestor)]
     pub use super::clusters::web_rtc_transport_requestor::{
         WebRtcTransportRequestorCluster, WebRtcTransportRequestorClusterPatch,
     };
-    #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+    #[cfg(cluster_wi_fi_network_diagnostics)]
     pub use super::clusters::wi_fi_network_diagnostics;
-    #[cfg(feature = "cluster-wi-fi-network-diagnostics")]
+    #[cfg(cluster_wi_fi_network_diagnostics)]
     pub use super::clusters::wi_fi_network_diagnostics::{
         WiFiNetworkDiagnosticsCluster, WiFiNetworkDiagnosticsClusterPatch,
     };
-    #[cfg(feature = "cluster-wi-fi-network-management")]
+    #[cfg(cluster_wi_fi_network_management)]
     pub use super::clusters::wi_fi_network_management;
-    #[cfg(feature = "cluster-wi-fi-network-management")]
+    #[cfg(cluster_wi_fi_network_management)]
     pub use super::clusters::wi_fi_network_management::{
         WiFiNetworkManagementCluster, WiFiNetworkManagementClusterPatch,
     };
-    #[cfg(feature = "cluster-window-covering")]
+    #[cfg(cluster_window_covering)]
     pub use super::clusters::window_covering;
-    #[cfg(feature = "cluster-window-covering")]
+    #[cfg(cluster_window_covering)]
     pub use super::clusters::window_covering::{WindowCoveringCluster, WindowCoveringClusterPatch};
-    #[cfg(feature = "cluster-zone-management")]
+    #[cfg(cluster_zone_management)]
     pub use super::clusters::zone_management;
-    #[cfg(feature = "cluster-zone-management")]
+    #[cfg(cluster_zone_management)]
     pub use super::clusters::zone_management::{ZoneManagementCluster, ZoneManagementClusterPatch};
     #[cfg(feature = "dispatch")]
     pub use super::dispatch::{

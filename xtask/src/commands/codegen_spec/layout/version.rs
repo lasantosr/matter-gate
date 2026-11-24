@@ -21,9 +21,9 @@ pub(in super::super) fn generate_version_clusters_mod(
 
         pub use super::globals;
 
-        $(for (mod_name, cluster_feat, orig_name) in modules join ($['\r']) =>
+        $(for (mod_name, cluster_cfg, orig_name) in modules join ($['\r']) =>
             $(format!("/// {orig_name} cluster domain models."))
-            #[cfg(feature = $(quoted(cluster_feat)))]
+            #[cfg($(cluster_cfg.as_str()))]
             pub mod $mod_name;
         )
     };
@@ -139,10 +139,10 @@ pub(in super::super) fn generate_version_mod(
                 EndpointDevice,
             };
 
-            $(for (mod_name, cluster_feat, _) in modules join ($['\r']) =>
-                #[cfg(feature = $(quoted(cluster_feat)))]
+            $(for (mod_name, cluster_cfg, _) in modules join ($['\r']) =>
+                #[cfg($(cluster_cfg.as_str()))]
                 pub use super::clusters::$mod_name;
-                #[cfg(feature = $(quoted(cluster_feat)))]
+                #[cfg($(cluster_cfg.as_str()))]
                 pub use super::clusters::$mod_name::{$(format!("{}Cluster", snake_to_pascal(mod_name))), $(format!("{}ClusterPatch", snake_to_pascal(mod_name)))};
             )
             $(&endpoint_cfg_str)

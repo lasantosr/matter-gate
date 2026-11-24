@@ -5,7 +5,7 @@ use std::{
 
 use genco::quote;
 
-use super::context::{PushLine as _, Tokens, cfg_feature_gate, format_hex};
+use super::context::{PushLine as _, Tokens, cluster_cfg_gate, format_hex};
 use crate::{
     error::Error,
     model::{ClusterDef, EnumDef, is_semantic_boolean_attr, sanitize_identifier, to_upper_camel_case},
@@ -16,10 +16,10 @@ type Result<T, E = Error> = StdResult<T, E>;
 pub(super) fn emit_enums(
     out: &mut Tokens,
     enums: &[EnumDef],
-    feature_gates: Option<&BTreeMap<String, Vec<String>>>,
+    cfg_gates: Option<&BTreeMap<String, Vec<String>>>,
 ) -> Result<()> {
     for enm in enums {
-        let gate = feature_gates.and_then(|gates| gates.get(&enm.name));
+        let gate = cfg_gates.and_then(|gates| gates.get(&enm.name));
         out.append(enum_tokens(enm, gate)?);
         out.push_blank();
     }
@@ -69,7 +69,7 @@ fn enum_tokens(enm: &EnumDef, gate: Option<&Vec<String>>) -> Result<Tokens> {
         return Err(Error::Parse(format!("Enum '{name}' has no variants")));
     };
 
-    let cfg_gate = cfg_feature_gate(gate);
+    let cfg_gate = cluster_cfg_gate(gate);
     Ok(quote! {
         $cfg_gate
         crate::define_matter_enum! {
