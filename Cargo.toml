@@ -34,7 +34,7 @@ uom        = { version = "0.38.0", default-features = false }
 
 # Internal workspace crates
 matter-data-model = { version = "0.1.0", path = "spec/matter-data-model", default-features = false }
-matter-spec       = { version = "0.1.0", path = "spec/matter-spec", default-features = false }
+matter-spec       = { version = "0.2.0", path = "spec/matter-spec", default-features = false }
 matter-spec-gen   = { version = "0.1.0", path = "spec/matter-spec-gen" }
 
 # Lints: https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
