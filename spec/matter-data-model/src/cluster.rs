@@ -10,6 +10,7 @@ use core::{
 
 use crate::{
     attribute::{Attribute, AttributeId},
+    command::CommandId,
     optional::Optional,
     value::AttributeValue,
 };
@@ -72,10 +73,18 @@ pub struct Cluster {
     pub data_version: Optional<DataVersion>,
     /// Attributes belonging to this cluster instance.
     pub attributes: Vec<Attribute>,
+    /// Accepted command IDs supported by this cluster instance (CSA §7.13 `AcceptedCommandList`, `0xFFF9`).
+    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
+    pub accepted_commands: Vec<CommandId>,
+    /// Generated command IDs emitted by this cluster instance (CSA §7.13 `GeneratedCommandList`, `0xFFF8`).
+    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
+    pub generated_commands: Vec<CommandId>,
 }
 
 impl Cluster {
-    /// Construct a cluster with attributes and omitted data version.
+    /// Construct a cluster with attributes, omitted data version, and empty command lists.
     ///
     /// Callers should provide attributes with unique [`AttributeId`]s; lookups and updates
     /// operate on the first matching ID.
@@ -85,16 +94,20 @@ impl Cluster {
             id,
             data_version: Optional::Omitted,
             attributes,
+            accepted_commands: Vec::new(),
+            generated_commands: Vec::new(),
         }
     }
 
-    /// Construct an empty cluster without attributes and omitted data version.
+    /// Construct an empty cluster without attributes, omitted data version, and empty command lists.
     #[must_use]
     pub const fn empty(id: ClusterId) -> Self {
         Self {
             id,
             data_version: Optional::Omitted,
             attributes: Vec::new(),
+            accepted_commands: Vec::new(),
+            generated_commands: Vec::new(),
         }
     }
 
@@ -131,6 +144,38 @@ impl Cluster {
     pub fn with_attributes(mut self, attributes: impl IntoIterator<Item = Attribute>) -> Self {
         for attr in attributes {
             self.set_attribute(attr.id, attr.value);
+        }
+        self
+    }
+
+    /// Add an accepted command ID to this cluster if not already present.
+    #[must_use]
+    pub fn with_accepted_command(mut self, id: CommandId) -> Self {
+        self.set_accepted_command(id);
+        self
+    }
+
+    /// Add multiple accepted command IDs to this cluster if not already present.
+    #[must_use]
+    pub fn with_accepted_commands(mut self, ids: impl IntoIterator<Item = CommandId>) -> Self {
+        for id in ids {
+            self.set_accepted_command(id);
+        }
+        self
+    }
+
+    /// Add a generated command ID to this cluster if not already present.
+    #[must_use]
+    pub fn with_generated_command(mut self, id: CommandId) -> Self {
+        self.set_generated_command(id);
+        self
+    }
+
+    /// Add multiple generated command IDs to this cluster if not already present.
+    #[must_use]
+    pub fn with_generated_commands(mut self, ids: impl IntoIterator<Item = CommandId>) -> Self {
+        for id in ids {
+            self.set_generated_command(id);
         }
         self
     }
@@ -177,6 +222,58 @@ impl Cluster {
             .position(|attr| attr.id == id)
             .map(|idx| self.attributes.remove(idx).value)
     }
+
+    /// Return `true` if `accepted_commands` contains the given command ID.
+    #[must_use]
+    pub fn has_accepted_command(&self, id: CommandId) -> bool {
+        self.accepted_commands.contains(&id)
+    }
+
+    /// Add an accepted command ID to this cluster in place if not already present, returning `true` if inserted.
+    pub fn set_accepted_command(&mut self, id: CommandId) -> bool {
+        if self.accepted_commands.contains(&id) {
+            false
+        } else {
+            self.accepted_commands.push(id);
+            true
+        }
+    }
+
+    /// Remove an accepted command ID from this cluster, returning `true` if removed.
+    pub fn remove_accepted_command(&mut self, id: CommandId) -> bool {
+        if let Some(idx) = self.accepted_commands.iter().position(|&cmd_id| cmd_id == id) {
+            self.accepted_commands.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
+
+    /// Return `true` if `generated_commands` contains the given command ID.
+    #[must_use]
+    pub fn has_generated_command(&self, id: CommandId) -> bool {
+        self.generated_commands.contains(&id)
+    }
+
+    /// Add a generated command ID to this cluster in place if not already present, returning `true` if inserted.
+    pub fn set_generated_command(&mut self, id: CommandId) -> bool {
+        if self.generated_commands.contains(&id) {
+            false
+        } else {
+            self.generated_commands.push(id);
+            true
+        }
+    }
+
+    /// Remove a generated command ID from this cluster, returning `true` if removed.
+    pub fn remove_generated_command(&mut self, id: CommandId) -> bool {
+        if let Some(idx) = self.generated_commands.iter().position(|&cmd_id| cmd_id == id) {
+            self.generated_commands.remove(idx);
+            true
+        } else {
+            false
+        }
+    }
 }
 
 impl From<(ClusterId, Vec<Attribute>)> for Cluster {
@@ -185,6 +282,8 @@ impl From<(ClusterId, Vec<Attribute>)> for Cluster {
             id,
             data_version: Optional::Omitted,
             attributes,
+            accepted_commands: Vec::new(),
+            generated_commands: Vec::new(),
         }
     }
 }
@@ -313,7 +412,7 @@ mod tests {
 
     #[cfg(feature = "schemars")]
     #[test]
-    fn cluster_json_schema_marks_data_version_optional() {
+    fn cluster_json_schema_marks_optional_fields() {
         let mut generator = schemars::SchemaGenerator::default();
         let schema = <Cluster as schemars::JsonSchema>::json_schema(&mut generator);
         let required = schema
@@ -321,8 +420,136 @@ mod tests {
             .and_then(|o| o.get("required"))
             .and_then(|v| v.as_array());
         assert!(
-            required.is_some_and(|req| !req.iter().any(|v| v.as_str() == Some("data_version"))),
-            "data_version must not be required in Cluster JSON schema"
+            required.is_some_and(|req| {
+                !req.iter().any(|v| {
+                    matches!(
+                        v.as_str(),
+                        Some("data_version" | "accepted_commands" | "generated_commands")
+                    )
+                })
+            }),
+            "data_version, accepted_commands, and generated_commands must not be required in Cluster JSON schema"
         );
+    }
+
+    #[test]
+    fn cluster_command_lists_default_empty() {
+        let c1 = Cluster::new(ClusterId::new(0x0006), alloc::vec![]);
+        assert_eq!(c1.accepted_commands, []);
+        assert_eq!(c1.generated_commands, []);
+
+        let c2 = Cluster::empty(ClusterId::new(0x0006));
+        assert_eq!(c2.accepted_commands, []);
+        assert_eq!(c2.generated_commands, []);
+
+        let c3 = Cluster::default();
+        assert_eq!(c3.accepted_commands, []);
+        assert_eq!(c3.generated_commands, []);
+
+        let c4 = Cluster::from((ClusterId::new(0x0006), alloc::vec![]));
+        assert_eq!(c4.accepted_commands, []);
+        assert_eq!(c4.generated_commands, []);
+    }
+
+    #[test]
+    fn cluster_command_builders_deduplicate_and_preserve_order() {
+        let cmd_off = CommandId::new(0x00);
+        let cmd_on = CommandId::new(0x01);
+        let cmd_toggle = CommandId::new(0x02);
+        let gen_resp = CommandId::new(0x00);
+        let gen_other = CommandId::new(0x01);
+
+        let mut cluster = Cluster::empty(ClusterId::new(0x0006))
+            .with_accepted_command(cmd_on)
+            .with_accepted_commands([cmd_off, cmd_on, cmd_toggle, cmd_off])
+            .with_generated_command(gen_other)
+            .with_generated_commands([gen_resp, gen_other]);
+
+        assert_eq!(cluster.accepted_commands, alloc::vec![cmd_on, cmd_off, cmd_toggle]);
+        assert_eq!(cluster.generated_commands, alloc::vec![gen_other, gen_resp]);
+
+        assert!(cluster.has_accepted_command(cmd_on));
+        assert!(!cluster.has_accepted_command(CommandId::new(0x99)));
+        assert!(!cluster.set_accepted_command(cmd_on));
+        assert!(cluster.set_accepted_command(CommandId::new(0x03)));
+        assert_eq!(
+            cluster.accepted_commands,
+            alloc::vec![cmd_on, cmd_off, cmd_toggle, CommandId::new(0x03)]
+        );
+
+        assert!(cluster.remove_accepted_command(cmd_off));
+        assert!(!cluster.remove_accepted_command(cmd_off));
+        assert_eq!(
+            cluster.accepted_commands,
+            alloc::vec![cmd_on, cmd_toggle, CommandId::new(0x03)]
+        );
+
+        assert!(cluster.has_generated_command(gen_resp));
+        assert!(!cluster.has_generated_command(CommandId::new(0x99)));
+        assert!(!cluster.set_generated_command(gen_resp));
+        assert!(cluster.set_generated_command(CommandId::new(0x02)));
+        assert!(cluster.remove_generated_command(gen_other));
+        assert!(!cluster.remove_generated_command(gen_other));
+        assert_eq!(cluster.generated_commands, alloc::vec![gen_resp, CommandId::new(0x02)]);
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn cluster_serde_omits_default_command_lists_on_deserialize() {
+        use serde::de::{
+            Deserialize as _, Deserializer, IntoDeserializer, Visitor,
+            value::{Error as DeValueError, MapDeserializer},
+        };
+
+        // Simulate a legacy payload with only `id` and `attributes` (no `accepted_commands` or `generated_commands`).
+        #[derive(Clone)]
+        enum FieldVal {
+            Id(u32),
+            EmptySeq,
+        }
+
+        impl IntoDeserializer<'_, DeValueError> for FieldVal {
+            type Deserializer = Self;
+
+            fn into_deserializer(self) -> Self::Deserializer {
+                self
+            }
+        }
+
+        impl<'de> Deserializer<'de> for FieldVal {
+            type Error = DeValueError;
+
+            serde::forward_to_deserialize_any! {
+                bool i8 i16 i32 i64 i128 u8 u16 u32 u64 u128 f32 f64 char str string
+                bytes byte_buf option unit unit_struct seq tuple
+                tuple_struct map struct enum identifier ignored_any
+            }
+
+            fn deserialize_newtype_struct<V: Visitor<'de>>(
+                self,
+                _name: &'static str,
+                visitor: V,
+            ) -> Result<V::Value, Self::Error> {
+                visitor.visit_newtype_struct(self)
+            }
+
+            fn deserialize_any<V: Visitor<'de>>(self, visitor: V) -> Result<V::Value, Self::Error> {
+                match self {
+                    Self::Id(v) => visitor.visit_u32(v),
+                    Self::EmptySeq => {
+                        let empty: Vec<u32> = alloc::vec![];
+                        empty.into_deserializer().deserialize_seq(visitor)
+                    }
+                }
+            }
+        }
+
+        let entries = [("id", FieldVal::Id(6)), ("attributes", FieldVal::EmptySeq)];
+        let de = MapDeserializer::<'_, _, DeValueError>::new(entries.into_iter());
+        let decoded = Cluster::deserialize(de).expect("legacy payload should deserialize");
+        assert_eq!(decoded.id, ClusterId::new(6));
+        assert_eq!(decoded.attributes, []);
+        assert_eq!(decoded.accepted_commands, []);
+        assert_eq!(decoded.generated_commands, []);
     }
 }
