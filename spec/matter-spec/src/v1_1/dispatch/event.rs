@@ -355,41 +355,6 @@ impl EventMeta for ClusterEvent {
 
     #[inline]
     fn priority(&self) -> EventPriority {
-        #[cfg(not(any(
-            cluster_access_control,
-            cluster_actions,
-            cluster_basic_information,
-            cluster_ota_software_update_requestor,
-            cluster_power_source,
-            cluster_general_diagnostics,
-            cluster_software_diagnostics,
-            cluster_thread_network_diagnostics,
-            cluster_wi_fi_network_diagnostics,
-            cluster_bridged_device_basic_information,
-            cluster_switch,
-            cluster_boolean_state,
-            cluster_door_lock,
-            cluster_pump_configuration_and_control,
-            cluster_unit_testing
-        )))]
-        match *self {}
-        #[cfg(any(
-            cluster_access_control,
-            cluster_actions,
-            cluster_basic_information,
-            cluster_ota_software_update_requestor,
-            cluster_power_source,
-            cluster_general_diagnostics,
-            cluster_software_diagnostics,
-            cluster_thread_network_diagnostics,
-            cluster_wi_fi_network_diagnostics,
-            cluster_bridged_device_basic_information,
-            cluster_switch,
-            cluster_boolean_state,
-            cluster_door_lock,
-            cluster_pump_configuration_and_control,
-            cluster_unit_testing
-        ))]
         match self {
             #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => inner.priority(),
@@ -427,41 +392,6 @@ impl EventMeta for ClusterEvent {
 
     #[inline]
     fn is_empty_payload(&self) -> bool {
-        #[cfg(not(any(
-            cluster_access_control,
-            cluster_actions,
-            cluster_basic_information,
-            cluster_ota_software_update_requestor,
-            cluster_power_source,
-            cluster_general_diagnostics,
-            cluster_software_diagnostics,
-            cluster_thread_network_diagnostics,
-            cluster_wi_fi_network_diagnostics,
-            cluster_bridged_device_basic_information,
-            cluster_switch,
-            cluster_boolean_state,
-            cluster_door_lock,
-            cluster_pump_configuration_and_control,
-            cluster_unit_testing
-        )))]
-        match *self {}
-        #[cfg(any(
-            cluster_access_control,
-            cluster_actions,
-            cluster_basic_information,
-            cluster_ota_software_update_requestor,
-            cluster_power_source,
-            cluster_general_diagnostics,
-            cluster_software_diagnostics,
-            cluster_thread_network_diagnostics,
-            cluster_wi_fi_network_diagnostics,
-            cluster_bridged_device_basic_information,
-            cluster_switch,
-            cluster_boolean_state,
-            cluster_door_lock,
-            cluster_pump_configuration_and_control,
-            cluster_unit_testing
-        ))]
         match self {
             #[cfg(cluster_access_control)]
             Self::AccessControl(inner) => EventMeta::is_empty_payload(inner),

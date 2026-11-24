@@ -293,7 +293,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             }
         }
 
-        $(dispatch_event_meta_tokens(&ev_clusters, &ev_any_cfg, &ev_not_any_cfg))
+        $(dispatch_event_meta_tokens(&ev_clusters))
         $(dispatch_event_describe_tokens(&ev_clusters, &ev_any_cfg, &ev_not_any_cfg))
     };
 
@@ -1050,7 +1050,7 @@ fn dispatch_attribute_describe_tokens(
     }
 }
 
-fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg: &str, ev_not_any_cfg: &str) -> Tokens {
+fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry]) -> Tokens {
     quote! {
         impl EventMeta for ClusterEvent {
             #[inline]
@@ -1100,9 +1100,6 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
 
             #[inline]
             fn priority(&self) -> EventPriority {
-                $(ev_not_any_cfg)
-                match *self {}
-                $(ev_any_cfg)
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
                         #[cfg($(c.cfg.as_str()))]
@@ -1114,9 +1111,6 @@ fn dispatch_event_meta_tokens(ev_clusters: &[&DispatchClusterEntry], ev_any_cfg:
 
             #[inline]
             fn is_empty_payload(&self) -> bool {
-                $(ev_not_any_cfg)
-                match *self {}
-                $(ev_any_cfg)
                 match self {
                     $(for c in ev_clusters join ($['\r']) =>
                         #[cfg($(c.cfg.as_str()))]
