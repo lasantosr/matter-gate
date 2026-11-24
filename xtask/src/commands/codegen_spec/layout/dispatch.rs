@@ -1915,3 +1915,34 @@ fn dispatch_endpoint_describe_tokens(
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn dispatch_event_meta_handles_zero_enabled_event_clusters() -> Result<()> {
+        let clusters = [DispatchClusterEntry {
+            cluster_id: 0x0028,
+            module_name: "basic_information".to_owned(),
+            name: "BasicInformation".to_owned(),
+            struct_name: "BasicInformationCluster".to_owned(),
+            cfg: "cluster_basic_information".to_owned(),
+            has_attributes: true,
+            has_client_commands: false,
+            has_server_commands: false,
+            has_events: true,
+            is_large_state: true,
+            is_large_patch: true,
+        }];
+
+        let rendered = generate_version_dispatch_event_rs(&clusters, "1.6")?;
+        assert!(
+            !rendered.contains("match *self {}"),
+            "EventMeta must always cover ClusterEvent::Unknown even when no event clusters are enabled"
+        );
+        assert!(rendered.contains("Self::Unknown(wire) => wire.priority"));
+        assert!(rendered.contains("Self::Unknown(_) => false"));
+        Ok(())
+    }
+}
