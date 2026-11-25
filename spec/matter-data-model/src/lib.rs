@@ -248,18 +248,18 @@ macro_rules! define_matter_id {
     };
 
     (@attr_value $name:ident, u8) => {
-        define_matter_id!(@attr_value_impl $name, U8);
+        define_matter_id!(@attr_value_impl $name, u8, U8);
     };
     (@attr_value $name:ident, u16) => {
-        define_matter_id!(@attr_value_impl $name, U16);
+        define_matter_id!(@attr_value_impl $name, u16, U16);
     };
     (@attr_value $name:ident, u32) => {
-        define_matter_id!(@attr_value_impl $name, U32);
+        define_matter_id!(@attr_value_impl $name, u32, U32);
     };
     (@attr_value $name:ident, u64) => {
-        define_matter_id!(@attr_value_impl $name, U64);
+        define_matter_id!(@attr_value_impl $name, u64, U64);
     };
-    (@attr_value_impl $name:ident, $variant:ident) => {
+    (@attr_value_impl $name:ident, $inner:ident, $variant:ident) => {
         impl From<$name> for crate::value::AttributeValue {
             fn from(val: $name) -> Self {
                 Self::$variant(val.raw())
@@ -272,10 +272,7 @@ macro_rules! define_matter_id {
             fn try_from(
                 val: &crate::value::AttributeValue,
             ) -> core::result::Result<Self, crate::status::MatterStatus> {
-                match val {
-                    crate::value::AttributeValue::$variant(v) => Ok(Self::new(*v)),
-                    _ => Err(crate::status::MatterStatus::InvalidDataType),
-                }
+                crate::value::decode_unsigned::<$inner>(val).map(Self::new)
             }
         }
 

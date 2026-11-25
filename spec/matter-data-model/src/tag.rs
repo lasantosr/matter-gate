@@ -9,7 +9,7 @@ use crate::{
     optional::{Nullable, Optional},
     status::MatterStatus,
     types::VendorId,
-    value::{AttributeValue, FieldId},
+    value::{AttributeValue, FieldId, decode_unsigned},
 };
 
 /// Matter semantic tag per Core Specification §9.5.4.4 (`SemanticTagStruct`).
@@ -142,27 +142,20 @@ impl TryFrom<&AttributeValue> for SemanticTag {
                     }
                     mfg_code = Some(match val {
                         AttributeValue::Null => Nullable::Null,
-                        AttributeValue::U16(v) => Nullable::NonNull(VendorId::new(*v)),
-                        _ => return Err(MatterStatus::InvalidDataType),
+                        other => Nullable::NonNull(VendorId::try_from(other)?),
                     });
                 }
                 1 => {
                     if namespace_id.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U8(ns) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    namespace_id = Some(*ns);
+                    namespace_id = Some(decode_unsigned::<u8>(val)?);
                 }
                 2 => {
                     if tag.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U8(t) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    tag = Some(*t);
+                    tag = Some(decode_unsigned::<u8>(val)?);
                 }
                 3 => {
                     if label.is_present() {
@@ -226,27 +219,20 @@ impl TryFrom<AttributeValue> for SemanticTag {
                     }
                     mfg_code = Some(match val {
                         AttributeValue::Null => Nullable::Null,
-                        AttributeValue::U16(v) => Nullable::NonNull(VendorId::new(v)),
-                        _ => return Err(MatterStatus::InvalidDataType),
+                        other => Nullable::NonNull(VendorId::try_from(other)?),
                     });
                 }
                 1 => {
                     if namespace_id.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U8(ns) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    namespace_id = Some(ns);
+                    namespace_id = Some(decode_unsigned::<u8>(&val)?);
                 }
                 2 => {
                     if tag.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U8(t) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    tag = Some(t);
+                    tag = Some(decode_unsigned::<u8>(&val)?);
                 }
                 3 => {
                     if label.is_present() {
@@ -416,5 +402,25 @@ mod tests {
         let c = SemanticTag::new(2, 0);
         assert!(a < b);
         assert!(b < c);
+    }
+
+    #[test]
+    fn semantic_tag_unsigned_width_flexibility() {
+        let flex = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U64(0xFFF1)),
+            (FieldId::new(1), AttributeValue::U16(1)),
+            (FieldId::new(2), AttributeValue::U32(2)),
+        ]);
+        let expected = SemanticTag::new(1, 2).with_mfg_code(VendorId::new(0xFFF1));
+        assert_eq!(SemanticTag::try_from(&flex), Ok(expected.clone()));
+        assert_eq!(SemanticTag::try_from(flex), Ok(expected));
+
+        let overflow = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::Null),
+            (FieldId::new(1), AttributeValue::U16(300)),
+            (FieldId::new(2), AttributeValue::U8(2)),
+        ]);
+        assert_eq!(SemanticTag::try_from(&overflow), Err(MatterStatus::ConstraintError));
+        assert_eq!(SemanticTag::try_from(overflow), Err(MatterStatus::ConstraintError));
     }
 }

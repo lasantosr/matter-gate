@@ -14,7 +14,7 @@ use crate::{
     event::EventId,
     optional::Optional,
     status::MatterStatus,
-    value::AttributeValue,
+    value::{AttributeValue, decode_unsigned},
 };
 
 define_matter_id! {
@@ -340,13 +340,13 @@ impl Cluster {
     ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::U32`].
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not an unsigned integer, or
+    /// [`MatterStatus::ConstraintError`] if an unsigned integer overflows `u32`.
     pub fn feature_map(&self) -> Result<Optional<u32>, MatterStatus> {
-        match self.attribute(AttributeId::FEATURE_MAP) {
-            None => Ok(Optional::Omitted),
-            Some(AttributeValue::U32(val)) => Ok(Optional::Present(*val)),
-            Some(_) => Err(MatterStatus::InvalidDataType),
-        }
+        self.attribute(AttributeId::FEATURE_MAP)
+            .map(decode_unsigned::<u32>)
+            .transpose()
+            .map(Optional::from)
     }
 
     /// Set `FeatureMap` (`0xFFFC`, CSA §7.13) in place, returning its previous value if replaced.
@@ -369,13 +369,13 @@ impl Cluster {
     ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::U16`].
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not an unsigned integer, or
+    /// [`MatterStatus::ConstraintError`] if an unsigned integer overflows `u16`.
     pub fn cluster_revision(&self) -> Result<Optional<u16>, MatterStatus> {
-        match self.attribute(AttributeId::CLUSTER_REVISION) {
-            None => Ok(Optional::Omitted),
-            Some(AttributeValue::U16(val)) => Ok(Optional::Present(*val)),
-            Some(_) => Err(MatterStatus::InvalidDataType),
-        }
+        self.attribute(AttributeId::CLUSTER_REVISION)
+            .map(decode_unsigned::<u16>)
+            .transpose()
+            .map(Optional::from)
     }
 
     /// Set `ClusterRevision` (`0xFFFD`, CSA §7.13) in place, returning its previous value if replaced.
@@ -685,22 +685,22 @@ mod tests {
     }
 
     #[test]
-    fn cluster_global_attributes_invalid_data_type() {
+    fn cluster_global_attributes_invalid_data_type_and_overflow() {
         let cluster = Cluster::new(
             ClusterId::new(0x0006),
             alloc::vec![
-                Attribute::new(AttributeId::GENERATED_COMMAND_LIST, AttributeValue::U32(1)),
+                Attribute::new(AttributeId::GENERATED_COMMAND_LIST, AttributeValue::I32(1)),
                 Attribute::new(
                     AttributeId::ACCEPTED_COMMAND_LIST,
-                    AttributeValue::List(alloc::vec![AttributeValue::U16(1)]),
+                    AttributeValue::List(alloc::vec![AttributeValue::I16(1)]),
                 ),
                 Attribute::new(AttributeId::EVENT_LIST, AttributeValue::Bool(true)),
                 Attribute::new(
                     AttributeId::ATTRIBUTE_LIST,
                     AttributeValue::List(alloc::vec![AttributeValue::U32(0), AttributeValue::Bool(false)]),
                 ),
-                Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::U16(1)),
-                Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::U32(1)),
+                Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::I32(-1)),
+                Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::String("1".into())),
             ],
         );
 
@@ -710,5 +710,70 @@ mod tests {
         assert_eq!(cluster.attribute_list(), Err(MatterStatus::InvalidDataType));
         assert_eq!(cluster.feature_map(), Err(MatterStatus::InvalidDataType));
         assert_eq!(cluster.cluster_revision(), Err(MatterStatus::InvalidDataType));
+
+        let overflow_cluster = Cluster::new(
+            ClusterId::new(0x0006),
+            alloc::vec![
+                Attribute::new(
+                    AttributeId::ACCEPTED_COMMAND_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U64(u64::from(u32::MAX) + 1)]),
+                ),
+                Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::U64(u64::from(u32::MAX) + 1)),
+                Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::U32(70_000)),
+            ],
+        );
+
+        assert_eq!(
+            overflow_cluster.accepted_command_list(),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(overflow_cluster.feature_map(), Err(MatterStatus::ConstraintError));
+        assert_eq!(overflow_cluster.cluster_revision(), Err(MatterStatus::ConstraintError));
+    }
+
+    #[test]
+    fn cluster_global_attributes_unsigned_width_flexibility() {
+        let cluster = Cluster::new(
+            ClusterId::new(0x0006),
+            alloc::vec![
+                Attribute::new(
+                    AttributeId::GENERATED_COMMAND_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U8(1), AttributeValue::U64(2)]),
+                ),
+                Attribute::new(
+                    AttributeId::ACCEPTED_COMMAND_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U16(3)]),
+                ),
+                Attribute::new(
+                    AttributeId::EVENT_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U8(4)]),
+                ),
+                Attribute::new(
+                    AttributeId::ATTRIBUTE_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U16(5), AttributeValue::U64(6)]),
+                ),
+                Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::U8(7)),
+                Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::U64(8)),
+            ],
+        );
+
+        assert_eq!(
+            cluster.generated_command_list(),
+            Ok(Optional::Present(alloc::vec![CommandId::new(1), CommandId::new(2)]))
+        );
+        assert_eq!(
+            cluster.accepted_command_list(),
+            Ok(Optional::Present(alloc::vec![CommandId::new(3)]))
+        );
+        assert_eq!(
+            cluster.event_list(),
+            Ok(Optional::Present(alloc::vec![EventId::new(4)]))
+        );
+        assert_eq!(
+            cluster.attribute_list(),
+            Ok(Optional::Present(alloc::vec![AttributeId::new(5), AttributeId::new(6)]))
+        );
+        assert_eq!(cluster.feature_map(), Ok(Optional::Present(7)));
+        assert_eq!(cluster.cluster_revision(), Ok(Optional::Present(8)));
     }
 }

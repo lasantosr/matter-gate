@@ -15,7 +15,7 @@ use crate::{
     status::MatterStatus,
     tag::SemanticTag,
     types::VendorId,
-    value::{AttributeValue, FieldId},
+    value::{AttributeValue, FieldId, decode_unsigned},
 };
 
 define_matter_id! {
@@ -125,19 +125,13 @@ impl TryFrom<&AttributeValue> for DeviceTypeEntry {
                     if id.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U32(raw) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    id = Some(DeviceTypeId::new(*raw));
+                    id = Some(DeviceTypeId::try_from(val)?);
                 }
                 1 => {
                     if revision.is_some() {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    let AttributeValue::U16(rev) = val else {
-                        return Err(MatterStatus::InvalidDataType);
-                    };
-                    revision = Some(*rev);
+                    revision = Some(decode_unsigned::<u16>(val)?);
                 }
                 _ => {
                     if seen_unknown.contains(field_id) {
@@ -703,6 +697,19 @@ mod tests {
         let entry_val = AttributeValue::from(entry);
         assert_eq!(DeviceTypeEntry::try_from(&entry_val), Ok(entry));
         assert_eq!(DeviceTypeEntry::try_from(entry_val), Ok(entry));
+        let flex_entry = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U64(0x0100)),
+            (FieldId::new(1), AttributeValue::U8(2)),
+        ]);
+        assert_eq!(DeviceTypeEntry::try_from(&flex_entry), Ok(entry));
+        let overflow_entry = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U32(0x0100)),
+            (FieldId::new(1), AttributeValue::U32(70_000)),
+        ]);
+        assert_eq!(
+            DeviceTypeEntry::try_from(&overflow_entry),
+            Err(MatterStatus::ConstraintError)
+        );
         assert!(EndpointId::ROOT.is_valid());
         assert!(!EndpointId::WILDCARD.is_valid());
         assert!(DeviceTypeId::new(0x0100).is_valid());

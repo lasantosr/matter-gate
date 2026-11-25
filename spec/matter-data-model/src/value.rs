@@ -636,6 +636,20 @@ impl TryFrom<AttributeValue> for Vec<(FieldId, AttributeValue)> {
     }
 }
 
+/// Decode any unsigned integer [`AttributeValue`] (`U8`..=`U64`) into `T` with range checking.
+///
+/// Returns `InvalidDataType` for signed or non-integer variants, and `ConstraintError` on overflow.
+pub(crate) fn decode_unsigned<T: TryFrom<u64>>(val: &AttributeValue) -> Result<T, MatterStatus> {
+    let raw = match val {
+        AttributeValue::U8(v) => u64::from(*v),
+        AttributeValue::U16(v) => u64::from(*v),
+        AttributeValue::U32(v) => u64::from(*v),
+        AttributeValue::U64(v) => *v,
+        _ => return Err(MatterStatus::InvalidDataType),
+    };
+    T::try_from(raw).map_err(|_| MatterStatus::ConstraintError)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -650,6 +664,24 @@ mod tests {
         assert_eq!(val, AttributeValue::U8(0x03));
         assert_eq!(FieldId::try_from(&val), Ok(FieldId::new(0x03)));
         assert_eq!(FieldId::try_from(val), Ok(FieldId::new(0x03)));
+        assert_eq!(FieldId::try_from(&AttributeValue::U64(0x03)), Ok(FieldId::new(0x03)));
+        assert_eq!(
+            FieldId::try_from(&AttributeValue::U16(300)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            FieldId::try_from(&AttributeValue::I8(3)),
+            Err(MatterStatus::InvalidDataType)
+        );
+        // Primitive AttributeValue conversions stay exact.
+        assert_eq!(
+            u16::try_from(&AttributeValue::U8(1)),
+            Err(MatterStatus::InvalidDataType)
+        );
+        assert_eq!(
+            u16::try_from(&AttributeValue::U32(1)),
+            Err(MatterStatus::InvalidDataType)
+        );
     }
 
     #[test]
