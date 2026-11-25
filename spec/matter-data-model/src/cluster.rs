@@ -12,6 +12,7 @@ use crate::{
     attribute::{Attribute, AttributeId},
     command::CommandId,
     event::EventId,
+    iter::ResultListIter,
     optional::Optional,
     status::MatterStatus,
     value::{AttributeValue, decode_unsigned},
@@ -232,10 +233,12 @@ impl Cluster {
 
     /// Read `GeneratedCommandList` (`0xFFF8`, CSA §7.13), returning `Optional::Omitted` if absent.
     ///
+    /// Returns a zero-allocation, single-pass [`ResultListIter`] over the wire list elements.
+    ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` command IDs.
-    pub fn generated_command_list(&self) -> Result<Optional<Vec<CommandId>>, MatterStatus> {
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::List`].
+    pub fn generated_command_list(&self) -> Result<Optional<ResultListIter<'_, CommandId>>, MatterStatus> {
         self.read_id_list(AttributeId::GENERATED_COMMAND_LIST)
     }
 
@@ -260,10 +263,12 @@ impl Cluster {
 
     /// Read `AcceptedCommandList` (`0xFFF9`, CSA §7.13), returning `Optional::Omitted` if absent.
     ///
+    /// Returns a zero-allocation, single-pass [`ResultListIter`] over the wire list elements.
+    ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` command IDs.
-    pub fn accepted_command_list(&self) -> Result<Optional<Vec<CommandId>>, MatterStatus> {
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::List`].
+    pub fn accepted_command_list(&self) -> Result<Optional<ResultListIter<'_, CommandId>>, MatterStatus> {
         self.read_id_list(AttributeId::ACCEPTED_COMMAND_LIST)
     }
 
@@ -288,10 +293,12 @@ impl Cluster {
 
     /// Read `EventList` (`0xFFFA`, CSA §7.13, Matter `v1.1`–`v1.3`), returning `Optional::Omitted` if absent.
     ///
+    /// Returns a zero-allocation, single-pass [`ResultListIter`] over the wire list elements.
+    ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` event IDs.
-    pub fn event_list(&self) -> Result<Optional<Vec<EventId>>, MatterStatus> {
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::List`].
+    pub fn event_list(&self) -> Result<Optional<ResultListIter<'_, EventId>>, MatterStatus> {
         self.read_id_list(AttributeId::EVENT_LIST)
     }
 
@@ -313,10 +320,12 @@ impl Cluster {
 
     /// Read `AttributeList` (`0xFFFB`, CSA §7.13), returning `Optional::Omitted` if absent.
     ///
+    /// Returns a zero-allocation, single-pass [`ResultListIter`] over the wire list elements.
+    ///
     /// # Errors
     ///
-    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` attribute IDs.
-    pub fn attribute_list(&self) -> Result<Optional<Vec<AttributeId>>, MatterStatus> {
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::List`].
+    pub fn attribute_list(&self) -> Result<Optional<ResultListIter<'_, AttributeId>>, MatterStatus> {
         self.read_id_list(AttributeId::ATTRIBUTE_LIST)
     }
 
@@ -406,17 +415,10 @@ impl Display for Cluster {
 }
 
 impl Cluster {
-    fn read_id_list<T>(&self, id: AttributeId) -> Result<Optional<Vec<T>>, MatterStatus>
-    where
-        for<'a> T: TryFrom<&'a AttributeValue, Error = MatterStatus>,
-    {
+    fn read_id_list<T>(&self, id: AttributeId) -> Result<Optional<ResultListIter<'_, T>>, MatterStatus> {
         match self.attribute(id) {
             None => Ok(Optional::Omitted),
-            Some(AttributeValue::List(items)) => items
-                .iter()
-                .map(T::try_from)
-                .collect::<Result<Vec<T>, _>>()
-                .map(Optional::Present),
+            Some(AttributeValue::List(items)) => Ok(Optional::Present(ResultListIter::new(items))),
             Some(_) => Err(MatterStatus::InvalidDataType),
         }
     }
@@ -578,14 +580,17 @@ mod tests {
         assert!(!cluster.has_feature_map());
         assert!(!cluster.has_cluster_revision());
 
-        assert_eq!(cluster.generated_command_list(), Ok(Optional::Omitted));
-        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Omitted));
-        assert_eq!(cluster.event_list(), Ok(Optional::Omitted));
-        assert_eq!(cluster.attribute_list(), Ok(Optional::Omitted));
+        assert_eq!(
+            cluster.generated_command_list().unwrap().to_vec(),
+            Ok(Optional::Omitted)
+        );
+        assert_eq!(cluster.accepted_command_list().unwrap().to_vec(), Ok(Optional::Omitted));
+        assert_eq!(cluster.event_list().unwrap().to_vec(), Ok(Optional::Omitted));
+        assert_eq!(cluster.attribute_list().unwrap().to_vec(), Ok(Optional::Omitted));
         assert_eq!(cluster.feature_map(), Ok(Optional::Omitted));
         assert_eq!(cluster.cluster_revision(), Ok(Optional::Omitted));
 
-        // Explicitly empty lists must be Present(vec![]), not Omitted.
+        // Explicitly empty lists must be Present(empty), not Omitted.
         cluster = cluster
             .with_generated_command_list([])
             .with_accepted_command_list([])
@@ -595,10 +600,22 @@ mod tests {
         assert!(cluster.has_accepted_command_list());
         assert!(cluster.has_event_list());
         assert!(cluster.has_attribute_list());
-        assert_eq!(cluster.generated_command_list(), Ok(Optional::Present(Vec::new())));
-        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Present(Vec::new())));
-        assert_eq!(cluster.event_list(), Ok(Optional::Present(Vec::new())));
-        assert_eq!(cluster.attribute_list(), Ok(Optional::Present(Vec::new())));
+        assert_eq!(
+            cluster.generated_command_list().unwrap().to_vec(),
+            Ok(Optional::Present(Vec::new()))
+        );
+        assert_eq!(
+            cluster.accepted_command_list().unwrap().to_vec(),
+            Ok(Optional::Present(Vec::new()))
+        );
+        assert_eq!(
+            cluster.event_list().unwrap().to_vec(),
+            Ok(Optional::Present(Vec::new()))
+        );
+        assert_eq!(
+            cluster.attribute_list().unwrap().to_vec(),
+            Ok(Optional::Present(Vec::new()))
+        );
 
         // Builders with populated values + order-preserving deduplication.
         let cmd0 = CommandId::new(0x00);
@@ -618,22 +635,27 @@ mod tests {
             .with_cluster_revision(6);
 
         assert_eq!(
-            populated.generated_command_list(),
+            populated.generated_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![cmd2, cmd0, cmd1]))
         );
         assert_eq!(
-            populated.accepted_command_list(),
+            populated.accepted_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![cmd1, cmd0]))
         );
-        assert_eq!(populated.event_list(), Ok(Optional::Present(alloc::vec![evt2, evt1])));
         assert_eq!(
-            populated.attribute_list(),
+            populated.event_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![evt2, evt1]))
+        );
+        assert_eq!(
+            populated.attribute_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![
                 attr1,
                 attr0,
                 AttributeId::CLUSTER_REVISION
             ]))
         );
+        assert_eq!(populated.accepted_command_list().unwrap().contains(cmd0), Ok(true));
+        assert_eq!(populated.accepted_command_list().unwrap().contains(cmd2), Ok(false));
         assert_eq!(populated.feature_map(), Ok(Optional::Present(3)));
         assert_eq!(populated.cluster_revision(), Ok(Optional::Present(6)));
     }
@@ -651,8 +673,18 @@ mod tests {
             )],
         );
         assert_eq!(
-            cluster.accepted_command_list(),
+            cluster.accepted_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![cmd1, cmd0, cmd1]))
+        );
+        // DoubleEndedIterator & ExactSizeIterator check.
+        assert_eq!(
+            cluster
+                .accepted_command_list()
+                .unwrap()
+                .unwrap()
+                .rev()
+                .collect::<Result<Vec<_>, _>>(),
+            Ok(alloc::vec![cmd1, cmd0, cmd1])
         );
 
         // In-place replacement returns previous value.
@@ -662,7 +694,7 @@ mod tests {
             Some(AttributeValue::List(alloc::vec![cmd1.into(), cmd0.into(), cmd1.into()]))
         );
         assert_eq!(
-            cluster.accepted_command_list(),
+            cluster.accepted_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![cmd0]))
         );
 
@@ -670,7 +702,7 @@ mod tests {
         let removed = cluster.remove_accepted_command_list();
         assert_eq!(removed, Some(AttributeValue::List(alloc::vec![cmd0.into()])));
         assert!(!cluster.has_accepted_command_list());
-        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Omitted));
+        assert_eq!(cluster.accepted_command_list().unwrap().to_vec(), Ok(Optional::Omitted));
 
         // FeatureMap & ClusterRevision set/remove.
         assert_eq!(cluster.set_feature_map(7), None);
@@ -704,10 +736,19 @@ mod tests {
             ],
         );
 
-        assert_eq!(cluster.generated_command_list(), Err(MatterStatus::InvalidDataType));
-        assert_eq!(cluster.accepted_command_list(), Err(MatterStatus::InvalidDataType));
-        assert_eq!(cluster.event_list(), Err(MatterStatus::InvalidDataType));
-        assert_eq!(cluster.attribute_list(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(
+            cluster.generated_command_list().err(),
+            Some(MatterStatus::InvalidDataType)
+        );
+        assert_eq!(
+            cluster.accepted_command_list().unwrap().to_vec(),
+            Err(MatterStatus::InvalidDataType)
+        );
+        assert_eq!(cluster.event_list().err(), Some(MatterStatus::InvalidDataType));
+        assert_eq!(
+            cluster.attribute_list().unwrap().to_vec(),
+            Err(MatterStatus::InvalidDataType)
+        );
         assert_eq!(cluster.feature_map(), Err(MatterStatus::InvalidDataType));
         assert_eq!(cluster.cluster_revision(), Err(MatterStatus::InvalidDataType));
 
@@ -724,7 +765,7 @@ mod tests {
         );
 
         assert_eq!(
-            overflow_cluster.accepted_command_list(),
+            overflow_cluster.accepted_command_list().unwrap().to_vec(),
             Err(MatterStatus::ConstraintError)
         );
         assert_eq!(overflow_cluster.feature_map(), Err(MatterStatus::ConstraintError));
@@ -758,19 +799,19 @@ mod tests {
         );
 
         assert_eq!(
-            cluster.generated_command_list(),
+            cluster.generated_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![CommandId::new(1), CommandId::new(2)]))
         );
         assert_eq!(
-            cluster.accepted_command_list(),
+            cluster.accepted_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![CommandId::new(3)]))
         );
         assert_eq!(
-            cluster.event_list(),
+            cluster.event_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![EventId::new(4)]))
         );
         assert_eq!(
-            cluster.attribute_list(),
+            cluster.attribute_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![AttributeId::new(5), AttributeId::new(6)]))
         );
         assert_eq!(cluster.feature_map(), Ok(Optional::Present(7)));

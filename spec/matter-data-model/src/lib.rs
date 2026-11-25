@@ -294,6 +294,7 @@ mod cluster;
 mod command;
 mod endpoint;
 mod event;
+mod iter;
 mod node;
 mod optional;
 mod status;
@@ -312,6 +313,7 @@ pub use self::{
     command::*,
     endpoint::*,
     event::*,
+    iter::*,
     node::*,
     optional::{
         Nullable::{NonNull, Null},
