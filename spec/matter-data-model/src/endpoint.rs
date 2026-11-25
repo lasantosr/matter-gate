@@ -2,7 +2,7 @@
 
 extern crate alloc;
 
-use alloc::vec::Vec;
+use alloc::{string::String, vec::Vec};
 use core::{
     fmt::{Display, Formatter, Result as FmtResult},
     mem,
@@ -11,7 +11,7 @@ use core::{
 use crate::{
     attribute::AttributeId,
     cluster::{Cluster, ClusterId},
-    optional::Nullable,
+    optional::{Nullable, Optional},
     status::MatterStatus,
     tag::SemanticTag,
     types::VendorId,
@@ -190,6 +190,11 @@ pub struct Endpoint {
     #[cfg_attr(feature = "serde", serde(default))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub tags: Vec<SemanticTag>,
+    /// Optional persistent unique identifier disambiguating this endpoint (Descriptor `EndpointUniqueID`, `0x0005`,
+    /// Matter `v1.4`+).
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
+    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
+    pub unique_id: Optional<String>,
 }
 
 impl Endpoint {
@@ -212,6 +217,7 @@ impl Endpoint {
             client_clusters,
             parts: Vec::new(),
             tags: Vec::new(),
+            unique_id: Optional::Omitted,
         }
     }
 
@@ -225,6 +231,7 @@ impl Endpoint {
             client_clusters: Vec::new(),
             parts: Vec::new(),
             tags: Vec::new(),
+            unique_id: Optional::Omitted,
         }
     }
 
@@ -244,6 +251,7 @@ impl Endpoint {
             client_clusters,
             parts: Vec::new(),
             tags: Vec::new(),
+            unique_id: Optional::Omitted,
         }
     }
 
@@ -289,7 +297,7 @@ impl Endpoint {
     /// Add a client cluster reference to this endpoint if not already present.
     #[must_use]
     pub fn with_client_cluster(mut self, cluster_id: ClusterId) -> Self {
-        self.set_client_cluster(cluster_id);
+        self.add_client_cluster(cluster_id);
         self
     }
 
@@ -297,7 +305,7 @@ impl Endpoint {
     #[must_use]
     pub fn with_client_clusters(mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Self {
         for cluster_id in cluster_ids {
-            self.set_client_cluster(cluster_id);
+            self.add_client_cluster(cluster_id);
         }
         self
     }
@@ -305,7 +313,7 @@ impl Endpoint {
     /// Add a child endpoint ID to `parts` (`PartsList`) if not already present.
     #[must_use]
     pub fn with_part(mut self, endpoint_id: EndpointId) -> Self {
-        self.set_part(endpoint_id);
+        self.add_part(endpoint_id);
         self
     }
 
@@ -313,7 +321,7 @@ impl Endpoint {
     #[must_use]
     pub fn with_parts(mut self, endpoint_ids: impl IntoIterator<Item = EndpointId>) -> Self {
         for endpoint_id in endpoint_ids {
-            self.set_part(endpoint_id);
+            self.add_part(endpoint_id);
         }
         self
     }
@@ -331,6 +339,20 @@ impl Endpoint {
         for tag in tags {
             self.set_tag(tag);
         }
+        self
+    }
+
+    /// Set the persistent unique identifier (`EndpointUniqueID`, `0x0005`, Matter `v1.4`+).
+    #[must_use]
+    pub fn with_unique_id(mut self, unique_id: impl Into<String>) -> Self {
+        self.unique_id = Optional::Present(unique_id.into());
+        self
+    }
+
+    /// Set or omit the optional persistent unique identifier (`EndpointUniqueID`, `0x0005`, Matter `v1.4`+).
+    #[must_use]
+    pub fn with_optional_unique_id(mut self, unique_id: impl Into<Optional<String>>) -> Self {
+        self.unique_id = unique_id.into();
         self
     }
 
@@ -408,7 +430,7 @@ impl Endpoint {
     }
 
     /// Add a client cluster reference to this endpoint in place if not already present, returning `true` if inserted.
-    pub fn set_client_cluster(&mut self, cluster_id: ClusterId) -> bool {
+    pub fn add_client_cluster(&mut self, cluster_id: ClusterId) -> bool {
         if self.client_clusters.contains(&cluster_id) {
             false
         } else {
@@ -434,7 +456,7 @@ impl Endpoint {
     }
 
     /// Add a child endpoint ID to `parts` (`PartsList`) in place if not already present, returning `true` if inserted.
-    pub fn set_part(&mut self, endpoint_id: EndpointId) -> bool {
+    pub fn add_part(&mut self, endpoint_id: EndpointId) -> bool {
         if self.parts.contains(&endpoint_id) {
             false
         } else {
@@ -482,6 +504,29 @@ impl Endpoint {
             .iter()
             .position(|t| t.mfg_code == mfg_code && t.namespace_id == namespace_id && t.tag == tag)
             .map(|idx| self.tags.remove(idx))
+    }
+
+    /// Return `true` if this endpoint has a persistent unique identifier (`EndpointUniqueID`, `0x0005`).
+    #[must_use]
+    pub const fn has_unique_id(&self) -> bool {
+        self.unique_id.is_present()
+    }
+
+    /// Return the persistent unique identifier (`EndpointUniqueID`, `0x0005`), or `Optional::Omitted` if absent.
+    #[must_use]
+    pub fn unique_id(&self) -> Optional<&str> {
+        self.unique_id.as_deref()
+    }
+
+    /// Set or replace the persistent unique identifier (`EndpointUniqueID`, `0x0005`), returning the previous value if
+    /// present.
+    pub fn set_unique_id(&mut self, unique_id: impl Into<String>) -> Option<String> {
+        mem::replace(&mut self.unique_id, Optional::Present(unique_id.into())).into_option()
+    }
+
+    /// Remove the persistent unique identifier (`EndpointUniqueID`, `0x0005`), returning it if present.
+    pub fn remove_unique_id(&mut self) -> Option<String> {
+        mem::take(&mut self.unique_id).into_option()
     }
 
     /// Convenience lookup for an attribute value across `server_cluster -> attribute`.
@@ -614,8 +659,8 @@ mod tests {
         let mut ep = Endpoint::empty(EndpointId::new(2));
         assert_eq!(ep.set_device_type(AGGREGATOR, 1), None);
         assert_eq!(ep.set_device_type(AGGREGATOR, 2), Some(1));
-        assert!(ep.set_client_cluster(BASIC_INFORMATION));
-        assert!(!ep.set_client_cluster(BASIC_INFORMATION));
+        assert!(ep.add_client_cluster(BASIC_INFORMATION));
+        assert!(!ep.add_client_cluster(BASIC_INFORMATION));
         ep.set_server_cluster(Cluster::empty(ClusterId::DESCRIPTOR).with_attribute(AttributeId::new(0), 1_u8));
         assert_eq!(
             ep.attribute(ClusterId::DESCRIPTOR, AttributeId::new(0)),
@@ -663,5 +708,230 @@ mod tests {
         assert!(DeviceTypeId::new(0x0100).is_valid());
         assert!(DeviceTypeId::from_mei(VendorId::new(0xFFF1), 0xBFFF).is_valid());
         assert!(!DeviceTypeId::new(0xC000).is_valid());
+    }
+
+    #[test]
+    fn endpoint_unique_id_lifecycle() {
+        let mut ep = Endpoint::empty(EndpointId::new(1));
+        assert!(!ep.has_unique_id());
+        assert_eq!(ep.unique_id(), Optional::Omitted);
+
+        ep = ep.with_unique_id("uid-001");
+        assert!(ep.has_unique_id());
+        assert_eq!(ep.unique_id(), Optional::Present("uid-001"));
+
+        assert_eq!(ep.set_unique_id("uid-002"), Some(String::from("uid-001")));
+        assert_eq!(ep.unique_id(), Optional::Present("uid-002"));
+
+        assert_eq!(ep.remove_unique_id(), Some(String::from("uid-002")));
+        assert!(!ep.has_unique_id());
+        assert_eq!(ep.unique_id(), Optional::Omitted);
+        assert_eq!(ep.remove_unique_id(), None);
+
+        let ep_opt = Endpoint::empty(EndpointId::new(2)).with_optional_unique_id(Some(String::from("uid-opt")));
+        assert_eq!(ep_opt.unique_id(), Optional::Present("uid-opt"));
+        let ep_omitted = ep_opt.with_optional_unique_id(Optional::Omitted);
+        assert!(!ep_omitted.has_unique_id());
+    }
+
+    #[cfg(feature = "serde")]
+    #[test]
+    fn endpoint_unique_id_serde_omission_and_presence() {
+        use serde::ser::{Error as SerError, Impossible, Serialize, SerializeStruct, Serializer, StdError};
+
+        #[derive(Debug, PartialEq)]
+        struct SerErr;
+        impl Display for SerErr {
+            fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+                f.write_str("ser error")
+            }
+        }
+        impl StdError for SerErr {}
+        impl SerError for SerErr {
+            fn custom<T: Display>(_msg: T) -> Self {
+                Self
+            }
+        }
+
+        struct FieldRecorder<'a>(&'a mut Vec<&'static str>);
+        impl SerializeStruct for FieldRecorder<'_> {
+            type Error = SerErr;
+            type Ok = ();
+
+            fn serialize_field<T: ?Sized + Serialize>(&mut self, key: &'static str, _value: &T) -> Result<(), SerErr> {
+                self.0.push(key);
+                Ok(())
+            }
+
+            fn end(self) -> Result<(), SerErr> {
+                Ok(())
+            }
+        }
+        impl<'a> Serializer for &'a mut FieldRecorder<'_> {
+            type Error = SerErr;
+            type Ok = ();
+            type SerializeMap = Impossible<(), SerErr>;
+            type SerializeSeq = Impossible<(), SerErr>;
+            type SerializeStruct = FieldRecorder<'a>;
+            type SerializeStructVariant = Impossible<(), SerErr>;
+            type SerializeTuple = Impossible<(), SerErr>;
+            type SerializeTupleStruct = Impossible<(), SerErr>;
+            type SerializeTupleVariant = Impossible<(), SerErr>;
+
+            fn serialize_struct(self, _name: &'static str, _len: usize) -> Result<Self::SerializeStruct, SerErr> {
+                Ok(FieldRecorder(self.0))
+            }
+
+            fn serialize_bool(self, _: bool) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_i8(self, _: i8) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_i16(self, _: i16) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_i32(self, _: i32) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_i64(self, _: i64) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_u8(self, _: u8) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_u16(self, _: u16) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_u32(self, _: u32) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_u64(self, _: u64) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_f32(self, _: f32) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_f64(self, _: f64) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_char(self, _: char) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_str(self, _: &str) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_bytes(self, _: &[u8]) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_none(self) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_some<T: ?Sized + Serialize>(self, _: &T) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_unit(self) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_unit_struct(self, _: &'static str) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_unit_variant(self, _: &'static str, _: u32, _: &'static str) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_newtype_struct<T: ?Sized + Serialize>(self, _: &'static str, _: &T) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_newtype_variant<T: ?Sized + Serialize>(
+                self,
+                _: &'static str,
+                _: u32,
+                _: &'static str,
+                _: &T,
+            ) -> Result<(), SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_seq(self, _: Option<usize>) -> Result<Self::SerializeSeq, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_tuple(self, _: usize) -> Result<Self::SerializeTuple, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_tuple_struct(self, _: &'static str, _: usize) -> Result<Self::SerializeTupleStruct, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_tuple_variant(
+                self,
+                _: &'static str,
+                _: u32,
+                _: &'static str,
+                _: usize,
+            ) -> Result<Self::SerializeTupleVariant, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_map(self, _: Option<usize>) -> Result<Self::SerializeMap, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+
+            fn serialize_struct_variant(
+                self,
+                _: &'static str,
+                _: u32,
+                _: &'static str,
+                _: usize,
+            ) -> Result<Self::SerializeStructVariant, SerErr> {
+                Err(SerErr::custom("unexpected"))
+            }
+        }
+
+        let mut fields = Vec::new();
+        let omitted = Endpoint::empty(EndpointId::new(1));
+        assert_eq!(omitted.serialize(&mut FieldRecorder(&mut fields)), Ok(()));
+        assert!(!fields.contains(&"unique_id"));
+
+        fields.clear();
+        let present = Endpoint::empty(EndpointId::new(2)).with_unique_id("matter-uid-42");
+        assert_eq!(present.serialize(&mut FieldRecorder(&mut fields)), Ok(()));
+        assert!(fields.contains(&"unique_id"));
+    }
+
+    #[cfg(feature = "schemars")]
+    #[test]
+    fn endpoint_json_schema_marks_unique_id_optional() {
+        let mut generator = schemars::SchemaGenerator::default();
+        let schema = <Endpoint as schemars::JsonSchema>::json_schema(&mut generator);
+        let required = schema
+            .as_object()
+            .and_then(|o| o.get("required"))
+            .and_then(|v| v.as_array());
+        assert!(
+            required.is_some_and(|req| !req.iter().any(|v| v.as_str() == Some("unique_id"))),
+            "unique_id must not be required in Endpoint JSON schema"
+        );
     }
 }

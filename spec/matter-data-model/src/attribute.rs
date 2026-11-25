@@ -12,17 +12,17 @@ define_matter_id! {
 }
 
 impl AttributeId {
-    /// Accepted Command List Global Attribute ID (`0xFFF9`) per CSA Matter Core Specification §7.8.
+    /// Accepted Command List Global Attribute ID (`0xFFF9`) per CSA Matter Core Specification §7.13.
     pub const ACCEPTED_COMMAND_LIST: Self = Self(0xFFF9);
-    /// Attribute List Global Attribute ID (`0xFFFB`) per CSA Matter Core Specification §7.8.
+    /// Attribute List Global Attribute ID (`0xFFFB`) per CSA Matter Core Specification §7.13.
     pub const ATTRIBUTE_LIST: Self = Self(0xFFFB);
-    /// Cluster Revision Global Attribute ID (`0xFFFD`) per CSA Matter Core Specification §7.8.
+    /// Cluster Revision Global Attribute ID (`0xFFFD`) per CSA Matter Core Specification §7.13.
     pub const CLUSTER_REVISION: Self = Self(0xFFFD);
-    /// Event List Global Attribute ID (`0xFFFA`) per CSA Matter Core Specification §7.8.
+    /// Event List Global Attribute ID (`0xFFFA`) per CSA Matter Core Specification §7.13 (Matter `v1.1`–`v1.3`).
     pub const EVENT_LIST: Self = Self(0xFFFA);
-    /// Feature Map Global Attribute ID (`0xFFFC`) per CSA Matter Core Specification §7.8.
+    /// Feature Map Global Attribute ID (`0xFFFC`) per CSA Matter Core Specification §7.13.
     pub const FEATURE_MAP: Self = Self(0xFFFC);
-    /// Generated Command List Global Attribute ID (`0xFFF8`) per CSA Matter Core Specification §7.8.
+    /// Generated Command List Global Attribute ID (`0xFFF8`) per CSA Matter Core Specification §7.13.
     pub const GENERATED_COMMAND_LIST: Self = Self(0xFFF8);
     /// Wildcard Attribute ID (`0xFFFF_FFFF`) per CSA Matter Interaction Model §10.5.
     pub const WILDCARD: Self = Self(0xFFFF_FFFF);

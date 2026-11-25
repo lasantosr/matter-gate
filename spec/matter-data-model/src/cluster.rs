@@ -10,7 +10,10 @@ use core::{
 
 use crate::{
     attribute::{Attribute, AttributeId},
+    command::CommandId,
+    event::EventId,
     optional::Optional,
+    status::MatterStatus,
     value::AttributeValue,
 };
 
@@ -135,6 +138,49 @@ impl Cluster {
         self
     }
 
+    /// Set the `GeneratedCommandList` global attribute (`0xFFF8`, CSA §7.13), deduplicating IDs in first-seen order.
+    #[must_use]
+    pub fn with_generated_command_list(mut self, commands: impl IntoIterator<Item = CommandId>) -> Self {
+        self.set_generated_command_list(commands);
+        self
+    }
+
+    /// Set the `AcceptedCommandList` global attribute (`0xFFF9`, CSA §7.13), deduplicating IDs in first-seen order.
+    #[must_use]
+    pub fn with_accepted_command_list(mut self, commands: impl IntoIterator<Item = CommandId>) -> Self {
+        self.set_accepted_command_list(commands);
+        self
+    }
+
+    /// Set the `EventList` global attribute (`0xFFFA`, CSA §7.13, Matter `v1.1`–`v1.3`), deduplicating IDs in
+    /// first-seen order.
+    #[must_use]
+    pub fn with_event_list(mut self, events: impl IntoIterator<Item = EventId>) -> Self {
+        self.set_event_list(events);
+        self
+    }
+
+    /// Set the `AttributeList` global attribute (`0xFFFB`, CSA §7.13), deduplicating IDs in first-seen order.
+    #[must_use]
+    pub fn with_attribute_list(mut self, attributes: impl IntoIterator<Item = AttributeId>) -> Self {
+        self.set_attribute_list(attributes);
+        self
+    }
+
+    /// Set the `FeatureMap` global attribute (`0xFFFC`, CSA §7.13).
+    #[must_use]
+    pub fn with_feature_map(mut self, feature_map: u32) -> Self {
+        self.set_feature_map(feature_map);
+        self
+    }
+
+    /// Set the `ClusterRevision` global attribute (`0xFFFD`, CSA §7.13).
+    #[must_use]
+    pub fn with_cluster_revision(mut self, revision: u16) -> Self {
+        self.set_cluster_revision(revision);
+        self
+    }
+
     /// Return `true` if this cluster contains an attribute with the given ID.
     #[must_use]
     pub fn has_attribute(&self, id: AttributeId) -> bool {
@@ -177,6 +223,170 @@ impl Cluster {
             .position(|attr| attr.id == id)
             .map(|idx| self.attributes.remove(idx).value)
     }
+
+    /// Return `true` if `GeneratedCommandList` (`0xFFF8`) is present on this cluster.
+    #[must_use]
+    pub fn has_generated_command_list(&self) -> bool {
+        self.has_attribute(AttributeId::GENERATED_COMMAND_LIST)
+    }
+
+    /// Read `GeneratedCommandList` (`0xFFF8`, CSA §7.13), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` command IDs.
+    pub fn generated_command_list(&self) -> Result<Optional<Vec<CommandId>>, MatterStatus> {
+        self.read_id_list(AttributeId::GENERATED_COMMAND_LIST)
+    }
+
+    /// Set `GeneratedCommandList` (`0xFFF8`, CSA §7.13) in place, deduplicating IDs in first-seen order.
+    pub fn set_generated_command_list(
+        &mut self,
+        commands: impl IntoIterator<Item = CommandId>,
+    ) -> Option<AttributeValue> {
+        self.set_id_list(AttributeId::GENERATED_COMMAND_LIST, commands)
+    }
+
+    /// Remove `GeneratedCommandList` (`0xFFF8`) from this cluster, returning its previous value if present.
+    pub fn remove_generated_command_list(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::GENERATED_COMMAND_LIST)
+    }
+
+    /// Return `true` if `AcceptedCommandList` (`0xFFF9`) is present on this cluster.
+    #[must_use]
+    pub fn has_accepted_command_list(&self) -> bool {
+        self.has_attribute(AttributeId::ACCEPTED_COMMAND_LIST)
+    }
+
+    /// Read `AcceptedCommandList` (`0xFFF9`, CSA §7.13), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` command IDs.
+    pub fn accepted_command_list(&self) -> Result<Optional<Vec<CommandId>>, MatterStatus> {
+        self.read_id_list(AttributeId::ACCEPTED_COMMAND_LIST)
+    }
+
+    /// Set `AcceptedCommandList` (`0xFFF9`, CSA §7.13) in place, deduplicating IDs in first-seen order.
+    pub fn set_accepted_command_list(
+        &mut self,
+        commands: impl IntoIterator<Item = CommandId>,
+    ) -> Option<AttributeValue> {
+        self.set_id_list(AttributeId::ACCEPTED_COMMAND_LIST, commands)
+    }
+
+    /// Remove `AcceptedCommandList` (`0xFFF9`) from this cluster, returning its previous value if present.
+    pub fn remove_accepted_command_list(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::ACCEPTED_COMMAND_LIST)
+    }
+
+    /// Return `true` if `EventList` (`0xFFFA`) is present on this cluster.
+    #[must_use]
+    pub fn has_event_list(&self) -> bool {
+        self.has_attribute(AttributeId::EVENT_LIST)
+    }
+
+    /// Read `EventList` (`0xFFFA`, CSA §7.13, Matter `v1.1`–`v1.3`), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` event IDs.
+    pub fn event_list(&self) -> Result<Optional<Vec<EventId>>, MatterStatus> {
+        self.read_id_list(AttributeId::EVENT_LIST)
+    }
+
+    /// Set `EventList` (`0xFFFA`, CSA §7.13, Matter `v1.1`–`v1.3`) in place, deduplicating IDs in first-seen order.
+    pub fn set_event_list(&mut self, events: impl IntoIterator<Item = EventId>) -> Option<AttributeValue> {
+        self.set_id_list(AttributeId::EVENT_LIST, events)
+    }
+
+    /// Remove `EventList` (`0xFFFA`) from this cluster, returning its previous value if present.
+    pub fn remove_event_list(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::EVENT_LIST)
+    }
+
+    /// Return `true` if `AttributeList` (`0xFFFB`) is present on this cluster.
+    #[must_use]
+    pub fn has_attribute_list(&self) -> bool {
+        self.has_attribute(AttributeId::ATTRIBUTE_LIST)
+    }
+
+    /// Read `AttributeList` (`0xFFFB`, CSA §7.13), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not a list of `u32` attribute IDs.
+    pub fn attribute_list(&self) -> Result<Optional<Vec<AttributeId>>, MatterStatus> {
+        self.read_id_list(AttributeId::ATTRIBUTE_LIST)
+    }
+
+    /// Set `AttributeList` (`0xFFFB`, CSA §7.13) in place, deduplicating IDs in first-seen order.
+    pub fn set_attribute_list(&mut self, attributes: impl IntoIterator<Item = AttributeId>) -> Option<AttributeValue> {
+        self.set_id_list(AttributeId::ATTRIBUTE_LIST, attributes)
+    }
+
+    /// Remove `AttributeList` (`0xFFFB`) from this cluster, returning its previous value if present.
+    pub fn remove_attribute_list(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::ATTRIBUTE_LIST)
+    }
+
+    /// Return `true` if `FeatureMap` (`0xFFFC`) is present on this cluster.
+    #[must_use]
+    pub fn has_feature_map(&self) -> bool {
+        self.has_attribute(AttributeId::FEATURE_MAP)
+    }
+
+    /// Read `FeatureMap` (`0xFFFC`, CSA §7.13), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::U32`].
+    pub fn feature_map(&self) -> Result<Optional<u32>, MatterStatus> {
+        match self.attribute(AttributeId::FEATURE_MAP) {
+            None => Ok(Optional::Omitted),
+            Some(AttributeValue::U32(val)) => Ok(Optional::Present(*val)),
+            Some(_) => Err(MatterStatus::InvalidDataType),
+        }
+    }
+
+    /// Set `FeatureMap` (`0xFFFC`, CSA §7.13) in place, returning its previous value if replaced.
+    pub fn set_feature_map(&mut self, feature_map: u32) -> Option<AttributeValue> {
+        self.set_attribute(AttributeId::FEATURE_MAP, AttributeValue::U32(feature_map))
+    }
+
+    /// Remove `FeatureMap` (`0xFFFC`) from this cluster, returning its previous value if present.
+    pub fn remove_feature_map(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::FEATURE_MAP)
+    }
+
+    /// Return `true` if `ClusterRevision` (`0xFFFD`) is present on this cluster.
+    #[must_use]
+    pub fn has_cluster_revision(&self) -> bool {
+        self.has_attribute(AttributeId::CLUSTER_REVISION)
+    }
+
+    /// Read `ClusterRevision` (`0xFFFD`, CSA §7.13), returning `Optional::Omitted` if absent.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`MatterStatus::InvalidDataType`] if the attribute is not [`AttributeValue::U16`].
+    pub fn cluster_revision(&self) -> Result<Optional<u16>, MatterStatus> {
+        match self.attribute(AttributeId::CLUSTER_REVISION) {
+            None => Ok(Optional::Omitted),
+            Some(AttributeValue::U16(val)) => Ok(Optional::Present(*val)),
+            Some(_) => Err(MatterStatus::InvalidDataType),
+        }
+    }
+
+    /// Set `ClusterRevision` (`0xFFFD`, CSA §7.13) in place, returning its previous value if replaced.
+    pub fn set_cluster_revision(&mut self, revision: u16) -> Option<AttributeValue> {
+        self.set_attribute(AttributeId::CLUSTER_REVISION, AttributeValue::U16(revision))
+    }
+
+    /// Remove `ClusterRevision` (`0xFFFD`) from this cluster, returning its previous value if present.
+    pub fn remove_cluster_revision(&mut self) -> Option<AttributeValue> {
+        self.remove_attribute(AttributeId::CLUSTER_REVISION)
+    }
 }
 
 impl From<(ClusterId, Vec<Attribute>)> for Cluster {
@@ -192,6 +402,38 @@ impl From<(ClusterId, Vec<Attribute>)> for Cluster {
 impl Display for Cluster {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "Cluster {} ({} attributes)", self.id, self.attributes.len())
+    }
+}
+
+impl Cluster {
+    fn read_id_list<T>(&self, id: AttributeId) -> Result<Optional<Vec<T>>, MatterStatus>
+    where
+        for<'a> T: TryFrom<&'a AttributeValue, Error = MatterStatus>,
+    {
+        match self.attribute(id) {
+            None => Ok(Optional::Omitted),
+            Some(AttributeValue::List(items)) => items
+                .iter()
+                .map(T::try_from)
+                .collect::<Result<Vec<T>, _>>()
+                .map(Optional::Present),
+            Some(_) => Err(MatterStatus::InvalidDataType),
+        }
+    }
+
+    fn set_id_list<T>(&mut self, id: AttributeId, items: impl IntoIterator<Item = T>) -> Option<AttributeValue>
+    where
+        T: Into<AttributeValue>,
+    {
+        let iter = items.into_iter();
+        let mut values = Vec::with_capacity(iter.size_hint().0);
+        for item in iter {
+            let val = item.into();
+            if !values.contains(&val) {
+                values.push(val);
+            }
+        }
+        self.set_attribute(id, AttributeValue::List(values))
     }
 }
 
@@ -324,5 +566,149 @@ mod tests {
             required.is_some_and(|req| !req.iter().any(|v| v.as_str() == Some("data_version"))),
             "data_version must not be required in Cluster JSON schema"
         );
+    }
+
+    #[test]
+    fn cluster_global_attributes_omitted_empty_and_populated() {
+        let mut cluster = Cluster::empty(ClusterId::new(0x0006));
+        assert!(!cluster.has_generated_command_list());
+        assert!(!cluster.has_accepted_command_list());
+        assert!(!cluster.has_event_list());
+        assert!(!cluster.has_attribute_list());
+        assert!(!cluster.has_feature_map());
+        assert!(!cluster.has_cluster_revision());
+
+        assert_eq!(cluster.generated_command_list(), Ok(Optional::Omitted));
+        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Omitted));
+        assert_eq!(cluster.event_list(), Ok(Optional::Omitted));
+        assert_eq!(cluster.attribute_list(), Ok(Optional::Omitted));
+        assert_eq!(cluster.feature_map(), Ok(Optional::Omitted));
+        assert_eq!(cluster.cluster_revision(), Ok(Optional::Omitted));
+
+        // Explicitly empty lists must be Present(vec![]), not Omitted.
+        cluster = cluster
+            .with_generated_command_list([])
+            .with_accepted_command_list([])
+            .with_event_list([])
+            .with_attribute_list([]);
+        assert!(cluster.has_generated_command_list());
+        assert!(cluster.has_accepted_command_list());
+        assert!(cluster.has_event_list());
+        assert!(cluster.has_attribute_list());
+        assert_eq!(cluster.generated_command_list(), Ok(Optional::Present(Vec::new())));
+        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Present(Vec::new())));
+        assert_eq!(cluster.event_list(), Ok(Optional::Present(Vec::new())));
+        assert_eq!(cluster.attribute_list(), Ok(Optional::Present(Vec::new())));
+
+        // Builders with populated values + order-preserving deduplication.
+        let cmd0 = CommandId::new(0x00);
+        let cmd1 = CommandId::new(0x01);
+        let cmd2 = CommandId::new(0x02);
+        let evt1 = EventId::new(0x10);
+        let evt2 = EventId::new(0x20);
+        let attr0 = AttributeId::new(0x0000);
+        let attr1 = AttributeId::new(0x0001);
+
+        let populated = Cluster::empty(ClusterId::new(0x0006))
+            .with_generated_command_list([cmd2, cmd0, cmd2, cmd1])
+            .with_accepted_command_list([cmd1, cmd0, cmd1])
+            .with_event_list([evt2, evt1, evt2])
+            .with_attribute_list([attr1, attr0, attr1, AttributeId::CLUSTER_REVISION])
+            .with_feature_map(0x0000_0003)
+            .with_cluster_revision(6);
+
+        assert_eq!(
+            populated.generated_command_list(),
+            Ok(Optional::Present(alloc::vec![cmd2, cmd0, cmd1]))
+        );
+        assert_eq!(
+            populated.accepted_command_list(),
+            Ok(Optional::Present(alloc::vec![cmd1, cmd0]))
+        );
+        assert_eq!(populated.event_list(), Ok(Optional::Present(alloc::vec![evt2, evt1])));
+        assert_eq!(
+            populated.attribute_list(),
+            Ok(Optional::Present(alloc::vec![
+                attr1,
+                attr0,
+                AttributeId::CLUSTER_REVISION
+            ]))
+        );
+        assert_eq!(populated.feature_map(), Ok(Optional::Present(3)));
+        assert_eq!(populated.cluster_revision(), Ok(Optional::Present(6)));
+    }
+
+    #[test]
+    fn cluster_global_attributes_set_remove_and_wire_read() {
+        let cmd0 = CommandId::new(0);
+        let cmd1 = CommandId::new(1);
+        // Raw wire list with duplicates is preserved on read without deduplicating.
+        let mut cluster = Cluster::new(
+            ClusterId::new(0x0006),
+            alloc::vec![Attribute::new(
+                AttributeId::ACCEPTED_COMMAND_LIST,
+                AttributeValue::List(alloc::vec![cmd1.into(), cmd0.into(), cmd1.into()]),
+            )],
+        );
+        assert_eq!(
+            cluster.accepted_command_list(),
+            Ok(Optional::Present(alloc::vec![cmd1, cmd0, cmd1]))
+        );
+
+        // In-place replacement returns previous value.
+        let prev = cluster.set_accepted_command_list([cmd0, cmd0]);
+        assert_eq!(
+            prev,
+            Some(AttributeValue::List(alloc::vec![cmd1.into(), cmd0.into(), cmd1.into()]))
+        );
+        assert_eq!(
+            cluster.accepted_command_list(),
+            Ok(Optional::Present(alloc::vec![cmd0]))
+        );
+
+        // Removal returns previous value and restores Omitted.
+        let removed = cluster.remove_accepted_command_list();
+        assert_eq!(removed, Some(AttributeValue::List(alloc::vec![cmd0.into()])));
+        assert!(!cluster.has_accepted_command_list());
+        assert_eq!(cluster.accepted_command_list(), Ok(Optional::Omitted));
+
+        // FeatureMap & ClusterRevision set/remove.
+        assert_eq!(cluster.set_feature_map(7), None);
+        assert_eq!(cluster.set_feature_map(9), Some(AttributeValue::U32(7)));
+        assert_eq!(cluster.remove_feature_map(), Some(AttributeValue::U32(9)));
+        assert!(!cluster.has_feature_map());
+
+        assert_eq!(cluster.set_cluster_revision(4), None);
+        assert_eq!(cluster.set_cluster_revision(5), Some(AttributeValue::U16(4)));
+        assert_eq!(cluster.remove_cluster_revision(), Some(AttributeValue::U16(5)));
+        assert!(!cluster.has_cluster_revision());
+    }
+
+    #[test]
+    fn cluster_global_attributes_invalid_data_type() {
+        let cluster = Cluster::new(
+            ClusterId::new(0x0006),
+            alloc::vec![
+                Attribute::new(AttributeId::GENERATED_COMMAND_LIST, AttributeValue::U32(1)),
+                Attribute::new(
+                    AttributeId::ACCEPTED_COMMAND_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U16(1)]),
+                ),
+                Attribute::new(AttributeId::EVENT_LIST, AttributeValue::Bool(true)),
+                Attribute::new(
+                    AttributeId::ATTRIBUTE_LIST,
+                    AttributeValue::List(alloc::vec![AttributeValue::U32(0), AttributeValue::Bool(false)]),
+                ),
+                Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::U16(1)),
+                Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::U32(1)),
+            ],
+        );
+
+        assert_eq!(cluster.generated_command_list(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(cluster.accepted_command_list(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(cluster.event_list(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(cluster.attribute_list(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(cluster.feature_map(), Err(MatterStatus::InvalidDataType));
+        assert_eq!(cluster.cluster_revision(), Err(MatterStatus::InvalidDataType));
     }
 }
