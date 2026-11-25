@@ -3,7 +3,13 @@
 extern crate alloc;
 
 use alloc::vec::Vec;
-use core::{borrow::Borrow, iter::FusedIterator, marker::PhantomData, slice::Iter as SliceIter};
+use core::{
+    borrow::Borrow,
+    fmt::{Debug, Formatter, Result as FmtResult},
+    iter::FusedIterator,
+    marker::PhantomData,
+    slice::Iter as SliceIter,
+};
 
 use crate::{optional::Optional, status::MatterStatus, value::AttributeValue};
 
@@ -12,7 +18,6 @@ use crate::{optional::Optional, status::MatterStatus, value::AttributeValue};
 ///
 /// Each element is converted via [`TryFrom<&AttributeValue>`] as it is visited without upfront
 /// scanning or heap allocation, yielding [`Result<T, MatterStatus>`].
-#[derive(Debug, Clone)]
 pub struct ResultListIter<'a, T> {
     inner: SliceIter<'a, AttributeValue>,
     _marker: PhantomData<fn() -> T>,
@@ -45,7 +50,7 @@ impl<'a, T> ResultListIter<'a, T>
 where
     T: TryFrom<&'a AttributeValue, Error = MatterStatus> + PartialEq,
 {
-    /// Return `true` if the wire list contains `target`, short-circuiting on match or decode error.
+    /// Return `true` if the remaining elements contain `target`, short-circuiting on match or decode error.
     pub fn contains(&self, target: impl Borrow<T>) -> Result<bool, MatterStatus> {
         let target = target.borrow();
         for item in self.inner.as_slice() {
@@ -61,13 +66,28 @@ impl<'a, T> ResultListIter<'a, T>
 where
     T: TryFrom<&'a AttributeValue, Error = MatterStatus>,
 {
-    /// Collect all decoded elements into a [`Vec<T>`] in a single pass.
+    /// Collect the remaining decoded elements (not yet yielded by `next`) into a [`Vec<T>`] in a single pass.
     pub fn to_vec(&self) -> Result<Vec<T>, MatterStatus> {
         let mut out = Vec::with_capacity(self.inner.len());
         for item in self.inner.as_slice() {
             out.push(T::try_from(item)?);
         }
         Ok(out)
+    }
+}
+
+impl<T> Clone for ResultListIter<'_, T> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone(),
+            _marker: PhantomData,
+        }
+    }
+}
+
+impl<T> Debug for ResultListIter<'_, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.debug_struct("ResultListIter").field("inner", &self.inner).finish()
     }
 }
 

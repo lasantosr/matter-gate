@@ -676,31 +676,32 @@ mod tests {
             cluster.accepted_command_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![cmd1, cmd0, cmd1]))
         );
-        // DoubleEndedIterator & ExactSizeIterator check.
-        assert_eq!(
-            cluster
-                .accepted_command_list()
-                .unwrap()
-                .unwrap()
-                .rev()
-                .collect::<Result<Vec<_>, _>>(),
-            Ok(alloc::vec![cmd1, cmd0, cmd1])
-        );
 
-        // In-place replacement returns previous value.
-        let prev = cluster.set_accepted_command_list([cmd0, cmd0]);
+        // In-place replacement returns previous value; verify DoubleEndedIterator & ExactSizeIterator on
+        // non-palindromic list.
+        let prev = cluster.set_accepted_command_list([cmd0, cmd1, cmd0]);
         assert_eq!(
             prev,
             Some(AttributeValue::List(alloc::vec![cmd1.into(), cmd0.into(), cmd1.into()]))
         );
         assert_eq!(
             cluster.accepted_command_list().unwrap().to_vec(),
-            Ok(Optional::Present(alloc::vec![cmd0]))
+            Ok(Optional::Present(alloc::vec![cmd0, cmd1]))
         );
+        let mut iter = cluster.accepted_command_list().unwrap().unwrap();
+        assert_eq!(iter.len(), 2);
+        assert_eq!(iter.next_back(), Some(Ok(cmd1)));
+        assert_eq!(iter.len(), 1);
+        assert_eq!(iter.next_back(), Some(Ok(cmd0)));
+        assert_eq!(iter.len(), 0);
+        assert_eq!(iter.next_back(), None);
 
         // Removal returns previous value and restores Omitted.
         let removed = cluster.remove_accepted_command_list();
-        assert_eq!(removed, Some(AttributeValue::List(alloc::vec![cmd0.into()])));
+        assert_eq!(
+            removed,
+            Some(AttributeValue::List(alloc::vec![cmd0.into(), cmd1.into()]))
+        );
         assert!(!cluster.has_accepted_command_list());
         assert_eq!(cluster.accepted_command_list().unwrap().to_vec(), Ok(Optional::Omitted));
 
