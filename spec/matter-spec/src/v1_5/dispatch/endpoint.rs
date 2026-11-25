@@ -1175,6 +1175,7 @@ impl DeviceMeta for EndpointDevice {
             Self::OrphanClusters(inner) => inner.device_type_id(),
             #[cfg(feature = "endpoint-all-clusters-app-server-example")]
             Self::AllClustersAppServerExample(inner) => inner.device_type_id(),
+
             Self::Unknown(ep) => ep
                 .primary_device_type()
                 .ok()
@@ -1561,6 +1562,7 @@ impl DeviceMeta for EndpointDevice {
             Self::OrphanClusters(inner) => inner.revision(),
             #[cfg(feature = "endpoint-all-clusters-app-server-example")]
             Self::AllClustersAppServerExample(inner) => inner.revision(),
+
             Self::Unknown(ep) => ep
                 .primary_device_type()
                 .ok()
@@ -1769,9 +1771,10 @@ fn select_endpoint_device(
     payload: BufferedPayload,
 ) -> Result<EndpointDevice, String> {
     if scope_name == Some("Unknown") {
-        return payload
-            .deserialize_into::<Endpoint>()
-            .map(|ep| EndpointDevice::Unknown(Box::new(ep)));
+        let ep = payload.deserialize_into::<Endpoint>()?;
+        ep.primary_device_type()
+            .map_err(|s| format!("invalid Descriptor DeviceTypeList: {s}"))?;
+        return Ok(EndpointDevice::Unknown(Box::new(ep)));
     }
     let _: &BufferedPayload = &payload;
     #[cfg(not(any(

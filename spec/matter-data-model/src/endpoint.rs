@@ -14,7 +14,7 @@ use crate::{
     iter::ResultListIter,
     optional::Optional,
     status::MatterStatus,
-    tag::SemanticTag,
+    tag::{SemanticTag, SemanticTagRef},
     value::{AttributeValue, FieldId, decode_unsigned},
 };
 
@@ -124,9 +124,8 @@ impl TryFrom<&AttributeValue> for DeviceTypeEntry {
 
         let mut id: Option<DeviceTypeId> = None;
         let mut revision: Option<u16> = None;
-        let mut seen_unknown: Vec<FieldId> = Vec::new();
 
-        for (field_id, val) in fields {
+        for (idx, (field_id, val)) in fields.iter().enumerate() {
             match field_id.raw() {
                 0 => {
                     if id.is_some() {
@@ -141,10 +140,12 @@ impl TryFrom<&AttributeValue> for DeviceTypeEntry {
                     revision = Some(decode_unsigned::<u16>(val)?);
                 }
                 _ => {
-                    if seen_unknown.contains(field_id) {
+                    if fields
+                        .get(..idx)
+                        .is_some_and(|prev| prev.iter().any(|(prev_id, _)| prev_id == field_id))
+                    {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    seen_unknown.push(*field_id);
                 }
             }
         }
@@ -408,12 +409,21 @@ impl Endpoint {
         }
     }
 
-    /// Set Descriptor `DeviceTypeList` (`0x0000`) in place, inserting Descriptor (`0x001D`) if absent.
+    /// Set Descriptor `DeviceTypeList` (`0x0000`) in place, inserting Descriptor (`0x001D`) if absent and
+    /// deduplicating by device type ID (updating `revision` on duplicates in first-seen order).
     pub fn set_device_type_list(
         &mut self,
         entries: impl IntoIterator<Item = DeviceTypeEntry>,
     ) -> Option<AttributeValue> {
-        let list = AttributeValue::List(entries.into_iter().map(AttributeValue::from).collect());
+        let mut unique: Vec<DeviceTypeEntry> = Vec::new();
+        for entry in entries {
+            if let Some(existing) = unique.iter_mut().find(|existing| existing.id == entry.id) {
+                existing.revision = entry.revision;
+            } else {
+                unique.push(entry);
+            }
+        }
+        let list = AttributeValue::List(unique.into_iter().map(AttributeValue::from).collect());
         self.set_descriptor_attribute(DESCRIPTOR_DEVICE_TYPE_LIST, list)
     }
 
@@ -534,9 +544,30 @@ impl Endpoint {
         decode_list_attr(self, DESCRIPTOR_TAG_LIST)
     }
 
-    /// Set Descriptor `TagList` (`0x0004`) in place, inserting Descriptor (`0x001D`) if absent.
+    /// Decode Descriptor `TagList` (`0x0004`) as a zero-allocation [`ResultListIter`] of borrowed [`SemanticTagRef`]s.
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `TagList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn tag_list_ref(&self) -> Result<Optional<ResultListIter<'_, SemanticTagRef<'_>>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_TAG_LIST)
+    }
+
+    /// Set Descriptor `TagList` (`0x0004`) in place, inserting Descriptor (`0x001D`) if absent and deduplicating
+    /// by `(mfg_code, namespace_id, tag)` key (replacing existing entries in first-seen order).
     pub fn set_tag_list(&mut self, tags: impl IntoIterator<Item = SemanticTag>) -> Option<AttributeValue> {
-        let list = AttributeValue::List(tags.into_iter().map(AttributeValue::from).collect());
+        let mut unique: Vec<SemanticTag> = Vec::new();
+        for tag in tags {
+            if let Some(existing) = unique.iter_mut().find(|existing| {
+                existing.mfg_code == tag.mfg_code
+                    && existing.namespace_id == tag.namespace_id
+                    && existing.tag == tag.tag
+            }) {
+                *existing = tag;
+            } else {
+                unique.push(tag);
+            }
+        }
+        let list = AttributeValue::List(unique.into_iter().map(AttributeValue::from).collect());
         self.set_descriptor_attribute(DESCRIPTOR_TAG_LIST, list)
     }
 
@@ -880,6 +911,63 @@ mod tests {
         assert_eq!(
             ep.server_list().unwrap().to_vec(),
             Ok(Optional::Present(alloc::vec![ClusterId::DESCRIPTOR, ON_OFF, IDENTIFY]))
+        );
+    }
+
+    #[test]
+    fn set_device_type_list_and_tag_list_deduplicate_by_key_and_borrow_tags() {
+        const LIGHT: DeviceTypeId = DeviceTypeId::new(0x0100);
+        const BRIDGED: DeviceTypeId = DeviceTypeId::new(0x0013);
+
+        let ep = Endpoint::empty(EndpointId::new(1))
+            .with_device_type_list([
+                DeviceTypeEntry::new(LIGHT, 1),
+                DeviceTypeEntry::new(BRIDGED, 1),
+                DeviceTypeEntry::new(LIGHT, 3),
+            ])
+            .with_tag_list([
+                SemanticTag::new(1, 2).with_label("Old"),
+                SemanticTag::new(1, 3).with_label("Right"),
+                SemanticTag::new(1, 2).with_label("New"),
+            ]);
+
+        assert_eq!(
+            ep.device_type_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![
+                DeviceTypeEntry::new(LIGHT, 3),
+                DeviceTypeEntry::new(BRIDGED, 1),
+            ]))
+        );
+
+        use crate::optional::Nullable;
+
+        let Optional::Present(tags_iter) = ep.tag_list_ref().unwrap() else {
+            panic!("expected TagList");
+        };
+        let borrowed: Vec<_> = tags_iter.collect::<Result<_, _>>().unwrap();
+        assert_eq!(borrowed.len(), 2);
+        assert_eq!(borrowed[0].label, Optional::Present(Nullable::NonNull("New")));
+        assert_eq!(borrowed[1].label, Optional::Present(Nullable::NonNull("Right")));
+
+        let unknown_dt = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U32(0x0100)),
+            (FieldId::new(1), AttributeValue::U16(2)),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+        ]);
+        assert_eq!(
+            DeviceTypeEntry::try_from(&unknown_dt),
+            Ok(DeviceTypeEntry::new(LIGHT, 2))
+        );
+
+        let dup_unknown_dt = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U32(0x0100)),
+            (FieldId::new(1), AttributeValue::U16(2)),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+            (FieldId::new(99), AttributeValue::Bool(false)),
+        ]);
+        assert_eq!(
+            DeviceTypeEntry::try_from(&dup_unknown_dt),
+            Err(MatterStatus::ConstraintError)
         );
     }
 }

@@ -958,7 +958,7 @@ impl SpecRegistry {
 
     fn validate_endpoint_ref_with_mode(&self, endpoint: &Endpoint, mode: ValidationMode) -> Result<(), EndpointError> {
         let Some(descriptor) = endpoint.descriptor() else {
-            return Err(EndpointError::EmptyDeviceTypes);
+            return Err(EndpointError::MissingMandatoryServerCluster(ClusterId::DESCRIPTOR));
         };
 
         // Decode and deduplicate DeviceTypeList (0x0000) in a single zero-alloc pass.

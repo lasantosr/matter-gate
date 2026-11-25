@@ -868,6 +868,7 @@ impl DeviceMeta for EndpointDevice {
             Self::AllClustersAppServerExample(inner) => inner.device_type_id(),
             #[cfg(feature = "endpoint-network-infrastructure-manager")]
             Self::NetworkInfrastructureManager => DeviceTypeId::new(0xFFF1_0010),
+
             Self::Unknown(ep) => ep
                 .primary_device_type()
                 .ok()
@@ -1154,6 +1155,7 @@ impl DeviceMeta for EndpointDevice {
             Self::NetworkInfrastructureManager => {
                 endpoints::network_infrastructure_manager::NetworkInfrastructureManager::REVISION
             }
+
             Self::Unknown(ep) => ep
                 .primary_device_type()
                 .ok()
@@ -1310,9 +1312,10 @@ fn select_endpoint_device(
     payload: BufferedPayload,
 ) -> Result<EndpointDevice, String> {
     if scope_name == Some("Unknown") {
-        return payload
-            .deserialize_into::<Endpoint>()
-            .map(|ep| EndpointDevice::Unknown(Box::new(ep)));
+        let ep = payload.deserialize_into::<Endpoint>()?;
+        ep.primary_device_type()
+            .map_err(|s| format!("invalid Descriptor DeviceTypeList: {s}"))?;
+        return Ok(EndpointDevice::Unknown(Box::new(ep)));
     }
     let _: &BufferedPayload = &payload;
     #[cfg(not(any(

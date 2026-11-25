@@ -1730,6 +1730,7 @@ fn dispatch_endpoint_meta_tokens(sorted_endpoints: &[DispatchEndpointEntry]) -> 
                             }
                         )
                     )
+                    // `DeviceMeta` is infallible; absent or malformed `DeviceTypeList` falls back to `0`.
                     Self::Unknown(ep) => ep
                         .primary_device_type()
                         .ok()
@@ -1770,6 +1771,7 @@ fn dispatch_endpoint_meta_tokens(sorted_endpoints: &[DispatchEndpointEntry]) -> 
                             }
                         )
                     )
+                    // `DeviceMeta` is infallible; absent or malformed `DeviceTypeList` falls back to `0`.
                     Self::Unknown(ep) => ep
                         .primary_device_type()
                         .ok()
@@ -1815,9 +1817,10 @@ fn dispatch_endpoint_describe_tokens(
             payload: BufferedPayload,
         ) -> Result<EndpointDevice, String> {
             if scope_name == Some("Unknown") {
-                return payload
-                    .deserialize_into::<Endpoint>()
-                    .map(|ep| EndpointDevice::Unknown(Box::new(ep)));
+                let ep = payload.deserialize_into::<Endpoint>()?;
+                ep.primary_device_type()
+                    .map_err(|s| format!("invalid Descriptor DeviceTypeList: {s}"))?;
+                return Ok(EndpointDevice::Unknown(Box::new(ep)));
             }
             let _: &BufferedPayload = &payload;
             $(ep_not_any_cfg)
