@@ -23,10 +23,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -330,7 +329,7 @@ impl crate::traits::PartialCluster for WiFiNetworkDiagnosticsClusterPatch {
     type Full = WiFiNetworkDiagnosticsCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -722,7 +721,7 @@ impl WiFiNetworkDiagnosticsCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::Bssid(decoded) => {
                     bssid.is_none().then_some(()).ok_or(ClusterError::InvalidAttribute(
                         AttributeError::InvalidValue {
@@ -1196,7 +1195,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -1242,32 +1241,32 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::Bssid(inner) => WireAttribute::from(inner),
-            Attribute::SecurityType(inner) => WireAttribute::from(inner),
-            Attribute::WiFiVersion(inner) => WireAttribute::from(inner),
-            Attribute::ChannelNumber(inner) => WireAttribute::from(inner),
-            Attribute::Rssi(inner) => WireAttribute::from(inner),
-            Attribute::BeaconLostCount(inner) => WireAttribute::from(inner),
-            Attribute::BeaconRxCount(inner) => WireAttribute::from(inner),
-            Attribute::PacketMulticastRxCount(inner) => WireAttribute::from(inner),
-            Attribute::PacketMulticastTxCount(inner) => WireAttribute::from(inner),
-            Attribute::PacketUnicastRxCount(inner) => WireAttribute::from(inner),
-            Attribute::PacketUnicastTxCount(inner) => WireAttribute::from(inner),
-            Attribute::CurrentMaxRate(inner) => WireAttribute::from(inner),
-            Attribute::OverrunCount(inner) => WireAttribute::from(inner),
+            Attribute::Bssid(inner) => model::Attribute::from(inner),
+            Attribute::SecurityType(inner) => model::Attribute::from(inner),
+            Attribute::WiFiVersion(inner) => model::Attribute::from(inner),
+            Attribute::ChannelNumber(inner) => model::Attribute::from(inner),
+            Attribute::Rssi(inner) => model::Attribute::from(inner),
+            Attribute::BeaconLostCount(inner) => model::Attribute::from(inner),
+            Attribute::BeaconRxCount(inner) => model::Attribute::from(inner),
+            Attribute::PacketMulticastRxCount(inner) => model::Attribute::from(inner),
+            Attribute::PacketMulticastTxCount(inner) => model::Attribute::from(inner),
+            Attribute::PacketUnicastRxCount(inner) => model::Attribute::from(inner),
+            Attribute::PacketUnicastTxCount(inner) => model::Attribute::from(inner),
+            Attribute::CurrentMaxRate(inner) => model::Attribute::from(inner),
+            Attribute::OverrunCount(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -1461,23 +1460,23 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::ResetCounts => WireCommand::from(commands::ResetCounts),
+            Command::ResetCounts => model::Command::from(commands::ResetCounts),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -1491,7 +1490,7 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::ResetCounts::COMMAND_ID => commands::ResetCounts::try_from_value_with_field(cmd.payload)
+            commands::ResetCounts::COMMAND_ID => commands::ResetCounts::decode_fields(cmd.payload)
                 .map(|_| Self::ResetCounts)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -1689,48 +1688,26 @@ impl Event {
         }
     }
 
-    pub fn from_wire(event_id: EventId, val: AttributeValue) -> Result<Self, EventError> {
-        match event_id {
-            events::Disconnection::EVENT_ID => events::Disconnection::try_from_value_with_field(val)
-                .map(Self::Disconnection)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::AssociationFailure::EVENT_ID => events::AssociationFailure::try_from_value_with_field(val)
-                .map(Self::AssociationFailure)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::ConnectionStatus::EVENT_ID => events::ConnectionStatus::try_from_value_with_field(val)
-                .map(Self::ConnectionStatus)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            other => Err(EventError::UnsupportedEvent(other)),
-        }
+    #[inline]
+    pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
+        Self::try_from(ev)
     }
 }
 
-impl From<Event> for WireEvent {
+impl From<Event> for model::Event {
     fn from(ev: Event) -> Self {
         match ev {
-            Event::Disconnection(inner) => WireEvent::from(inner),
-            Event::AssociationFailure(inner) => WireEvent::from(inner),
-            Event::ConnectionStatus(inner) => WireEvent::from(inner),
+            Event::Disconnection(inner) => model::Event::from(inner),
+            Event::AssociationFailure(inner) => model::Event::from(inner),
+            Event::ConnectionStatus(inner) => model::Event::from(inner),
         }
     }
 }
 
-impl TryFrom<WireEvent> for Event {
+impl TryFrom<model::Event> for Event {
     type Error = EventError;
 
-    fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+    fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
         if ev.cluster_id != Self::CLUSTER_ID {
             return Err(EventError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -1745,7 +1722,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::Disconnection::try_from_value_with_field(ev.payload)
+                events::Disconnection::decode_fields(ev.payload)
                     .map(Self::Disconnection)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -1760,7 +1737,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::AssociationFailure::try_from_value_with_field(ev.payload)
+                events::AssociationFailure::decode_fields(ev.payload)
                     .map(Self::AssociationFailure)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -1775,7 +1752,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ConnectionStatus::try_from_value_with_field(ev.payload)
+                events::ConnectionStatus::decode_fields(ev.payload)
                     .map(Self::ConnectionStatus)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -3236,20 +3213,37 @@ pub mod commands {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -3305,15 +3299,16 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_REASON_CODE, AttributeValue::from(self.reason_code)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut reason_code = None;
@@ -3337,16 +3332,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3390,11 +3386,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_ASSOCIATION_FAILURE,
@@ -3404,7 +3396,12 @@ pub mod events {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut association_failure = None;
@@ -3443,16 +3440,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3486,18 +3484,19 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_CONNECTION_STATUS,
                 AttributeValue::from(self.connection_status)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut connection_status = None;
@@ -3521,16 +3520,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

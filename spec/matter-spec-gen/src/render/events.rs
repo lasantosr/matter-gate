@@ -202,22 +202,9 @@ pub(super) fn emit_event_enum_tokens(cluster: &ClusterDef, cluster_struct_name: 
                 }
             }
 
-            pub fn from_wire(event_id: EventId, val: AttributeValue) -> Result<Self, EventError> {
-                match event_id {
-                    $(for ev in &cluster.events join ($['\r']) =>
-                        events::$(&ev.name)::EVENT_ID => {
-                            events::$(&ev.name)::try_from_value_with_field(val)
-                                $(if ev.fields.is_empty() => .map(|_| Self::$(&ev.name)))
-                                $(if !ev.fields.is_empty() => .map(Self::$(&ev.name)))
-                                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                                    id: event_id,
-                                    field_id,
-                                    status,
-                                })
-                        }
-                    )
-                    other => Err(EventError::UnsupportedEvent(other)),
-                }
+            #[inline]
+            pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
+                Self::try_from(ev)
             }
 
             $(emit_event_enum_select_described(cluster))
@@ -257,21 +244,37 @@ fn emit_unit_event_tokens(
 
             #[inline]
             #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Null
+            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+                Vec::new()
             }
 
             #[inline]
-            pub(crate) fn try_from_value_with_field(
-                val: AttributeValue,
-            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                Self::try_from_value(val).map_err(|status| (None, status))
+            #[must_use]
+            pub fn into_value(self) -> AttributeValue {
+                AttributeValue::Struct(self.into_fields())
             }
 
+            #[inline]
+            pub(crate) fn decode_fields(
+                fields: Vec<(FieldId, AttributeValue)>,
+            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+                if let Some((fid, _)) = fields.first() {
+                    Err((Some(*fid), MatterStatus::ConstraintError))
+                } else {
+                    Ok(Self)
+                }
+            }
+
+            #[inline]
+            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
+            }
+
+            #[inline]
             pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
                 match val {
                     AttributeValue::Null => Ok(Self),
-                    AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                    AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                     _ => Err(MatterStatus::InvalidDataType),
                 }
             }
@@ -344,18 +347,19 @@ fn emit_struct_event_tokens(
             $methods_tokens
 
             #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.encode_fields_inner())
+            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+                $encode_vec_body
             }
 
-            pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
-                $encode_vec_body
+            #[must_use]
+            pub fn into_value(self) -> AttributeValue {
+                AttributeValue::Struct(self.into_fields())
             }
 
             $(if short_field_count >= 5 =>
                 #[expect(clippy::many_single_char_names, reason = $(quoted(many_single_char_reason)))]
             )
-            pub(crate) fn decode_fields_inner(
+            pub(crate) fn decode_fields(
                 fields: Vec<(FieldId, AttributeValue)>,
             ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
                 $(for field in partition.all join ($['\r']) =>
@@ -367,18 +371,17 @@ fn emit_struct_event_tokens(
                 })
             }
 
-            pub(crate) fn try_from_value_with_field(
-                val: AttributeValue,
-            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                let AttributeValue::Struct(fields) = val else {
-                    return Err((None, MatterStatus::InvalidDataType));
-                };
-                Self::decode_fields_inner(fields)
+            #[inline]
+            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
             }
 
             #[inline]
             pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+                let AttributeValue::Struct(fields) = val else {
+                    return Err(MatterStatus::InvalidDataType);
+                };
+                Self::try_from_fields(fields)
             }
         }
 
@@ -412,25 +415,25 @@ fn emit_event_enum_select_described(cluster: &ClusterDef) -> Tokens {
 
 fn emit_event_enum_wire_impls(cluster: &ClusterDef, has_multiple: bool) -> Tokens {
     quote! {
-        impl From<Event> for WireEvent {
+        impl From<Event> for model::Event {
             fn from(ev: Event) -> Self {
                 match ev {
                     $(for ev in &cluster.events join ($['\r']) =>
                         $(if ev.fields.is_empty() =>
-                            Event::$(&ev.name) => WireEvent::from(events::$(&ev.name)),
+                            Event::$(&ev.name) => model::Event::from(events::$(&ev.name)),
                         )
                         $(if !ev.fields.is_empty() =>
-                            Event::$(&ev.name)(inner) => WireEvent::from(inner),
+                            Event::$(&ev.name)(inner) => model::Event::from(inner),
                         )
                     )
                 }
             }
         }
 
-        impl TryFrom<WireEvent> for Event {
+        impl TryFrom<model::Event> for Event {
             type Error = EventError;
 
-            fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+            fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
                 if ev.cluster_id != Self::CLUSTER_ID {
                     return Err(EventError::ClusterIdMismatch {
                         expected: Self::CLUSTER_ID,
@@ -446,7 +449,7 @@ fn emit_event_enum_wire_impls(cluster: &ClusterDef, has_multiple: bool) -> Token
                                     actual: ev.priority,
                                 });
                             }
-                            events::$(&ev.name)::try_from_value_with_field(ev.payload)
+                            events::$(&ev.name)::decode_fields(ev.payload)
                                 $(if ev.fields.is_empty() => .map(|_| Self::$(&ev.name)))
                                 $(if !ev.fields.is_empty() => .map(Self::$(&ev.name)))
                                 .map_err(|(field_id, status)| EventError::InvalidPayload {

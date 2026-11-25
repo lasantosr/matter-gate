@@ -1,8 +1,16 @@
 //! Matter Event entity per CSA Matter Specification Section 7.10.
 
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::fmt::{Display, Formatter, Result as FmtResult};
 
-use crate::{cluster::ClusterId, optional::Optional, status::MatterStatus, value::AttributeValue};
+use crate::{
+    cluster::ClusterId,
+    optional::Optional,
+    status::MatterStatus,
+    value::{AttributeValue, FieldId},
+};
 
 define_matter_id! {
     /// Strongly-typed Matter Event identifier (`u32`).
@@ -135,7 +143,10 @@ impl Display for EventTimestamp {
     }
 }
 
-/// Wire representation of a Matter Event record per Section 7.10.
+/// Wire representation of a cluster-scoped Matter Event record per Section 7.10.
+///
+/// Events are standalone records carrying [`Self::cluster_id`] without an endpoint or node
+/// address; source `(NodeId, EndpointId)` routing lives at the Interaction Model layer.
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -160,18 +171,18 @@ pub struct Event {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub timestamp: Optional<EventTimestamp>,
-    /// Wire payload of the event.
-    pub payload: AttributeValue,
+    /// Context-tagged TLV struct fields of the event payload (empty for unit events).
+    pub payload: Vec<(FieldId, AttributeValue)>,
 }
 
 impl Event {
-    /// Construct a new event with omitted event number and timestamp.
+    /// Construct a new event with TLV struct payload fields and omitted event number and timestamp.
     #[must_use]
     pub const fn new(
         cluster_id: ClusterId,
         event_id: EventId,
         priority: EventPriority,
-        payload: AttributeValue,
+        payload: Vec<(FieldId, AttributeValue)>,
     ) -> Self {
         Self {
             cluster_id,
@@ -180,6 +191,19 @@ impl Event {
             event_number: Optional::Omitted,
             timestamp: Optional::Omitted,
             payload,
+        }
+    }
+
+    /// Construct a unit event with an empty payload field list and omitted event number and timestamp.
+    #[must_use]
+    pub const fn unit(cluster_id: ClusterId, event_id: EventId, priority: EventPriority) -> Self {
+        Self {
+            cluster_id,
+            event_id,
+            priority,
+            event_number: Optional::Omitted,
+            timestamp: Optional::Omitted,
+            payload: Vec::new(),
         }
     }
 
@@ -210,6 +234,13 @@ impl Event {
         self.timestamp = timestamp.into();
         self
     }
+
+    /// Set or replace the event payload fields.
+    #[must_use]
+    pub fn with_payload(mut self, payload: impl Into<Vec<(FieldId, AttributeValue)>>) -> Self {
+        self.payload = payload.into();
+        self
+    }
 }
 
 impl Display for Event {
@@ -218,7 +249,7 @@ impl Display for Event {
         if let Optional::Present(num) = self.event_number {
             write!(f, " #{num}")?;
         }
-        write!(f, " ({})", self.payload)
+        write!(f, " ({} fields)", self.payload.len())
     }
 }
 
@@ -243,15 +274,20 @@ mod tests {
 
         const ON_OFF_CLUSTER_ID: ClusterId = ClusterId::new(0x0006);
 
-        let event = Event::new(ON_OFF_CLUSTER_ID, eid, EventPriority::Info, AttributeValue::Bool(true))
-            .with_event_number(ev_num);
+        let fields = alloc::vec![(FieldId::new(0), AttributeValue::Bool(true))];
+        let event = Event::new(ON_OFF_CLUSTER_ID, eid, EventPriority::Info, fields.clone()).with_event_number(ev_num);
 
         assert_eq!(event.cluster_id, ON_OFF_CLUSTER_ID);
         assert_eq!(event.event_id, eid);
         assert_eq!(event.priority, EventPriority::Info);
         assert_eq!(event.event_number, Optional::Present(ev_num));
         assert_eq!(event.timestamp, Optional::Omitted);
-        assert_eq!(event.payload, AttributeValue::Bool(true));
+        assert_eq!(event.payload, fields);
+
+        let unit_event = Event::unit(ON_OFF_CLUSTER_ID, eid, EventPriority::Debug);
+        assert_eq!(unit_event.payload, []);
+        let with_payload = unit_event.with_payload(fields.clone());
+        assert_eq!(with_payload.payload, fields);
 
         let ts_event = event.clone().with_timestamp(EventTimestamp::EpochMs(1_000_000));
         assert_eq!(
@@ -271,7 +307,7 @@ mod tests {
         let prio_val = AttributeValue::from(EventPriority::Critical);
         assert_eq!(EventPriority::try_from(&prio_val), Ok(EventPriority::Critical));
         assert_eq!(EventPriority::try_from(prio_val), Ok(EventPriority::Critical));
-        assert_eq!(alloc::format!("{event}"), "0x0006/0x02 [Info] #100 (true)");
+        assert_eq!(alloc::format!("{event}"), "0x0006/0x02 [Info] #100 (1 fields)");
         assert_eq!("0x02".parse::<EventId>(), Ok(eid));
         assert_eq!("100".parse::<EventNumber>(), Ok(ev_num));
         assert!(eid.is_valid());

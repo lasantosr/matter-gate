@@ -7,7 +7,7 @@ use crate::{
     error::{AttributeError, ClusterError, CommandError, EndpointError, EventError},
     model::{
         Attribute, AttributeId, AttributeValue, Cluster, ClusterId, Command, CommandId, DeviceTypeEntry, DeviceTypeId,
-        Endpoint, EndpointId, Event, EventId, EventPriority, MatterStatus,
+        Endpoint, EndpointId, Event, EventId, EventPriority, FieldId, MatterStatus, Optional,
     },
     traits::{AttributeSpec, ClusterSpec, CommandSpec, DeviceTypeSpec, EventSpec, PartialCluster},
 };
@@ -19,11 +19,10 @@ struct MockZstCommand;
 
 impl From<MockZstCommand> for Command {
     fn from(_: MockZstCommand) -> Self {
-        Self::new(
+        Self::unit(
             MockZstCommand::CLUSTER_ID,
             MockZstCommand::COMMAND_ID,
             MockZstCommand::DIRECTION,
-            AttributeValue::Null,
         )
     }
 }
@@ -112,7 +111,7 @@ impl From<MockArgCommand> for Command {
             MockArgCommand::CLUSTER_ID,
             MockArgCommand::COMMAND_ID,
             MockArgCommand::DIRECTION,
-            AttributeValue::U8(cmd.level),
+            alloc::vec![(FieldId::new(0), AttributeValue::U8(cmd.level))],
         )
     }
 }
@@ -133,8 +132,8 @@ impl TryFrom<Command> for MockArgCommand {
                 actual: cmd.command_id,
             });
         }
-        match cmd.payload {
-            AttributeValue::U8(level) => Ok(Self { level }),
+        match cmd.payload.as_slice() {
+            [(fid, AttributeValue::U8(level))] if *fid == FieldId::new(0) => Ok(Self { level: *level }),
             _ => Err(CommandError::InvalidPayload {
                 id: cmd.command_id,
                 field_id: None,
@@ -515,7 +514,7 @@ impl From<MockEvent> for Event {
             MockEvent::CLUSTER_ID,
             MockEvent::EVENT_ID,
             MockEvent::PRIORITY,
-            AttributeValue::U8(e.new_position),
+            alloc::vec![(FieldId::new(0), AttributeValue::U8(e.new_position))],
         )
     }
 }
@@ -536,8 +535,10 @@ impl TryFrom<Event> for MockEvent {
                 actual: e.event_id,
             });
         }
-        match e.payload {
-            AttributeValue::U8(new_position) => Ok(Self { new_position }),
+        match e.payload.as_slice() {
+            [(fid, AttributeValue::U8(new_position))] if *fid == FieldId::new(0) => Ok(Self {
+                new_position: *new_position,
+            }),
             _ => Err(EventError::InvalidPayload {
                 id: e.event_id,
                 field_id: None,
@@ -604,14 +605,18 @@ impl TryFrom<Endpoint> for MockDevice {
     type Error = EndpointError;
 
     fn try_from(ep: Endpoint) -> Result<Self, Self::Error> {
-        if !ep.has_device_type(Self::DEVICE_TYPE_ID) {
+        if !ep.has_device_type(Self::DEVICE_TYPE_ID).unwrap_or(false) {
             return Err(EndpointError::DeviceTypeMismatch {
                 expected: Self::DEVICE_TYPE_ID,
-                actual: ep.primary_device_type().map(|dt| dt.id).unwrap_or(DeviceTypeId::new(0)),
+                actual: ep
+                    .primary_device_type()
+                    .ok()
+                    .and_then(Optional::into_option)
+                    .map_or(DeviceTypeId::new(0), |dt| dt.id),
             });
         }
         let cluster = ep
-            .server_cluster(MockCluster::CLUSTER_ID)
+            .cluster(MockCluster::CLUSTER_ID)
             .cloned()
             .ok_or(EndpointError::MissingMandatoryServerCluster(MockCluster::CLUSTER_ID))?;
         let on_off = MockCluster::try_from(cluster).map_err(|source| EndpointError::InvalidCluster {
@@ -630,12 +635,8 @@ impl DeviceTypeSpec for MockDevice {
     const REVISION: u16 = 4;
 
     fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Endpoint::new(
-            id,
-            alloc::vec![DeviceTypeEntry::new(MockDevice::DEVICE_TYPE_ID, MockDevice::REVISION)],
-            alloc::vec![Cluster::from(self.on_off)],
-            Vec::new(),
-        )
+        Endpoint::new(id, alloc::vec![Cluster::from(self.on_off)])
+            .with_device_type_list([DeviceTypeEntry::new(MockDevice::DEVICE_TYPE_ID, MockDevice::REVISION)])
     }
 
     fn view(_endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {

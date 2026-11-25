@@ -20,10 +20,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -108,7 +107,7 @@ impl crate::traits::PartialCluster for ScenesManagementClusterPatch {
     type Full = ScenesManagementCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -253,7 +252,7 @@ impl ScenesManagementCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::LastConfiguredBy(decoded) => {
                     last_configured_by
                         .is_none()
@@ -421,7 +420,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -441,22 +440,22 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::LastConfiguredBy(inner) => WireAttribute::from(inner),
-            Attribute::SceneTableSize(inner) => WireAttribute::from(inner),
-            Attribute::FabricSceneInfo(inner) => WireAttribute::from(inner),
+            Attribute::LastConfiguredBy(inner) => model::Attribute::from(inner),
+            Attribute::SceneTableSize(inner) => model::Attribute::from(inner),
+            Attribute::FabricSceneInfo(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -662,30 +661,30 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::AddScene(inner) => WireCommand::from(inner),
-            Command::ViewScene(inner) => WireCommand::from(inner),
-            Command::RemoveScene(inner) => WireCommand::from(inner),
-            Command::RemoveAllScenes(inner) => WireCommand::from(inner),
-            Command::StoreScene(inner) => WireCommand::from(inner),
-            Command::RecallScene(inner) => WireCommand::from(inner),
-            Command::GetSceneMembership(inner) => WireCommand::from(inner),
-            Command::CopyScene(inner) => WireCommand::from(inner),
+            Command::AddScene(inner) => model::Command::from(inner),
+            Command::ViewScene(inner) => model::Command::from(inner),
+            Command::RemoveScene(inner) => model::Command::from(inner),
+            Command::RemoveAllScenes(inner) => model::Command::from(inner),
+            Command::StoreScene(inner) => model::Command::from(inner),
+            Command::RecallScene(inner) => model::Command::from(inner),
+            Command::GetSceneMembership(inner) => model::Command::from(inner),
+            Command::CopyScene(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -699,58 +698,56 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::AddScene::COMMAND_ID => commands::AddScene::try_from_value_with_field(cmd.payload)
+            commands::AddScene::COMMAND_ID => commands::AddScene::decode_fields(cmd.payload)
                 .map(Self::AddScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::ViewScene::COMMAND_ID => commands::ViewScene::try_from_value_with_field(cmd.payload)
+            commands::ViewScene::COMMAND_ID => commands::ViewScene::decode_fields(cmd.payload)
                 .map(Self::ViewScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::RemoveScene::COMMAND_ID => commands::RemoveScene::try_from_value_with_field(cmd.payload)
+            commands::RemoveScene::COMMAND_ID => commands::RemoveScene::decode_fields(cmd.payload)
                 .map(Self::RemoveScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::RemoveAllScenes::COMMAND_ID => commands::RemoveAllScenes::try_from_value_with_field(cmd.payload)
+            commands::RemoveAllScenes::COMMAND_ID => commands::RemoveAllScenes::decode_fields(cmd.payload)
                 .map(Self::RemoveAllScenes)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::StoreScene::COMMAND_ID => commands::StoreScene::try_from_value_with_field(cmd.payload)
+            commands::StoreScene::COMMAND_ID => commands::StoreScene::decode_fields(cmd.payload)
                 .map(Self::StoreScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::RecallScene::COMMAND_ID => commands::RecallScene::try_from_value_with_field(cmd.payload)
+            commands::RecallScene::COMMAND_ID => commands::RecallScene::decode_fields(cmd.payload)
                 .map(Self::RecallScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::GetSceneMembership::COMMAND_ID => {
-                commands::GetSceneMembership::try_from_value_with_field(cmd.payload)
-                    .map(Self::GetSceneMembership)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::CopyScene::COMMAND_ID => commands::CopyScene::try_from_value_with_field(cmd.payload)
+            commands::GetSceneMembership::COMMAND_ID => commands::GetSceneMembership::decode_fields(cmd.payload)
+                .map(Self::GetSceneMembership)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::CopyScene::COMMAND_ID => commands::CopyScene::decode_fields(cmd.payload)
                 .map(Self::CopyScene)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -1007,29 +1004,29 @@ impl CommandResponse {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<CommandResponse> for WireCommand {
+impl From<CommandResponse> for model::Command {
     fn from(cmd: CommandResponse) -> Self {
         match cmd {
-            CommandResponse::AddSceneResponse(inner) => WireCommand::from(inner),
-            CommandResponse::ViewSceneResponse(inner) => WireCommand::from(inner),
-            CommandResponse::RemoveSceneResponse(inner) => WireCommand::from(inner),
-            CommandResponse::RemoveAllScenesResponse(inner) => WireCommand::from(inner),
-            CommandResponse::StoreSceneResponse(inner) => WireCommand::from(inner),
-            CommandResponse::GetSceneMembershipResponse(inner) => WireCommand::from(inner),
-            CommandResponse::CopySceneResponse(inner) => WireCommand::from(inner),
+            CommandResponse::AddSceneResponse(inner) => model::Command::from(inner),
+            CommandResponse::ViewSceneResponse(inner) => model::Command::from(inner),
+            CommandResponse::RemoveSceneResponse(inner) => model::Command::from(inner),
+            CommandResponse::RemoveAllScenesResponse(inner) => model::Command::from(inner),
+            CommandResponse::StoreSceneResponse(inner) => model::Command::from(inner),
+            CommandResponse::GetSceneMembershipResponse(inner) => model::Command::from(inner),
+            CommandResponse::CopySceneResponse(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for CommandResponse {
+impl TryFrom<model::Command> for CommandResponse {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -1043,35 +1040,29 @@ impl TryFrom<WireCommand> for CommandResponse {
             });
         }
         match cmd.command_id {
-            commands::AddSceneResponse::COMMAND_ID => {
-                commands::AddSceneResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::AddSceneResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::ViewSceneResponse::COMMAND_ID => {
-                commands::ViewSceneResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::ViewSceneResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::RemoveSceneResponse::COMMAND_ID => {
-                commands::RemoveSceneResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::RemoveSceneResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::AddSceneResponse::COMMAND_ID => commands::AddSceneResponse::decode_fields(cmd.payload)
+                .map(Self::AddSceneResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::ViewSceneResponse::COMMAND_ID => commands::ViewSceneResponse::decode_fields(cmd.payload)
+                .map(Self::ViewSceneResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::RemoveSceneResponse::COMMAND_ID => commands::RemoveSceneResponse::decode_fields(cmd.payload)
+                .map(Self::RemoveSceneResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             commands::RemoveAllScenesResponse::COMMAND_ID => {
-                commands::RemoveAllScenesResponse::try_from_value_with_field(cmd.payload)
+                commands::RemoveAllScenesResponse::decode_fields(cmd.payload)
                     .map(Self::RemoveAllScenesResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -1079,17 +1070,15 @@ impl TryFrom<WireCommand> for CommandResponse {
                         status,
                     })
             }
-            commands::StoreSceneResponse::COMMAND_ID => {
-                commands::StoreSceneResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::StoreSceneResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::StoreSceneResponse::COMMAND_ID => commands::StoreSceneResponse::decode_fields(cmd.payload)
+                .map(Self::StoreSceneResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             commands::GetSceneMembershipResponse::COMMAND_ID => {
-                commands::GetSceneMembershipResponse::try_from_value_with_field(cmd.payload)
+                commands::GetSceneMembershipResponse::decode_fields(cmd.payload)
                     .map(Self::GetSceneMembershipResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -1097,15 +1086,13 @@ impl TryFrom<WireCommand> for CommandResponse {
                         status,
                     })
             }
-            commands::CopySceneResponse::COMMAND_ID => {
-                commands::CopySceneResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::CopySceneResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::CopySceneResponse::COMMAND_ID => commands::CopySceneResponse::decode_fields(cmd.payload)
+                .map(Self::CopySceneResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             _ => Err(CommandError::UnsupportedCommand(cmd.command_id)),
         }
     }
@@ -1890,11 +1877,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
                 (Self::FIELD_SCENE_ID, AttributeValue::from(self.scene_id)),
@@ -1912,7 +1895,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -1990,16 +1978,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2047,18 +2036,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
                 (Self::FIELD_SCENE_ID, AttributeValue::from(self.scene_id)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2096,16 +2086,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2153,18 +2144,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
                 (Self::FIELD_SCENE_ID, AttributeValue::from(self.scene_id)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2202,16 +2194,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2256,15 +2249,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2288,16 +2282,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2353,18 +2348,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
                 (Self::FIELD_SCENE_ID, AttributeValue::from(self.scene_id)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2402,16 +2398,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2478,11 +2475,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(3);
             fields.push((Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)));
             fields.push((Self::FIELD_SCENE_ID, AttributeValue::from(self.scene_id)));
@@ -2499,7 +2492,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2550,16 +2548,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2605,15 +2604,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut group_id = None;
@@ -2637,16 +2637,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2717,11 +2718,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_MODE, AttributeValue::from(self.mode)),
                 (
@@ -2743,7 +2740,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut mode = None;
@@ -2824,16 +2826,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -2884,11 +2887,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STATUS, AttributeValue::from(self.status)),
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
@@ -2896,7 +2895,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -2947,16 +2951,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3043,11 +3048,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(6);
             fields.push((Self::FIELD_STATUS, AttributeValue::from(self.status)));
             fields.push((Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)));
@@ -3067,7 +3068,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3157,16 +3163,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3217,11 +3224,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STATUS, AttributeValue::from(self.status)),
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
@@ -3229,7 +3232,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3280,16 +3288,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3337,18 +3346,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STATUS, AttributeValue::from(self.status)),
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3386,16 +3396,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3446,11 +3457,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STATUS, AttributeValue::from(self.status)),
                 (Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),
@@ -3458,7 +3465,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3509,16 +3521,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3580,11 +3593,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(4);
             fields.push((Self::FIELD_STATUS, AttributeValue::from(self.status)));
             match self.capacity {
@@ -3605,7 +3614,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3669,16 +3683,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -3733,11 +3748,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STATUS, AttributeValue::from(self.status)),
                 (
@@ -3751,7 +3762,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status = None;
@@ -3804,16 +3820,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

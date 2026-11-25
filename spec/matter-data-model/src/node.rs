@@ -206,7 +206,7 @@ impl Node {
             .map(|idx| self.endpoints.remove(idx))
     }
 
-    /// Convenience lookup for an attribute value across `endpoint -> server_cluster -> attribute`.
+    /// Convenience lookup for an attribute value across `endpoint -> cluster -> attribute`.
     #[must_use]
     pub fn attribute(
         &self,
@@ -214,12 +214,10 @@ impl Node {
         cluster_id: ClusterId,
         attribute_id: AttributeId,
     ) -> Option<&AttributeValue> {
-        self.endpoint(endpoint_id)?
-            .server_cluster(cluster_id)?
-            .attribute(attribute_id)
+        self.endpoint(endpoint_id)?.cluster(cluster_id)?.attribute(attribute_id)
     }
 
-    /// Convenience mutable lookup for an attribute value across `endpoint -> server_cluster -> attribute`.
+    /// Convenience mutable lookup for an attribute value across `endpoint -> cluster -> attribute`.
     #[must_use]
     pub fn attribute_mut(
         &mut self,
@@ -228,7 +226,7 @@ impl Node {
         attribute_id: AttributeId,
     ) -> Option<&mut AttributeValue> {
         self.endpoint_mut(endpoint_id)?
-            .server_cluster_mut(cluster_id)?
+            .cluster_mut(cluster_id)?
             .attribute_mut(attribute_id)
     }
 }
@@ -288,13 +286,11 @@ mod tests {
                 ROOT_NODE_DEVICE_TYPE,
                 1,
                 alloc::vec![],
-                alloc::vec![],
             ))
             .with_endpoint(Endpoint::single_device(
                 EndpointId::new(1),
                 ON_OFF_LIGHT_DEVICE_TYPE,
                 1,
-                alloc::vec![],
                 alloc::vec![],
             ));
 
@@ -319,30 +315,10 @@ mod tests {
     #[test]
     fn remove_endpoint_preserves_order() {
         let mut node = Node::new(NodeId::new(1), alloc::vec![])
-            .with_endpoint(Endpoint::new(
-                EndpointId::ROOT,
-                alloc::vec![],
-                alloc::vec![],
-                alloc::vec![],
-            ))
-            .with_endpoint(Endpoint::new(
-                EndpointId::new(1),
-                alloc::vec![],
-                alloc::vec![],
-                alloc::vec![],
-            ))
-            .with_endpoint(Endpoint::new(
-                EndpointId::new(2),
-                alloc::vec![],
-                alloc::vec![],
-                alloc::vec![],
-            ))
-            .with_endpoint(Endpoint::new(
-                EndpointId::new(3),
-                alloc::vec![],
-                alloc::vec![],
-                alloc::vec![],
-            ));
+            .with_endpoint(Endpoint::empty(EndpointId::ROOT))
+            .with_endpoint(Endpoint::empty(EndpointId::new(1)))
+            .with_endpoint(Endpoint::empty(EndpointId::new(2)))
+            .with_endpoint(Endpoint::empty(EndpointId::new(3)));
 
         assert!(node.remove_endpoint(EndpointId::new(1)).is_some());
         let ids: Vec<u16> = node.endpoints.iter().map(|ep| ep.id.raw()).collect();
@@ -352,7 +328,7 @@ mod tests {
         assert!(!empty.has_endpoint(EndpointId::ROOT));
         empty.set_endpoint(
             Endpoint::empty(EndpointId::ROOT)
-                .with_server_cluster(Cluster::empty(ClusterId::DESCRIPTOR).with_attribute(AttributeId::new(0), 1_u8)),
+                .with_cluster(Cluster::empty(ClusterId::DESCRIPTOR).with_attribute(AttributeId::new(0), 1_u8)),
         );
         assert!(empty.has_endpoint(EndpointId::ROOT));
         if let Some(v) = empty.attribute_mut(EndpointId::ROOT, ClusterId::DESCRIPTOR, AttributeId::new(0)) {

@@ -24,10 +24,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -925,7 +924,7 @@ impl crate::traits::PartialCluster for ThermostatClusterPatch {
     type Full = ThermostatCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -2629,7 +2628,7 @@ impl ThermostatCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::LocalTemperature(decoded) => {
                     local_temperature
                         .is_none()
@@ -4799,7 +4798,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -5036,83 +5035,83 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::LocalTemperature(inner) => WireAttribute::from(inner),
-            Attribute::OutdoorTemperature(inner) => WireAttribute::from(inner),
-            Attribute::Occupancy(inner) => WireAttribute::from(inner),
-            Attribute::AbsMinHeatSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::AbsMaxHeatSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::AbsMinCoolSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::AbsMaxCoolSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::PiCoolingDemand(inner) => WireAttribute::from(inner),
-            Attribute::PiHeatingDemand(inner) => WireAttribute::from(inner),
-            Attribute::HvacSystemTypeConfiguration(inner) => WireAttribute::from(inner),
-            Attribute::LocalTemperatureCalibration(inner) => WireAttribute::from(inner),
-            Attribute::OccupiedCoolingSetpoint(inner) => WireAttribute::from(inner),
-            Attribute::OccupiedHeatingSetpoint(inner) => WireAttribute::from(inner),
-            Attribute::UnoccupiedCoolingSetpoint(inner) => WireAttribute::from(inner),
-            Attribute::UnoccupiedHeatingSetpoint(inner) => WireAttribute::from(inner),
-            Attribute::MinHeatSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::MaxHeatSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::MinCoolSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::MaxCoolSetpointLimit(inner) => WireAttribute::from(inner),
-            Attribute::MinSetpointDeadBand(inner) => WireAttribute::from(inner),
-            Attribute::RemoteSensing(inner) => WireAttribute::from(inner),
-            Attribute::ControlSequenceOfOperation(inner) => WireAttribute::from(inner),
-            Attribute::SystemMode(inner) => WireAttribute::from(inner),
-            Attribute::ThermostatRunningMode(inner) => WireAttribute::from(inner),
-            Attribute::StartOfWeek(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfWeeklyTransitions(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfDailyTransitions(inner) => WireAttribute::from(inner),
-            Attribute::TemperatureSetpointHold(inner) => WireAttribute::from(inner),
-            Attribute::TemperatureSetpointHoldDuration(inner) => WireAttribute::from(inner),
-            Attribute::ThermostatProgrammingOperationMode(inner) => WireAttribute::from(inner),
-            Attribute::ThermostatRunningState(inner) => WireAttribute::from(inner),
-            Attribute::SetpointChangeSource(inner) => WireAttribute::from(inner),
-            Attribute::SetpointChangeAmount(inner) => WireAttribute::from(inner),
-            Attribute::SetpointChangeSourceTimestamp(inner) => WireAttribute::from(inner),
-            Attribute::OccupiedSetback(inner) => WireAttribute::from(inner),
-            Attribute::OccupiedSetbackMin(inner) => WireAttribute::from(inner),
-            Attribute::OccupiedSetbackMax(inner) => WireAttribute::from(inner),
-            Attribute::UnoccupiedSetback(inner) => WireAttribute::from(inner),
-            Attribute::UnoccupiedSetbackMin(inner) => WireAttribute::from(inner),
-            Attribute::UnoccupiedSetbackMax(inner) => WireAttribute::from(inner),
-            Attribute::EmergencyHeatDelta(inner) => WireAttribute::from(inner),
-            Attribute::AcType(inner) => WireAttribute::from(inner),
-            Attribute::AcCapacity(inner) => WireAttribute::from(inner),
-            Attribute::AcRefrigerantType(inner) => WireAttribute::from(inner),
-            Attribute::AcCompressorType(inner) => WireAttribute::from(inner),
-            Attribute::AcErrorCode(inner) => WireAttribute::from(inner),
-            Attribute::AcLouverPosition(inner) => WireAttribute::from(inner),
-            Attribute::AcCoilTemperature(inner) => WireAttribute::from(inner),
-            Attribute::AcCapacityformat(inner) => WireAttribute::from(inner),
-            Attribute::PresetTypes(inner) => WireAttribute::from(inner),
-            Attribute::ScheduleTypes(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfPresets(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfSchedules(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfScheduleTransitions(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfScheduleTransitionPerDay(inner) => WireAttribute::from(inner),
-            Attribute::ActivePresetHandle(inner) => WireAttribute::from(inner),
-            Attribute::ActiveScheduleHandle(inner) => WireAttribute::from(inner),
-            Attribute::Presets(inner) => WireAttribute::from(inner),
-            Attribute::Schedules(inner) => WireAttribute::from(inner),
-            Attribute::SetpointHoldExpiryTimestamp(inner) => WireAttribute::from(inner),
-            Attribute::MaxThermostatSuggestions(inner) => WireAttribute::from(inner),
-            Attribute::ThermostatSuggestions(inner) => WireAttribute::from(inner),
-            Attribute::CurrentThermostatSuggestion(inner) => WireAttribute::from(inner),
-            Attribute::ThermostatSuggestionNotFollowingReason(inner) => WireAttribute::from(inner),
+            Attribute::LocalTemperature(inner) => model::Attribute::from(inner),
+            Attribute::OutdoorTemperature(inner) => model::Attribute::from(inner),
+            Attribute::Occupancy(inner) => model::Attribute::from(inner),
+            Attribute::AbsMinHeatSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::AbsMaxHeatSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::AbsMinCoolSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::AbsMaxCoolSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::PiCoolingDemand(inner) => model::Attribute::from(inner),
+            Attribute::PiHeatingDemand(inner) => model::Attribute::from(inner),
+            Attribute::HvacSystemTypeConfiguration(inner) => model::Attribute::from(inner),
+            Attribute::LocalTemperatureCalibration(inner) => model::Attribute::from(inner),
+            Attribute::OccupiedCoolingSetpoint(inner) => model::Attribute::from(inner),
+            Attribute::OccupiedHeatingSetpoint(inner) => model::Attribute::from(inner),
+            Attribute::UnoccupiedCoolingSetpoint(inner) => model::Attribute::from(inner),
+            Attribute::UnoccupiedHeatingSetpoint(inner) => model::Attribute::from(inner),
+            Attribute::MinHeatSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::MaxHeatSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::MinCoolSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::MaxCoolSetpointLimit(inner) => model::Attribute::from(inner),
+            Attribute::MinSetpointDeadBand(inner) => model::Attribute::from(inner),
+            Attribute::RemoteSensing(inner) => model::Attribute::from(inner),
+            Attribute::ControlSequenceOfOperation(inner) => model::Attribute::from(inner),
+            Attribute::SystemMode(inner) => model::Attribute::from(inner),
+            Attribute::ThermostatRunningMode(inner) => model::Attribute::from(inner),
+            Attribute::StartOfWeek(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfWeeklyTransitions(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfDailyTransitions(inner) => model::Attribute::from(inner),
+            Attribute::TemperatureSetpointHold(inner) => model::Attribute::from(inner),
+            Attribute::TemperatureSetpointHoldDuration(inner) => model::Attribute::from(inner),
+            Attribute::ThermostatProgrammingOperationMode(inner) => model::Attribute::from(inner),
+            Attribute::ThermostatRunningState(inner) => model::Attribute::from(inner),
+            Attribute::SetpointChangeSource(inner) => model::Attribute::from(inner),
+            Attribute::SetpointChangeAmount(inner) => model::Attribute::from(inner),
+            Attribute::SetpointChangeSourceTimestamp(inner) => model::Attribute::from(inner),
+            Attribute::OccupiedSetback(inner) => model::Attribute::from(inner),
+            Attribute::OccupiedSetbackMin(inner) => model::Attribute::from(inner),
+            Attribute::OccupiedSetbackMax(inner) => model::Attribute::from(inner),
+            Attribute::UnoccupiedSetback(inner) => model::Attribute::from(inner),
+            Attribute::UnoccupiedSetbackMin(inner) => model::Attribute::from(inner),
+            Attribute::UnoccupiedSetbackMax(inner) => model::Attribute::from(inner),
+            Attribute::EmergencyHeatDelta(inner) => model::Attribute::from(inner),
+            Attribute::AcType(inner) => model::Attribute::from(inner),
+            Attribute::AcCapacity(inner) => model::Attribute::from(inner),
+            Attribute::AcRefrigerantType(inner) => model::Attribute::from(inner),
+            Attribute::AcCompressorType(inner) => model::Attribute::from(inner),
+            Attribute::AcErrorCode(inner) => model::Attribute::from(inner),
+            Attribute::AcLouverPosition(inner) => model::Attribute::from(inner),
+            Attribute::AcCoilTemperature(inner) => model::Attribute::from(inner),
+            Attribute::AcCapacityformat(inner) => model::Attribute::from(inner),
+            Attribute::PresetTypes(inner) => model::Attribute::from(inner),
+            Attribute::ScheduleTypes(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfPresets(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfSchedules(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfScheduleTransitions(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfScheduleTransitionPerDay(inner) => model::Attribute::from(inner),
+            Attribute::ActivePresetHandle(inner) => model::Attribute::from(inner),
+            Attribute::ActiveScheduleHandle(inner) => model::Attribute::from(inner),
+            Attribute::Presets(inner) => model::Attribute::from(inner),
+            Attribute::Schedules(inner) => model::Attribute::from(inner),
+            Attribute::SetpointHoldExpiryTimestamp(inner) => model::Attribute::from(inner),
+            Attribute::MaxThermostatSuggestions(inner) => model::Attribute::from(inner),
+            Attribute::ThermostatSuggestions(inner) => model::Attribute::from(inner),
+            Attribute::CurrentThermostatSuggestion(inner) => model::Attribute::from(inner),
+            Attribute::ThermostatSuggestionNotFollowingReason(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -5722,31 +5721,31 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::SetpointRaiseLower(inner) => WireCommand::from(inner),
-            Command::SetWeeklySchedule(inner) => WireCommand::from(inner),
-            Command::GetWeeklySchedule(inner) => WireCommand::from(inner),
-            Command::ClearWeeklySchedule => WireCommand::from(commands::ClearWeeklySchedule),
-            Command::SetActiveScheduleRequest(inner) => WireCommand::from(inner),
-            Command::SetActivePresetRequest(inner) => WireCommand::from(inner),
-            Command::AddThermostatSuggestion(inner) => WireCommand::from(inner),
-            Command::RemoveThermostatSuggestion(inner) => WireCommand::from(inner),
-            Command::AtomicRequest(inner) => WireCommand::from(inner),
+            Command::SetpointRaiseLower(inner) => model::Command::from(inner),
+            Command::SetWeeklySchedule(inner) => model::Command::from(inner),
+            Command::GetWeeklySchedule(inner) => model::Command::from(inner),
+            Command::ClearWeeklySchedule => model::Command::from(commands::ClearWeeklySchedule),
+            Command::SetActiveScheduleRequest(inner) => model::Command::from(inner),
+            Command::SetActivePresetRequest(inner) => model::Command::from(inner),
+            Command::AddThermostatSuggestion(inner) => model::Command::from(inner),
+            Command::RemoveThermostatSuggestion(inner) => model::Command::from(inner),
+            Command::AtomicRequest(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -5760,44 +5759,36 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::SetpointRaiseLower::COMMAND_ID => {
-                commands::SetpointRaiseLower::try_from_value_with_field(cmd.payload)
-                    .map(Self::SetpointRaiseLower)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::SetWeeklySchedule::COMMAND_ID => {
-                commands::SetWeeklySchedule::try_from_value_with_field(cmd.payload)
-                    .map(Self::SetWeeklySchedule)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::GetWeeklySchedule::COMMAND_ID => {
-                commands::GetWeeklySchedule::try_from_value_with_field(cmd.payload)
-                    .map(Self::GetWeeklySchedule)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::ClearWeeklySchedule::COMMAND_ID => {
-                commands::ClearWeeklySchedule::try_from_value_with_field(cmd.payload)
-                    .map(|_| Self::ClearWeeklySchedule)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::SetpointRaiseLower::COMMAND_ID => commands::SetpointRaiseLower::decode_fields(cmd.payload)
+                .map(Self::SetpointRaiseLower)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::SetWeeklySchedule::COMMAND_ID => commands::SetWeeklySchedule::decode_fields(cmd.payload)
+                .map(Self::SetWeeklySchedule)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::GetWeeklySchedule::COMMAND_ID => commands::GetWeeklySchedule::decode_fields(cmd.payload)
+                .map(Self::GetWeeklySchedule)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::ClearWeeklySchedule::COMMAND_ID => commands::ClearWeeklySchedule::decode_fields(cmd.payload)
+                .map(|_| Self::ClearWeeklySchedule)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             commands::SetActiveScheduleRequest::COMMAND_ID => {
-                commands::SetActiveScheduleRequest::try_from_value_with_field(cmd.payload)
+                commands::SetActiveScheduleRequest::decode_fields(cmd.payload)
                     .map(Self::SetActiveScheduleRequest)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -5806,7 +5797,7 @@ impl TryFrom<WireCommand> for Command {
                     })
             }
             commands::SetActivePresetRequest::COMMAND_ID => {
-                commands::SetActivePresetRequest::try_from_value_with_field(cmd.payload)
+                commands::SetActivePresetRequest::decode_fields(cmd.payload)
                     .map(Self::SetActivePresetRequest)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -5815,7 +5806,7 @@ impl TryFrom<WireCommand> for Command {
                     })
             }
             commands::AddThermostatSuggestion::COMMAND_ID => {
-                commands::AddThermostatSuggestion::try_from_value_with_field(cmd.payload)
+                commands::AddThermostatSuggestion::decode_fields(cmd.payload)
                     .map(Self::AddThermostatSuggestion)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -5824,7 +5815,7 @@ impl TryFrom<WireCommand> for Command {
                     })
             }
             commands::RemoveThermostatSuggestion::COMMAND_ID => {
-                commands::RemoveThermostatSuggestion::try_from_value_with_field(cmd.payload)
+                commands::RemoveThermostatSuggestion::decode_fields(cmd.payload)
                     .map(Self::RemoveThermostatSuggestion)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -5832,7 +5823,7 @@ impl TryFrom<WireCommand> for Command {
                         status,
                     })
             }
-            commands::AtomicRequest::COMMAND_ID => commands::AtomicRequest::try_from_value_with_field(cmd.payload)
+            commands::AtomicRequest::COMMAND_ID => commands::AtomicRequest::decode_fields(cmd.payload)
                 .map(Self::AtomicRequest)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -6065,25 +6056,25 @@ impl CommandResponse {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<CommandResponse> for WireCommand {
+impl From<CommandResponse> for model::Command {
     fn from(cmd: CommandResponse) -> Self {
         match cmd {
-            CommandResponse::AddThermostatSuggestionResponse(inner) => WireCommand::from(inner),
-            CommandResponse::GetWeeklyScheduleResponse(inner) => WireCommand::from(inner),
-            CommandResponse::AtomicResponse(inner) => WireCommand::from(inner),
+            CommandResponse::AddThermostatSuggestionResponse(inner) => model::Command::from(inner),
+            CommandResponse::GetWeeklyScheduleResponse(inner) => model::Command::from(inner),
+            CommandResponse::AtomicResponse(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for CommandResponse {
+impl TryFrom<model::Command> for CommandResponse {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -6098,7 +6089,7 @@ impl TryFrom<WireCommand> for CommandResponse {
         }
         match cmd.command_id {
             commands::AddThermostatSuggestionResponse::COMMAND_ID => {
-                commands::AddThermostatSuggestionResponse::try_from_value_with_field(cmd.payload)
+                commands::AddThermostatSuggestionResponse::decode_fields(cmd.payload)
                     .map(Self::AddThermostatSuggestionResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -6107,7 +6098,7 @@ impl TryFrom<WireCommand> for CommandResponse {
                     })
             }
             commands::GetWeeklyScheduleResponse::COMMAND_ID => {
-                commands::GetWeeklyScheduleResponse::try_from_value_with_field(cmd.payload)
+                commands::GetWeeklyScheduleResponse::decode_fields(cmd.payload)
                     .map(Self::GetWeeklyScheduleResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -6115,7 +6106,7 @@ impl TryFrom<WireCommand> for CommandResponse {
                         status,
                     })
             }
-            commands::AtomicResponse::COMMAND_ID => commands::AtomicResponse::try_from_value_with_field(cmd.payload)
+            commands::AtomicResponse::COMMAND_ID => commands::AtomicResponse::decode_fields(cmd.payload)
                 .map(Self::AtomicResponse)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -6359,88 +6350,31 @@ impl Event {
         }
     }
 
-    pub fn from_wire(event_id: EventId, val: AttributeValue) -> Result<Self, EventError> {
-        match event_id {
-            events::SystemModeChange::EVENT_ID => events::SystemModeChange::try_from_value_with_field(val)
-                .map(Self::SystemModeChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::LocalTemperatureChange::EVENT_ID => events::LocalTemperatureChange::try_from_value_with_field(val)
-                .map(Self::LocalTemperatureChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::OccupancyChange::EVENT_ID => events::OccupancyChange::try_from_value_with_field(val)
-                .map(Self::OccupancyChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::SetpointChange::EVENT_ID => events::SetpointChange::try_from_value_with_field(val)
-                .map(Self::SetpointChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::RunningStateChange::EVENT_ID => events::RunningStateChange::try_from_value_with_field(val)
-                .map(Self::RunningStateChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::RunningModeChange::EVENT_ID => events::RunningModeChange::try_from_value_with_field(val)
-                .map(Self::RunningModeChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::ActiveScheduleChange::EVENT_ID => events::ActiveScheduleChange::try_from_value_with_field(val)
-                .map(Self::ActiveScheduleChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::ActivePresetChange::EVENT_ID => events::ActivePresetChange::try_from_value_with_field(val)
-                .map(Self::ActivePresetChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            other => Err(EventError::UnsupportedEvent(other)),
-        }
+    #[inline]
+    pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
+        Self::try_from(ev)
     }
 }
 
-impl From<Event> for WireEvent {
+impl From<Event> for model::Event {
     fn from(ev: Event) -> Self {
         match ev {
-            Event::SystemModeChange(inner) => WireEvent::from(inner),
-            Event::LocalTemperatureChange(inner) => WireEvent::from(inner),
-            Event::OccupancyChange(inner) => WireEvent::from(inner),
-            Event::SetpointChange(inner) => WireEvent::from(inner),
-            Event::RunningStateChange(inner) => WireEvent::from(inner),
-            Event::RunningModeChange(inner) => WireEvent::from(inner),
-            Event::ActiveScheduleChange(inner) => WireEvent::from(inner),
-            Event::ActivePresetChange(inner) => WireEvent::from(inner),
+            Event::SystemModeChange(inner) => model::Event::from(inner),
+            Event::LocalTemperatureChange(inner) => model::Event::from(inner),
+            Event::OccupancyChange(inner) => model::Event::from(inner),
+            Event::SetpointChange(inner) => model::Event::from(inner),
+            Event::RunningStateChange(inner) => model::Event::from(inner),
+            Event::RunningModeChange(inner) => model::Event::from(inner),
+            Event::ActiveScheduleChange(inner) => model::Event::from(inner),
+            Event::ActivePresetChange(inner) => model::Event::from(inner),
         }
     }
 }
 
-impl TryFrom<WireEvent> for Event {
+impl TryFrom<model::Event> for Event {
     type Error = EventError;
 
-    fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+    fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
         if ev.cluster_id != Self::CLUSTER_ID {
             return Err(EventError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -6455,7 +6389,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SystemModeChange::try_from_value_with_field(ev.payload)
+                events::SystemModeChange::decode_fields(ev.payload)
                     .map(Self::SystemModeChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6470,7 +6404,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::LocalTemperatureChange::try_from_value_with_field(ev.payload)
+                events::LocalTemperatureChange::decode_fields(ev.payload)
                     .map(Self::LocalTemperatureChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6485,7 +6419,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::OccupancyChange::try_from_value_with_field(ev.payload)
+                events::OccupancyChange::decode_fields(ev.payload)
                     .map(Self::OccupancyChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6500,7 +6434,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SetpointChange::try_from_value_with_field(ev.payload)
+                events::SetpointChange::decode_fields(ev.payload)
                     .map(Self::SetpointChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6515,7 +6449,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::RunningStateChange::try_from_value_with_field(ev.payload)
+                events::RunningStateChange::decode_fields(ev.payload)
                     .map(Self::RunningStateChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6530,7 +6464,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::RunningModeChange::try_from_value_with_field(ev.payload)
+                events::RunningModeChange::decode_fields(ev.payload)
                     .map(Self::RunningModeChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6545,7 +6479,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ActiveScheduleChange::try_from_value_with_field(ev.payload)
+                events::ActiveScheduleChange::decode_fields(ev.payload)
                     .map(Self::ActiveScheduleChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -6560,7 +6494,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ActivePresetChange::try_from_value_with_field(ev.payload)
+                events::ActivePresetChange::decode_fields(ev.payload)
                     .map(Self::ActivePresetChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -12239,18 +12173,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_MODE, AttributeValue::from(self.mode)),
                 (Self::FIELD_AMOUNT, AttributeValue::from(self.amount)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut mode = None;
@@ -12288,16 +12223,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12356,11 +12292,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE,
@@ -12381,7 +12313,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut number_of_transitions_for_sequence = None;
@@ -12451,16 +12388,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12511,18 +12449,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_DAYS_TO_RETURN, AttributeValue::from(self.days_to_return)),
                 (Self::FIELD_MODE_TO_RETURN, AttributeValue::from(self.mode_to_return)),
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut days_to_return = None;
@@ -12560,16 +12499,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12614,15 +12554,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_UNIQUE_ID, AttributeValue::from(self.unique_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut unique_id = None;
@@ -12646,16 +12587,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12693,20 +12635,37 @@ pub mod commands {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -12754,15 +12713,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_SCHEDULE_HANDLE, AttributeValue::from(self.schedule_handle)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut schedule_handle = None;
@@ -12789,16 +12749,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12851,11 +12812,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_PRESET_HANDLE,
                 match self.preset_handle {
@@ -12865,7 +12822,12 @@ pub mod commands {
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut preset_handle = None;
@@ -12892,16 +12854,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -12981,11 +12944,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_NUMBER_OF_TRANSITIONS_FOR_SEQUENCE,
@@ -13006,7 +12965,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut number_of_transitions_for_sequence = None;
@@ -13076,16 +13040,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13141,11 +13106,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_PRESET_HANDLE, AttributeValue::from(self.preset_handle)),
                 (
@@ -13162,7 +13123,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut preset_handle = None;
@@ -13221,16 +13187,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13275,15 +13242,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_UNIQUE_ID, AttributeValue::from(self.unique_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut unique_id = None;
@@ -13307,16 +13275,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13385,11 +13354,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(3);
             fields.push((Self::FIELD_STATUS_CODE, AttributeValue::from(self.status_code)));
             fields.push((
@@ -13402,7 +13367,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut status_code = None;
@@ -13456,16 +13426,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13527,11 +13498,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(3);
             fields.push((Self::FIELD_REQUEST_TYPE, AttributeValue::from(self.request_type)));
             fields.push((
@@ -13544,7 +13511,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut request_type = None;
@@ -13595,16 +13567,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13668,11 +13641,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(v) = self.previous_system_mode {
                 fields.push((Self::FIELD_PREVIOUS_SYSTEM_MODE, AttributeValue::from(v)));
@@ -13684,7 +13653,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_system_mode = None;
@@ -13723,16 +13697,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13773,11 +13748,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_CURRENT_LOCAL_TEMPERATURE,
                 match self.current_local_temperature {
@@ -13787,7 +13758,12 @@ pub mod events {
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut current_local_temperature = None;
@@ -13812,16 +13788,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -13890,11 +13867,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(v) = self.previous_occupancy {
                 fields.push((Self::FIELD_PREVIOUS_OCCUPANCY, AttributeValue::from(v)));
@@ -13906,7 +13879,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_occupancy = None;
@@ -13944,16 +13922,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -14023,11 +14002,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(4);
             fields.push((Self::FIELD_SYSTEM_MODE, AttributeValue::from(self.system_mode)));
             if let Optional::Present(v) = self.occupancy {
@@ -14043,7 +14018,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut system_mode = None;
@@ -14107,16 +14087,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -14164,11 +14145,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(v) = self.previous_running_state {
                 fields.push((Self::FIELD_PREVIOUS_RUNNING_STATE, AttributeValue::from(v)));
@@ -14180,7 +14157,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_running_state = None;
@@ -14219,16 +14201,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -14283,11 +14266,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(v) = self.previous_running_mode {
                 fields.push((Self::FIELD_PREVIOUS_RUNNING_MODE, AttributeValue::from(v)));
@@ -14299,7 +14278,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_running_mode = None;
@@ -14338,16 +14322,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -14411,11 +14396,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(inner) = self.previous_schedule_handle {
                 match inner {
@@ -14438,7 +14419,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_schedule_handle = None;
@@ -14483,16 +14469,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -14570,11 +14557,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(2);
             if let Optional::Present(inner) = self.previous_preset_handle {
                 match inner {
@@ -14597,7 +14580,12 @@ pub mod events {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut previous_preset_handle = None;
@@ -14642,16 +14630,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

@@ -20,10 +20,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -371,7 +370,7 @@ impl crate::traits::PartialCluster for WindowCoveringClusterPatch {
     type Full = WindowCoveringCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -1000,7 +999,7 @@ impl WindowCoveringCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::Type(decoded) => {
                     r#type.is_none().then_some(()).ok_or(ClusterError::InvalidAttribute(
                         AttributeError::InvalidValue {
@@ -1785,7 +1784,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -1862,41 +1861,41 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::Type(inner) => WireAttribute::from(inner),
-            Attribute::PhysicalClosedLimitLift(inner) => WireAttribute::from(inner),
-            Attribute::PhysicalClosedLimitTilt(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionLift(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionTilt(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfActuationsLift(inner) => WireAttribute::from(inner),
-            Attribute::NumberOfActuationsTilt(inner) => WireAttribute::from(inner),
-            Attribute::ConfigStatus(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionLiftPercentage(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionTiltPercentage(inner) => WireAttribute::from(inner),
-            Attribute::OperationalStatus(inner) => WireAttribute::from(inner),
-            Attribute::TargetPositionLiftPercent100ths(inner) => WireAttribute::from(inner),
-            Attribute::TargetPositionTiltPercent100ths(inner) => WireAttribute::from(inner),
-            Attribute::EndProductType(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionLiftPercent100ths(inner) => WireAttribute::from(inner),
-            Attribute::CurrentPositionTiltPercent100ths(inner) => WireAttribute::from(inner),
-            Attribute::InstalledOpenLimitLift(inner) => WireAttribute::from(inner),
-            Attribute::InstalledClosedLimitLift(inner) => WireAttribute::from(inner),
-            Attribute::InstalledOpenLimitTilt(inner) => WireAttribute::from(inner),
-            Attribute::InstalledClosedLimitTilt(inner) => WireAttribute::from(inner),
-            Attribute::WcMode(inner) => WireAttribute::from(inner),
-            Attribute::SafetyStatus(inner) => WireAttribute::from(inner),
+            Attribute::Type(inner) => model::Attribute::from(inner),
+            Attribute::PhysicalClosedLimitLift(inner) => model::Attribute::from(inner),
+            Attribute::PhysicalClosedLimitTilt(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionLift(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionTilt(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfActuationsLift(inner) => model::Attribute::from(inner),
+            Attribute::NumberOfActuationsTilt(inner) => model::Attribute::from(inner),
+            Attribute::ConfigStatus(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionLiftPercentage(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionTiltPercentage(inner) => model::Attribute::from(inner),
+            Attribute::OperationalStatus(inner) => model::Attribute::from(inner),
+            Attribute::TargetPositionLiftPercent100ths(inner) => model::Attribute::from(inner),
+            Attribute::TargetPositionTiltPercent100ths(inner) => model::Attribute::from(inner),
+            Attribute::EndProductType(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionLiftPercent100ths(inner) => model::Attribute::from(inner),
+            Attribute::CurrentPositionTiltPercent100ths(inner) => model::Attribute::from(inner),
+            Attribute::InstalledOpenLimitLift(inner) => model::Attribute::from(inner),
+            Attribute::InstalledClosedLimitLift(inner) => model::Attribute::from(inner),
+            Attribute::InstalledOpenLimitTilt(inner) => model::Attribute::from(inner),
+            Attribute::InstalledClosedLimitTilt(inner) => model::Attribute::from(inner),
+            Attribute::WcMode(inner) => model::Attribute::from(inner),
+            Attribute::SafetyStatus(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -2240,29 +2239,29 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::UpOrOpen => WireCommand::from(commands::UpOrOpen),
-            Command::DownOrClose => WireCommand::from(commands::DownOrClose),
-            Command::StopMotion => WireCommand::from(commands::StopMotion),
-            Command::GoToLiftValue(inner) => WireCommand::from(inner),
-            Command::GoToLiftPercentage(inner) => WireCommand::from(inner),
-            Command::GoToTiltValue(inner) => WireCommand::from(inner),
-            Command::GoToTiltPercentage(inner) => WireCommand::from(inner),
+            Command::UpOrOpen => model::Command::from(commands::UpOrOpen),
+            Command::DownOrClose => model::Command::from(commands::DownOrClose),
+            Command::StopMotion => model::Command::from(commands::StopMotion),
+            Command::GoToLiftValue(inner) => model::Command::from(inner),
+            Command::GoToLiftPercentage(inner) => model::Command::from(inner),
+            Command::GoToTiltValue(inner) => model::Command::from(inner),
+            Command::GoToTiltPercentage(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -2276,59 +2275,55 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::UpOrOpen::COMMAND_ID => commands::UpOrOpen::try_from_value_with_field(cmd.payload)
+            commands::UpOrOpen::COMMAND_ID => commands::UpOrOpen::decode_fields(cmd.payload)
                 .map(|_| Self::UpOrOpen)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::DownOrClose::COMMAND_ID => commands::DownOrClose::try_from_value_with_field(cmd.payload)
+            commands::DownOrClose::COMMAND_ID => commands::DownOrClose::decode_fields(cmd.payload)
                 .map(|_| Self::DownOrClose)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::StopMotion::COMMAND_ID => commands::StopMotion::try_from_value_with_field(cmd.payload)
+            commands::StopMotion::COMMAND_ID => commands::StopMotion::decode_fields(cmd.payload)
                 .map(|_| Self::StopMotion)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::GoToLiftValue::COMMAND_ID => commands::GoToLiftValue::try_from_value_with_field(cmd.payload)
+            commands::GoToLiftValue::COMMAND_ID => commands::GoToLiftValue::decode_fields(cmd.payload)
                 .map(Self::GoToLiftValue)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::GoToLiftPercentage::COMMAND_ID => {
-                commands::GoToLiftPercentage::try_from_value_with_field(cmd.payload)
-                    .map(Self::GoToLiftPercentage)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::GoToTiltValue::COMMAND_ID => commands::GoToTiltValue::try_from_value_with_field(cmd.payload)
+            commands::GoToLiftPercentage::COMMAND_ID => commands::GoToLiftPercentage::decode_fields(cmd.payload)
+                .map(Self::GoToLiftPercentage)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::GoToTiltValue::COMMAND_ID => commands::GoToTiltValue::decode_fields(cmd.payload)
                 .map(Self::GoToTiltValue)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
                     field_id,
                     status,
                 }),
-            commands::GoToTiltPercentage::COMMAND_ID => {
-                commands::GoToTiltPercentage::try_from_value_with_field(cmd.payload)
-                    .map(Self::GoToTiltPercentage)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::GoToTiltPercentage::COMMAND_ID => commands::GoToTiltPercentage::decode_fields(cmd.payload)
+                .map(Self::GoToTiltPercentage)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             _ => Err(CommandError::UnsupportedCommand(cmd.command_id)),
         }
     }
@@ -4127,20 +4122,37 @@ pub mod commands {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -4173,20 +4185,37 @@ pub mod commands {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -4219,20 +4248,37 @@ pub mod commands {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -4279,15 +4325,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_LIFT_VALUE, AttributeValue::from(self.lift_value)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut lift_value = None;
@@ -4311,16 +4358,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -4372,18 +4420,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_LIFT_PERCENT100THS_VALUE,
                 AttributeValue::from(self.lift_percent100ths_value)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut lift_percent100ths_value = None;
@@ -4408,16 +4457,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -4469,15 +4519,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_TILT_VALUE, AttributeValue::from(self.tilt_value)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut tilt_value = None;
@@ -4501,16 +4552,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -4562,18 +4614,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_TILT_PERCENT100THS_VALUE,
                 AttributeValue::from(self.tilt_percent100ths_value)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut tilt_percent100ths_value = None;
@@ -4598,16 +4651,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

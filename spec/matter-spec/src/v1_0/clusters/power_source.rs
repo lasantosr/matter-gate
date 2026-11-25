@@ -19,10 +19,9 @@ use crate::dispatch::{DescribedVariant, deserialize_enum_described};
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -455,7 +454,7 @@ impl crate::traits::PartialCluster for PowerSourceClusterPatch {
     type Full = PowerSourceCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -1277,7 +1276,7 @@ impl PowerSourceCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::Status(decoded) => {
                     status.is_none().then_some(()).ok_or(ClusterError::InvalidAttribute(
                         AttributeError::InvalidValue {
@@ -2338,7 +2337,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -2459,50 +2458,50 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::Status(inner) => WireAttribute::from(inner),
-            Attribute::Order(inner) => WireAttribute::from(inner),
-            Attribute::Description(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedInputVoltage(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedInputFrequency(inner) => WireAttribute::from(inner),
-            Attribute::WiredCurrentType(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedCurrent(inner) => WireAttribute::from(inner),
-            Attribute::WiredNominalVoltage(inner) => WireAttribute::from(inner),
-            Attribute::WiredMaximumCurrent(inner) => WireAttribute::from(inner),
-            Attribute::WiredPresent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveWiredFaults(inner) => WireAttribute::from(inner),
-            Attribute::BatVoltage(inner) => WireAttribute::from(inner),
-            Attribute::BatPercentRemaining(inner) => WireAttribute::from(inner),
-            Attribute::BatTimeRemaining(inner) => WireAttribute::from(inner),
-            Attribute::BatChargeLevel(inner) => WireAttribute::from(inner),
-            Attribute::BatReplacementNeeded(inner) => WireAttribute::from(inner),
-            Attribute::BatReplaceability(inner) => WireAttribute::from(inner),
-            Attribute::BatPresent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveBatFaults(inner) => WireAttribute::from(inner),
-            Attribute::BatReplacementDescription(inner) => WireAttribute::from(inner),
-            Attribute::BatCommonDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatAnsiDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatIecDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatApprovedChemistry(inner) => WireAttribute::from(inner),
-            Attribute::BatCapacity(inner) => WireAttribute::from(inner),
-            Attribute::BatQuantity(inner) => WireAttribute::from(inner),
-            Attribute::BatChargeState(inner) => WireAttribute::from(inner),
-            Attribute::BatTimeToFullCharge(inner) => WireAttribute::from(inner),
-            Attribute::BatFunctionalWhileCharging(inner) => WireAttribute::from(inner),
-            Attribute::BatChargingCurrent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveBatChargeFaults(inner) => WireAttribute::from(inner),
+            Attribute::Status(inner) => model::Attribute::from(inner),
+            Attribute::Order(inner) => model::Attribute::from(inner),
+            Attribute::Description(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedInputVoltage(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedInputFrequency(inner) => model::Attribute::from(inner),
+            Attribute::WiredCurrentType(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedCurrent(inner) => model::Attribute::from(inner),
+            Attribute::WiredNominalVoltage(inner) => model::Attribute::from(inner),
+            Attribute::WiredMaximumCurrent(inner) => model::Attribute::from(inner),
+            Attribute::WiredPresent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveWiredFaults(inner) => model::Attribute::from(inner),
+            Attribute::BatVoltage(inner) => model::Attribute::from(inner),
+            Attribute::BatPercentRemaining(inner) => model::Attribute::from(inner),
+            Attribute::BatTimeRemaining(inner) => model::Attribute::from(inner),
+            Attribute::BatChargeLevel(inner) => model::Attribute::from(inner),
+            Attribute::BatReplacementNeeded(inner) => model::Attribute::from(inner),
+            Attribute::BatReplaceability(inner) => model::Attribute::from(inner),
+            Attribute::BatPresent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveBatFaults(inner) => model::Attribute::from(inner),
+            Attribute::BatReplacementDescription(inner) => model::Attribute::from(inner),
+            Attribute::BatCommonDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatAnsiDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatIecDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatApprovedChemistry(inner) => model::Attribute::from(inner),
+            Attribute::BatCapacity(inner) => model::Attribute::from(inner),
+            Attribute::BatQuantity(inner) => model::Attribute::from(inner),
+            Attribute::BatChargeState(inner) => model::Attribute::from(inner),
+            Attribute::BatTimeToFullCharge(inner) => model::Attribute::from(inner),
+            Attribute::BatFunctionalWhileCharging(inner) => model::Attribute::from(inner),
+            Attribute::BatChargingCurrent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveBatChargeFaults(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {

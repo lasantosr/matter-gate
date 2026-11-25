@@ -86,6 +86,107 @@ impl SemanticTag {
     }
 }
 
+/// Borrowed zero-allocation view of a [`SemanticTag`] decoded from wire [`AttributeValue`] fields.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Default)]
+#[non_exhaustive]
+pub struct SemanticTagRef<'a> {
+    /// Manufacturer vendor ID for vendor-specific namespaces, or `Nullable::Null` for standard namespaces (field ID
+    /// `0`).
+    pub mfg_code: Nullable<VendorId>,
+    /// Common or vendor-specific semantic tag namespace ID (field ID `1`).
+    pub namespace_id: u8,
+    /// Tag value within `namespace_id` (`enum8` on the wire, field ID `2`).
+    pub tag: u8,
+    /// Optional human-readable label borrowed from the wire attribute, max 64 bytes (field ID `3`).
+    pub label: Optional<Nullable<&'a str>>,
+}
+
+impl SemanticTagRef<'_> {
+    /// Convert this borrowed view into an owned [`SemanticTag`], cloning the label string if present.
+    #[must_use]
+    pub fn to_owned_tag(self) -> SemanticTag {
+        SemanticTag {
+            mfg_code: self.mfg_code,
+            namespace_id: self.namespace_id,
+            tag: self.tag,
+            label: self.label.map(|l| l.map(String::from)),
+        }
+    }
+}
+
+impl From<SemanticTagRef<'_>> for SemanticTag {
+    fn from(tag: SemanticTagRef<'_>) -> Self {
+        tag.to_owned_tag()
+    }
+}
+
+impl<'a> TryFrom<&'a AttributeValue> for SemanticTagRef<'a> {
+    type Error = MatterStatus;
+
+    fn try_from(value: &'a AttributeValue) -> Result<Self, Self::Error> {
+        let AttributeValue::Struct(fields) = value else {
+            return Err(MatterStatus::InvalidDataType);
+        };
+
+        let mut mfg_code: Option<Nullable<VendorId>> = None;
+        let mut namespace_id: Option<u8> = None;
+        let mut tag: Option<u8> = None;
+        let mut label: Optional<Nullable<&'a str>> = Optional::Omitted;
+
+        for (idx, (id, val)) in fields.iter().enumerate() {
+            match id.raw() {
+                0 => {
+                    if mfg_code.is_some() {
+                        return Err(MatterStatus::ConstraintError);
+                    }
+                    mfg_code = Some(match val {
+                        AttributeValue::Null => Nullable::Null,
+                        other => Nullable::NonNull(VendorId::try_from(other)?),
+                    });
+                }
+                1 => {
+                    if namespace_id.is_some() {
+                        return Err(MatterStatus::ConstraintError);
+                    }
+                    namespace_id = Some(decode_unsigned::<u8>(val)?);
+                }
+                2 => {
+                    if tag.is_some() {
+                        return Err(MatterStatus::ConstraintError);
+                    }
+                    tag = Some(decode_unsigned::<u8>(val)?);
+                }
+                3 => {
+                    if label.is_present() {
+                        return Err(MatterStatus::ConstraintError);
+                    }
+                    let parsed = match val {
+                        AttributeValue::Null => Nullable::Null,
+                        AttributeValue::String(s) => Nullable::NonNull(s.as_str()),
+                        _ => return Err(MatterStatus::InvalidDataType),
+                    };
+                    label = Optional::Present(parsed);
+                }
+                _ => {
+                    if fields
+                        .get(..idx)
+                        .is_some_and(|prev| prev.iter().any(|(prev_id, _)| prev_id == id))
+                    {
+                        return Err(MatterStatus::ConstraintError);
+                    }
+                }
+            }
+        }
+
+        Ok(Self {
+            mfg_code: mfg_code.ok_or(MatterStatus::ConstraintError)?,
+            namespace_id: namespace_id.ok_or(MatterStatus::ConstraintError)?,
+            tag: tag.ok_or(MatterStatus::ConstraintError)?,
+            label,
+        })
+    }
+}
+
 impl fmt::Display for SemanticTag {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "ns={}, tag={}", self.namespace_id, self.tag)?;
@@ -422,5 +523,34 @@ mod tests {
         ]);
         assert_eq!(SemanticTag::try_from(&overflow), Err(MatterStatus::ConstraintError));
         assert_eq!(SemanticTag::try_from(overflow), Err(MatterStatus::ConstraintError));
+    }
+
+    #[test]
+    fn semantic_tag_ref_borrows_label_and_rejects_duplicate_unknown_fields() {
+        let val = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::Null),
+            (FieldId::new(1), AttributeValue::U8(1)),
+            (FieldId::new(2), AttributeValue::U8(2)),
+            (FieldId::new(3), AttributeValue::String(String::from("Left"))),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+        ]);
+        let borrowed = SemanticTagRef::try_from(&val).unwrap();
+        assert_eq!(borrowed.mfg_code, Nullable::Null);
+        assert_eq!(borrowed.namespace_id, 1);
+        assert_eq!(borrowed.tag, 2);
+        assert_eq!(borrowed.label, Optional::Present(Nullable::NonNull("Left")));
+        assert_eq!(borrowed.to_owned_tag(), SemanticTag::new(1, 2).with_label("Left"));
+
+        let dup_unknown = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::Null),
+            (FieldId::new(1), AttributeValue::U8(1)),
+            (FieldId::new(2), AttributeValue::U8(2)),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+            (FieldId::new(99), AttributeValue::Bool(false)),
+        ]);
+        assert_eq!(
+            SemanticTagRef::try_from(&dup_unknown),
+            Err(MatterStatus::ConstraintError)
+        );
     }
 }

@@ -36,7 +36,7 @@ use crate::v1_2::clusters;
 use crate::{
     dispatch::{EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema},
     error::EventError,
-    model::{ClusterId, Event as WireEvent, EventId, EventPriority},
+    model::{self, ClusterId, EventId, EventPriority},
 };
 
 /// Polymorphic event across all enabled clusters in this Matter specification version.
@@ -89,12 +89,12 @@ pub enum ClusterEvent {
     #[cfg(cluster_unit_testing)]
     UnitTesting(clusters::unit_testing::Event),
     /// Forward-compatible fallback for unrecognized clusters.
-    Unknown(WireEvent),
+    Unknown(model::Event),
 }
 
 impl ClusterEvent {
-    /// Decodes an owned [`WireEvent`] into a [`ClusterEvent`].
-    pub fn from_wire(ev: WireEvent) -> Result<Self, EventError> {
+    /// Decodes an owned [`model::Event`] into a [`ClusterEvent`].
+    pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
         match ev.cluster_id.raw() {
             #[cfg(cluster_access_control)]
             0x001F => clusters::access_control::Event::try_from(ev).map(Self::AccessControl),
@@ -149,7 +149,7 @@ impl ClusterEvent {
     }
 }
 
-impl From<ClusterEvent> for WireEvent {
+impl From<ClusterEvent> for model::Event {
     fn from(ev: ClusterEvent) -> Self {
         match ev {
             #[cfg(cluster_access_control)]
@@ -199,10 +199,10 @@ impl From<ClusterEvent> for WireEvent {
     }
 }
 
-impl TryFrom<WireEvent> for ClusterEvent {
+impl TryFrom<model::Event> for ClusterEvent {
     type Error = EventError;
 
-    fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+    fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
         match ev.cluster_id.raw() {
             #[cfg(cluster_access_control)]
             0x001F => clusters::access_control::Event::try_from(ev).map(Self::AccessControl),
@@ -562,7 +562,7 @@ fn select_cluster_event(
     payload: BufferedPayload,
 ) -> Result<ClusterEvent, String> {
     if scope_name == Some("Unknown") {
-        return payload.deserialize_into::<WireEvent>().map(ClusterEvent::Unknown);
+        return payload.deserialize_into::<model::Event>().map(ClusterEvent::Unknown);
     }
     let (_, _, _) = (item_name, item_id, &payload);
     #[cfg(not(any(

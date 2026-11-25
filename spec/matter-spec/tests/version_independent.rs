@@ -158,13 +158,13 @@ mod tests {
 
     #[cfg(all(feature = "v1_6", feature = "dispatch", cluster_on_off))]
     #[test]
-    fn cluster_attribute_from_wire_routes_on_off() {
+    fn cluster_attribute_from_model_routes_on_off() {
         use matter_spec::{
             model::AttributeValue,
             v1_6::{clusters::on_off, dispatch::ClusterAttribute},
         };
 
-        let res = ClusterAttribute::from_wire(
+        let res = ClusterAttribute::from_model(
             on_off::OnOffCluster::CLUSTER_ID,
             on_off::OnOffCluster::ATTR_ON_OFF,
             AttributeValue::Bool(true),

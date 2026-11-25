@@ -7,8 +7,8 @@ use crate::{
     error::{AttributeError, ClusterError, CommandError, EndpointError, EventError},
     model::{
         Attribute, AttributeId, AttributeValue, Cluster, ClusterId, Command, CommandDirection, CommandId,
-        DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId, Event, EventId, EventPriority, FieldId, MatterStatus,
-        Nullable,
+        DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId, Event, EventId, EventPriority, MatterStatus, Nullable,
+        Optional,
     },
     wire::{WireCluster, WireEvent},
 };
@@ -150,18 +150,32 @@ pub trait EndpointExt {
     /// Returns a zero-allocation borrowed view over `self` if `self` declares
     /// [`D::DEVICE_TYPE_ID`](DeviceTypeSpec::DEVICE_TYPE_ID).
     ///
-    /// Returns `Ok(None)` when `D` is absent from `self.device_types`, `Ok(Some(view))` when present and conformant,
-    /// or `Err(e)` when `D` is listed on the endpoint but fails conformance checks.
+    /// Returns `Ok(None)` when `D` is absent from Descriptor `DeviceTypeList` (`0x0000`), `Ok(Some(view))` when
+    /// present and conformant, or `Err(e)` when `D` is listed on the endpoint but fails conformance checks.
     fn view_as<D: DeviceTypeSpec>(&self) -> Result<Option<D::View<'_>>, EndpointError>;
 }
 
 impl EndpointExt for Endpoint {
     #[inline]
     fn view_as<D: DeviceTypeSpec>(&self) -> Result<Option<D::View<'_>>, EndpointError> {
-        if !self.has_device_type(D::DEVICE_TYPE_ID) {
+        if !self
+            .has_device_type(D::DEVICE_TYPE_ID)
+            .map_err(|status| descriptor_attr_invalid(0x0000, status))?
+        {
             return Ok(None);
         }
         D::view(self).map(Some)
+    }
+}
+
+fn descriptor_attr_invalid(attr_id: u32, status: MatterStatus) -> EndpointError {
+    EndpointError::InvalidCluster {
+        id: ClusterId::DESCRIPTOR,
+        source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+            id: AttributeId::new(attr_id),
+            field_id: None,
+            status,
+        }),
     }
 }
 
@@ -178,32 +192,54 @@ pub(crate) fn validate_device_view(
     mandatory_server: &[ClusterId],
     mandatory_client: &[ClusterId],
 ) -> Result<(), EndpointError> {
-    if endpoint.device_types.is_empty() {
+    let Optional::Present(dt_iter) = endpoint
+        .device_type_list()
+        .map_err(|status| descriptor_attr_invalid(0x0000, status))?
+    else {
         return Err(EndpointError::EmptyDeviceTypes);
+    };
+    let mut first_id: Option<DeviceTypeId> = None;
+    let mut found = false;
+    for entry in dt_iter {
+        let entry = entry.map_err(|status| descriptor_attr_invalid(0x0000, status))?;
+        if first_id.is_none() {
+            first_id = Some(entry.id);
+        }
+        if entry.id == device_type_id {
+            found = true;
+            break;
+        }
     }
-    if !endpoint.has_device_type(device_type_id) {
-        let actual = endpoint
-            .primary_device_type()
-            .map(|dt| dt.id)
-            .unwrap_or(DeviceTypeId::new(0));
+    let Some(actual) = first_id else {
+        return Err(EndpointError::EmptyDeviceTypes);
+    };
+    if !found {
         return Err(EndpointError::DeviceTypeMismatch {
             expected: device_type_id,
             actual,
         });
     }
     for &cluster_id in disallowed {
-        if endpoint.server_cluster(cluster_id).is_some() {
+        if endpoint.cluster(cluster_id).is_some() {
             return Err(EndpointError::DisallowedCluster(cluster_id));
         }
     }
     for &cluster_id in mandatory_server {
-        if endpoint.server_cluster(cluster_id).is_none() {
+        if endpoint.cluster(cluster_id).is_none() {
             return Err(EndpointError::MissingMandatoryServerCluster(cluster_id));
         }
     }
-    for &cluster_id in mandatory_client {
-        if !endpoint.client_clusters.contains(&cluster_id) {
-            return Err(EndpointError::MissingMandatoryClientCluster(cluster_id));
+    if !mandatory_client.is_empty() {
+        let client_list = endpoint
+            .client_list()
+            .map_err(|status| descriptor_attr_invalid(0x0002, status))?;
+        for &cluster_id in mandatory_client {
+            if !client_list
+                .contains(cluster_id)
+                .map_err(|status| descriptor_attr_invalid(0x0002, status))?
+            {
+                return Err(EndpointError::MissingMandatoryClientCluster(cluster_id));
+            }
         }
     }
     Ok(())
@@ -311,17 +347,7 @@ pub(crate) fn update_descriptor_cluster(
     server_clusters: &[Cluster],
     client_clusters: &[ClusterId],
 ) -> Cluster {
-    let device_type_list = AttributeValue::List(
-        device_types
-            .iter()
-            .map(|dt| {
-                AttributeValue::Struct(vec![
-                    (FieldId::new(0), AttributeValue::from(dt.id)),
-                    (FieldId::new(1), AttributeValue::U16(dt.revision)),
-                ])
-            })
-            .collect(),
-    );
+    let device_type_list = AttributeValue::List(device_types.iter().copied().map(AttributeValue::from).collect());
 
     let mut server_ids = Vec::with_capacity(server_clusters.len().saturating_add(1));
     server_ids.push(AttributeValue::from(ClusterId::DESCRIPTOR));
@@ -444,7 +470,7 @@ mod tests {
             Err(EndpointError::EmptyDeviceTypes)
         );
 
-        let wrong_dt = Endpoint::single_device(EndpointId::new(1), DeviceTypeId::new(0x0101), 1, vec![], vec![]);
+        let wrong_dt = Endpoint::single_device(EndpointId::new(1), DeviceTypeId::new(0x0101), 1, vec![]);
         assert_eq!(
             validate_device_view(&wrong_dt, dt_id, &disallowed, &mandatory_srv, &mandatory_cli),
             Err(EndpointError::DeviceTypeMismatch {
@@ -461,14 +487,15 @@ mod tests {
                 Cluster::empty(ClusterId::new(0x0406)),
                 Cluster::empty(ClusterId::new(0x0006)),
             ],
-            vec![ClusterId::new(0x0019)],
-        );
+        )
+        .with_client_list([ClusterId::new(0x0019)]);
         assert_eq!(
             validate_device_view(&with_disallowed, dt_id, &disallowed, &mandatory_srv, &mandatory_cli),
             Err(EndpointError::DisallowedCluster(ClusterId::new(0x0406)))
         );
 
-        let missing_srv = Endpoint::single_device(EndpointId::new(1), dt_id, 1, vec![], vec![ClusterId::new(0x0019)]);
+        let missing_srv =
+            Endpoint::single_device(EndpointId::new(1), dt_id, 1, vec![]).with_client_list([ClusterId::new(0x0019)]);
         assert_eq!(
             validate_device_view(&missing_srv, dt_id, &disallowed, &mandatory_srv, &mandatory_cli),
             Err(EndpointError::MissingMandatoryServerCluster(ClusterId::new(0x0006)))
@@ -479,7 +506,6 @@ mod tests {
             dt_id,
             1,
             vec![Cluster::empty(ClusterId::new(0x0006))],
-            vec![],
         );
         assert_eq!(
             validate_device_view(&missing_cli, dt_id, &disallowed, &mandatory_srv, &mandatory_cli),
@@ -491,8 +517,8 @@ mod tests {
             dt_id,
             1,
             vec![Cluster::empty(ClusterId::new(0x0006))],
-            vec![ClusterId::new(0x0019)],
-        );
+        )
+        .with_client_list([ClusterId::new(0x0019)]);
         validate_device_view(&valid, dt_id, &disallowed, &mandatory_srv, &mandatory_cli).unwrap();
     }
 

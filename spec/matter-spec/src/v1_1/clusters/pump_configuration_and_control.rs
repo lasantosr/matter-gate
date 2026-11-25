@@ -18,10 +18,9 @@ use crate::dispatch::{DescribedVariant, deserialize_enum_described};
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -486,7 +485,7 @@ impl crate::traits::PartialCluster for PumpConfigurationAndControlClusterPatch {
     type Full = PumpConfigurationAndControlCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -1122,7 +1121,7 @@ impl PumpConfigurationAndControlCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::MaxPressure(decoded) => {
                     max_pressure
                         .is_none()
@@ -1904,7 +1903,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -1980,42 +1979,42 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::MaxPressure(inner) => WireAttribute::from(inner),
-            Attribute::MaxSpeed(inner) => WireAttribute::from(inner),
-            Attribute::MaxFlow(inner) => WireAttribute::from(inner),
-            Attribute::MinConstPressure(inner) => WireAttribute::from(inner),
-            Attribute::MaxConstPressure(inner) => WireAttribute::from(inner),
-            Attribute::MinCompPressure(inner) => WireAttribute::from(inner),
-            Attribute::MaxCompPressure(inner) => WireAttribute::from(inner),
-            Attribute::MinConstSpeed(inner) => WireAttribute::from(inner),
-            Attribute::MaxConstSpeed(inner) => WireAttribute::from(inner),
-            Attribute::MinConstFlow(inner) => WireAttribute::from(inner),
-            Attribute::MaxConstFlow(inner) => WireAttribute::from(inner),
-            Attribute::MinConstTemp(inner) => WireAttribute::from(inner),
-            Attribute::MaxConstTemp(inner) => WireAttribute::from(inner),
-            Attribute::PumpStatus(inner) => WireAttribute::from(inner),
-            Attribute::EffectiveOperationMode(inner) => WireAttribute::from(inner),
-            Attribute::EffectiveControlMode(inner) => WireAttribute::from(inner),
-            Attribute::Capacity(inner) => WireAttribute::from(inner),
-            Attribute::Speed(inner) => WireAttribute::from(inner),
-            Attribute::LifetimeRunningHours(inner) => WireAttribute::from(inner),
-            Attribute::Power(inner) => WireAttribute::from(inner),
-            Attribute::LifetimeEnergyConsumed(inner) => WireAttribute::from(inner),
-            Attribute::OperationMode(inner) => WireAttribute::from(inner),
-            Attribute::ControlMode(inner) => WireAttribute::from(inner),
+            Attribute::MaxPressure(inner) => model::Attribute::from(inner),
+            Attribute::MaxSpeed(inner) => model::Attribute::from(inner),
+            Attribute::MaxFlow(inner) => model::Attribute::from(inner),
+            Attribute::MinConstPressure(inner) => model::Attribute::from(inner),
+            Attribute::MaxConstPressure(inner) => model::Attribute::from(inner),
+            Attribute::MinCompPressure(inner) => model::Attribute::from(inner),
+            Attribute::MaxCompPressure(inner) => model::Attribute::from(inner),
+            Attribute::MinConstSpeed(inner) => model::Attribute::from(inner),
+            Attribute::MaxConstSpeed(inner) => model::Attribute::from(inner),
+            Attribute::MinConstFlow(inner) => model::Attribute::from(inner),
+            Attribute::MaxConstFlow(inner) => model::Attribute::from(inner),
+            Attribute::MinConstTemp(inner) => model::Attribute::from(inner),
+            Attribute::MaxConstTemp(inner) => model::Attribute::from(inner),
+            Attribute::PumpStatus(inner) => model::Attribute::from(inner),
+            Attribute::EffectiveOperationMode(inner) => model::Attribute::from(inner),
+            Attribute::EffectiveControlMode(inner) => model::Attribute::from(inner),
+            Attribute::Capacity(inner) => model::Attribute::from(inner),
+            Attribute::Speed(inner) => model::Attribute::from(inner),
+            Attribute::LifetimeRunningHours(inner) => model::Attribute::from(inner),
+            Attribute::Power(inner) => model::Attribute::from(inner),
+            Attribute::LifetimeEnergyConsumed(inner) => model::Attribute::from(inner),
+            Attribute::OperationMode(inner) => model::Attribute::from(inner),
+            Attribute::ControlMode(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -2422,164 +2421,40 @@ impl Event {
         }
     }
 
-    pub fn from_wire(event_id: EventId, val: AttributeValue) -> Result<Self, EventError> {
-        match event_id {
-            events::SupplyVoltageLow::EVENT_ID => events::SupplyVoltageLow::try_from_value_with_field(val)
-                .map(|_| Self::SupplyVoltageLow)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::SupplyVoltageHigh::EVENT_ID => events::SupplyVoltageHigh::try_from_value_with_field(val)
-                .map(|_| Self::SupplyVoltageHigh)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::PowerMissingPhase::EVENT_ID => events::PowerMissingPhase::try_from_value_with_field(val)
-                .map(|_| Self::PowerMissingPhase)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::SystemPressureLow::EVENT_ID => events::SystemPressureLow::try_from_value_with_field(val)
-                .map(|_| Self::SystemPressureLow)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::SystemPressureHigh::EVENT_ID => events::SystemPressureHigh::try_from_value_with_field(val)
-                .map(|_| Self::SystemPressureHigh)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::DryRunning::EVENT_ID => events::DryRunning::try_from_value_with_field(val)
-                .map(|_| Self::DryRunning)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::MotorTemperatureHigh::EVENT_ID => events::MotorTemperatureHigh::try_from_value_with_field(val)
-                .map(|_| Self::MotorTemperatureHigh)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::PumpMotorFatalFailure::EVENT_ID => events::PumpMotorFatalFailure::try_from_value_with_field(val)
-                .map(|_| Self::PumpMotorFatalFailure)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::ElectronicTemperatureHigh::EVENT_ID => {
-                events::ElectronicTemperatureHigh::try_from_value_with_field(val)
-                    .map(|_| Self::ElectronicTemperatureHigh)
-                    .map_err(|(field_id, status)| EventError::InvalidPayload {
-                        id: event_id,
-                        field_id,
-                        status,
-                    })
-            }
-            events::PumpBlocked::EVENT_ID => events::PumpBlocked::try_from_value_with_field(val)
-                .map(|_| Self::PumpBlocked)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::SensorFailure::EVENT_ID => events::SensorFailure::try_from_value_with_field(val)
-                .map(|_| Self::SensorFailure)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::ElectronicNonFatalFailure::EVENT_ID => {
-                events::ElectronicNonFatalFailure::try_from_value_with_field(val)
-                    .map(|_| Self::ElectronicNonFatalFailure)
-                    .map_err(|(field_id, status)| EventError::InvalidPayload {
-                        id: event_id,
-                        field_id,
-                        status,
-                    })
-            }
-            events::ElectronicFatalFailure::EVENT_ID => events::ElectronicFatalFailure::try_from_value_with_field(val)
-                .map(|_| Self::ElectronicFatalFailure)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::GeneralFault::EVENT_ID => events::GeneralFault::try_from_value_with_field(val)
-                .map(|_| Self::GeneralFault)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::Leakage::EVENT_ID => events::Leakage::try_from_value_with_field(val)
-                .map(|_| Self::Leakage)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::AirDetection::EVENT_ID => events::AirDetection::try_from_value_with_field(val)
-                .map(|_| Self::AirDetection)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::TurbineOperation::EVENT_ID => events::TurbineOperation::try_from_value_with_field(val)
-                .map(|_| Self::TurbineOperation)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            other => Err(EventError::UnsupportedEvent(other)),
-        }
+    #[inline]
+    pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
+        Self::try_from(ev)
     }
 }
 
-impl From<Event> for WireEvent {
+impl From<Event> for model::Event {
     fn from(ev: Event) -> Self {
         match ev {
-            Event::SupplyVoltageLow => WireEvent::from(events::SupplyVoltageLow),
-            Event::SupplyVoltageHigh => WireEvent::from(events::SupplyVoltageHigh),
-            Event::PowerMissingPhase => WireEvent::from(events::PowerMissingPhase),
-            Event::SystemPressureLow => WireEvent::from(events::SystemPressureLow),
-            Event::SystemPressureHigh => WireEvent::from(events::SystemPressureHigh),
-            Event::DryRunning => WireEvent::from(events::DryRunning),
-            Event::MotorTemperatureHigh => WireEvent::from(events::MotorTemperatureHigh),
-            Event::PumpMotorFatalFailure => WireEvent::from(events::PumpMotorFatalFailure),
-            Event::ElectronicTemperatureHigh => WireEvent::from(events::ElectronicTemperatureHigh),
-            Event::PumpBlocked => WireEvent::from(events::PumpBlocked),
-            Event::SensorFailure => WireEvent::from(events::SensorFailure),
-            Event::ElectronicNonFatalFailure => WireEvent::from(events::ElectronicNonFatalFailure),
-            Event::ElectronicFatalFailure => WireEvent::from(events::ElectronicFatalFailure),
-            Event::GeneralFault => WireEvent::from(events::GeneralFault),
-            Event::Leakage => WireEvent::from(events::Leakage),
-            Event::AirDetection => WireEvent::from(events::AirDetection),
-            Event::TurbineOperation => WireEvent::from(events::TurbineOperation),
+            Event::SupplyVoltageLow => model::Event::from(events::SupplyVoltageLow),
+            Event::SupplyVoltageHigh => model::Event::from(events::SupplyVoltageHigh),
+            Event::PowerMissingPhase => model::Event::from(events::PowerMissingPhase),
+            Event::SystemPressureLow => model::Event::from(events::SystemPressureLow),
+            Event::SystemPressureHigh => model::Event::from(events::SystemPressureHigh),
+            Event::DryRunning => model::Event::from(events::DryRunning),
+            Event::MotorTemperatureHigh => model::Event::from(events::MotorTemperatureHigh),
+            Event::PumpMotorFatalFailure => model::Event::from(events::PumpMotorFatalFailure),
+            Event::ElectronicTemperatureHigh => model::Event::from(events::ElectronicTemperatureHigh),
+            Event::PumpBlocked => model::Event::from(events::PumpBlocked),
+            Event::SensorFailure => model::Event::from(events::SensorFailure),
+            Event::ElectronicNonFatalFailure => model::Event::from(events::ElectronicNonFatalFailure),
+            Event::ElectronicFatalFailure => model::Event::from(events::ElectronicFatalFailure),
+            Event::GeneralFault => model::Event::from(events::GeneralFault),
+            Event::Leakage => model::Event::from(events::Leakage),
+            Event::AirDetection => model::Event::from(events::AirDetection),
+            Event::TurbineOperation => model::Event::from(events::TurbineOperation),
         }
     }
 }
 
-impl TryFrom<WireEvent> for Event {
+impl TryFrom<model::Event> for Event {
     type Error = EventError;
 
-    fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+    fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
         if ev.cluster_id != Self::CLUSTER_ID {
             return Err(EventError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -2594,7 +2469,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SupplyVoltageLow::try_from_value_with_field(ev.payload)
+                events::SupplyVoltageLow::decode_fields(ev.payload)
                     .map(|_| Self::SupplyVoltageLow)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2609,7 +2484,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SupplyVoltageHigh::try_from_value_with_field(ev.payload)
+                events::SupplyVoltageHigh::decode_fields(ev.payload)
                     .map(|_| Self::SupplyVoltageHigh)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2624,7 +2499,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::PowerMissingPhase::try_from_value_with_field(ev.payload)
+                events::PowerMissingPhase::decode_fields(ev.payload)
                     .map(|_| Self::PowerMissingPhase)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2639,7 +2514,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SystemPressureLow::try_from_value_with_field(ev.payload)
+                events::SystemPressureLow::decode_fields(ev.payload)
                     .map(|_| Self::SystemPressureLow)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2654,7 +2529,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SystemPressureHigh::try_from_value_with_field(ev.payload)
+                events::SystemPressureHigh::decode_fields(ev.payload)
                     .map(|_| Self::SystemPressureHigh)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2669,7 +2544,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::DryRunning::try_from_value_with_field(ev.payload)
+                events::DryRunning::decode_fields(ev.payload)
                     .map(|_| Self::DryRunning)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2684,7 +2559,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::MotorTemperatureHigh::try_from_value_with_field(ev.payload)
+                events::MotorTemperatureHigh::decode_fields(ev.payload)
                     .map(|_| Self::MotorTemperatureHigh)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2699,7 +2574,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::PumpMotorFatalFailure::try_from_value_with_field(ev.payload)
+                events::PumpMotorFatalFailure::decode_fields(ev.payload)
                     .map(|_| Self::PumpMotorFatalFailure)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2714,7 +2589,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ElectronicTemperatureHigh::try_from_value_with_field(ev.payload)
+                events::ElectronicTemperatureHigh::decode_fields(ev.payload)
                     .map(|_| Self::ElectronicTemperatureHigh)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2729,7 +2604,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::PumpBlocked::try_from_value_with_field(ev.payload)
+                events::PumpBlocked::decode_fields(ev.payload)
                     .map(|_| Self::PumpBlocked)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2744,7 +2619,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::SensorFailure::try_from_value_with_field(ev.payload)
+                events::SensorFailure::decode_fields(ev.payload)
                     .map(|_| Self::SensorFailure)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2759,7 +2634,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ElectronicNonFatalFailure::try_from_value_with_field(ev.payload)
+                events::ElectronicNonFatalFailure::decode_fields(ev.payload)
                     .map(|_| Self::ElectronicNonFatalFailure)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2774,7 +2649,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::ElectronicFatalFailure::try_from_value_with_field(ev.payload)
+                events::ElectronicFatalFailure::decode_fields(ev.payload)
                     .map(|_| Self::ElectronicFatalFailure)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2789,7 +2664,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::GeneralFault::try_from_value_with_field(ev.payload)
+                events::GeneralFault::decode_fields(ev.payload)
                     .map(|_| Self::GeneralFault)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2804,7 +2679,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::Leakage::try_from_value_with_field(ev.payload)
+                events::Leakage::decode_fields(ev.payload)
                     .map(|_| Self::Leakage)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2819,7 +2694,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::AirDetection::try_from_value_with_field(ev.payload)
+                events::AirDetection::decode_fields(ev.payload)
                     .map(|_| Self::AirDetection)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2834,7 +2709,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::TurbineOperation::try_from_value_with_field(ev.payload)
+                events::TurbineOperation::decode_fields(ev.payload)
                     .map(|_| Self::TurbineOperation)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -5122,19 +4997,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5156,19 +5049,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5190,19 +5101,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5224,19 +5153,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5258,19 +5205,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5292,19 +5257,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5326,19 +5309,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5360,19 +5361,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5394,19 +5413,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5432,19 +5469,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5466,19 +5521,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5500,19 +5573,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5538,19 +5629,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5572,19 +5681,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5606,19 +5733,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5640,19 +5785,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }
@@ -5674,19 +5837,37 @@ pub mod events {
 
         #[inline]
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Null
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+            Vec::new()
         }
 
         #[inline]
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            Self::try_from_value(val).map_err(|status| (None, status))
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
         }
 
+        #[inline]
+        pub(crate) fn decode_fields(
+            fields: Vec<(FieldId, AttributeValue)>,
+        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
+            if let Some((fid, _)) = fields.first() {
+                Err((Some(*fid), MatterStatus::ConstraintError))
+            } else {
+                Ok(Self)
+            }
+        }
+
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
+        }
+
+        #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             match val {
                 AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                 _ => Err(MatterStatus::InvalidDataType),
             }
         }

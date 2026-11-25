@@ -161,13 +161,12 @@ mod tests {
     fn wire_to_json_gateway_flow() {
         use matter_spec::model::{Command as WireCommand, CommandDirection};
 
-        let cmd = ClusterCommand::from_wire(WireCommand::new(
+        let cmd = ClusterCommand::from_model(WireCommand::unit(
             OnOffCluster::CLUSTER_ID,
             on_off::commands::Off::COMMAND_ID,
             CommandDirection::ClientToServer,
-            AttributeValue::Null,
         ))
-        .expect("from_wire Off");
+        .expect("from_model Off");
         assert_eq!(cmd, ClusterCommand::OnOff(on_off::Command::Off));
 
         let inv = Invocation::new(EndpointId::new(3), cmd);
@@ -207,7 +206,7 @@ mod tests {
 
         let global_cmd = ClusterCommand::OnOff(on_off::Command::Off);
         let wire_cmd = WireCommand::from(global_cmd.clone());
-        let cmd_back = ClusterCommand::from_wire(wire_cmd).expect("from_wire ClusterCommand");
+        let cmd_back = ClusterCommand::from_model(wire_cmd).expect("from_model ClusterCommand");
         assert_eq!(cmd_back, global_cmd);
 
         let light = OnOffLight::default();
@@ -224,7 +223,7 @@ mod tests {
             model::{
                 Attribute as WireAttribute, AttributeId, Cluster, ClusterId, Command as WireCommand, CommandDirection,
                 CommandId, DataVersion, DeviceTypeEntry, DeviceTypeId, Endpoint, Event as WireEvent, EventId,
-                EventPriority, Optional,
+                EventPriority, FieldId, Optional,
             },
             v1_6::dispatch::{ClusterCommandResponse, ClusterEvent, ClusterPatch},
             wire::WireCluster,
@@ -271,7 +270,7 @@ mod tests {
 
         // 3. ClusterAttribute::Unknown
         let attr_aid = AttributeId::new(0x0003);
-        let attr = ClusterAttribute::from_wire(unknown_cid, attr_aid, AttributeValue::U8(5)).expect("unknown attr");
+        let attr = ClusterAttribute::from_model(unknown_cid, attr_aid, AttributeValue::U8(5)).expect("unknown attr");
         assert!(matches!(attr, ClusterAttribute::Unknown(c, a, _) if c == unknown_cid && a == attr_aid));
         assert_eq!(attr.cluster_name(), "Unknown");
         assert_eq!(attr.attribute_name(), "Unknown");
@@ -289,9 +288,9 @@ mod tests {
             unknown_cid,
             CommandId::new(0x01),
             CommandDirection::ClientToServer,
-            AttributeValue::U32(123),
+            vec![(FieldId::new(0), AttributeValue::U32(123))],
         );
-        let cmd = ClusterCommand::from_wire(raw_cmd.clone()).expect("unknown ClusterCommand");
+        let cmd = ClusterCommand::from_model(raw_cmd.clone()).expect("unknown ClusterCommand");
         assert!(matches!(cmd, ClusterCommand::Unknown(_)));
         assert_eq!(cmd.cluster_name(), "Unknown");
         assert_eq!(cmd.command_name(), "Unknown");
@@ -305,9 +304,9 @@ mod tests {
             unknown_cid,
             CommandId::new(0x02),
             CommandDirection::ServerToClient,
-            AttributeValue::String("ok".into()),
+            vec![(FieldId::new(0), AttributeValue::String("ok".into()))],
         );
-        let resp = ClusterCommandResponse::from_wire(raw_resp.clone()).expect("unknown ClusterCommandResponse");
+        let resp = ClusterCommandResponse::from_model(raw_resp.clone()).expect("unknown ClusterCommandResponse");
         assert!(matches!(resp, ClusterCommandResponse::Unknown(_)));
         assert_eq!(resp.cluster_name(), "Unknown");
         assert_eq!(resp.command_name(), "Unknown");
@@ -318,13 +317,8 @@ mod tests {
         assert_eq!(WireCommand::from(resp), raw_resp);
 
         // 6. ClusterEvent::Unknown
-        let raw_ev = WireEvent::new(
-            unknown_cid,
-            EventId::new(0x04),
-            EventPriority::Info,
-            AttributeValue::Null,
-        );
-        let ev = ClusterEvent::from_wire(raw_ev.clone()).expect("unknown ClusterEvent");
+        let raw_ev = WireEvent::unit(unknown_cid, EventId::new(0x04), EventPriority::Info);
+        let ev = ClusterEvent::from_model(raw_ev.clone()).expect("unknown ClusterEvent");
         assert!(matches!(ev, ClusterEvent::Unknown(_)));
         assert_eq!(ev.cluster_name(), "Unknown");
         assert_eq!(ev.event_name(), "Unknown");
@@ -335,12 +329,7 @@ mod tests {
 
         // 7. EndpointDevice::Unknown
         let unknown_dt = DeviceTypeId::new(0xFFF1_0099);
-        let raw_ep = Endpoint::new(
-            EndpointId::new(9),
-            vec![DeviceTypeEntry::new(unknown_dt, 1)],
-            vec![],
-            vec![],
-        );
+        let raw_ep = Endpoint::empty(EndpointId::new(9)).with_device_type_list([DeviceTypeEntry::new(unknown_dt, 1)]);
         let dev = EndpointDevice::try_from(raw_ep.clone()).expect("unknown EndpointDevice");
         assert!(matches!(dev, EndpointDevice::Unknown(_)));
         assert_eq!(dev.device_type_name(), "Unknown");

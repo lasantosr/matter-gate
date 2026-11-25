@@ -35,7 +35,7 @@ Workspace rules for AI agents. Each crate and subsystem has an additive `AGENTS.
 
 - **Public ecosystem boundaries:** Crates whose `AGENTS.md` designates them as public boundaries must maintain SemVer stability (`#[non_exhaustive]` on evolving public structs/enums, paired with constructors or builders).
 - **Workspace-internal crates:** All other crates prefer exhaustive matching and destructuring (no `#[non_exhaustive]`) so changes surface as compile errors at every call site.
-- **API conventions (`Optional` vs `Option`, `set_*` vs `add_*`):** Use `Optional<T>` for Matter protocol presence/omission and `Option<T>` for Rust API mechanics (lookup misses, previous values on `set_*`/`remove_*`, type casts); use `set_*` for keyed upserts/scalar replacements returning `Option<Previous>` and `add_*` for ID-set insertions returning `bool`.
+- **API conventions (`Optional` vs `Option`, `set_*` vs `add_*`, `with_*`):** Use `Optional<T>` for Matter protocol presence/omission and `Option<T>` for Rust API mechanics (lookup misses, previous values on `set_*`/`remove_*`, type casts); use `set_*` for keyed upserts/scalar replacements returning `Option<Previous>` and `add_*` for ID-set insertions returning `bool`; for fluent builders, `with_<scalar>` and `with_*_list` overwrite the target field or list attribute, while `with_<item>`/`with_<items>` upsert into keyed child containers.
 
 ## 3. Workflow
 

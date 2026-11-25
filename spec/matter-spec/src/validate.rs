@@ -4,7 +4,6 @@
 //! and borrowed [`matter_data_model`] wire types without heap allocation, cloning,
 //! or mutating valid payloads.
 
-use alloc::string::String;
 use core::{
     fmt,
     ops::{BitAnd, BitAndAssign, BitOr, BitOrAssign, BitXor, BitXorAssign, Not},
@@ -13,8 +12,8 @@ use core::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EndpointError, EventError, NodeError},
     model::{
-        Attribute, AttributeId, AttributeValue, Cluster, ClusterId, Command, CommandDirection, CommandId, DeviceTypeId,
-        Endpoint, Event, EventId, EventPriority, FieldId, MatterStatus, Node, SemanticTag, VendorId,
+        Attribute, AttributeId, AttributeValue, Cluster, ClusterId, Command, CommandDirection, CommandId,
+        DeviceTypeEntry, DeviceTypeId, Endpoint, Event, EventId, EventPriority, FieldId, MatterStatus, Node,
     },
 };
 
@@ -848,7 +847,7 @@ impl SpecRegistry {
                 actual: cmd.direction,
             });
         }
-        validate_struct_payload(&cmd.payload, desc.fields, true, 0, None).map_err(|(field_id, status)| {
+        validate_struct_fields(&cmd.payload, desc.fields, true, 0, None).map_err(|(field_id, status)| {
             CommandError::InvalidPayload {
                 id: cmd.command_id,
                 field_id,
@@ -870,7 +869,7 @@ impl SpecRegistry {
                 actual: event.priority,
             });
         }
-        validate_struct_payload(&event.payload, desc.fields, false, 0, None).map_err(|(field_id, status)| {
+        validate_struct_fields(&event.payload, desc.fields, false, 0, None).map_err(|(field_id, status)| {
             EventError::InvalidPayload {
                 id: event.event_id,
                 field_id,
@@ -958,25 +957,17 @@ impl SpecRegistry {
     }
 
     fn validate_endpoint_ref_with_mode(&self, endpoint: &Endpoint, mode: ValidationMode) -> Result<(), EndpointError> {
-        if endpoint.device_types.is_empty() {
-            return Err(EndpointError::EmptyDeviceTypes);
-        }
+        let Some(descriptor) = endpoint.descriptor() else {
+            return Err(EndpointError::MissingMandatoryServerCluster(ClusterId::DESCRIPTOR));
+        };
 
-        // Duplicate DeviceTypeId check (O(N^2) bounded, zero-alloc).
-        for (i, dt) in endpoint.device_types.iter().enumerate() {
-            if endpoint
-                .device_types
-                .get(..i)
-                .is_some_and(|prevs| prevs.iter().any(|prev| prev.id == dt.id))
-            {
-                return Err(EndpointError::DuplicateDeviceType(dt.id));
-            }
-        }
+        // Decode and deduplicate DeviceTypeList (0x0000) in a single zero-alloc pass.
+        let device_types = decode_and_check_device_types(descriptor)?;
 
         // Duplicate server cluster IDs.
-        for (i, c) in endpoint.server_clusters.iter().enumerate() {
+        for (i, c) in endpoint.clusters.iter().enumerate() {
             if endpoint
-                .server_clusters
+                .clusters
                 .get(..i)
                 .is_some_and(|prevs| prevs.iter().any(|prev| prev.id == c.id))
             {
@@ -984,35 +975,26 @@ impl SpecRegistry {
             }
         }
 
-        // Duplicate client cluster IDs.
-        for (i, cid) in endpoint.client_clusters.iter().enumerate() {
-            if endpoint
-                .client_clusters
-                .get(..i)
-                .is_some_and(|prevs| prevs.contains(cid))
-            {
-                return Err(EndpointError::DuplicateCluster(*cid));
-            }
-        }
+        // Decode and deduplicate Descriptor::ClientList (0x0002) once, if present.
+        let client_list = decode_and_check_client_list(descriptor)?;
 
         // Validate each device type's cluster requirements, choice groups, and includes.
-        for dt_entry in &endpoint.device_types {
+        device_types.try_for_each(|dt_id| {
             let dt_desc = self
-                .find_device_type(dt_entry.id)
-                .ok_or(EndpointError::UnsupportedDeviceType(dt_entry.id))?;
-            validate_device_type_reqs(endpoint, dt_desc, mode)?;
+                .find_device_type(dt_id)
+                .ok_or(EndpointError::UnsupportedDeviceType(dt_id))?;
+            validate_device_type_reqs(endpoint, &client_list, dt_desc, mode)?;
             for inc in dt_desc.includes {
                 validate_include_item(endpoint, inc)?;
             }
-        }
+            Ok(())
+        })?;
 
-        // Cross-check Descriptor (0x001D) if present.
-        if let Some(descriptor) = endpoint.server_clusters.iter().find(|c| c.id == ClusterId::DESCRIPTOR) {
-            validate_descriptor_consistency(endpoint, descriptor)?;
-        }
+        // Cross-check Descriptor ServerList (0x0001) against endpoint.clusters if present.
+        validate_descriptor_consistency(endpoint, descriptor)?;
 
         // Validate each registered server cluster; extra/MEI clusters not in registry are permitted.
-        for cluster in &endpoint.server_clusters {
+        for cluster in &endpoint.clusters {
             if self.find_cluster(cluster.id).is_some() {
                 self.validate_cluster_ref_with_mode(cluster, mode)
                     .map_err(|source| EndpointError::InvalidCluster { id: cluster.id, source })?;
@@ -1183,7 +1165,16 @@ fn validate_struct_payload(
     let AttributeValue::Struct(entries) = value else {
         return Err((None, MatterStatus::InvalidDataType));
     };
+    validate_struct_fields(entries, fields, is_command, feature_map, cluster)
+}
 
+fn validate_struct_fields(
+    entries: &[(FieldId, AttributeValue)],
+    fields: &[FieldDescriptor],
+    is_command: bool,
+    feature_map: u32,
+    cluster: Option<&Cluster>,
+) -> Result<(), (Option<FieldId>, MatterStatus)> {
     let mut seen = StackBitset::new();
     for (idx, (fid, fval)) in entries.iter().enumerate() {
         let Some((desc_idx, field_desc)) = fields.iter().enumerate().find(|(_, f)| f.id == *fid) else {
@@ -1491,100 +1482,144 @@ fn list_contains_u32(val: &AttributeValue, target: u32) -> bool {
         .any(|item| extract_unsigned(item) == Some(u64::from(target)))
 }
 
-fn descriptor_attr_error(attr_id: u32) -> EndpointError {
+fn descriptor_attr_status(attr_id: u32, status: MatterStatus) -> EndpointError {
     EndpointError::InvalidCluster {
         id: ClusterId::DESCRIPTOR,
         source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
             id: AttributeId::new(attr_id),
             field_id: None,
-            status: MatterStatus::ConstraintError,
+            status,
         }),
     }
 }
 
-fn decode_device_type_entry_ref(val: &AttributeValue) -> Option<(u32, u16)> {
-    let AttributeValue::Struct(fields) = val else {
-        return None;
-    };
-    let mut id = None;
-    let mut rev = None;
-    for (fid, fval) in fields {
-        match fid.raw() {
-            0 => id = extract_unsigned(fval).and_then(|v| u32::try_from(v).ok()),
-            1 => rev = extract_unsigned(fval).and_then(|v| u16::try_from(v).ok()),
-            _ => {}
-        }
-    }
-    Some((id?, rev?))
+fn descriptor_attr_error(attr_id: u32) -> EndpointError {
+    descriptor_attr_status(attr_id, MatterStatus::ConstraintError)
 }
 
-fn semantic_tag_matches_ref(val: &AttributeValue, tag: &SemanticTag) -> bool {
-    let AttributeValue::Struct(fields) = val else {
-        return false;
+struct DecodedDeviceTypes<'a> {
+    buf: [DeviceTypeId; 16],
+    len: usize,
+    overflow: Option<&'a [AttributeValue]>,
+}
+
+impl DecodedDeviceTypes<'_> {
+    fn try_for_each(&self, mut f: impl FnMut(DeviceTypeId) -> Result<(), EndpointError>) -> Result<(), EndpointError> {
+        for &id in self.buf.get(..self.len).unwrap_or_default() {
+            f(id)?;
+        }
+        if let Some(rest) = self.overflow {
+            for item in rest {
+                let entry = DeviceTypeEntry::try_from(item).map_err(|s| descriptor_attr_status(0x0000, s))?;
+                f(entry.id)?;
+            }
+        }
+        Ok(())
+    }
+}
+
+struct DecodedClientList<'a> {
+    buf: [ClusterId; 32],
+    len: usize,
+    overflow: Option<&'a [AttributeValue]>,
+}
+
+impl DecodedClientList<'_> {
+    fn contains(&self, id: ClusterId) -> bool {
+        if self.buf.get(..self.len).unwrap_or_default().contains(&id) {
+            return true;
+        }
+        self.overflow
+            .is_some_and(|rest| rest.iter().any(|item| ClusterId::try_from(item) == Ok(id)))
+    }
+}
+
+fn decode_and_check_device_types(descriptor: &Cluster) -> Result<DecodedDeviceTypes<'_>, EndpointError> {
+    let Some(val) = descriptor.attribute(AttributeId::new(0x0000)) else {
+        return Err(EndpointError::EmptyDeviceTypes);
     };
-    let mut mfg_code: Option<Option<u16>> = None;
-    let mut namespace_id: Option<u8> = None;
-    let mut tag_val: Option<u8> = None;
-    let mut label: Option<Option<&str>> = None;
-    for (fid, fval) in fields {
-        match fid.raw() {
-            0 => match fval {
-                AttributeValue::Null => mfg_code = Some(None),
-                other => {
-                    let Some(v) = extract_unsigned(other).and_then(|v| u16::try_from(v).ok()) else {
-                        return false;
-                    };
-                    mfg_code = Some(Some(v));
-                }
-            },
-            1 => namespace_id = extract_unsigned(fval).and_then(|v| u8::try_from(v).ok()),
-            2 => tag_val = extract_unsigned(fval).and_then(|v| u8::try_from(v).ok()),
-            3 => match fval {
-                AttributeValue::Null => label = Some(None),
-                AttributeValue::String(s) => label = Some(Some(s.as_str())),
-                _ => return false,
-            },
-            _ => {}
+    let AttributeValue::List(items) = val else {
+        return Err(descriptor_attr_status(0x0000, MatterStatus::InvalidDataType));
+    };
+    if items.is_empty() {
+        return Err(EndpointError::EmptyDeviceTypes);
+    }
+
+    let mut buf = [DeviceTypeId::new(0); 16];
+    let mut len = 0;
+    for (idx, item) in items.iter().enumerate() {
+        let dt_id = DeviceTypeEntry::try_from(item)
+            .map_err(|s| descriptor_attr_status(0x0000, s))?
+            .id;
+        if buf.get(..len).unwrap_or_default().contains(&dt_id) {
+            return Err(EndpointError::DuplicateDeviceType(dt_id));
+        }
+        if let Some(slot) = buf.get_mut(len) {
+            *slot = dt_id;
+            len = len.saturating_add(1);
+        } else if items
+            .get(buf.len()..idx)
+            .unwrap_or_default()
+            .iter()
+            .any(|prev| DeviceTypeEntry::try_from(prev).ok().map(|e| e.id) == Some(dt_id))
+        {
+            return Err(EndpointError::DuplicateDeviceType(dt_id));
+        } else {
+            // Unique overflow entry verified against all prior entries.
         }
     }
-    mfg_code.unwrap_or(None) == tag.mfg_code.into_option().map(VendorId::raw)
-        && namespace_id == Some(tag.namespace_id)
-        && tag_val == Some(tag.tag)
-        && label.unwrap_or(None)
-            == tag
-                .label
-                .as_ref()
-                .into_option()
-                .and_then(|n| n.as_ref().into_option())
-                .map(String::as_str)
+
+    let overflow = items.get(buf.len()..).filter(|rest| !rest.is_empty());
+    Ok(DecodedDeviceTypes { buf, len, overflow })
+}
+
+fn decode_and_check_client_list(descriptor: &Cluster) -> Result<DecodedClientList<'_>, EndpointError> {
+    let mut buf = [ClusterId::new(0); 32];
+    let Some(val) = descriptor.attribute(AttributeId::new(0x0002)) else {
+        return Ok(DecodedClientList {
+            buf,
+            len: 0,
+            overflow: None,
+        });
+    };
+    let AttributeValue::List(items) = val else {
+        return Err(descriptor_attr_status(0x0002, MatterStatus::InvalidDataType));
+    };
+
+    let mut len = 0;
+    for (idx, item) in items.iter().enumerate() {
+        let cid = ClusterId::try_from(item).map_err(|s| descriptor_attr_status(0x0002, s))?;
+        if buf.get(..len).unwrap_or_default().contains(&cid) {
+            return Err(EndpointError::DuplicateCluster(cid));
+        }
+        if let Some(slot) = buf.get_mut(len) {
+            *slot = cid;
+            len = len.saturating_add(1);
+        } else if items
+            .get(buf.len()..idx)
+            .unwrap_or_default()
+            .iter()
+            .any(|prev| ClusterId::try_from(prev) == Ok(cid))
+        {
+            return Err(EndpointError::DuplicateCluster(cid));
+        } else {
+            // Unique overflow entry verified against all prior entries.
+        }
+    }
+
+    let overflow = items.get(buf.len()..).filter(|rest| !rest.is_empty());
+    Ok(DecodedClientList { buf, len, overflow })
 }
 
 fn validate_descriptor_consistency(endpoint: &Endpoint, descriptor: &Cluster) -> Result<(), EndpointError> {
-    if let Some(val) = descriptor.attribute(AttributeId::new(0x0000)) {
-        let AttributeValue::List(dt_list) = val else {
-            return Err(descriptor_attr_error(0x0000));
-        };
-        if dt_list.len() != endpoint.device_types.len() {
-            return Err(descriptor_attr_error(0x0000));
-        }
-        for dt in &endpoint.device_types {
-            if !dt_list
-                .iter()
-                .any(|item| decode_device_type_entry_ref(item) == Some((dt.id.raw(), dt.revision)))
-            {
-                return Err(descriptor_attr_error(0x0000));
-            }
-        }
-    }
-
     if let Some(val) = descriptor.attribute(AttributeId::new(0x0001)) {
         let AttributeValue::List(srv_list) = val else {
-            return Err(descriptor_attr_error(0x0001));
+            return Err(descriptor_attr_status(0x0001, MatterStatus::InvalidDataType));
         };
-        if srv_list.len() != endpoint.server_clusters.len() {
+        if srv_list.len() != endpoint.clusters.len() {
             return Err(descriptor_attr_error(0x0001));
         }
-        for srv in &endpoint.server_clusters {
+        for srv in &endpoint.clusters {
             if !srv_list
                 .iter()
                 .any(|item| extract_unsigned(item) == Some(u64::from(srv.id.raw())))
@@ -1592,62 +1627,6 @@ fn validate_descriptor_consistency(endpoint: &Endpoint, descriptor: &Cluster) ->
                 return Err(descriptor_attr_error(0x0001));
             }
         }
-    }
-
-    if let Some(val) = descriptor.attribute(AttributeId::new(0x0002)) {
-        let AttributeValue::List(cli_list) = val else {
-            return Err(descriptor_attr_error(0x0002));
-        };
-        if cli_list.len() != endpoint.client_clusters.len() {
-            return Err(descriptor_attr_error(0x0002));
-        }
-        for cli in &endpoint.client_clusters {
-            if !cli_list
-                .iter()
-                .any(|item| extract_unsigned(item) == Some(u64::from(cli.raw())))
-            {
-                return Err(descriptor_attr_error(0x0002));
-            }
-        }
-    }
-
-    if let Some(val) = descriptor.attribute(AttributeId::new(0x0003)) {
-        let AttributeValue::List(parts_list) = val else {
-            return Err(descriptor_attr_error(0x0003));
-        };
-        if parts_list.len() != endpoint.parts.len() {
-            return Err(descriptor_attr_error(0x0003));
-        }
-        for part in &endpoint.parts {
-            if !parts_list
-                .iter()
-                .any(|item| extract_unsigned(item) == Some(u64::from(part.raw())))
-            {
-                return Err(descriptor_attr_error(0x0003));
-            }
-        }
-    } else if !endpoint.parts.is_empty() {
-        return Err(descriptor_attr_error(0x0003));
-    } else {
-        // Empty parts list may be omitted.
-    }
-
-    if let Some(val) = descriptor.attribute(AttributeId::new(0x0004)) {
-        let AttributeValue::List(tag_list) = val else {
-            return Err(descriptor_attr_error(0x0004));
-        };
-        if tag_list.len() != endpoint.tags.len() {
-            return Err(descriptor_attr_error(0x0004));
-        }
-        for tag in &endpoint.tags {
-            if !tag_list.iter().any(|item| semantic_tag_matches_ref(item, tag)) {
-                return Err(descriptor_attr_error(0x0004));
-            }
-        }
-    } else if !endpoint.tags.is_empty() {
-        return Err(descriptor_attr_error(0x0004));
-    } else {
-        // Empty tag list may be omitted.
     }
 
     Ok(())
@@ -1722,6 +1701,7 @@ fn check_field_duplicate(
 
 fn validate_device_type_reqs(
     endpoint: &Endpoint,
+    client_list: &DecodedClientList<'_>,
     dt_desc: &DeviceTypeDescriptor,
     mode: ValidationMode,
 ) -> Result<(), EndpointError> {
@@ -1731,7 +1711,7 @@ fn validate_device_type_reqs(
 
     for req in dt_desc.server_clusters {
         let conf = eval_conformance(req.conformance, 0, None);
-        let present = endpoint.server_clusters.iter().any(|c| c.id == req.cluster_id);
+        let present = endpoint.clusters.iter().any(|c| c.id == req.cluster_id);
         if conf == ConformanceResult::Mandatory && !present {
             return Err(EndpointError::MissingMandatoryServerCluster(req.cluster_id));
         }
@@ -1742,7 +1722,7 @@ fn validate_device_type_reqs(
 
     for req in dt_desc.client_clusters {
         let conf = eval_conformance(req.conformance, 0, None);
-        let present = endpoint.client_clusters.contains(&req.cluster_id);
+        let present = client_list.contains(req.cluster_id);
         if conf == ConformanceResult::Mandatory && !present {
             return Err(EndpointError::MissingMandatoryClientCluster(req.cluster_id));
         }
@@ -1753,8 +1733,7 @@ fn validate_device_type_reqs(
 
     for group in dt_desc.choice_groups {
         if !check_choice_group(group, |id| {
-            endpoint.server_clusters.iter().any(|c| c.id.raw() == id)
-                || endpoint.client_clusters.iter().any(|c| c.raw() == id)
+            endpoint.clusters.iter().any(|c| c.id.raw() == id) || client_list.contains(ClusterId::new(id))
         }) {
             let first_id = group.members.first().copied().unwrap_or(0);
             return Err(EndpointError::MissingMandatoryServerCluster(ClusterId::new(first_id)));
@@ -1768,7 +1747,7 @@ fn validate_include_item(endpoint: &Endpoint, inc: &DeviceTypeIncludeItem) -> Re
     if !inc.is_server {
         return Ok(());
     }
-    let Some(cluster) = endpoint.server_clusters.iter().find(|c| c.id == inc.cluster_id) else {
+    let Some(cluster) = endpoint.clusters.iter().find(|c| c.id == inc.cluster_id) else {
         return Ok(());
     };
 
@@ -2150,11 +2129,10 @@ mod tests {
     #[test]
     fn command_missing_mandatory_field_returns_invalid_command() {
         let reg = mock_registry(false);
-        let cmd = Command::new(
+        let cmd = Command::unit(
             ClusterId::new(0x0006),
             CommandId::new(0x00),
             CommandDirection::ClientToServer,
-            AttributeValue::Struct(vec![]),
         );
         assert_eq!(
             reg.validate_command_ref(&cmd),
@@ -2186,21 +2164,16 @@ mod tests {
 
         // Registry not expecting EventList does not require it.
         let reg_no_ev_list = mock_registry(false);
-        let mut ep = Endpoint::new(EndpointId::new(1), vec![], vec![], vec![]);
-        ep.device_types.push(DeviceTypeEntry::new(DeviceTypeId::new(0x0100), 1));
-        ep.server_clusters.push(cluster);
-        // Extra/MEI cluster not in registry is permitted.
-        ep.server_clusters.push(Cluster::empty(ClusterId::new(0xFFF1_0001)));
+        let ep = Endpoint::empty(EndpointId::new(1))
+            .with_device_type_list([DeviceTypeEntry::new(DeviceTypeId::new(0x0100), 1)])
+            .with_cluster(cluster)
+            // Extra/MEI cluster not in registry is permitted.
+            .with_cluster(Cluster::empty(ClusterId::new(0xFFF1_0001)));
 
         reg_no_ev_list.validator().endpoint(&ep).unwrap();
 
         // Event validation preserves metadata.
-        let ev = Event::new(
-            ClusterId::new(0x0006),
-            EventId::new(0x00),
-            EventPriority::Info,
-            AttributeValue::Struct(vec![]),
-        );
+        let ev = Event::unit(ClusterId::new(0x0006), EventId::new(0x00), EventPriority::Info);
         reg_no_ev_list.validator().event(&ev).unwrap();
     }
 
@@ -2281,12 +2254,10 @@ mod tests {
     fn validate_node_ref_enforces_mandatory_under_full_snapshot() {
         let reg = mock_registry(false);
 
-        let mut root_ep = Endpoint::new(EndpointId::ROOT, vec![], vec![], vec![]);
-        root_ep
-            .device_types
-            .push(DeviceTypeEntry::new(DeviceTypeId::new(0x0100), 1));
-        // OnOff cluster is missing mandatory OnOff attribute (0x0000) and ChoiceA/ChoiceB.
-        root_ep.server_clusters.push(Cluster::empty(ClusterId::new(0x0006)));
+        let root_ep = Endpoint::empty(EndpointId::ROOT)
+            .with_device_type_list([DeviceTypeEntry::new(DeviceTypeId::new(0x0100), 1)])
+            // OnOff cluster is missing mandatory OnOff attribute (0x0000) and ChoiceA/ChoiceB.
+            .with_cluster(Cluster::empty(ClusterId::new(0x0006)));
 
         let node = Node::new(NodeId::new(1), vec![root_ep]);
         assert_eq!(
@@ -2432,11 +2403,10 @@ mod tests {
             Err(AttributeError::UnsupportedCluster(ClusterId::new(0x9999)))
         );
         assert_eq!(
-            REG.validator().event(&Event::new(
+            REG.validator().event(&Event::unit(
                 ClusterId::new(0x0006),
                 EventId::new(0x0000),
                 EventPriority::Critical,
-                AttributeValue::Struct(vec![]),
             )),
             Err(EventError::PriorityMismatch {
                 expected: EventPriority::Info,

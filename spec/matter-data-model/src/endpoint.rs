@@ -11,12 +11,19 @@ use core::{
 use crate::{
     attribute::AttributeId,
     cluster::{Cluster, ClusterId},
-    optional::{Nullable, Optional},
+    iter::ResultListIter,
+    optional::Optional,
     status::MatterStatus,
-    tag::SemanticTag,
-    types::VendorId,
+    tag::{SemanticTag, SemanticTagRef},
     value::{AttributeValue, FieldId, decode_unsigned},
 };
+
+const DESCRIPTOR_DEVICE_TYPE_LIST: AttributeId = AttributeId::new(0x0000);
+const DESCRIPTOR_SERVER_LIST: AttributeId = AttributeId::new(0x0001);
+const DESCRIPTOR_CLIENT_LIST: AttributeId = AttributeId::new(0x0002);
+const DESCRIPTOR_PARTS_LIST: AttributeId = AttributeId::new(0x0003);
+const DESCRIPTOR_TAG_LIST: AttributeId = AttributeId::new(0x0004);
+const DESCRIPTOR_ENDPOINT_UNIQUE_ID: AttributeId = AttributeId::new(0x0005);
 
 define_matter_id! {
     /// Strongly-typed Matter Endpoint identifier (`u16`).
@@ -117,9 +124,8 @@ impl TryFrom<&AttributeValue> for DeviceTypeEntry {
 
         let mut id: Option<DeviceTypeId> = None;
         let mut revision: Option<u16> = None;
-        let mut seen_unknown: Vec<FieldId> = Vec::new();
 
-        for (field_id, val) in fields {
+        for (idx, (field_id, val)) in fields.iter().enumerate() {
             match field_id.raw() {
                 0 => {
                     if id.is_some() {
@@ -134,10 +140,12 @@ impl TryFrom<&AttributeValue> for DeviceTypeEntry {
                     revision = Some(decode_unsigned::<u16>(val)?);
                 }
                 _ => {
-                    if seen_unknown.contains(field_id) {
+                    if fields
+                        .get(..idx)
+                        .is_some_and(|prev| prev.iter().any(|(prev_id, _)| prev_id == field_id))
+                    {
                         return Err(MatterStatus::ConstraintError);
                     }
-                    seen_unknown.push(*field_id);
                 }
             }
         }
@@ -158,6 +166,16 @@ impl TryFrom<AttributeValue> for DeviceTypeEntry {
 }
 
 /// Stateful wire representation of a Matter Endpoint on a [`crate::node::Node`] per Section 7.3.
+///
+/// An endpoint has no native wire attributes of its own; endpoint-level metadata (`DeviceTypeList`,
+/// `ServerList`, `ClientList`, `PartsList`, `TagList`, and `EndpointUniqueID`) is carried by its
+/// Descriptor cluster (`0x001D`) inside [`Self::clusters`].
+///
+/// Adding or removing clusters via [`Self::with_cluster`] / [`Self::set_cluster`] does not automatically mutate
+/// Descriptor `ServerList` (`0x0001`), so partial/delta snapshots never fabricate Descriptor state.
+///
+/// When authoring a complete endpoint snapshot, either set `ServerList` explicitly with [`Self::with_server_list`] or
+/// call [`Self::with_synced_server_list`] / [`Self::sync_server_list`] once all clusters have been added.
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -170,83 +188,37 @@ impl TryFrom<AttributeValue> for DeviceTypeEntry {
 pub struct Endpoint {
     /// Matter endpoint identifier.
     pub id: EndpointId,
-    /// Device types implemented by this endpoint (Descriptor `DeviceTypeList`).
-    pub device_types: Vec<DeviceTypeEntry>,
-    /// Server clusters hosted on this endpoint (Descriptor `ServerList`).
-    pub server_clusters: Vec<Cluster>,
-    /// Client cluster IDs referenced by this endpoint (Descriptor `ClientList`).
-    pub client_clusters: Vec<ClusterId>,
-    /// Child endpoint IDs composed under this endpoint (Descriptor `PartsList`).
-    #[cfg_attr(feature = "serde", serde(default))]
-    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
-    pub parts: Vec<EndpointId>,
-    /// Semantic tags disambiguating this endpoint (Descriptor `TagList`).
-    #[cfg_attr(feature = "serde", serde(default))]
-    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
-    pub tags: Vec<SemanticTag>,
-    /// Optional persistent unique identifier disambiguating this endpoint (Descriptor `EndpointUniqueID`, `0x0005`,
-    /// Matter `v1.4`+).
-    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
-    #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
-    pub unique_id: Optional<String>,
+    /// Server cluster instances hosted on this endpoint (including Descriptor `0x001D`).
+    pub clusters: Vec<Cluster>,
 }
 
 impl Endpoint {
-    /// Construct an endpoint with its complete collection of device types and clusters,
-    /// and empty `parts` and `tags` lists.
+    /// Construct an endpoint with its collection of server cluster instances.
     ///
-    /// Callers should provide unique device type, server cluster, and client cluster IDs;
-    /// lookups and updates operate on the first matching ID.
+    /// Callers should provide clusters with unique [`ClusterId`]s; lookups and updates
+    /// operate on the first matching ID.
     #[must_use]
-    pub const fn new(
-        id: EndpointId,
-        device_types: Vec<DeviceTypeEntry>,
-        server_clusters: Vec<Cluster>,
-        client_clusters: Vec<ClusterId>,
-    ) -> Self {
-        Self {
-            id,
-            device_types,
-            server_clusters,
-            client_clusters,
-            parts: Vec::new(),
-            tags: Vec::new(),
-            unique_id: Optional::Omitted,
-        }
+    pub const fn new(id: EndpointId, clusters: Vec<Cluster>) -> Self {
+        Self { id, clusters }
     }
 
-    /// Construct an empty endpoint with no device types, clusters, parts, or tags.
+    /// Construct an empty endpoint with no clusters.
     #[must_use]
     pub const fn empty(id: EndpointId) -> Self {
         Self {
             id,
-            device_types: Vec::new(),
-            server_clusters: Vec::new(),
-            client_clusters: Vec::new(),
-            parts: Vec::new(),
-            tags: Vec::new(),
-            unique_id: Optional::Omitted,
+            clusters: Vec::new(),
         }
     }
 
-    /// Construct a single-device-type endpoint with empty `parts` and `tags` lists.
+    /// Construct a single-device-type endpoint, ensuring its Descriptor cluster (`0x001D`)
+    /// declares `DeviceTypeList` (`0x0000`) and a synchronized `ServerList` (`0x0001`).
     #[must_use]
-    pub fn single_device(
-        id: EndpointId,
-        device_type_id: DeviceTypeId,
-        revision: u16,
-        server_clusters: Vec<Cluster>,
-        client_clusters: Vec<ClusterId>,
-    ) -> Self {
-        Self {
-            id,
-            device_types: alloc::vec![DeviceTypeEntry::new(device_type_id, revision)],
-            server_clusters,
-            client_clusters,
-            parts: Vec::new(),
-            tags: Vec::new(),
-            unique_id: Optional::Omitted,
-        }
+    pub fn single_device(id: EndpointId, device_type_id: DeviceTypeId, revision: u16, clusters: Vec<Cluster>) -> Self {
+        let mut ep = Self::new(id, clusters);
+        ep.set_device_type_list([DeviceTypeEntry::new(device_type_id, revision)]);
+        ep.sync_server_list();
+        ep
     }
 
     /// Set or override the endpoint identifier.
@@ -256,302 +228,444 @@ impl Endpoint {
         self
     }
 
-    /// Add or update a device type entry on this endpoint.
-    #[must_use]
-    pub fn with_device_type(mut self, id: DeviceTypeId, revision: u16) -> Self {
-        self.set_device_type(id, revision);
-        self
-    }
-
-    /// Add or update multiple device type entries on this endpoint.
-    #[must_use]
-    pub fn with_device_types(mut self, entries: impl IntoIterator<Item = DeviceTypeEntry>) -> Self {
-        for entry in entries {
-            self.set_device_type(entry.id, entry.revision);
-        }
-        self
-    }
-
     /// Add or update a server cluster instance on this endpoint.
+    ///
+    /// Does not modify Descriptor `ServerList` (`0x0001`); call [`Self::with_synced_server_list`] at the end of fluent
+    /// construction when authoring a complete endpoint snapshot.
     #[must_use]
-    pub fn with_server_cluster(mut self, cluster: impl Into<Cluster>) -> Self {
-        self.set_server_cluster(cluster);
+    pub fn with_cluster(mut self, cluster: impl Into<Cluster>) -> Self {
+        self.set_cluster(cluster);
         self
     }
 
     /// Add or update multiple server cluster instances on this endpoint.
+    ///
+    /// Does not modify Descriptor `ServerList` (`0x0001`); call [`Self::with_synced_server_list`] at the end of fluent
+    /// construction when authoring a complete endpoint snapshot.
     #[must_use]
-    pub fn with_server_clusters(mut self, clusters: impl IntoIterator<Item = Cluster>) -> Self {
+    pub fn with_clusters(mut self, clusters: impl IntoIterator<Item = Cluster>) -> Self {
         for cluster in clusters {
-            self.set_server_cluster(cluster);
+            self.set_cluster(cluster);
         }
         self
     }
 
-    /// Add a client cluster reference to this endpoint if not already present.
+    /// Set Descriptor `DeviceTypeList` (`0x0000`) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
-    pub fn with_client_cluster(mut self, cluster_id: ClusterId) -> Self {
-        self.add_client_cluster(cluster_id);
+    pub fn with_device_type_list(mut self, entries: impl IntoIterator<Item = DeviceTypeEntry>) -> Self {
+        self.set_device_type_list(entries);
         self
     }
 
-    /// Add multiple client cluster references to this endpoint if not already present.
+    /// Set Descriptor `ServerList` (`0x0001`) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
-    pub fn with_client_clusters(mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Self {
-        for cluster_id in cluster_ids {
-            self.add_client_cluster(cluster_id);
-        }
+    pub fn with_server_list(mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Self {
+        self.set_server_list(cluster_ids);
         self
     }
 
-    /// Add a child endpoint ID to `parts` (`PartsList`) if not already present.
+    /// Synchronize Descriptor `ServerList` (`0x0001`) with the cluster IDs currently hosted in [`Self::clusters`].
+    ///
+    /// Ensures Descriptor (`0x001D`) is present in [`Self::clusters`] and deduplicates IDs in first-seen order.
+    /// This operation is idempotent and intended to be called at the end of fluent construction when authoring a
+    /// complete endpoint snapshot.
     #[must_use]
-    pub fn with_part(mut self, endpoint_id: EndpointId) -> Self {
-        self.add_part(endpoint_id);
+    pub fn with_synced_server_list(mut self) -> Self {
+        self.sync_server_list();
         self
     }
 
-    /// Add multiple child endpoint IDs to `parts` (`PartsList`) if not already present.
+    /// Set Descriptor `ClientList` (`0x0002`) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
-    pub fn with_parts(mut self, endpoint_ids: impl IntoIterator<Item = EndpointId>) -> Self {
-        for endpoint_id in endpoint_ids {
-            self.add_part(endpoint_id);
-        }
+    pub fn with_client_list(mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Self {
+        self.set_client_list(cluster_ids);
         self
     }
 
-    /// Add or update a semantic tag in `tags` (`TagList`).
+    /// Set Descriptor `PartsList` (`0x0003`) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
-    pub fn with_tag(mut self, tag: SemanticTag) -> Self {
-        self.set_tag(tag);
+    pub fn with_parts_list(mut self, endpoint_ids: impl IntoIterator<Item = EndpointId>) -> Self {
+        self.set_parts_list(endpoint_ids);
         self
     }
 
-    /// Add or update multiple semantic tags in `tags` (`TagList`).
+    /// Set Descriptor `TagList` (`0x0004`) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
-    pub fn with_tags(mut self, tags: impl IntoIterator<Item = SemanticTag>) -> Self {
-        for tag in tags {
-            self.set_tag(tag);
-        }
+    pub fn with_tag_list(mut self, tags: impl IntoIterator<Item = SemanticTag>) -> Self {
+        self.set_tag_list(tags);
         self
     }
 
-    /// Set the persistent unique identifier (`EndpointUniqueID`, `0x0005`, Matter `v1.4`+).
+    /// Set Descriptor `EndpointUniqueID` (`0x0005`, Matter `v1.4`+) on this endpoint's Descriptor cluster (`0x001D`).
     #[must_use]
     pub fn with_unique_id(mut self, unique_id: impl Into<String>) -> Self {
-        self.unique_id = Optional::Present(unique_id.into());
+        self.set_unique_id(unique_id);
         self
     }
 
-    /// Set or omit the optional persistent unique identifier (`EndpointUniqueID`, `0x0005`, Matter `v1.4`+).
+    /// Set or omit Descriptor `EndpointUniqueID` (`0x0005`, Matter `v1.4`+) on this endpoint's Descriptor cluster
+    /// (`0x001D`).
     #[must_use]
     pub fn with_optional_unique_id(mut self, unique_id: impl Into<Optional<String>>) -> Self {
-        self.unique_id = unique_id.into();
-        self
-    }
-
-    /// Returns `true` if this endpoint exposes the given device type.
-    #[must_use]
-    pub fn has_device_type(&self, id: DeviceTypeId) -> bool {
-        self.device_types.iter().any(|entry| entry.id == id)
-    }
-
-    /// Returns the primary device type declared on this endpoint (first entry in `device_types`).
-    #[must_use]
-    pub fn primary_device_type(&self) -> Option<DeviceTypeEntry> {
-        self.device_types.first().copied()
-    }
-
-    /// Insert or update a device type entry on this endpoint in place, returning the previous revision if updated.
-    pub fn set_device_type(&mut self, id: DeviceTypeId, revision: u16) -> Option<u16> {
-        if let Some(existing) = self.device_types.iter_mut().find(|entry| entry.id == id) {
-            Some(mem::replace(&mut existing.revision, revision))
-        } else {
-            self.device_types.push(DeviceTypeEntry::new(id, revision));
-            None
+        match unique_id.into() {
+            Optional::Present(uid) => {
+                self.set_unique_id(uid);
+            }
+            Optional::Omitted => {
+                self.remove_unique_id();
+            }
         }
-    }
-
-    /// Remove a device type entry by ID from this endpoint, returning it if present.
-    pub fn remove_device_type(&mut self, id: DeviceTypeId) -> Option<DeviceTypeEntry> {
-        self.device_types
-            .iter()
-            .position(|entry| entry.id == id)
-            .map(|idx| self.device_types.remove(idx))
+        self
     }
 
     /// Return `true` if this endpoint hosts a server cluster with the given ID.
     #[must_use]
-    pub fn has_server_cluster(&self, id: ClusterId) -> bool {
-        self.server_clusters.iter().any(|c| c.id == id)
+    pub fn has_cluster(&self, id: ClusterId) -> bool {
+        self.clusters.iter().any(|c| c.id == id)
     }
 
     /// Find a server cluster on this endpoint by cluster ID.
     #[must_use]
-    pub fn server_cluster(&self, id: ClusterId) -> Option<&Cluster> {
-        self.server_clusters.iter().find(|c| c.id == id)
+    pub fn cluster(&self, id: ClusterId) -> Option<&Cluster> {
+        self.clusters.iter().find(|c| c.id == id)
     }
 
     /// Return a mutable reference to a server cluster on this endpoint by cluster ID.
     #[must_use]
-    pub fn server_cluster_mut(&mut self, id: ClusterId) -> Option<&mut Cluster> {
-        self.server_clusters.iter_mut().find(|c| c.id == id)
+    pub fn cluster_mut(&mut self, id: ClusterId) -> Option<&mut Cluster> {
+        self.clusters.iter_mut().find(|c| c.id == id)
     }
 
     /// Insert or update a server cluster on this endpoint in place, returning the previous cluster if replaced.
-    pub fn set_server_cluster(&mut self, cluster: impl Into<Cluster>) -> Option<Cluster> {
+    pub fn set_cluster(&mut self, cluster: impl Into<Cluster>) -> Option<Cluster> {
         let cluster = cluster.into();
-        if let Some(existing) = self.server_clusters.iter_mut().find(|c| c.id == cluster.id) {
+        if let Some(existing) = self.clusters.iter_mut().find(|c| c.id == cluster.id) {
             Some(mem::replace(existing, cluster))
         } else {
-            self.server_clusters.push(cluster);
+            self.clusters.push(cluster);
             None
         }
     }
 
     /// Remove a server cluster by ID from this endpoint, returning it if present.
-    pub fn remove_server_cluster(&mut self, id: ClusterId) -> Option<Cluster> {
-        self.server_clusters
+    pub fn remove_cluster(&mut self, id: ClusterId) -> Option<Cluster> {
+        self.clusters
             .iter()
             .position(|c| c.id == id)
-            .map(|idx| self.server_clusters.remove(idx))
+            .map(|idx| self.clusters.remove(idx))
     }
 
-    /// Return `true` if this endpoint declares a client cluster with the given ID.
+    /// Return the Descriptor cluster (`0x001D`) on this endpoint, if present.
     #[must_use]
-    pub fn has_client_cluster(&self, id: ClusterId) -> bool {
-        self.client_clusters.contains(&id)
+    pub fn descriptor(&self) -> Option<&Cluster> {
+        self.cluster(ClusterId::DESCRIPTOR)
     }
 
-    /// Add a client cluster reference to this endpoint in place if not already present, returning `true` if inserted.
-    pub fn add_client_cluster(&mut self, cluster_id: ClusterId) -> bool {
-        if self.client_clusters.contains(&cluster_id) {
-            false
-        } else {
-            self.client_clusters.push(cluster_id);
-            true
+    /// Return a mutable reference to the Descriptor cluster (`0x001D`) on this endpoint, if present.
+    #[must_use]
+    pub fn descriptor_mut(&mut self) -> Option<&mut Cluster> {
+        self.cluster_mut(ClusterId::DESCRIPTOR)
+    }
+
+    /// Return `true` if Descriptor `DeviceTypeList` (`0x0000`) is present on this endpoint.
+    #[must_use]
+    pub fn has_device_type_list(&self) -> bool {
+        self.descriptor()
+            .is_some_and(|c| c.has_attribute(DESCRIPTOR_DEVICE_TYPE_LIST))
+    }
+
+    /// Decode Descriptor `DeviceTypeList` (`0x0000`) as a zero-allocation [`ResultListIter`].
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `DeviceTypeList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn device_type_list(&self) -> Result<Optional<ResultListIter<'_, DeviceTypeEntry>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_DEVICE_TYPE_LIST)
+    }
+
+    /// Return `true` if Descriptor `DeviceTypeList` (`0x0000`) contains the given device type ID.
+    ///
+    /// Returns `Ok(false)` when Descriptor or `DeviceTypeList` is absent.
+    pub fn has_device_type(&self, id: DeviceTypeId) -> Result<bool, MatterStatus> {
+        let Optional::Present(iter) = self.device_type_list()? else {
+            return Ok(false);
+        };
+        for entry in iter {
+            if entry?.id == id {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    /// Return the primary device type declared on this endpoint (first entry in Descriptor `DeviceTypeList`, `0x0000`),
+    /// or `Optional::Omitted` if absent or empty.
+    pub fn primary_device_type(&self) -> Result<Optional<DeviceTypeEntry>, MatterStatus> {
+        let Optional::Present(mut iter) = self.device_type_list()? else {
+            return Ok(Optional::Omitted);
+        };
+        match iter.next() {
+            Some(res) => res.map(Optional::Present),
+            None => Ok(Optional::Omitted),
         }
     }
 
-    /// Remove a client cluster reference by ID from this endpoint, returning `true` if removed.
-    pub fn remove_client_cluster(&mut self, cluster_id: ClusterId) -> bool {
-        if let Some(idx) = self.client_clusters.iter().position(|&id| id == cluster_id) {
-            self.client_clusters.remove(idx);
-            true
-        } else {
-            false
+    /// Set Descriptor `DeviceTypeList` (`0x0000`) in place, inserting Descriptor (`0x001D`) if absent and
+    /// deduplicating by device type ID (updating `revision` on duplicates in first-seen order).
+    pub fn set_device_type_list(
+        &mut self,
+        entries: impl IntoIterator<Item = DeviceTypeEntry>,
+    ) -> Option<AttributeValue> {
+        let mut unique: Vec<DeviceTypeEntry> = Vec::new();
+        for entry in entries {
+            if let Some(existing) = unique.iter_mut().find(|existing| existing.id == entry.id) {
+                existing.revision = entry.revision;
+            } else {
+                unique.push(entry);
+            }
+        }
+        let list = AttributeValue::List(unique.into_iter().map(AttributeValue::from).collect());
+        self.set_descriptor_attribute(DESCRIPTOR_DEVICE_TYPE_LIST, list)
+    }
+
+    /// Remove Descriptor `DeviceTypeList` (`0x0000`) in place, returning the previous value if present.
+    pub fn remove_device_type_list(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_DEVICE_TYPE_LIST)
+    }
+
+    /// Return `true` if Descriptor `ServerList` (`0x0001`) is present on this endpoint.
+    #[must_use]
+    pub fn has_server_list(&self) -> bool {
+        self.descriptor()
+            .is_some_and(|c| c.has_attribute(DESCRIPTOR_SERVER_LIST))
+    }
+
+    /// Decode Descriptor `ServerList` (`0x0001`) as a zero-allocation [`ResultListIter`].
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `ServerList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn server_list(&self) -> Result<Optional<ResultListIter<'_, ClusterId>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_SERVER_LIST)
+    }
+
+    /// Set Descriptor `ServerList` (`0x0001`) in place, inserting Descriptor (`0x001D`) if absent and deduplicating
+    /// IDs in first-seen order.
+    pub fn set_server_list(&mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Option<AttributeValue> {
+        self.set_descriptor_id_list(DESCRIPTOR_SERVER_LIST, cluster_ids)
+    }
+
+    /// Remove Descriptor `ServerList` (`0x0001`) in place, returning the previous value if present.
+    pub fn remove_server_list(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_SERVER_LIST)
+    }
+
+    /// Synchronize Descriptor `ServerList` (`0x0001`) with the cluster IDs currently hosted in [`Self::clusters`],
+    /// deduplicating IDs in first-seen order.
+    ///
+    /// Ensures Descriptor (`0x001D`) is present in [`Self::clusters`] before writing `ServerList`, returning the
+    /// previous attribute value if replaced. This operation is idempotent.
+    pub fn sync_server_list(&mut self) -> Option<AttributeValue> {
+        let has_desc = self.has_cluster(ClusterId::DESCRIPTOR);
+        let mut values = Vec::with_capacity(self.clusters.len().saturating_add(usize::from(!has_desc)));
+        if !has_desc {
+            values.push(AttributeValue::from(ClusterId::DESCRIPTOR));
+        }
+        for cluster in &self.clusters {
+            let val = AttributeValue::from(cluster.id);
+            if !values.contains(&val) {
+                values.push(val);
+            }
+        }
+        self.set_descriptor_attribute(DESCRIPTOR_SERVER_LIST, AttributeValue::List(values))
+    }
+
+    /// Return `true` if Descriptor `ClientList` (`0x0002`) is present on this endpoint.
+    #[must_use]
+    pub fn has_client_list(&self) -> bool {
+        self.descriptor()
+            .is_some_and(|c| c.has_attribute(DESCRIPTOR_CLIENT_LIST))
+    }
+
+    /// Decode Descriptor `ClientList` (`0x0002`) as a zero-allocation [`ResultListIter`].
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `ClientList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn client_list(&self) -> Result<Optional<ResultListIter<'_, ClusterId>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_CLIENT_LIST)
+    }
+
+    /// Set Descriptor `ClientList` (`0x0002`) in place, inserting Descriptor (`0x001D`) if absent and deduplicating
+    /// IDs in first-seen order.
+    pub fn set_client_list(&mut self, cluster_ids: impl IntoIterator<Item = ClusterId>) -> Option<AttributeValue> {
+        self.set_descriptor_id_list(DESCRIPTOR_CLIENT_LIST, cluster_ids)
+    }
+
+    /// Remove Descriptor `ClientList` (`0x0002`) in place, returning the previous value if present.
+    pub fn remove_client_list(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_CLIENT_LIST)
+    }
+
+    /// Return `true` if Descriptor `PartsList` (`0x0003`) is present on this endpoint.
+    #[must_use]
+    pub fn has_parts_list(&self) -> bool {
+        self.descriptor()
+            .is_some_and(|c| c.has_attribute(DESCRIPTOR_PARTS_LIST))
+    }
+
+    /// Decode Descriptor `PartsList` (`0x0003`) as a zero-allocation [`ResultListIter`].
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `PartsList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn parts_list(&self) -> Result<Optional<ResultListIter<'_, EndpointId>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_PARTS_LIST)
+    }
+
+    /// Set Descriptor `PartsList` (`0x0003`) in place, inserting Descriptor (`0x001D`) if absent and deduplicating
+    /// IDs in first-seen order.
+    pub fn set_parts_list(&mut self, endpoint_ids: impl IntoIterator<Item = EndpointId>) -> Option<AttributeValue> {
+        self.set_descriptor_id_list(DESCRIPTOR_PARTS_LIST, endpoint_ids)
+    }
+
+    /// Remove Descriptor `PartsList` (`0x0003`) in place, returning the previous value if present.
+    pub fn remove_parts_list(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_PARTS_LIST)
+    }
+
+    /// Return `true` if Descriptor `TagList` (`0x0004`) is present on this endpoint.
+    #[must_use]
+    pub fn has_tag_list(&self) -> bool {
+        self.descriptor().is_some_and(|c| c.has_attribute(DESCRIPTOR_TAG_LIST))
+    }
+
+    /// Decode Descriptor `TagList` (`0x0004`) as a lazy [`ResultListIter`].
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `TagList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn tag_list(&self) -> Result<Optional<ResultListIter<'_, SemanticTag>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_TAG_LIST)
+    }
+
+    /// Decode Descriptor `TagList` (`0x0004`) as a zero-allocation [`ResultListIter`] of borrowed [`SemanticTagRef`]s.
+    ///
+    /// Returns `Ok(Optional::Omitted)` when Descriptor or `TagList` is absent, or
+    /// `Err(MatterStatus::InvalidDataType)` if the attribute is not a wire list.
+    pub fn tag_list_ref(&self) -> Result<Optional<ResultListIter<'_, SemanticTagRef<'_>>>, MatterStatus> {
+        decode_list_attr(self, DESCRIPTOR_TAG_LIST)
+    }
+
+    /// Set Descriptor `TagList` (`0x0004`) in place, inserting Descriptor (`0x001D`) if absent and deduplicating
+    /// by `(mfg_code, namespace_id, tag)` key (replacing existing entries in first-seen order).
+    pub fn set_tag_list(&mut self, tags: impl IntoIterator<Item = SemanticTag>) -> Option<AttributeValue> {
+        let mut unique: Vec<SemanticTag> = Vec::new();
+        for tag in tags {
+            if let Some(existing) = unique.iter_mut().find(|existing| {
+                existing.mfg_code == tag.mfg_code
+                    && existing.namespace_id == tag.namespace_id
+                    && existing.tag == tag.tag
+            }) {
+                *existing = tag;
+            } else {
+                unique.push(tag);
+            }
+        }
+        let list = AttributeValue::List(unique.into_iter().map(AttributeValue::from).collect());
+        self.set_descriptor_attribute(DESCRIPTOR_TAG_LIST, list)
+    }
+
+    /// Remove Descriptor `TagList` (`0x0004`) in place, returning the previous value if present.
+    pub fn remove_tag_list(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_TAG_LIST)
+    }
+
+    /// Return `true` if Descriptor `EndpointUniqueID` (`0x0005`) is present on this endpoint.
+    #[must_use]
+    pub fn has_unique_id(&self) -> bool {
+        self.descriptor()
+            .is_some_and(|c| c.has_attribute(DESCRIPTOR_ENDPOINT_UNIQUE_ID))
+    }
+
+    /// Borrow Descriptor `EndpointUniqueID` (`0x0005`), or `Optional::Omitted` if absent.
+    pub fn unique_id(&self) -> Result<Optional<&str>, MatterStatus> {
+        let Some(val) = self
+            .descriptor()
+            .and_then(|c| c.attribute(DESCRIPTOR_ENDPOINT_UNIQUE_ID))
+        else {
+            return Ok(Optional::Omitted);
+        };
+        match val {
+            AttributeValue::String(s) => Ok(Optional::Present(s.as_str())),
+            _ => Err(MatterStatus::InvalidDataType),
         }
     }
 
-    /// Return `true` if `parts` (`PartsList`) contains the given child endpoint ID.
-    #[must_use]
-    pub fn has_part(&self, endpoint_id: EndpointId) -> bool {
-        self.parts.contains(&endpoint_id)
+    /// Set Descriptor `EndpointUniqueID` (`0x0005`) in place, inserting Descriptor (`0x001D`) if absent.
+    pub fn set_unique_id(&mut self, unique_id: impl Into<String>) -> Option<AttributeValue> {
+        self.set_descriptor_attribute(DESCRIPTOR_ENDPOINT_UNIQUE_ID, AttributeValue::String(unique_id.into()))
     }
 
-    /// Add a child endpoint ID to `parts` (`PartsList`) in place if not already present, returning `true` if inserted.
-    pub fn add_part(&mut self, endpoint_id: EndpointId) -> bool {
-        if self.parts.contains(&endpoint_id) {
-            false
-        } else {
-            self.parts.push(endpoint_id);
-            true
-        }
+    /// Remove Descriptor `EndpointUniqueID` (`0x0005`) in place, returning the previous value if present.
+    pub fn remove_unique_id(&mut self) -> Option<AttributeValue> {
+        self.descriptor_mut()?.remove_attribute(DESCRIPTOR_ENDPOINT_UNIQUE_ID)
     }
 
-    /// Remove a child endpoint ID from `parts` (`PartsList`), returning `true` if removed.
-    pub fn remove_part(&mut self, endpoint_id: EndpointId) -> bool {
-        if let Some(idx) = self.parts.iter().position(|&id| id == endpoint_id) {
-            self.parts.remove(idx);
-            true
-        } else {
-            false
-        }
-    }
-
-    /// Return `true` if `tags` (`TagList`) contains a tag matching `(mfg_code, namespace_id, tag)`.
-    #[must_use]
-    pub fn has_tag(&self, mfg_code: Nullable<VendorId>, namespace_id: u8, tag: u8) -> bool {
-        self.tags
-            .iter()
-            .any(|t| t.mfg_code == mfg_code && t.namespace_id == namespace_id && t.tag == tag)
-    }
-
-    /// Insert or update a semantic tag in `tags` (`TagList`) in place, matching on
-    /// `(mfg_code, namespace_id, tag)` and returning the previous entry if replaced.
-    pub fn set_tag(&mut self, tag: SemanticTag) -> Option<SemanticTag> {
-        if let Some(existing) = self
-            .tags
-            .iter_mut()
-            .find(|t| t.mfg_code == tag.mfg_code && t.namespace_id == tag.namespace_id && t.tag == tag.tag)
-        {
-            Some(mem::replace(existing, tag))
-        } else {
-            self.tags.push(tag);
-            None
-        }
-    }
-
-    /// Remove a semantic tag by `(mfg_code, namespace_id, tag)` from `tags` (`TagList`), returning it if present.
-    pub fn remove_tag(&mut self, mfg_code: Nullable<VendorId>, namespace_id: u8, tag: u8) -> Option<SemanticTag> {
-        self.tags
-            .iter()
-            .position(|t| t.mfg_code == mfg_code && t.namespace_id == namespace_id && t.tag == tag)
-            .map(|idx| self.tags.remove(idx))
-    }
-
-    /// Return `true` if this endpoint has a persistent unique identifier (`EndpointUniqueID`, `0x0005`).
-    #[must_use]
-    pub const fn has_unique_id(&self) -> bool {
-        self.unique_id.is_present()
-    }
-
-    /// Return the persistent unique identifier (`EndpointUniqueID`, `0x0005`), or `Optional::Omitted` if absent.
-    #[must_use]
-    pub fn unique_id(&self) -> Optional<&str> {
-        self.unique_id.as_deref()
-    }
-
-    /// Set or replace the persistent unique identifier (`EndpointUniqueID`, `0x0005`), returning the previous value if
-    /// present.
-    pub fn set_unique_id(&mut self, unique_id: impl Into<String>) -> Option<String> {
-        mem::replace(&mut self.unique_id, Optional::Present(unique_id.into())).into_option()
-    }
-
-    /// Remove the persistent unique identifier (`EndpointUniqueID`, `0x0005`), returning it if present.
-    pub fn remove_unique_id(&mut self) -> Option<String> {
-        mem::take(&mut self.unique_id).into_option()
-    }
-
-    /// Convenience lookup for an attribute value across `server_cluster -> attribute`.
+    /// Convenience lookup for an attribute value across `cluster -> attribute`.
     #[must_use]
     pub fn attribute(&self, cluster_id: ClusterId, attribute_id: AttributeId) -> Option<&AttributeValue> {
-        self.server_cluster(cluster_id)?.attribute(attribute_id)
+        self.cluster(cluster_id)?.attribute(attribute_id)
     }
 
-    /// Convenience mutable lookup for an attribute value across `server_cluster -> attribute`.
+    /// Convenience mutable lookup for an attribute value across `cluster -> attribute`.
     #[must_use]
     pub fn attribute_mut(&mut self, cluster_id: ClusterId, attribute_id: AttributeId) -> Option<&mut AttributeValue> {
-        self.server_cluster_mut(cluster_id)?.attribute_mut(attribute_id)
+        self.cluster_mut(cluster_id)?.attribute_mut(attribute_id)
+    }
+
+    fn set_descriptor_id_list<T: Into<AttributeValue>>(
+        &mut self,
+        attr_id: AttributeId,
+        ids: impl IntoIterator<Item = T>,
+    ) -> Option<AttributeValue> {
+        let iter = ids.into_iter();
+        let mut values = Vec::with_capacity(iter.size_hint().0);
+        for id in iter {
+            let val = id.into();
+            if !values.contains(&val) {
+                values.push(val);
+            }
+        }
+        self.set_descriptor_attribute(attr_id, AttributeValue::List(values))
+    }
+
+    fn set_descriptor_attribute(&mut self, attr_id: AttributeId, value: AttributeValue) -> Option<AttributeValue> {
+        if let Some(desc) = self.descriptor_mut() {
+            desc.set_attribute(attr_id, value)
+        } else {
+            let desc = Cluster::empty(ClusterId::DESCRIPTOR).with_attribute(attr_id, value);
+            self.clusters.insert(0, desc);
+            None
+        }
     }
 }
 
 impl Display for Endpoint {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        write!(
-            f,
-            "Endpoint {} ({} server clusters, {} client clusters)",
-            self.id,
-            self.server_clusters.len(),
-            self.client_clusters.len()
-        )
+        write!(f, "Endpoint {} ({} clusters)", self.id, self.clusters.len())
+    }
+}
+
+fn decode_list_attr<T>(ep: &Endpoint, attr_id: AttributeId) -> Result<Optional<ResultListIter<'_, T>>, MatterStatus> {
+    let Some(val) = ep.descriptor().and_then(|c| c.attribute(attr_id)) else {
+        return Ok(Optional::Omitted);
+    };
+    match val {
+        AttributeValue::List(items) => Ok(Optional::Present(ResultListIter::new(items))),
+        _ => Err(MatterStatus::InvalidDataType),
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::{cluster::DataVersion, optional::Optional, types::VendorId};
+    use crate::{cluster::DataVersion, types::VendorId};
 
     #[test]
     fn endpoint_id_and_device_type_id() {
@@ -584,64 +698,64 @@ mod tests {
         const IDENTIFY: ClusterId = ClusterId::new(0x0003);
         const THERMOSTAT_CLUSTER: ClusterId = ClusterId::new(0x0201);
 
-        let ep = Endpoint::single_device(
-            EndpointId::new(1),
-            ON_OFF_LIGHT,
-            1,
-            alloc::vec![Cluster::empty(ON_OFF)],
-            alloc::vec![BASIC_INFO],
-        )
-        .with_device_type(DIMMABLE_LIGHT, 2)
-        .with_client_cluster(IDENTIFY);
+        let ep = Endpoint::single_device(EndpointId::new(1), ON_OFF_LIGHT, 1, alloc::vec![Cluster::empty(ON_OFF)])
+            .with_device_type_list([
+                DeviceTypeEntry::new(ON_OFF_LIGHT, 1),
+                DeviceTypeEntry::new(DIMMABLE_LIGHT, 2),
+            ])
+            .with_client_list([BASIC_INFO, IDENTIFY]);
 
         assert_eq!(ep.id, EndpointId::new(1));
-        assert!(ep.has_device_type(ON_OFF_LIGHT));
-        assert!(ep.has_device_type(DIMMABLE_LIGHT));
-        assert!(!ep.has_device_type(THERMOSTAT_DEVICE));
+        assert_eq!(ep.has_device_type(ON_OFF_LIGHT), Ok(true));
+        assert_eq!(ep.has_device_type(DIMMABLE_LIGHT), Ok(true));
+        assert_eq!(ep.has_device_type(THERMOSTAT_DEVICE), Ok(false));
 
-        assert_eq!(ep.primary_device_type(), Some(DeviceTypeEntry::new(ON_OFF_LIGHT, 1)));
-        assert!(ep.server_cluster(ON_OFF).is_some());
-        assert!(ep.server_cluster(THERMOSTAT_CLUSTER).is_none());
-        assert_eq!(ep.client_clusters.len(), 2);
-
-        // Deduplicating builders & in-place mutation
-        let mut ep = ep
-            .with_device_type(ON_OFF_LIGHT, 3)
-            .with_client_cluster(IDENTIFY)
-            .with_server_cluster(Cluster::empty(ON_OFF).with_data_version(DataVersion::new(2)));
-        assert_eq!(ep.device_types.len(), 2);
-        assert_eq!(ep.primary_device_type(), Some(DeviceTypeEntry::new(ON_OFF_LIGHT, 3)));
-        assert_eq!(ep.client_clusters.len(), 2);
-        assert_eq!(ep.server_clusters.len(), 1);
         assert_eq!(
-            ep.server_cluster(ON_OFF).unwrap().data_version,
+            ep.primary_device_type(),
+            Ok(Optional::Present(DeviceTypeEntry::new(ON_OFF_LIGHT, 1)))
+        );
+        assert!(ep.cluster(ON_OFF).is_some());
+        assert!(ep.cluster(ClusterId::DESCRIPTOR).is_some());
+        assert!(ep.cluster(THERMOSTAT_CLUSTER).is_none());
+        assert_eq!(
+            ep.server_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![ClusterId::DESCRIPTOR, ON_OFF]))
+        );
+        assert_eq!(
+            ep.client_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![BASIC_INFO, IDENTIFY]))
+        );
+
+        let mut ep = ep.with_cluster(Cluster::empty(ON_OFF).with_data_version(DataVersion::new(2)));
+        assert_eq!(ep.clusters.len(), 2);
+        assert_eq!(
+            ep.cluster(ON_OFF).unwrap().data_version,
             Optional::Present(DataVersion::new(2))
         );
 
-        assert!(ep.has_server_cluster(ON_OFF));
-        assert!(ep.has_client_cluster(IDENTIFY));
-        assert!(ep.server_cluster_mut(ON_OFF).is_some());
-        assert!(ep.remove_server_cluster(ON_OFF).is_some());
-        assert!(!ep.has_server_cluster(ON_OFF));
+        assert!(ep.has_cluster(ON_OFF));
+        assert!(ep.cluster_mut(ON_OFF).is_some());
+        assert!(ep.remove_cluster(ON_OFF).is_some());
+        assert!(!ep.has_cluster(ON_OFF));
         assert!(EndpointId::ROOT.is_root());
         assert!(EndpointId::WILDCARD.is_wildcard());
     }
 
     #[test]
-    fn remove_server_cluster_preserves_order() {
-        let mut ep = Endpoint::new(EndpointId::new(1), alloc::vec![], alloc::vec![], alloc::vec![])
-            .with_server_cluster(Cluster::empty(ClusterId::new(1)))
-            .with_server_cluster(Cluster::empty(ClusterId::new(2)))
-            .with_server_cluster(Cluster::empty(ClusterId::new(3)))
-            .with_server_cluster(Cluster::empty(ClusterId::new(4)));
+    fn remove_cluster_preserves_order() {
+        let mut ep = Endpoint::new(EndpointId::new(1), alloc::vec![])
+            .with_cluster(Cluster::empty(ClusterId::new(1)))
+            .with_cluster(Cluster::empty(ClusterId::new(2)))
+            .with_cluster(Cluster::empty(ClusterId::new(3)))
+            .with_cluster(Cluster::empty(ClusterId::new(4)));
 
-        assert!(ep.remove_server_cluster(ClusterId::new(2)).is_some());
-        let ids: Vec<u32> = ep.server_clusters.iter().map(|c| c.id.raw()).collect();
+        assert!(ep.remove_cluster(ClusterId::new(2)).is_some());
+        let ids: Vec<u32> = ep.clusters.iter().map(|c| c.id.raw()).collect();
         assert_eq!(ids, alloc::vec![1, 3, 4]);
     }
 
     #[test]
-    fn endpoint_helpers_and_formatting() {
+    fn endpoint_descriptor_helpers_and_formatting() {
         let mei_dt = DeviceTypeId::from_mei(VendorId::new(0x0001), 0x0002);
         assert_eq!(alloc::format!("{mei_dt}"), "0x00010002");
         assert_eq!("0x00010002".parse::<DeviceTypeId>(), Ok(mei_dt));
@@ -651,46 +765,60 @@ mod tests {
         const BASIC_INFORMATION: ClusterId = ClusterId::new(0x0028);
 
         let mut ep = Endpoint::empty(EndpointId::new(2));
-        assert_eq!(ep.set_device_type(AGGREGATOR, 1), None);
-        assert_eq!(ep.set_device_type(AGGREGATOR, 2), Some(1));
-        assert!(ep.add_client_cluster(BASIC_INFORMATION));
-        assert!(!ep.add_client_cluster(BASIC_INFORMATION));
-        ep.set_server_cluster(Cluster::empty(ClusterId::DESCRIPTOR).with_attribute(AttributeId::new(0), 1_u8));
+        assert!(!ep.has_device_type_list());
+        assert!(!ep.has_server_list());
+        assert!(!ep.has_client_list());
+        assert!(!ep.has_parts_list());
+        assert!(!ep.has_tag_list());
+        assert!(!ep.has_unique_id());
+        assert_eq!(ep.has_device_type(AGGREGATOR), Ok(false));
+        assert_eq!(ep.primary_device_type(), Ok(Optional::Omitted));
+
+        assert_eq!(ep.set_device_type_list([DeviceTypeEntry::new(AGGREGATOR, 1)]), None);
+        assert!(ep.has_device_type_list());
         assert_eq!(
-            ep.attribute(ClusterId::DESCRIPTOR, AttributeId::new(0)),
-            Some(&AttributeValue::U8(1))
+            ep.primary_device_type(),
+            Ok(Optional::Present(DeviceTypeEntry::new(AGGREGATOR, 1)))
         );
-        if let Some(v) = ep.attribute_mut(ClusterId::DESCRIPTOR, AttributeId::new(0)) {
-            *v = AttributeValue::U8(2);
-        }
+        assert!(ep.set_client_list([BASIC_INFORMATION]).is_none());
+        assert_eq!(ep.client_list().unwrap().contains(BASIC_INFORMATION), Ok(true));
+        assert!(ep.sync_server_list().is_none());
         assert_eq!(
-            ep.attribute(ClusterId::DESCRIPTOR, AttributeId::new(0)),
-            Some(&AttributeValue::U8(2))
+            ep.server_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![ClusterId::DESCRIPTOR]))
         );
+
         assert_eq!(
-            alloc::format!("{ep}"),
-            "Endpoint 2 (1 server clusters, 1 client clusters)"
+            ep.attribute(ClusterId::DESCRIPTOR, DESCRIPTOR_CLIENT_LIST),
+            Some(&AttributeValue::List(alloc::vec![AttributeValue::from(
+                BASIC_INFORMATION
+            )]))
         );
-        assert!(ep.remove_client_cluster(BASIC_INFORMATION));
-        assert!(!ep.remove_client_cluster(BASIC_INFORMATION));
-        assert!(ep.remove_device_type(AGGREGATOR).is_some());
+        assert_eq!(alloc::format!("{ep}"), "Endpoint 2 (1 clusters)");
+
+        assert!(ep.remove_client_list().is_some());
+        assert!(!ep.has_client_list());
+        assert!(ep.remove_device_type_list().is_some());
+        assert!(!ep.has_device_type_list());
 
         // PartsList & TagList helpers
+        let tag_left = SemanticTag::new(1, 2).with_label("Left");
         ep = ep
-            .with_part(EndpointId::new(3))
-            .with_parts([EndpointId::new(3), EndpointId::new(4)])
-            .with_tag(SemanticTag::new(1, 2).with_label("Left"));
-        assert!(ep.has_part(EndpointId::new(3)));
-        assert!(ep.has_part(EndpointId::new(4)));
-        assert_eq!(ep.parts.len(), 2);
-        assert!(ep.remove_part(EndpointId::new(3)));
-        assert!(!ep.remove_part(EndpointId::new(3)));
-        assert!(ep.has_tag(Nullable::Null, 1, 2));
-        let prev_tag = ep.set_tag(SemanticTag::new(1, 2).with_label("Top"));
-        assert!(prev_tag.is_some());
-        assert_eq!(ep.tags.len(), 1);
-        assert!(ep.remove_tag(Nullable::Null, 1, 2).is_some());
-        assert!(!ep.has_tag(Nullable::Null, 1, 2));
+            .with_parts_list([EndpointId::new(3), EndpointId::new(4)])
+            .with_tag_list([tag_left.clone()]);
+        assert!(ep.has_parts_list());
+        assert_eq!(ep.parts_list().unwrap().contains(EndpointId::new(3)), Ok(true));
+        assert_eq!(ep.parts_list().unwrap().contains(EndpointId::new(4)), Ok(true));
+        assert!(ep.remove_parts_list().is_some());
+        assert!(!ep.has_parts_list());
+
+        assert!(ep.has_tag_list());
+        assert_eq!(
+            ep.tag_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![tag_left]))
+        );
+        assert!(ep.remove_tag_list().is_some());
+        assert!(!ep.has_tag_list());
 
         // DeviceTypeEntry wire roundtrip + ID validity
         let entry = DeviceTypeEntry::new(DeviceTypeId::new(0x0100), 2);
@@ -718,227 +846,128 @@ mod tests {
     }
 
     #[test]
-    fn endpoint_unique_id_lifecycle() {
+    fn endpoint_unique_id_lifecycle_and_type_errors() {
         let mut ep = Endpoint::empty(EndpointId::new(1));
         assert!(!ep.has_unique_id());
-        assert_eq!(ep.unique_id(), Optional::Omitted);
+        assert_eq!(ep.unique_id(), Ok(Optional::Omitted));
 
         ep = ep.with_unique_id("uid-001");
         assert!(ep.has_unique_id());
-        assert_eq!(ep.unique_id(), Optional::Present("uid-001"));
+        assert_eq!(ep.unique_id(), Ok(Optional::Present("uid-001")));
 
-        assert_eq!(ep.set_unique_id("uid-002"), Some(String::from("uid-001")));
-        assert_eq!(ep.unique_id(), Optional::Present("uid-002"));
+        assert_eq!(
+            ep.set_unique_id("uid-002"),
+            Some(AttributeValue::String(String::from("uid-001")))
+        );
+        assert_eq!(ep.unique_id(), Ok(Optional::Present("uid-002")));
 
-        assert_eq!(ep.remove_unique_id(), Some(String::from("uid-002")));
+        assert_eq!(
+            ep.remove_unique_id(),
+            Some(AttributeValue::String(String::from("uid-002")))
+        );
         assert!(!ep.has_unique_id());
-        assert_eq!(ep.unique_id(), Optional::Omitted);
+        assert_eq!(ep.unique_id(), Ok(Optional::Omitted));
         assert_eq!(ep.remove_unique_id(), None);
 
         let ep_opt = Endpoint::empty(EndpointId::new(2)).with_optional_unique_id(Some(String::from("uid-opt")));
-        assert_eq!(ep_opt.unique_id(), Optional::Present("uid-opt"));
+        assert_eq!(ep_opt.unique_id(), Ok(Optional::Present("uid-opt")));
         let ep_omitted = ep_opt.with_optional_unique_id(Optional::Omitted);
         assert!(!ep_omitted.has_unique_id());
+
+        // Malformed wire types surface InvalidDataType
+        let bad = Endpoint::empty(EndpointId::new(3)).with_cluster(
+            Cluster::empty(ClusterId::DESCRIPTOR)
+                .with_attribute(DESCRIPTOR_DEVICE_TYPE_LIST, true)
+                .with_attribute(DESCRIPTOR_ENDPOINT_UNIQUE_ID, 42_u32),
+        );
+        assert_eq!(bad.device_type_list().unwrap_err(), MatterStatus::InvalidDataType);
+        assert_eq!(bad.unique_id(), Err(MatterStatus::InvalidDataType));
     }
 
-    #[cfg(feature = "serde")]
     #[test]
-    fn endpoint_unique_id_serde_omission_and_presence() {
-        use serde::ser::{Error as SerError, Impossible, Serialize, SerializeStruct, Serializer, StdError};
+    fn endpoint_sync_server_list_is_idempotent() {
+        const ON_OFF: ClusterId = ClusterId::new(0x0006);
+        const IDENTIFY: ClusterId = ClusterId::new(0x0003);
 
-        #[derive(Debug, PartialEq)]
-        struct SerErr;
-        impl Display for SerErr {
-            fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-                f.write_str("ser error")
-            }
-        }
-        impl StdError for SerErr {}
-        impl SerError for SerErr {
-            fn custom<T: Display>(_msg: T) -> Self {
-                Self
-            }
-        }
+        let mut ep = Endpoint::empty(EndpointId::new(1))
+            .with_cluster(Cluster::empty(ON_OFF))
+            .with_cluster(Cluster::empty(IDENTIFY))
+            .with_synced_server_list();
 
-        struct FieldRecorder<'a>(&'a mut Vec<&'static str>);
-        impl SerializeStruct for FieldRecorder<'_> {
-            type Error = SerErr;
-            type Ok = ();
+        let expected = alloc::vec![ClusterId::DESCRIPTOR, ON_OFF, IDENTIFY];
+        assert_eq!(
+            ep.server_list().unwrap().to_vec(),
+            Ok(Optional::Present(expected.clone()))
+        );
 
-            fn serialize_field<T: ?Sized + Serialize>(&mut self, key: &'static str, _value: &T) -> Result<(), SerErr> {
-                self.0.push(key);
-                Ok(())
-            }
+        let prev = ep.sync_server_list();
+        assert!(prev.is_some());
+        assert_eq!(ep.server_list().unwrap().to_vec(), Ok(Optional::Present(expected)));
+        assert_eq!(ep.clusters.len(), 3);
 
-            fn end(self) -> Result<(), SerErr> {
-                Ok(())
-            }
-        }
-        impl<'a> Serializer for &'a mut FieldRecorder<'_> {
-            type Error = SerErr;
-            type Ok = ();
-            type SerializeMap = Impossible<(), SerErr>;
-            type SerializeSeq = Impossible<(), SerErr>;
-            type SerializeStruct = FieldRecorder<'a>;
-            type SerializeStructVariant = Impossible<(), SerErr>;
-            type SerializeTuple = Impossible<(), SerErr>;
-            type SerializeTupleStruct = Impossible<(), SerErr>;
-            type SerializeTupleVariant = Impossible<(), SerErr>;
-
-            fn serialize_struct(self, _name: &'static str, _len: usize) -> Result<Self::SerializeStruct, SerErr> {
-                Ok(FieldRecorder(self.0))
-            }
-
-            fn serialize_bool(self, _: bool) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_i8(self, _: i8) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_i16(self, _: i16) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_i32(self, _: i32) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_i64(self, _: i64) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_u8(self, _: u8) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_u16(self, _: u16) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_u32(self, _: u32) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_u64(self, _: u64) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_f32(self, _: f32) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_f64(self, _: f64) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_char(self, _: char) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_str(self, _: &str) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_bytes(self, _: &[u8]) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_none(self) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_some<T: ?Sized + Serialize>(self, _: &T) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_unit(self) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_unit_struct(self, _: &'static str) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_unit_variant(self, _: &'static str, _: u32, _: &'static str) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_newtype_struct<T: ?Sized + Serialize>(self, _: &'static str, _: &T) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_newtype_variant<T: ?Sized + Serialize>(
-                self,
-                _: &'static str,
-                _: u32,
-                _: &'static str,
-                _: &T,
-            ) -> Result<(), SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_seq(self, _: Option<usize>) -> Result<Self::SerializeSeq, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_tuple(self, _: usize) -> Result<Self::SerializeTuple, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_tuple_struct(self, _: &'static str, _: usize) -> Result<Self::SerializeTupleStruct, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_tuple_variant(
-                self,
-                _: &'static str,
-                _: u32,
-                _: &'static str,
-                _: usize,
-            ) -> Result<Self::SerializeTupleVariant, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_map(self, _: Option<usize>) -> Result<Self::SerializeMap, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-
-            fn serialize_struct_variant(
-                self,
-                _: &'static str,
-                _: u32,
-                _: &'static str,
-                _: usize,
-            ) -> Result<Self::SerializeStructVariant, SerErr> {
-                Err(SerErr::custom("unexpected"))
-            }
-        }
-
-        let mut fields = Vec::new();
-        let omitted = Endpoint::empty(EndpointId::new(1));
-        assert_eq!(omitted.serialize(&mut FieldRecorder(&mut fields)), Ok(()));
-        assert!(!fields.contains(&"unique_id"));
-
-        fields.clear();
-        let present = Endpoint::empty(EndpointId::new(2)).with_unique_id("matter-uid-42");
-        assert_eq!(present.serialize(&mut FieldRecorder(&mut fields)), Ok(()));
-        assert!(fields.contains(&"unique_id"));
+        // Deduplicates duplicate cluster IDs in first-seen order
+        ep.clusters.push(Cluster::empty(ON_OFF));
+        ep.sync_server_list();
+        assert_eq!(
+            ep.server_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![ClusterId::DESCRIPTOR, ON_OFF, IDENTIFY]))
+        );
     }
 
-    #[cfg(feature = "schemars")]
     #[test]
-    fn endpoint_json_schema_marks_unique_id_optional() {
-        let mut generator = schemars::SchemaGenerator::default();
-        let schema = <Endpoint as schemars::JsonSchema>::json_schema(&mut generator);
-        let required = schema
-            .as_object()
-            .and_then(|o| o.get("required"))
-            .and_then(|v| v.as_array());
-        assert!(
-            required.is_some_and(|req| !req.iter().any(|v| v.as_str() == Some("unique_id"))),
-            "unique_id must not be required in Endpoint JSON schema"
+    fn set_device_type_list_and_tag_list_deduplicate_by_key_and_borrow_tags() {
+        const LIGHT: DeviceTypeId = DeviceTypeId::new(0x0100);
+        const BRIDGED: DeviceTypeId = DeviceTypeId::new(0x0013);
+
+        let ep = Endpoint::empty(EndpointId::new(1))
+            .with_device_type_list([
+                DeviceTypeEntry::new(LIGHT, 1),
+                DeviceTypeEntry::new(BRIDGED, 1),
+                DeviceTypeEntry::new(LIGHT, 3),
+            ])
+            .with_tag_list([
+                SemanticTag::new(1, 2).with_label("Old"),
+                SemanticTag::new(1, 3).with_label("Right"),
+                SemanticTag::new(1, 2).with_label("New"),
+            ]);
+
+        assert_eq!(
+            ep.device_type_list().unwrap().to_vec(),
+            Ok(Optional::Present(alloc::vec![
+                DeviceTypeEntry::new(LIGHT, 3),
+                DeviceTypeEntry::new(BRIDGED, 1),
+            ]))
+        );
+
+        use crate::optional::Nullable;
+
+        let Optional::Present(tags_iter) = ep.tag_list_ref().unwrap() else {
+            panic!("expected TagList");
+        };
+        let borrowed: Vec<_> = tags_iter.collect::<Result<_, _>>().unwrap();
+        assert_eq!(borrowed.len(), 2);
+        assert_eq!(borrowed[0].label, Optional::Present(Nullable::NonNull("New")));
+        assert_eq!(borrowed[1].label, Optional::Present(Nullable::NonNull("Right")));
+
+        let unknown_dt = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U32(0x0100)),
+            (FieldId::new(1), AttributeValue::U16(2)),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+        ]);
+        assert_eq!(
+            DeviceTypeEntry::try_from(&unknown_dt),
+            Ok(DeviceTypeEntry::new(LIGHT, 2))
+        );
+
+        let dup_unknown_dt = AttributeValue::Struct(alloc::vec![
+            (FieldId::new(0), AttributeValue::U32(0x0100)),
+            (FieldId::new(1), AttributeValue::U16(2)),
+            (FieldId::new(99), AttributeValue::Bool(true)),
+            (FieldId::new(99), AttributeValue::Bool(false)),
+        ]);
+        assert_eq!(
+            DeviceTypeEntry::try_from(&dup_unknown_dt),
+            Err(MatterStatus::ConstraintError)
         );
     }
 }

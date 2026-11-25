@@ -23,10 +23,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -383,7 +382,7 @@ impl crate::traits::PartialCluster for CommodityTariffClusterPatch {
     type Full = CommodityTariffCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -938,7 +937,7 @@ impl CommodityTariffCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::TariffInfo(decoded) => {
                     tariff_info
                         .is_none()
@@ -1598,7 +1597,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -1662,38 +1661,38 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::TariffInfo(inner) => WireAttribute::from(inner),
-            Attribute::TariffUnit(inner) => WireAttribute::from(inner),
-            Attribute::StartDate(inner) => WireAttribute::from(inner),
-            Attribute::DayEntries(inner) => WireAttribute::from(inner),
-            Attribute::DayPatterns(inner) => WireAttribute::from(inner),
-            Attribute::CalendarPeriods(inner) => WireAttribute::from(inner),
-            Attribute::IndividualDays(inner) => WireAttribute::from(inner),
-            Attribute::CurrentDay(inner) => WireAttribute::from(inner),
-            Attribute::NextDay(inner) => WireAttribute::from(inner),
-            Attribute::CurrentDayEntry(inner) => WireAttribute::from(inner),
-            Attribute::CurrentDayEntryDate(inner) => WireAttribute::from(inner),
-            Attribute::NextDayEntry(inner) => WireAttribute::from(inner),
-            Attribute::NextDayEntryDate(inner) => WireAttribute::from(inner),
-            Attribute::TariffComponents(inner) => WireAttribute::from(inner),
-            Attribute::TariffPeriods(inner) => WireAttribute::from(inner),
-            Attribute::CurrentTariffComponents(inner) => WireAttribute::from(inner),
-            Attribute::NextTariffComponents(inner) => WireAttribute::from(inner),
-            Attribute::DefaultRandomizationOffset(inner) => WireAttribute::from(inner),
-            Attribute::DefaultRandomizationType(inner) => WireAttribute::from(inner),
+            Attribute::TariffInfo(inner) => model::Attribute::from(inner),
+            Attribute::TariffUnit(inner) => model::Attribute::from(inner),
+            Attribute::StartDate(inner) => model::Attribute::from(inner),
+            Attribute::DayEntries(inner) => model::Attribute::from(inner),
+            Attribute::DayPatterns(inner) => model::Attribute::from(inner),
+            Attribute::CalendarPeriods(inner) => model::Attribute::from(inner),
+            Attribute::IndividualDays(inner) => model::Attribute::from(inner),
+            Attribute::CurrentDay(inner) => model::Attribute::from(inner),
+            Attribute::NextDay(inner) => model::Attribute::from(inner),
+            Attribute::CurrentDayEntry(inner) => model::Attribute::from(inner),
+            Attribute::CurrentDayEntryDate(inner) => model::Attribute::from(inner),
+            Attribute::NextDayEntry(inner) => model::Attribute::from(inner),
+            Attribute::NextDayEntryDate(inner) => model::Attribute::from(inner),
+            Attribute::TariffComponents(inner) => model::Attribute::from(inner),
+            Attribute::TariffPeriods(inner) => model::Attribute::from(inner),
+            Attribute::CurrentTariffComponents(inner) => model::Attribute::from(inner),
+            Attribute::NextTariffComponents(inner) => model::Attribute::from(inner),
+            Attribute::DefaultRandomizationOffset(inner) => model::Attribute::from(inner),
+            Attribute::DefaultRandomizationType(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -1921,24 +1920,24 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::GetTariffComponent(inner) => WireCommand::from(inner),
-            Command::GetDayEntry(inner) => WireCommand::from(inner),
+            Command::GetTariffComponent(inner) => model::Command::from(inner),
+            Command::GetDayEntry(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -1952,16 +1951,14 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::GetTariffComponent::COMMAND_ID => {
-                commands::GetTariffComponent::try_from_value_with_field(cmd.payload)
-                    .map(Self::GetTariffComponent)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::GetDayEntry::COMMAND_ID => commands::GetDayEntry::try_from_value_with_field(cmd.payload)
+            commands::GetTariffComponent::COMMAND_ID => commands::GetTariffComponent::decode_fields(cmd.payload)
+                .map(Self::GetTariffComponent)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::GetDayEntry::COMMAND_ID => commands::GetDayEntry::decode_fields(cmd.payload)
                 .map(Self::GetDayEntry)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -2134,24 +2131,24 @@ impl CommandResponse {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<CommandResponse> for WireCommand {
+impl From<CommandResponse> for model::Command {
     fn from(cmd: CommandResponse) -> Self {
         match cmd {
-            CommandResponse::GetTariffComponentResponse(inner) => WireCommand::from(inner),
-            CommandResponse::GetDayEntryResponse(inner) => WireCommand::from(inner),
+            CommandResponse::GetTariffComponentResponse(inner) => model::Command::from(inner),
+            CommandResponse::GetDayEntryResponse(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for CommandResponse {
+impl TryFrom<model::Command> for CommandResponse {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -2166,7 +2163,7 @@ impl TryFrom<WireCommand> for CommandResponse {
         }
         match cmd.command_id {
             commands::GetTariffComponentResponse::COMMAND_ID => {
-                commands::GetTariffComponentResponse::try_from_value_with_field(cmd.payload)
+                commands::GetTariffComponentResponse::decode_fields(cmd.payload)
                     .map(Self::GetTariffComponentResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -2174,15 +2171,13 @@ impl TryFrom<WireCommand> for CommandResponse {
                         status,
                     })
             }
-            commands::GetDayEntryResponse::COMMAND_ID => {
-                commands::GetDayEntryResponse::try_from_value_with_field(cmd.payload)
-                    .map(Self::GetDayEntryResponse)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::GetDayEntryResponse::COMMAND_ID => commands::GetDayEntryResponse::decode_fields(cmd.payload)
+                .map(Self::GetDayEntryResponse)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             _ => Err(CommandError::UnsupportedCommand(cmd.command_id)),
         }
     }
@@ -5851,18 +5846,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_TARIFF_COMPONENT_ID,
                 AttributeValue::from(self.tariff_component_id)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut tariff_component_id = None;
@@ -5887,16 +5883,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -5958,11 +5955,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_LABEL,
@@ -5982,7 +5975,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut label = None;
@@ -6039,16 +6037,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -6094,15 +6093,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_DAY_ENTRY_ID, AttributeValue::from(self.day_entry_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut day_entry_id = None;
@@ -6126,16 +6126,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -6187,15 +6188,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_DAY_ENTRY, AttributeValue::from(self.day_entry)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut day_entry = None;
@@ -6219,16 +6221,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

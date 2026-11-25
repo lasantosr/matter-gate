@@ -23,10 +23,9 @@ use crate::dispatch::{
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -489,7 +488,7 @@ impl crate::traits::PartialCluster for CameraAvStreamManagementClusterPatch {
     type Full = CameraAvStreamManagementCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -1627,7 +1626,7 @@ impl CameraAvStreamManagementCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::MaxConcurrentEncoders(decoded) => {
                     max_concurrent_encoders
                         .is_none()
@@ -3111,7 +3110,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -3285,61 +3284,61 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::MaxConcurrentEncoders(inner) => WireAttribute::from(inner),
-            Attribute::MaxEncodedPixelRate(inner) => WireAttribute::from(inner),
-            Attribute::VideoSensorParams(inner) => WireAttribute::from(inner),
-            Attribute::NightVisionUsesInfrared(inner) => WireAttribute::from(inner),
-            Attribute::MinViewportResolution(inner) => WireAttribute::from(inner),
-            Attribute::RateDistortionTradeOffPoints(inner) => WireAttribute::from(inner),
-            Attribute::MaxContentBufferSize(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneCapabilities(inner) => WireAttribute::from(inner),
-            Attribute::SpeakerCapabilities(inner) => WireAttribute::from(inner),
-            Attribute::TwoWayTalkSupport(inner) => WireAttribute::from(inner),
-            Attribute::SnapshotCapabilities(inner) => WireAttribute::from(inner),
-            Attribute::MaxNetworkBandwidth(inner) => WireAttribute::from(inner),
-            Attribute::CurrentFrameRate(inner) => WireAttribute::from(inner),
-            Attribute::HdrModeEnabled(inner) => WireAttribute::from(inner),
-            Attribute::SupportedStreamUsages(inner) => WireAttribute::from(inner),
-            Attribute::AllocatedVideoStreams(inner) => WireAttribute::from(inner),
-            Attribute::AllocatedAudioStreams(inner) => WireAttribute::from(inner),
-            Attribute::AllocatedSnapshotStreams(inner) => WireAttribute::from(inner),
-            Attribute::StreamUsagePriorities(inner) => WireAttribute::from(inner),
-            Attribute::SoftRecordingPrivacyModeEnabled(inner) => WireAttribute::from(inner),
-            Attribute::SoftLivestreamPrivacyModeEnabled(inner) => WireAttribute::from(inner),
-            Attribute::HardPrivacyModeOn(inner) => WireAttribute::from(inner),
-            Attribute::NightVision(inner) => WireAttribute::from(inner),
-            Attribute::NightVisionIllum(inner) => WireAttribute::from(inner),
-            Attribute::Viewport(inner) => WireAttribute::from(inner),
-            Attribute::SpeakerMuted(inner) => WireAttribute::from(inner),
-            Attribute::SpeakerVolumeLevel(inner) => WireAttribute::from(inner),
-            Attribute::SpeakerMaxLevel(inner) => WireAttribute::from(inner),
-            Attribute::SpeakerMinLevel(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneMuted(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneVolumeLevel(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneMaxLevel(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneMinLevel(inner) => WireAttribute::from(inner),
-            Attribute::MicrophoneAgcEnabled(inner) => WireAttribute::from(inner),
-            Attribute::ImageRotation(inner) => WireAttribute::from(inner),
-            Attribute::ImageFlipHorizontal(inner) => WireAttribute::from(inner),
-            Attribute::ImageFlipVertical(inner) => WireAttribute::from(inner),
-            Attribute::LocalVideoRecordingEnabled(inner) => WireAttribute::from(inner),
-            Attribute::LocalSnapshotRecordingEnabled(inner) => WireAttribute::from(inner),
-            Attribute::StatusLightEnabled(inner) => WireAttribute::from(inner),
-            Attribute::StatusLightBrightness(inner) => WireAttribute::from(inner),
-            Attribute::ImageRotationDiscreteAngles(inner) => WireAttribute::from(inner),
+            Attribute::MaxConcurrentEncoders(inner) => model::Attribute::from(inner),
+            Attribute::MaxEncodedPixelRate(inner) => model::Attribute::from(inner),
+            Attribute::VideoSensorParams(inner) => model::Attribute::from(inner),
+            Attribute::NightVisionUsesInfrared(inner) => model::Attribute::from(inner),
+            Attribute::MinViewportResolution(inner) => model::Attribute::from(inner),
+            Attribute::RateDistortionTradeOffPoints(inner) => model::Attribute::from(inner),
+            Attribute::MaxContentBufferSize(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneCapabilities(inner) => model::Attribute::from(inner),
+            Attribute::SpeakerCapabilities(inner) => model::Attribute::from(inner),
+            Attribute::TwoWayTalkSupport(inner) => model::Attribute::from(inner),
+            Attribute::SnapshotCapabilities(inner) => model::Attribute::from(inner),
+            Attribute::MaxNetworkBandwidth(inner) => model::Attribute::from(inner),
+            Attribute::CurrentFrameRate(inner) => model::Attribute::from(inner),
+            Attribute::HdrModeEnabled(inner) => model::Attribute::from(inner),
+            Attribute::SupportedStreamUsages(inner) => model::Attribute::from(inner),
+            Attribute::AllocatedVideoStreams(inner) => model::Attribute::from(inner),
+            Attribute::AllocatedAudioStreams(inner) => model::Attribute::from(inner),
+            Attribute::AllocatedSnapshotStreams(inner) => model::Attribute::from(inner),
+            Attribute::StreamUsagePriorities(inner) => model::Attribute::from(inner),
+            Attribute::SoftRecordingPrivacyModeEnabled(inner) => model::Attribute::from(inner),
+            Attribute::SoftLivestreamPrivacyModeEnabled(inner) => model::Attribute::from(inner),
+            Attribute::HardPrivacyModeOn(inner) => model::Attribute::from(inner),
+            Attribute::NightVision(inner) => model::Attribute::from(inner),
+            Attribute::NightVisionIllum(inner) => model::Attribute::from(inner),
+            Attribute::Viewport(inner) => model::Attribute::from(inner),
+            Attribute::SpeakerMuted(inner) => model::Attribute::from(inner),
+            Attribute::SpeakerVolumeLevel(inner) => model::Attribute::from(inner),
+            Attribute::SpeakerMaxLevel(inner) => model::Attribute::from(inner),
+            Attribute::SpeakerMinLevel(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneMuted(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneVolumeLevel(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneMaxLevel(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneMinLevel(inner) => model::Attribute::from(inner),
+            Attribute::MicrophoneAgcEnabled(inner) => model::Attribute::from(inner),
+            Attribute::ImageRotation(inner) => model::Attribute::from(inner),
+            Attribute::ImageFlipHorizontal(inner) => model::Attribute::from(inner),
+            Attribute::ImageFlipVertical(inner) => model::Attribute::from(inner),
+            Attribute::LocalVideoRecordingEnabled(inner) => model::Attribute::from(inner),
+            Attribute::LocalSnapshotRecordingEnabled(inner) => model::Attribute::from(inner),
+            Attribute::StatusLightEnabled(inner) => model::Attribute::from(inner),
+            Attribute::StatusLightBrightness(inner) => model::Attribute::from(inner),
+            Attribute::ImageRotationDiscreteAngles(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -3839,32 +3838,32 @@ impl Command {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<Command> for WireCommand {
+impl From<Command> for model::Command {
     fn from(cmd: Command) -> Self {
         match cmd {
-            Command::AudioStreamAllocate(inner) => WireCommand::from(inner),
-            Command::AudioStreamDeallocate(inner) => WireCommand::from(inner),
-            Command::VideoStreamAllocate(inner) => WireCommand::from(inner),
-            Command::VideoStreamModify(inner) => WireCommand::from(inner),
-            Command::VideoStreamDeallocate(inner) => WireCommand::from(inner),
-            Command::SnapshotStreamAllocate(inner) => WireCommand::from(inner),
-            Command::SnapshotStreamModify(inner) => WireCommand::from(inner),
-            Command::SnapshotStreamDeallocate(inner) => WireCommand::from(inner),
-            Command::SetStreamPriorities(inner) => WireCommand::from(inner),
-            Command::CaptureSnapshot(inner) => WireCommand::from(inner),
+            Command::AudioStreamAllocate(inner) => model::Command::from(inner),
+            Command::AudioStreamDeallocate(inner) => model::Command::from(inner),
+            Command::VideoStreamAllocate(inner) => model::Command::from(inner),
+            Command::VideoStreamModify(inner) => model::Command::from(inner),
+            Command::VideoStreamDeallocate(inner) => model::Command::from(inner),
+            Command::SnapshotStreamAllocate(inner) => model::Command::from(inner),
+            Command::SnapshotStreamModify(inner) => model::Command::from(inner),
+            Command::SnapshotStreamDeallocate(inner) => model::Command::from(inner),
+            Command::SetStreamPriorities(inner) => model::Command::from(inner),
+            Command::CaptureSnapshot(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for Command {
+impl TryFrom<model::Command> for Command {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -3878,53 +3877,43 @@ impl TryFrom<WireCommand> for Command {
             });
         }
         match cmd.command_id {
-            commands::AudioStreamAllocate::COMMAND_ID => {
-                commands::AudioStreamAllocate::try_from_value_with_field(cmd.payload)
-                    .map(Self::AudioStreamAllocate)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::AudioStreamDeallocate::COMMAND_ID => {
-                commands::AudioStreamDeallocate::try_from_value_with_field(cmd.payload)
-                    .map(Self::AudioStreamDeallocate)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::VideoStreamAllocate::COMMAND_ID => {
-                commands::VideoStreamAllocate::try_from_value_with_field(cmd.payload)
-                    .map(Self::VideoStreamAllocate)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::VideoStreamModify::COMMAND_ID => {
-                commands::VideoStreamModify::try_from_value_with_field(cmd.payload)
-                    .map(Self::VideoStreamModify)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::VideoStreamDeallocate::COMMAND_ID => {
-                commands::VideoStreamDeallocate::try_from_value_with_field(cmd.payload)
-                    .map(Self::VideoStreamDeallocate)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::AudioStreamAllocate::COMMAND_ID => commands::AudioStreamAllocate::decode_fields(cmd.payload)
+                .map(Self::AudioStreamAllocate)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::AudioStreamDeallocate::COMMAND_ID => commands::AudioStreamDeallocate::decode_fields(cmd.payload)
+                .map(Self::AudioStreamDeallocate)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::VideoStreamAllocate::COMMAND_ID => commands::VideoStreamAllocate::decode_fields(cmd.payload)
+                .map(Self::VideoStreamAllocate)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::VideoStreamModify::COMMAND_ID => commands::VideoStreamModify::decode_fields(cmd.payload)
+                .map(Self::VideoStreamModify)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::VideoStreamDeallocate::COMMAND_ID => commands::VideoStreamDeallocate::decode_fields(cmd.payload)
+                .map(Self::VideoStreamDeallocate)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             commands::SnapshotStreamAllocate::COMMAND_ID => {
-                commands::SnapshotStreamAllocate::try_from_value_with_field(cmd.payload)
+                commands::SnapshotStreamAllocate::decode_fields(cmd.payload)
                     .map(Self::SnapshotStreamAllocate)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -3932,17 +3921,15 @@ impl TryFrom<WireCommand> for Command {
                         status,
                     })
             }
-            commands::SnapshotStreamModify::COMMAND_ID => {
-                commands::SnapshotStreamModify::try_from_value_with_field(cmd.payload)
-                    .map(Self::SnapshotStreamModify)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
+            commands::SnapshotStreamModify::COMMAND_ID => commands::SnapshotStreamModify::decode_fields(cmd.payload)
+                .map(Self::SnapshotStreamModify)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
             commands::SnapshotStreamDeallocate::COMMAND_ID => {
-                commands::SnapshotStreamDeallocate::try_from_value_with_field(cmd.payload)
+                commands::SnapshotStreamDeallocate::decode_fields(cmd.payload)
                     .map(Self::SnapshotStreamDeallocate)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -3950,16 +3937,14 @@ impl TryFrom<WireCommand> for Command {
                         status,
                     })
             }
-            commands::SetStreamPriorities::COMMAND_ID => {
-                commands::SetStreamPriorities::try_from_value_with_field(cmd.payload)
-                    .map(Self::SetStreamPriorities)
-                    .map_err(|(field_id, status)| CommandError::InvalidPayload {
-                        id: cmd.command_id,
-                        field_id,
-                        status,
-                    })
-            }
-            commands::CaptureSnapshot::COMMAND_ID => commands::CaptureSnapshot::try_from_value_with_field(cmd.payload)
+            commands::SetStreamPriorities::COMMAND_ID => commands::SetStreamPriorities::decode_fields(cmd.payload)
+                .map(Self::SetStreamPriorities)
+                .map_err(|(field_id, status)| CommandError::InvalidPayload {
+                    id: cmd.command_id,
+                    field_id,
+                    status,
+                }),
+            commands::CaptureSnapshot::COMMAND_ID => commands::CaptureSnapshot::decode_fields(cmd.payload)
                 .map(Self::CaptureSnapshot)
                 .map_err(|(field_id, status)| CommandError::InvalidPayload {
                     id: cmd.command_id,
@@ -4199,26 +4184,26 @@ impl CommandResponse {
     }
 
     #[inline]
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         Self::try_from(cmd)
     }
 }
 
-impl From<CommandResponse> for WireCommand {
+impl From<CommandResponse> for model::Command {
     fn from(cmd: CommandResponse) -> Self {
         match cmd {
-            CommandResponse::AudioStreamAllocateResponse(inner) => WireCommand::from(inner),
-            CommandResponse::VideoStreamAllocateResponse(inner) => WireCommand::from(inner),
-            CommandResponse::SnapshotStreamAllocateResponse(inner) => WireCommand::from(inner),
-            CommandResponse::CaptureSnapshotResponse(inner) => WireCommand::from(inner),
+            CommandResponse::AudioStreamAllocateResponse(inner) => model::Command::from(inner),
+            CommandResponse::VideoStreamAllocateResponse(inner) => model::Command::from(inner),
+            CommandResponse::SnapshotStreamAllocateResponse(inner) => model::Command::from(inner),
+            CommandResponse::CaptureSnapshotResponse(inner) => model::Command::from(inner),
         }
     }
 }
 
-impl TryFrom<WireCommand> for CommandResponse {
+impl TryFrom<model::Command> for CommandResponse {
     type Error = CommandError;
 
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
         if cmd.cluster_id != Self::CLUSTER_ID {
             return Err(CommandError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -4233,7 +4218,7 @@ impl TryFrom<WireCommand> for CommandResponse {
         }
         match cmd.command_id {
             commands::AudioStreamAllocateResponse::COMMAND_ID => {
-                commands::AudioStreamAllocateResponse::try_from_value_with_field(cmd.payload)
+                commands::AudioStreamAllocateResponse::decode_fields(cmd.payload)
                     .map(Self::AudioStreamAllocateResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -4242,7 +4227,7 @@ impl TryFrom<WireCommand> for CommandResponse {
                     })
             }
             commands::VideoStreamAllocateResponse::COMMAND_ID => {
-                commands::VideoStreamAllocateResponse::try_from_value_with_field(cmd.payload)
+                commands::VideoStreamAllocateResponse::decode_fields(cmd.payload)
                     .map(Self::VideoStreamAllocateResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -4251,7 +4236,7 @@ impl TryFrom<WireCommand> for CommandResponse {
                     })
             }
             commands::SnapshotStreamAllocateResponse::COMMAND_ID => {
-                commands::SnapshotStreamAllocateResponse::try_from_value_with_field(cmd.payload)
+                commands::SnapshotStreamAllocateResponse::decode_fields(cmd.payload)
                     .map(Self::SnapshotStreamAllocateResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -4260,7 +4245,7 @@ impl TryFrom<WireCommand> for CommandResponse {
                     })
             }
             commands::CaptureSnapshotResponse::COMMAND_ID => {
-                commands::CaptureSnapshotResponse::try_from_value_with_field(cmd.payload)
+                commands::CaptureSnapshotResponse::decode_fields(cmd.payload)
                     .map(Self::CaptureSnapshotResponse)
                     .map_err(|(field_id, status)| CommandError::InvalidPayload {
                         id: cmd.command_id,
@@ -8448,11 +8433,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_STREAM_USAGE, AttributeValue::from(self.stream_usage)),
                 (Self::FIELD_AUDIO_CODEC, AttributeValue::from(self.audio_codec)),
@@ -8463,7 +8444,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut stream_usage = None;
@@ -8563,16 +8549,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -8618,15 +8605,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_AUDIO_STREAM_ID, AttributeValue::from(self.audio_stream_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut audio_stream_id = None;
@@ -8650,16 +8638,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -8715,15 +8704,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_AUDIO_STREAM_ID, AttributeValue::from(self.audio_stream_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut audio_stream_id = None;
@@ -8747,16 +8737,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -8864,11 +8855,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(11);
             fields.push((Self::FIELD_STREAM_USAGE, AttributeValue::from(self.stream_usage)));
             fields.push((Self::FIELD_VIDEO_CODEC, AttributeValue::from(self.video_codec)));
@@ -8891,7 +8878,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut stream_usage = None;
@@ -9053,16 +9045,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9108,15 +9101,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_VIDEO_STREAM_ID, AttributeValue::from(self.video_stream_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut video_stream_id = None;
@@ -9140,16 +9134,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9227,11 +9222,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(3);
             fields.push((Self::FIELD_VIDEO_STREAM_ID, AttributeValue::from(self.video_stream_id)));
             if let Optional::Present(v) = self.watermark_enabled {
@@ -9243,7 +9234,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut video_stream_id = None;
@@ -9294,16 +9290,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9355,15 +9352,16 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_VIDEO_STREAM_ID, AttributeValue::from(self.video_stream_id)),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut video_stream_id = None;
@@ -9387,16 +9385,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9488,11 +9487,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(7);
             fields.push((Self::FIELD_IMAGE_CODEC, AttributeValue::from(self.image_codec)));
             fields.push((Self::FIELD_MAX_FRAME_RATE, AttributeValue::from(self.max_frame_rate)));
@@ -9508,7 +9503,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut image_codec = None;
@@ -9616,16 +9616,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9671,18 +9672,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_SNAPSHOT_STREAM_ID,
                 AttributeValue::from(self.snapshot_stream_id)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut snapshot_stream_id = None;
@@ -9706,16 +9708,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9793,11 +9796,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             let mut fields = Vec::with_capacity(3);
             fields.push((
                 Self::FIELD_SNAPSHOT_STREAM_ID,
@@ -9812,7 +9811,12 @@ pub mod commands {
             fields
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut snapshot_stream_id = None;
@@ -9863,16 +9867,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -9925,18 +9930,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_SNAPSHOT_STREAM_ID,
                 AttributeValue::from(self.snapshot_stream_id)
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut snapshot_stream_id = None;
@@ -9960,16 +9966,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -10021,18 +10028,19 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(
                 Self::FIELD_STREAM_PRIORITIES,
                 AttributeValue::List(self.stream_priorities.into_iter().map(AttributeValue::from).collect())
             ),]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut stream_priorities = None;
@@ -10056,16 +10064,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -10123,11 +10132,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_SNAPSHOT_STREAM_ID,
@@ -10143,7 +10148,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut snapshot_stream_id = None;
@@ -10182,16 +10192,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -10248,11 +10259,7 @@ pub mod commands {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (Self::FIELD_DATA, AttributeValue::from(self.data)),
                 (Self::FIELD_IMAGE_CODEC, AttributeValue::from(self.image_codec)),
@@ -10260,7 +10267,12 @@ pub mod commands {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut data = None;
@@ -10311,16 +10323,17 @@ pub mod commands {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
