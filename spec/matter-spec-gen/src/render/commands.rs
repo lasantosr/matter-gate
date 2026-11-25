@@ -195,22 +195,37 @@ fn emit_unit_command_tokens(
 
             #[inline]
             #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Null
+            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+                Vec::new()
             }
 
             #[inline]
-            pub(crate) fn try_from_value_with_field(
-                val: AttributeValue,
+            #[must_use]
+            pub fn into_value(self) -> AttributeValue {
+                AttributeValue::Struct(self.into_fields())
+            }
+
+            #[inline]
+            pub(crate) fn decode_fields(
+                fields: Vec<(FieldId, AttributeValue)>,
             ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                Self::try_from_value(val).map_err(|status| (None, status))
+                if let Some((fid, _)) = fields.first() {
+                    Err((Some(*fid), MatterStatus::ConstraintError))
+                } else {
+                    Ok(Self)
+                }
+            }
+
+            #[inline]
+            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
             }
 
             #[inline]
             pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
                 match val {
                     AttributeValue::Null => Ok(Self),
-                    AttributeValue::Struct(fields) if fields.is_empty() => Ok(Self),
+                    AttributeValue::Struct(fields) => Self::try_from_fields(fields),
                     _ => Err(MatterStatus::InvalidDataType),
                 }
             }
@@ -308,18 +323,19 @@ fn emit_struct_command_tokens(
             $methods_tokens
 
             #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.encode_fields_inner())
+            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
+                $encode_vec_body
             }
 
-            pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
-                $encode_vec_body
+            #[must_use]
+            pub fn into_value(self) -> AttributeValue {
+                AttributeValue::Struct(self.into_fields())
             }
 
             $(if short_field_count >= 5 =>
                 #[expect(clippy::many_single_char_names, reason = $(quoted(many_single_char_reason)))]
             )
-            pub(crate) fn decode_fields_inner(
+            pub(crate) fn decode_fields(
                 fields: Vec<(FieldId, AttributeValue)>,
             ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
                 $(for arg in partition.all join ($['\r']) =>
@@ -331,18 +347,17 @@ fn emit_struct_command_tokens(
                 })
             }
 
-            pub(crate) fn try_from_value_with_field(
-                val: AttributeValue,
-            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                let AttributeValue::Struct(fields) = val else {
-                    return Err((None, MatterStatus::InvalidDataType));
-                };
-                Self::decode_fields_inner(fields)
+            #[inline]
+            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
             }
 
             #[inline]
             pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+                let AttributeValue::Struct(fields) = val else {
+                    return Err(MatterStatus::InvalidDataType);
+                };
+                Self::try_from_fields(fields)
             }
         }
 
@@ -432,7 +447,7 @@ fn emit_single_command_enum(
             }
 
             #[inline]
-            pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+            pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
                 Self::try_from(cmd)
             }
 
@@ -475,25 +490,25 @@ fn emit_command_enum_wire_impls(
     has_multiple: bool,
 ) -> Tokens {
     quote! {
-        impl From<$enum_name> for WireCommand {
+        impl From<$enum_name> for model::Command {
             fn from(cmd: $enum_name) -> Self {
                 match cmd {
                     $(for cmd in cmds join ($['\r']) =>
                         $(if cmd.args.is_empty() =>
-                            $enum_name::$(&cmd.name) => WireCommand::from(commands::$(&cmd.name)),
+                            $enum_name::$(&cmd.name) => model::Command::from(commands::$(&cmd.name)),
                         )
                         $(if !cmd.args.is_empty() =>
-                            $enum_name::$(&cmd.name)(inner) => WireCommand::from(inner),
+                            $enum_name::$(&cmd.name)(inner) => model::Command::from(inner),
                         )
                     )
                 }
             }
         }
 
-        impl TryFrom<WireCommand> for $enum_name {
+        impl TryFrom<model::Command> for $enum_name {
             type Error = CommandError;
 
-            fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
+            fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
                 if cmd.cluster_id != Self::CLUSTER_ID {
                     return Err(CommandError::ClusterIdMismatch {
                         expected: Self::CLUSTER_ID,
@@ -509,7 +524,7 @@ fn emit_command_enum_wire_impls(
                 match cmd.command_id {
                     $(for cmd in cmds join ($['\r']) =>
                         commands::$(&cmd.name)::COMMAND_ID => {
-                            commands::$(&cmd.name)::try_from_value_with_field(cmd.payload)
+                            commands::$(&cmd.name)::decode_fields(cmd.payload)
                                 $(if cmd.args.is_empty() => .map(|_| Self::$(&cmd.name)))
                                 $(if !cmd.args.is_empty() => .map(Self::$(&cmd.name)))
                                 .map_err(|(field_id, status)| CommandError::InvalidPayload {

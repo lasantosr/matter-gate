@@ -155,7 +155,7 @@ use crate::v1_0::clusters;
 use crate::{
     dispatch::{ClusterMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
     error::ClusterError,
-    model::{Attribute as WireAttribute, Cluster, ClusterId},
+    model::{self, Cluster, ClusterId},
 };
 
 #[doc=" Polymorphic cluster state snapshot across all enabled clusters in this Matter specification version."]
@@ -292,7 +292,7 @@ pub enum ClusterSnapshot {
     #[cfg(cluster_fault_injection)]
     FaultInjection,
     #[doc=" Forward-compatible fallback for unrecognized clusters."]
-    Unknown(ClusterId, Vec<WireAttribute>),
+    Unknown(ClusterId, Vec<model::Attribute>),
 }
 
 impl From<ClusterSnapshot> for Cluster {
@@ -1236,7 +1236,7 @@ fn select_cluster_snapshot(
 ) -> Result<ClusterSnapshot, String> {
     if scope_name == Some("Unknown") {
         let cid = scope_id.ok_or_else(|| String::from("missing 'cluster_id' for Unknown cluster"))?;
-        let attrs = payload.deserialize_into::<Vec<WireAttribute>>()?;
+        let attrs = payload.deserialize_into::<Vec<model::Attribute>>()?;
         return Ok(ClusterSnapshot::Unknown(ClusterId::new(cid), attrs));
     }
     let _: &BufferedPayload = &payload;
@@ -2481,7 +2481,7 @@ pub enum ClusterPatch {
     #[cfg(cluster_fault_injection)]
     FaultInjection,
     #[doc=" Forward-compatible fallback for unrecognized clusters."]
-    Unknown(ClusterId, Vec<WireAttribute>),
+    Unknown(ClusterId, Vec<model::Attribute>),
 }
 
 impl From<ClusterPatch> for Cluster {
@@ -2492,7 +2492,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0003),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_scenes)]
@@ -2500,7 +2500,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0005),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_on_off)]
@@ -2508,7 +2508,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0006),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_pulse_width_modulation)]
@@ -2518,7 +2518,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x001D),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_binding)]
@@ -2526,7 +2526,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x001E),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_access_control)]
@@ -2534,7 +2534,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x001F),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_actions)]
@@ -2542,7 +2542,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0025),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_basic_information)]
@@ -2550,7 +2550,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0028),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_ota_software_update_provider)]
@@ -2560,7 +2560,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002A),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_localization_configuration)]
@@ -2568,7 +2568,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002B),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_time_format_localization)]
@@ -2576,7 +2576,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002C),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_unit_localization)]
@@ -2584,7 +2584,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002D),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_power_source_configuration)]
@@ -2592,7 +2592,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002E),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_power_source)]
@@ -2600,7 +2600,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x002F),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_general_commissioning)]
@@ -2608,7 +2608,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0030),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_network_commissioning)]
@@ -2616,7 +2616,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0031),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_diagnostic_logs)]
@@ -2626,7 +2626,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0033),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_software_diagnostics)]
@@ -2634,7 +2634,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0034),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_thread_network_diagnostics)]
@@ -2642,7 +2642,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0035),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_wi_fi_network_diagnostics)]
@@ -2650,7 +2650,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0036),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_ethernet_network_diagnostics)]
@@ -2658,7 +2658,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0037),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_time_synchronization)]
@@ -2666,7 +2666,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0038),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_bridged_device_basic)]
@@ -2674,7 +2674,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0039),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_switch)]
@@ -2682,7 +2682,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x003B),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_administrator_commissioning)]
@@ -2690,7 +2690,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x003C),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_operational_credentials)]
@@ -2698,7 +2698,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x003E),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_group_key_management)]
@@ -2706,7 +2706,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x003F),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_fixed_label)]
@@ -2714,7 +2714,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0040),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_user_label)]
@@ -2722,7 +2722,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0041),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_proxy_configuration)]
@@ -2736,7 +2736,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0045),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_mode_select)]
@@ -2744,7 +2744,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0050),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_door_lock)]
@@ -2752,7 +2752,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0101),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_window_covering)]
@@ -2760,7 +2760,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0102),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_pump_configuration_and_control)]
@@ -2768,7 +2768,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0200),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_thermostat)]
@@ -2776,7 +2776,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0201),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_illuminance_measurement)]
@@ -2784,7 +2784,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0400),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_temperature_measurement)]
@@ -2792,7 +2792,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0402),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_pressure_measurement)]
@@ -2800,7 +2800,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0403),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_flow_measurement)]
@@ -2808,7 +2808,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0404),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_relative_humidity_measurement)]
@@ -2816,7 +2816,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0405),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_wake_on_lan)]
@@ -2824,7 +2824,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0503),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_channel)]
@@ -2832,7 +2832,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0504),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_target_navigator)]
@@ -2840,7 +2840,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0505),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_media_playback)]
@@ -2848,7 +2848,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0506),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_media_input)]
@@ -2856,7 +2856,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x0507),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_low_power)]
@@ -2868,7 +2868,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x050A),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_audio_output)]
@@ -2876,7 +2876,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x050B),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_application_launcher)]
@@ -2884,7 +2884,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x050C),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_application_basic)]
@@ -2892,7 +2892,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x050D),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_account_login)]
@@ -2902,7 +2902,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0x1046),
                 PartialCluster::into_attributes(inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_unit_testing)]
@@ -2910,7 +2910,7 @@ impl From<ClusterPatch> for Cluster {
                 ClusterId::new(0xFFF1_FC05),
                 PartialCluster::into_attributes(*inner)
                     .into_iter()
-                    .map(|(id, val)| WireAttribute::new(id, val))
+                    .map(|(id, val)| model::Attribute::new(id, val))
                     .collect(),
             ),
             #[cfg(cluster_fault_injection)]
@@ -3556,7 +3556,7 @@ fn select_cluster_patch(
 ) -> Result<ClusterPatch, String> {
     if scope_name == Some("Unknown") {
         let cid = scope_id.ok_or_else(|| String::from("missing 'cluster_id' for Unknown cluster"))?;
-        let attrs = payload.deserialize_into::<Vec<WireAttribute>>()?;
+        let attrs = payload.deserialize_into::<Vec<model::Attribute>>()?;
         return Ok(ClusterPatch::Unknown(ClusterId::new(cid), attrs));
     }
     let _: &BufferedPayload = &payload;

@@ -58,6 +58,12 @@ define_matter_id! {
 }
 
 /// Stateful wire representation of a Matter Cluster instance per Section 7.7.
+///
+/// Adding or removing attributes via [`Self::with_attribute`] / [`Self::set_attribute`] does not automatically mutate
+/// global `AttributeList` (`0xFFFB`), so partial/delta snapshots never fabricate global attributes.
+///
+/// When authoring a complete cluster snapshot, either set `AttributeList` explicitly with [`Self::with_attribute_list`]
+/// or call [`Self::with_synced_attribute_list`] / [`Self::sync_attribute_list`] once all attributes have been added.
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -124,6 +130,9 @@ impl Cluster {
     }
 
     /// Add or update an attribute on this cluster.
+    ///
+    /// Does not modify `AttributeList` (`0xFFFB`); call [`Self::with_synced_attribute_list`] at the end of fluent
+    /// construction when authoring a complete cluster snapshot.
     #[must_use]
     pub fn with_attribute(mut self, id: AttributeId, value: impl Into<AttributeValue>) -> Self {
         self.set_attribute(id, value);
@@ -131,6 +140,9 @@ impl Cluster {
     }
 
     /// Add or update multiple attributes on this cluster.
+    ///
+    /// Does not modify `AttributeList` (`0xFFFB`); call [`Self::with_synced_attribute_list`] at the end of fluent
+    /// construction when authoring a complete cluster snapshot.
     #[must_use]
     pub fn with_attributes(mut self, attributes: impl IntoIterator<Item = Attribute>) -> Self {
         for attr in attributes {
@@ -165,6 +177,18 @@ impl Cluster {
     #[must_use]
     pub fn with_attribute_list(mut self, attributes: impl IntoIterator<Item = AttributeId>) -> Self {
         self.set_attribute_list(attributes);
+        self
+    }
+
+    /// Synchronize `AttributeList` (`0xFFFB`, CSA §7.13) with the attribute IDs currently present in
+    /// [`Self::attributes`], ensuring `AttributeId::ATTRIBUTE_LIST` itself is included and deduplicating IDs in
+    /// first-seen order.
+    ///
+    /// This operation is idempotent and intended to be called at the end of fluent construction when authoring a
+    /// complete cluster snapshot.
+    #[must_use]
+    pub fn with_synced_attribute_list(mut self) -> Self {
+        self.sync_attribute_list();
         self
     }
 
@@ -337,6 +361,26 @@ impl Cluster {
     /// Remove `AttributeList` (`0xFFFB`) from this cluster, returning its previous value if present.
     pub fn remove_attribute_list(&mut self) -> Option<AttributeValue> {
         self.remove_attribute(AttributeId::ATTRIBUTE_LIST)
+    }
+
+    /// Synchronize `AttributeList` (`0xFFFB`, CSA §7.13) with the attribute IDs currently present in
+    /// [`Self::attributes`], ensuring `AttributeId::ATTRIBUTE_LIST` itself is included and deduplicating IDs in
+    /// first-seen order.
+    ///
+    /// Returns the previous `AttributeList` value if replaced. This operation is idempotent.
+    pub fn sync_attribute_list(&mut self) -> Option<AttributeValue> {
+        let mut values = Vec::with_capacity(self.attributes.len().saturating_add(1));
+        for attr in &self.attributes {
+            let val = AttributeValue::from(attr.id);
+            if !values.contains(&val) {
+                values.push(val);
+            }
+        }
+        let attr_list_val = AttributeValue::from(AttributeId::ATTRIBUTE_LIST);
+        if !values.contains(&attr_list_val) {
+            values.push(attr_list_val);
+        }
+        self.set_attribute(AttributeId::ATTRIBUTE_LIST, AttributeValue::List(values))
     }
 
     /// Return `true` if `FeatureMap` (`0xFFFC`) is present on this cluster.
@@ -817,5 +861,33 @@ mod tests {
         );
         assert_eq!(cluster.feature_map(), Ok(Optional::Present(7)));
         assert_eq!(cluster.cluster_revision(), Ok(Optional::Present(8)));
+    }
+
+    #[test]
+    fn cluster_sync_attribute_list_is_idempotent() {
+        let mut cluster = Cluster::empty(ClusterId::new(0x0006))
+            .with_attribute(AttributeId::new(0x0000), true)
+            .with_feature_map(1)
+            .with_cluster_revision(6)
+            .with_synced_attribute_list();
+
+        let expected = alloc::vec![
+            AttributeId::new(0x0000),
+            AttributeId::FEATURE_MAP,
+            AttributeId::CLUSTER_REVISION,
+            AttributeId::ATTRIBUTE_LIST,
+        ];
+        assert_eq!(
+            cluster.attribute_list().unwrap().to_vec(),
+            Ok(Optional::Present(expected.clone()))
+        );
+
+        let prev = cluster.sync_attribute_list();
+        assert!(prev.is_some());
+        assert_eq!(
+            cluster.attribute_list().unwrap().to_vec(),
+            Ok(Optional::Present(expected))
+        );
+        assert_eq!(cluster.attributes.len(), 4);
     }
 }

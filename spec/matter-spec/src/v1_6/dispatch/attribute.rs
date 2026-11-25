@@ -310,7 +310,7 @@ use crate::v1_6::clusters;
 use crate::{
     dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
     error::AttributeError,
-    model::{Attribute as WireAttribute, AttributeId, AttributeValue, ClusterId},
+    model::{self, AttributeId, AttributeValue, ClusterId},
 };
 
 /// Polymorphic attribute across all enabled clusters in this Matter specification version.
@@ -622,7 +622,7 @@ pub enum ClusterAttribute {
 
 impl ClusterAttribute {
     /// Decodes an owned `(ClusterId, AttributeId, AttributeValue)` into a [`ClusterAttribute`].
-    pub fn from_wire(
+    pub fn from_model(
         cluster_id: ClusterId,
         attribute_id: AttributeId,
         val: AttributeValue,
@@ -2245,7 +2245,7 @@ impl ClusterAttribute {
     }
 }
 
-impl From<ClusterAttribute> for WireAttribute {
+impl From<ClusterAttribute> for model::Attribute {
     fn from(attr: ClusterAttribute) -> Self {
         match attr {
             #[cfg(cluster_identify)]

@@ -59,8 +59,8 @@ use crate::dispatch::{BufferedPayload, deserialize_enum_described};
 use crate::v1_1::endpoints;
 use crate::{
     dispatch::{DeviceMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
-    error::EndpointError,
-    model::{DeviceTypeId, Endpoint, EndpointId},
+    error::{AttributeError, ClusterError, EndpointError},
+    model::{AttributeId, ClusterId, DeviceTypeId, Endpoint, EndpointId, Optional},
 };
 
 /// Polymorphic device endpoint across all enabled device types in this Matter specification version.
@@ -271,7 +271,18 @@ impl TryFrom<Endpoint> for EndpointDevice {
     type Error = EndpointError;
 
     fn try_from(endpoint: Endpoint) -> Result<Self, Self::Error> {
-        let primary = endpoint.primary_device_type().ok_or(EndpointError::EmptyDeviceTypes)?;
+        let primary = endpoint
+            .primary_device_type()
+            .map_err(|status| EndpointError::InvalidCluster {
+                id: ClusterId::DESCRIPTOR,
+                source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                    id: AttributeId::new(0x0000),
+                    field_id: None,
+                    status,
+                }),
+            })?
+            .into_option()
+            .ok_or(EndpointError::EmptyDeviceTypes)?;
         match primary.id.raw() {
             #[cfg(feature = "endpoint-all-clusters-app-server-example")]
             0x0000 => {
@@ -591,7 +602,11 @@ impl DeviceMeta for EndpointDevice {
             Self::OrphanClusters(inner) => inner.device_type_id(),
             #[cfg(feature = "endpoint-secondary-network-commissioning-device-type")]
             Self::SecondaryNetworkCommissioningDeviceType(inner) => inner.device_type_id(),
-            Self::Unknown(ep) => ep.primary_device_type().map_or(DeviceTypeId::new(0), |d| d.id),
+            Self::Unknown(ep) => ep
+                .primary_device_type()
+                .ok()
+                .and_then(Optional::into_option)
+                .map_or(DeviceTypeId::new(0), |d| d.id),
         }
     }
 
@@ -781,7 +796,11 @@ impl DeviceMeta for EndpointDevice {
             Self::OrphanClusters(inner) => inner.revision(),
             #[cfg(feature = "endpoint-secondary-network-commissioning-device-type")]
             Self::SecondaryNetworkCommissioningDeviceType(inner) => inner.revision(),
-            Self::Unknown(ep) => ep.primary_device_type().map_or(0, |d| d.revision),
+            Self::Unknown(ep) => ep
+                .primary_device_type()
+                .ok()
+                .and_then(Optional::into_option)
+                .map_or(0, |d| d.revision),
         }
     }
 

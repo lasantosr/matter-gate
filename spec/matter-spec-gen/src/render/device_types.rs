@@ -35,7 +35,12 @@ pub(crate) fn generate_single_device_type_tokens(
         $header
         $intro
 
-        use alloc::{vec, vec::Vec};
+        $(if resolved.optional_fields.is_empty() =>
+            use alloc::vec;
+        )
+        $(if !resolved.optional_fields.is_empty() =>
+            use alloc::vec::Vec;
+        )
 
         use crate::{
             model::{
@@ -523,31 +528,41 @@ fn emit_endpoint_wire_conversions(
             /// Places this typed device on the endpoint with the given `id`.
             #[must_use]
             pub fn into_endpoint(self, id: EndpointId) -> Endpoint {
-                let mut server_clusters = vec![
-                    $(for (fname, _) in &resolved.mandatory_fields join ($['\r']) =>
-                        Cluster::from(self.$fname),
-                    )
-                ];
-                $(for (fname, _) in &resolved.optional_fields join ($['\r']) =>
-                    if let Optional::Present(cluster) = self.$fname {
-                        server_clusters.push(Cluster::from(cluster));
-                    }
+                $(if resolved.optional_fields.is_empty() =>
+                    let mut clusters = vec![
+                        Cluster::empty(ClusterId::DESCRIPTOR),
+                        $(for (fname, _) in &resolved.mandatory_fields join ($['\r']) =>
+                            Cluster::from(self.$fname),
+                        )
+                    ];
                 )
-
-                let device_types = vec![
-                    DeviceTypeEntry::new($struct_name::DEVICE_TYPE_ID, $struct_name::REVISION),
-                ];
-                let client_clusters = Vec::from($struct_name::MANDATORY_CLIENT_CLUSTERS);
+                $(if !resolved.optional_fields.is_empty() =>
+                    let mut clusters = Vec::with_capacity(
+                        $(resolved.mandatory_fields.len().saturating_add(1))
+                        $(for (fname, _) in &resolved.optional_fields => + usize::from(self.$fname.is_present()))
+                    );
+                    clusters.push(Cluster::empty(ClusterId::DESCRIPTOR));
+                    $(for (fname, _) in &resolved.mandatory_fields join ($['\r']) =>
+                        clusters.push(Cluster::from(self.$fname));
+                    )
+                    $(for (fname, _) in &resolved.optional_fields join ($['\r']) =>
+                        if let Optional::Present(cluster) = self.$fname {
+                            clusters.push(Cluster::from(cluster));
+                        }
+                    )
+                )
 
                 let descriptor = update_descriptor_cluster(
                     None,
-                    &device_types,
-                    &server_clusters,
-                    &client_clusters,
+                    &[DeviceTypeEntry::new($struct_name::DEVICE_TYPE_ID, $struct_name::REVISION)],
+                    clusters.get(1..).unwrap_or_default(),
+                    $struct_name::MANDATORY_CLIENT_CLUSTERS,
                 );
-                server_clusters.insert(0, descriptor);
+                if let Some(slot) = clusters.first_mut() {
+                    *slot = descriptor;
+                }
 
-                Endpoint::new(id, device_types, server_clusters, client_clusters)
+                Endpoint::new(id, clusters)
             }
         }
 
@@ -576,7 +591,7 @@ fn emit_endpoint_wire_conversions(
 
                 $(if has_server_clusters =>
                     let decode = |id, source| EndpointError::InvalidCluster { id, source };
-                    for cluster in endpoint.server_clusters {
+                    for cluster in endpoint.clusters {
                         $(if let &[(fname, ctype)] = all_fields.as_slice() =>
                             if cluster.id == $ctype::CLUSTER_ID {
                                 if $fname.is_some() {
@@ -652,14 +667,14 @@ fn emit_device_type_spec_and_dispatch(
             #[inline]
             #[must_use]
             pub fn descriptor(&self) -> Option<&'a Cluster> {
-                self.endpoint.server_cluster(ClusterId::DESCRIPTOR)
+                self.endpoint.descriptor()
             }
 
             $(for (fname, ctype) in resolved.mandatory_fields.iter().chain(&resolved.optional_fields) join ($['\n']) =>
                 #[inline]
                 #[must_use]
                 pub fn $fname(&self) -> Option<&'a Cluster> {
-                    self.endpoint.server_cluster($ctype::CLUSTER_ID)
+                    self.endpoint.cluster($ctype::CLUSTER_ID)
                 }
             )
         }

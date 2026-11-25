@@ -91,8 +91,8 @@ mod v1_4_specific_tests {
 
         assert!(light.level_control.is_omitted());
         let endpoint = light.clone().into_endpoint(EndpointId::new(1));
-        assert!(endpoint.server_cluster(DescriptorCluster::CLUSTER_ID).is_some());
-        assert!(endpoint.server_cluster(OnOffCluster::CLUSTER_ID).is_some());
+        assert!(endpoint.cluster(DescriptorCluster::CLUSTER_ID).is_some());
+        assert!(endpoint.cluster(OnOffCluster::CLUSTER_ID).is_some());
 
         let light_back = OnOffLight::try_from(endpoint).unwrap();
         assert_eq!(light, light_back);
@@ -100,13 +100,12 @@ mod v1_4_specific_tests {
         // Conformance verification detects missing mandatory clusters
         let partial_endpoint = Endpoint::new(
             EndpointId::new(1),
-            vec![DeviceTypeEntry::new(OnOffLight::DEVICE_TYPE_ID, OnOffLight::REVISION)],
             vec![
                 Cluster::empty(IdentifyCluster::CLUSTER_ID),
                 Cluster::empty(GroupsCluster::CLUSTER_ID),
             ],
-            vec![],
-        );
+        )
+        .with_device_type_list([DeviceTypeEntry::new(OnOffLight::DEVICE_TYPE_ID, OnOffLight::REVISION)]);
         let err_missing = OnOffLight::try_from(partial_endpoint);
         assert!(matches!(
             err_missing,
@@ -473,18 +472,10 @@ mod v1_6_regression_tests {
         };
         let mut light_ep = light.into_endpoint(EndpointId::new(1));
         let custom_version = DataVersion::new(42);
-        if let Some(desc_wire) = light_ep
-            .server_clusters
-            .iter_mut()
-            .find(|c| c.id == DescriptorCluster::CLUSTER_ID)
-        {
+        if let Some(desc_wire) = light_ep.descriptor_mut() {
             desc_wire.data_version = Optional::Present(custom_version);
         }
-        if let Some(on_off_wire) = light_ep
-            .server_clusters
-            .iter_mut()
-            .find(|c| c.id == OnOffCluster::CLUSTER_ID)
-        {
+        if let Some(on_off_wire) = light_ep.cluster_mut(OnOffCluster::CLUSTER_ID) {
             on_off_wire.data_version = Optional::Present(DataVersion::new(99));
         }
 
@@ -492,47 +483,30 @@ mod v1_6_regression_tests {
             .endpoint(&light_ep)
             .expect("OnOffLight should validate");
         let validated = &light_ep;
-        let desc_after = validated
-            .server_clusters
-            .iter()
-            .find(|c| c.id == DescriptorCluster::CLUSTER_ID)
-            .expect("Descriptor cluster present");
+        let desc_after = validated.descriptor().expect("Descriptor cluster present");
         assert_eq!(desc_after.data_version, Optional::Present(custom_version));
         let parsed_desc = DescriptorCluster::try_from(desc_after.clone()).expect("parse Descriptor");
         assert_eq!(parsed_desc.parts_list, []);
 
         let on_off_after = validated
-            .server_clusters
-            .iter()
-            .find(|c| c.id == OnOffCluster::CLUSTER_ID)
+            .cluster(OnOffCluster::CLUSTER_ID)
             .expect("OnOff cluster present");
         assert_eq!(on_off_after.data_version, Optional::Present(DataVersion::new(99)));
 
-        // Non-mutating validator rejects inconsistent Descriptor PartsList rather than rewriting it.
-        if let Some(desc_wire) = light_ep
-            .server_clusters
-            .iter_mut()
-            .find(|c| c.id == DescriptorCluster::CLUSTER_ID)
-            && let Some(parts_attr) = desc_wire
-                .attributes
-                .iter_mut()
-                .find(|a| a.id == AttributeId::new(0x0003))
-        {
-            parts_attr.value = AttributeValue::List(vec![AttributeValue::U16(2), AttributeValue::U16(3)]);
-        }
+        // Non-mutating validator rejects inconsistent Descriptor ServerList rather than rewriting it.
+        light_ep.set_server_list([DescriptorCluster::CLUSTER_ID]);
         let _err = registry::Validator::full()
             .endpoint(&light_ep)
-            .expect_err("inconsistent PartsList must fail");
+            .expect_err("inconsistent ServerList must fail");
     }
 
     #[test]
     fn command_direction_mismatch_and_directionless_from_wire() {
         // OnOff::Off is a client-to-server command (ID 0x0000).
-        let wrong_dir = WireCommand::new(
+        let wrong_dir = WireCommand::unit(
             OnOffCluster::CLUSTER_ID,
             CommandId::new(0x0000),
             CommandDirection::ServerToClient,
-            AttributeValue::Null,
         );
         let err = on_off::Command::try_from(wrong_dir).expect_err("opposite direction must fail");
         assert!(matches!(
@@ -540,13 +514,12 @@ mod v1_6_regression_tests {
             CommandError::DirectionMismatch { .. } | CommandError::UnsupportedCommand(_)
         ));
 
-        let directionless = on_off::Command::from_wire(WireCommand::new(
+        let directionless = on_off::Command::from_model(WireCommand::unit(
             OnOffCluster::CLUSTER_ID,
             CommandId::new(0x0000),
             CommandDirection::ClientToServer,
-            AttributeValue::Null,
         ))
-        .expect("from_wire should succeed");
+        .expect("from_model should succeed");
         assert_eq!(directionless, on_off::Command::Off);
     }
 
@@ -641,7 +614,7 @@ mod v1_6_regression_tests {
             basic_information::BasicInformationCluster::CLUSTER_ID,
             StartUp::EVENT_ID,
             StartUp::PRIORITY,
-            AttributeValue::Struct(vec![(FieldId::new(0), AttributeValue::U32(7))]),
+            vec![(FieldId::new(0), AttributeValue::U32(7))],
         );
         wire_ok.event_number = Optional::Present(EventNumber::new(42));
         wire_ok.timestamp = Optional::Present(EventTimestamp::EpochMs(1_700_000_000));
@@ -664,7 +637,7 @@ mod v1_6_regression_tests {
             basic_information::BasicInformationCluster::CLUSTER_ID,
             StartUp::EVENT_ID,
             EventPriority::Debug,
-            AttributeValue::Struct(vec![(FieldId::new(0), AttributeValue::U32(7))]),
+            vec![(FieldId::new(0), AttributeValue::U32(7))],
         );
         assert_eq!(
             WireEvent::<StartUp>::try_from(wire_bad_prio.clone()),
@@ -698,7 +671,7 @@ mod v1_6_regression_tests {
             ThermostatCluster::CLUSTER_ID,
             SetpointRaiseLower::COMMAND_ID,
             CommandDirection::ClientToServer,
-            AttributeValue::Struct(vec![(FieldId::new(0), AttributeValue::U8(0))]),
+            vec![(FieldId::new(0), AttributeValue::U8(0))],
         );
         assert_eq!(
             SetpointRaiseLower::try_from(bad_cmd),
@@ -714,7 +687,7 @@ mod v1_6_regression_tests {
             basic_information::BasicInformationCluster::CLUSTER_ID,
             StartUp::EVENT_ID,
             StartUp::PRIORITY,
-            AttributeValue::Struct(vec![(FieldId::new(0), AttributeValue::Bool(true))]),
+            vec![(FieldId::new(0), AttributeValue::Bool(true))],
         );
         assert_eq!(
             StartUp::try_from(bad_ev.clone()),
@@ -738,7 +711,7 @@ mod v1_6_regression_tests {
             basic_information::BasicInformationCluster::CLUSTER_ID,
             StartUp::EVENT_ID,
             EventPriority::Info,
-            AttributeValue::Struct(vec![(FieldId::new(0), AttributeValue::U32(1))]),
+            vec![(FieldId::new(0), AttributeValue::U32(1))],
         );
         assert_eq!(
             StartUp::try_from(prio_ev),
@@ -813,14 +786,10 @@ mod v1_6_regression_tests {
             v1_6::{endpoints::RootNode, registry},
         };
 
-        // Construct a root endpoint whose Descriptor cluster is empty (missing mandatory DeviceTypeList)
-        let mut ep = Endpoint::new(
-            EndpointId::ROOT,
-            vec![DeviceTypeEntry::new(RootNode::DEVICE_TYPE_ID, RootNode::REVISION)],
-            vec![Cluster::empty(DescriptorCluster::CLUSTER_ID)],
-            vec![],
-        );
-        ep.server_clusters.push(Cluster::empty(OnOffCluster::CLUSTER_ID));
+        // Construct a root endpoint whose Descriptor cluster declares RootNode but is missing mandatory clusters
+        let ep = Endpoint::empty(EndpointId::ROOT)
+            .with_device_type_list([DeviceTypeEntry::new(RootNode::DEVICE_TYPE_ID, RootNode::REVISION)])
+            .with_cluster(Cluster::empty(OnOffCluster::CLUSTER_ID));
 
         let node = Node::new(NodeId::new(1), vec![ep]);
         assert!(matches!(
@@ -865,12 +834,8 @@ mod v1_6_regression_tests {
                 .is_none()
         );
 
-        let incomplete = Endpoint::new(
-            EndpointId::new(6),
-            vec![DeviceTypeEntry::new(OnOffLight::DEVICE_TYPE_ID, OnOffLight::REVISION)],
-            vec![Cluster::empty(DescriptorCluster::CLUSTER_ID)],
-            vec![],
-        );
+        let incomplete = Endpoint::empty(EndpointId::new(6))
+            .with_device_type_list([DeviceTypeEntry::new(OnOffLight::DEVICE_TYPE_ID, OnOffLight::REVISION)]);
         let err = incomplete
             .view_as::<OnOffLight>()
             .expect_err("declared device type missing mandatory server clusters must error");
@@ -890,14 +855,14 @@ mod v1_6_regression_tests {
         }
         .into_endpoint(EndpointId::new(2));
 
-        ep.server_clusters
+        ep.clusters
             .push(Cluster::from(BridgedDeviceBasicInformationCluster::default()));
 
         let decoded =
             OnOffLight::try_from(ep.clone()).expect("OnOffLight::try_from should accept extra non-disallowed clusters");
         assert_eq!(decoded.on_off.on_off, OnOff::On);
 
-        ep.server_clusters.push(Cluster::from(OnOffCluster::OFF));
+        ep.clusters.push(Cluster::from(OnOffCluster::OFF));
         let err = OnOffLight::try_from(ep).expect_err("duplicate OnOffCluster must fail");
         assert_eq!(err, EndpointError::DuplicateCluster(OnOffCluster::CLUSTER_ID));
     }

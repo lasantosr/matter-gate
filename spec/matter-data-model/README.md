@@ -51,7 +51,6 @@ let node = Node::new(NodeId::new(0x0000_0000_1234_5678), Vec::new())
         ROOT_NODE_DEVICE_TYPE,
         1,
         vec![Cluster::empty(BASIC_INFORMATION_CLUSTER)],
-        Vec::new(),
     ))
     .with_endpoint(Endpoint::single_device(
         EndpointId::new(1),
@@ -62,14 +61,13 @@ let node = Node::new(NodeId::new(0x0000_0000_1234_5678), Vec::new())
                 .with_data_version(DataVersion::new(1))
                 .with_attribute(AttributeId::new(0), true),
         ],
-        Vec::new(),
     ));
 
 assert_eq!(node.endpoints.len(), 2);
 assert!(node.root_endpoint().is_some());
 
 let light = node.endpoint(EndpointId::new(1)).unwrap();
-let on_off = light.server_cluster(ON_OFF_CLUSTER).unwrap();
+let on_off = light.cluster(ON_OFF_CLUSTER).unwrap();
 assert_eq!(
     on_off.attribute(AttributeId::new(0)),
     Some(&AttributeValue::Bool(true))

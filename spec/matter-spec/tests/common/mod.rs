@@ -226,18 +226,24 @@ macro_rules! test_version_behavior {
                 use ver::clusters::on_off::commands::Off;
 
                 // Unit command without payload
+                assert_eq!(Off.into_fields(), []);
+                let _parsed_off_fields = Off::try_from_fields(Vec::new()).expect("parse Off command fields");
                 let off_val = Off.into_value();
-                assert_eq!(off_val, AttributeValue::Null);
+                assert_eq!(off_val, AttributeValue::Struct(Vec::new()));
                 let _parsed_off = Off::try_from_value(off_val).expect("parse Off command");
 
                 // Command with structured arguments
                 let cmd = Identify::new(10_u16);
+                let cmd_fields = cmd.clone().into_fields();
+                assert_eq!(Identify::try_from_fields(cmd_fields).expect("parse Identify fields"), cmd);
                 let cmd_val = cmd.into_value();
                 let parsed_cmd = Identify::try_from_value(cmd_val).expect("parse Identify");
                 assert_eq!(parsed_cmd.identify_time, 10);
 
                 // Event roundtrip
                 let ev = StateChange { state_value: true };
+                let ev_fields = ev.clone().into_fields();
+                assert_eq!(StateChange::try_from_fields(ev_fields).expect("parse StateChange fields"), ev);
                 let ev_val = ev.into_value();
                 let parsed_ev = StateChange::try_from_value(ev_val).expect("parse StateChange");
                 assert!(parsed_ev.state_value);
@@ -318,10 +324,9 @@ macro_rules! test_version_behavior {
                 // Missing mandatory cluster rejection
                 let partial_endpoint = Endpoint::new(
                     EndpointId::new(1),
-                    vec![DeviceTypeEntry::new($switch_ty::DEVICE_TYPE_ID, $switch_ty::REVISION)],
                     vec![Cluster::empty(IdentifyCluster::CLUSTER_ID)],
-                    vec![],
-                );
+                )
+                .with_device_type_list([DeviceTypeEntry::new($switch_ty::DEVICE_TYPE_ID, $switch_ty::REVISION)]);
                 let err_missing = $switch_ty::try_from(partial_endpoint);
                 assert!(matches!(
                     err_missing,
@@ -332,18 +337,18 @@ macro_rules! test_version_behavior {
                 // Disallowed cluster rejection (OnOffCluster is disallowed as a server on OnOffLightSwitch)
                 let invalid_endpoint = Endpoint::new(
                     EndpointId::new(1),
-                    vec![DeviceTypeEntry::new($switch_ty::DEVICE_TYPE_ID, $switch_ty::REVISION)],
                     vec![
                         Cluster::empty(DescriptorCluster::CLUSTER_ID),
                         Cluster::empty(IdentifyCluster::CLUSTER_ID),
                         Cluster::empty(BindingCluster::CLUSTER_ID),
                         Cluster::empty(OnOffCluster::CLUSTER_ID),
                     ],
-                    vec![
-                        IdentifyCluster::CLUSTER_ID,
-                        OnOffCluster::CLUSTER_ID,
-                    ],
-                );
+                )
+                .with_device_type_list([DeviceTypeEntry::new($switch_ty::DEVICE_TYPE_ID, $switch_ty::REVISION)])
+                .with_client_list([
+                    IdentifyCluster::CLUSTER_ID,
+                    OnOffCluster::CLUSTER_ID,
+                ]);
                 let err_disallowed = $switch_ty::try_from(invalid_endpoint);
                 assert!(matches!(
                     err_disallowed,

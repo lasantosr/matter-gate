@@ -675,7 +675,7 @@ macro_rules! impl_matter_command {
                     $name::CLUSTER_ID,
                     $name::COMMAND_ID,
                     $name::DIRECTION,
-                    cmd.into_value(),
+                    cmd.into_fields(),
                 )
             }
         }
@@ -702,7 +702,7 @@ macro_rules! impl_matter_command {
                         actual: cmd.direction,
                     });
                 }
-                Self::try_from_value_with_field(cmd.payload).map_err(|(field_id, status)| {
+                Self::decode_fields(cmd.payload).map_err(|(field_id, status)| {
                     $crate::error::CommandError::InvalidPayload {
                         id: Self::COMMAND_ID,
                         field_id,
@@ -785,7 +785,7 @@ macro_rules! impl_matter_event {
                     $name::CLUSTER_ID,
                     $name::EVENT_ID,
                     $name::PRIORITY,
-                    ev.into_value(),
+                    ev.into_fields(),
                 )
             }
         }
@@ -812,7 +812,7 @@ macro_rules! impl_matter_event {
                         actual: ev.priority,
                     });
                 }
-                Self::try_from_value_with_field(ev.payload).map_err(|(field_id, status)| {
+                Self::decode_fields(ev.payload).map_err(|(field_id, status)| {
                     $crate::error::EventError::InvalidPayload {
                         id: Self::EVENT_ID,
                         field_id,

@@ -80,10 +80,9 @@ pub(crate) fn generate_cluster_tokens(
         use crate::{
             types,
             model::{
-                ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId,
-                Command as WireCommand, CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId,
-                Event as WireEvent, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
-                MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
+                self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId,
+                DataVersion, DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex,
+                FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
             },
             error::{AttributeError, ClusterError, CommandError, EventError},
         };
@@ -584,7 +583,7 @@ fn emit_try_from_attributes_tokens(partition: &MemberPartition<'_>) -> Tokens {
                     if id.is_global() {
                         continue;
                     }
-                    match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+                    match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                         $(for attr in resolved_attrs join ($['\r']) =>
                             Attribute::$(&attr.name)(decoded) => {
                                 $(&attr.fname).is_none().then_some(()).ok_or(ClusterError::InvalidAttribute(
@@ -775,7 +774,7 @@ fn emit_attribute_enum_tokens(
             }
 
             #[inline]
-            pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+            pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
                 Self::try_from(attr)
             }
 
@@ -859,22 +858,22 @@ fn emit_attribute_enum_tokens(
 
 fn emit_attribute_enum_wire_impls(resolved_attrs: &[ResolvedMember], has_multiple: bool) -> Tokens {
     quote! {
-        impl From<Attribute> for WireAttribute {
+        impl From<Attribute> for model::Attribute {
             #[inline]
             fn from(attr: Attribute) -> Self {
                 match attr {
                     $(for attr in resolved_attrs join ($['\r']) =>
-                        Attribute::$(&attr.name)(inner) => WireAttribute::from(inner),
+                        Attribute::$(&attr.name)(inner) => model::Attribute::from(inner),
                     )
                 }
             }
         }
 
-        impl TryFrom<WireAttribute> for Attribute {
+        impl TryFrom<model::Attribute> for Attribute {
             type Error = AttributeError;
 
             #[inline]
-            fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+            fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
                 Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
                     MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
                     status => AttributeError::InvalidValue {
@@ -1061,7 +1060,7 @@ fn emit_cluster_patch_tokens(
                 $(if !partition.is_empty() => value: AttributeValue)
             ) -> Result<(), AttributeError> {
                 $(if !partition.is_empty() =>
-                    let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+                    let attr = Attribute::try_from(model::Attribute::new(id, value))?;
                     self.apply(attr);
                     Ok(())
                 )

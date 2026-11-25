@@ -1,8 +1,15 @@
 //! Matter Command entity per CSA Matter Specification Section 7.9.
 
+extern crate alloc;
+
+use alloc::vec::Vec;
 use core::fmt::{Display, Formatter, Result as FmtResult};
 
-use crate::{cluster::ClusterId, status::MatterStatus, value::AttributeValue};
+use crate::{
+    cluster::ClusterId,
+    status::MatterStatus,
+    value::{AttributeValue, FieldId},
+};
 
 define_matter_id! {
     /// Strongly-typed Matter Command identifier (`u32`).
@@ -97,7 +104,10 @@ impl TryFrom<AttributeValue> for CommandDirection {
     }
 }
 
-/// Wire representation of a Matter Command invocation or response per Section 7.9.
+/// Wire representation of a cluster-scoped Matter Command invocation or response per Section 7.9.
+///
+/// Commands are standalone envelopes carrying [`Self::cluster_id`] without an endpoint or node
+/// address; target/source `(NodeId, EndpointId)` routing lives at the Interaction Model layer.
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
@@ -114,18 +124,18 @@ pub struct Command {
     pub command_id: CommandId,
     /// Direction of the command in the Interaction Model.
     pub direction: CommandDirection,
-    /// Wire payload of the command (or `AttributeValue::Null` for unit commands).
-    pub payload: AttributeValue,
+    /// Context-tagged TLV struct fields of the command payload (empty for unit commands).
+    pub payload: Vec<(FieldId, AttributeValue)>,
 }
 
 impl Command {
-    /// Construct a new command with payload.
+    /// Construct a new command with TLV struct payload fields.
     #[must_use]
     pub const fn new(
         cluster_id: ClusterId,
         command_id: CommandId,
         direction: CommandDirection,
-        payload: AttributeValue,
+        payload: Vec<(FieldId, AttributeValue)>,
     ) -> Self {
         Self {
             cluster_id,
@@ -135,20 +145,20 @@ impl Command {
         }
     }
 
-    /// Construct a unit command with `AttributeValue::Null` payload.
+    /// Construct a unit command with an empty payload field list.
     #[must_use]
     pub const fn unit(cluster_id: ClusterId, command_id: CommandId, direction: CommandDirection) -> Self {
         Self {
             cluster_id,
             command_id,
             direction,
-            payload: AttributeValue::Null,
+            payload: Vec::new(),
         }
     }
 
-    /// Set or replace the command payload.
+    /// Set or replace the command payload fields.
     #[must_use]
-    pub fn with_payload(mut self, payload: impl Into<AttributeValue>) -> Self {
+    pub fn with_payload(mut self, payload: impl Into<Vec<(FieldId, AttributeValue)>>) -> Self {
         self.payload = payload.into();
         self
     }
@@ -158,8 +168,11 @@ impl Display for Command {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(
             f,
-            "{}/{}:{} ({})",
-            self.cluster_id, self.command_id, self.direction, self.payload
+            "{}/{}:{} ({} fields)",
+            self.cluster_id,
+            self.command_id,
+            self.direction,
+            self.payload.len()
         )
     }
 }
@@ -180,21 +193,22 @@ mod tests {
 
         const ON_OFF_CLUSTER_ID: ClusterId = ClusterId::new(0x0006);
 
-        let cmd = Command::new(
-            ON_OFF_CLUSTER_ID,
-            cid,
-            CommandDirection::ClientToServer,
-            AttributeValue::Bool(true),
-        );
+        let fields = alloc::vec![(FieldId::new(0), AttributeValue::Bool(true))];
+        let cmd = Command::new(ON_OFF_CLUSTER_ID, cid, CommandDirection::ClientToServer, fields.clone());
         assert_eq!(cmd.cluster_id, ON_OFF_CLUSTER_ID);
         assert_eq!(cmd.command_id, cid);
         assert_eq!(cmd.direction, CommandDirection::ClientToServer);
-        assert_eq!(cmd.payload, AttributeValue::Bool(true));
+        assert_eq!(cmd.payload, fields);
 
         let unit_cmd = Command::unit(ON_OFF_CLUSTER_ID, cid, CommandDirection::ServerToClient);
-        assert_eq!(unit_cmd.payload, AttributeValue::Null);
-        let with_payload_cmd = unit_cmd.clone().with_payload(42_u8);
-        assert_eq!(with_payload_cmd.payload, AttributeValue::U8(42));
+        assert_eq!(unit_cmd.payload, []);
+        let with_payload_cmd = unit_cmd
+            .clone()
+            .with_payload(alloc::vec![(FieldId::new(0), AttributeValue::U8(42))]);
+        assert_eq!(
+            with_payload_cmd.payload,
+            alloc::vec![(FieldId::new(0), AttributeValue::U8(42))]
+        );
 
         let val = AttributeValue::from(cid);
         assert_eq!(CommandId::try_from(&val), Ok(cid));
@@ -209,7 +223,7 @@ mod tests {
             CommandDirection::try_from(dir_val),
             Ok(CommandDirection::ServerToClient)
         );
-        assert_eq!(alloc::format!("{unit_cmd}"), "0x0006/0x01:ServerToClient (null)");
+        assert_eq!(alloc::format!("{unit_cmd}"), "0x0006/0x01:ServerToClient (0 fields)");
         assert_eq!("0x01".parse::<CommandId>(), Ok(cid));
         assert!(cid.is_valid());
         assert!(CommandId::from_mei(VendorId::new(0xFFF1), 0x00FF).is_valid());

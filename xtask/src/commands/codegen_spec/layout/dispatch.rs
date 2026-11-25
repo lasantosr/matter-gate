@@ -69,7 +69,7 @@ pub(in super::super) fn generate_version_dispatch_command_rs(
         use crate::{
             dispatch::{CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
             error::CommandError,
-            model::{ClusterId, Command as WireCommand, CommandDirection, CommandId},
+            model::{self, ClusterId, CommandDirection, CommandId},
         };
 
         $(&any_cmd_cfg)
@@ -131,7 +131,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
         use crate::{
             dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
             error::AttributeError,
-            model::{Attribute as WireAttribute, AttributeId, AttributeValue, ClusterId},
+            model::{self, AttributeId, AttributeValue, ClusterId},
         };
 
         /// Polymorphic attribute across all enabled clusters in this Matter specification version.
@@ -154,7 +154,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
 
         impl ClusterAttribute {
             /// Decodes an owned `(ClusterId, AttributeId, AttributeValue)` into a [`ClusterAttribute`].
-            pub fn from_wire(
+            pub fn from_model(
                 cluster_id: ClusterId,
                 attribute_id: AttributeId,
                 val: AttributeValue,
@@ -178,7 +178,7 @@ pub(in super::super) fn generate_version_dispatch_attribute_rs(
             }
         }
 
-        impl From<ClusterAttribute> for WireAttribute {
+        impl From<ClusterAttribute> for model::Attribute {
             fn from(attr: ClusterAttribute) -> Self {
                 match attr {
                     $(for c in &attr_clusters join ($['\r']) =>
@@ -227,7 +227,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
         use crate::{
             dispatch::{EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema},
             error::EventError,
-            model::{ClusterId, Event as WireEvent, EventId, EventPriority},
+            model::{self, ClusterId, EventId, EventPriority},
         };
 
         /// Polymorphic event across all enabled clusters in this Matter specification version.
@@ -245,12 +245,12 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
                 $(c.name.as_str())(clusters::$(c.module_name.as_str())::Event),
             )
             /// Forward-compatible fallback for unrecognized clusters.
-            Unknown(WireEvent),
+            Unknown(model::Event),
         }
 
         impl ClusterEvent {
-            /// Decodes an owned [`WireEvent`] into a [`ClusterEvent`].
-            pub fn from_wire(ev: WireEvent) -> Result<Self, EventError> {
+            /// Decodes an owned [`model::Event`] into a [`ClusterEvent`].
+            pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
                 match ev.cluster_id.raw() {
                     $(for c in &ev_clusters join ($['\r']) =>
                         #[cfg($(c.cfg.as_str()))]
@@ -264,7 +264,7 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             }
         }
 
-        impl From<ClusterEvent> for WireEvent {
+        impl From<ClusterEvent> for model::Event {
             fn from(ev: ClusterEvent) -> Self {
                 match ev {
                     $(for c in &ev_clusters join ($['\r']) =>
@@ -276,10 +276,10 @@ pub(in super::super) fn generate_version_dispatch_event_rs(
             }
         }
 
-        impl TryFrom<WireEvent> for ClusterEvent {
+        impl TryFrom<model::Event> for ClusterEvent {
             type Error = EventError;
 
-            fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+            fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
                 match ev.cluster_id.raw() {
                     $(for c in &ev_clusters join ($['\r']) =>
                         #[cfg($(c.cfg.as_str()))]
@@ -347,7 +347,7 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
         use crate::{
             dispatch::{ClusterMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
             error::ClusterError,
-            model::{Attribute as WireAttribute, Cluster, ClusterId},
+            model::{self, Cluster, ClusterId},
         };
 
         /// Polymorphic cluster state snapshot across all enabled clusters in this Matter specification version.
@@ -374,7 +374,7 @@ pub(in super::super) fn generate_version_dispatch_cluster_rs(
                 )
             )
             /// Forward-compatible fallback for unrecognized clusters.
-            Unknown(ClusterId, Vec<WireAttribute>),
+            Unknown(ClusterId, Vec<model::Attribute>),
         }
 
         impl From<ClusterSnapshot> for Cluster {
@@ -462,8 +462,8 @@ pub(in super::super) fn generate_version_dispatch_endpoint_rs(
         use crate::$(v_mod)::endpoints;
         use crate::{
             dispatch::{DeviceMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
-            error::EndpointError,
-            model::{DeviceTypeId, Endpoint, EndpointId},
+            error::{AttributeError, ClusterError, EndpointError},
+            model::{AttributeId, ClusterId, DeviceTypeId, Endpoint, EndpointId, Optional},
         };
 
         /// Polymorphic device endpoint across all enabled device types in this Matter specification version.
@@ -527,6 +527,15 @@ pub(in super::super) fn generate_version_dispatch_endpoint_rs(
             fn try_from(endpoint: Endpoint) -> Result<Self, Self::Error> {
                 let primary = endpoint
                     .primary_device_type()
+                    .map_err(|status| EndpointError::InvalidCluster {
+                        id: ClusterId::DESCRIPTOR,
+                        source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                            id: AttributeId::new(0x0000),
+                            field_id: None,
+                            status,
+                        }),
+                    })?
+                    .into_option()
                     .ok_or(EndpointError::EmptyDeviceTypes)?;
                 match primary.id.raw() {
                     $(for e in &sorted_endpoints join ($['\r']) =>
@@ -622,17 +631,17 @@ fn emit_command_enum_impl(
                 $(c.name.as_str())(clusters::$(c.module_name.as_str())::$member_ty),
             )
             /// Forward-compatible fallback for unrecognized clusters.
-            Unknown(WireCommand),
+            Unknown(model::Command),
         }
 
         impl $enum_name {
-            /// Decodes an owned [`WireCommand`] into this polymorphic enum.
-            pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+            /// Decodes an owned [`model::Command`] into this polymorphic enum.
+            pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
                 match cmd.cluster_id.raw() {
                     $(for c in clusters join ($['\r']) =>
                         #[cfg($(c.cfg.as_str()))]
                         $(format_hex_u32(c.cluster_id)) => {
-                            clusters::$(c.module_name.as_str())::$member_ty::from_wire(cmd)
+                            clusters::$(c.module_name.as_str())::$member_ty::from_model(cmd)
                                 .map(Self::$(c.name.as_str()))
                         }
                     )
@@ -641,7 +650,7 @@ fn emit_command_enum_impl(
             }
         }
 
-        impl From<$enum_name> for WireCommand {
+        impl From<$enum_name> for model::Command {
             fn from(cmd: $enum_name) -> Self {
                 match cmd {
                     $(for c in clusters join ($['\r']) =>
@@ -653,12 +662,12 @@ fn emit_command_enum_impl(
             }
         }
 
-        impl TryFrom<WireCommand> for $enum_name {
+        impl TryFrom<model::Command> for $enum_name {
             type Error = CommandError;
 
             #[inline]
-            fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
-                Self::from_wire(cmd)
+            fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
+                Self::from_model(cmd)
             }
         }
 
@@ -754,7 +763,7 @@ fn emit_command_enum_describe_impl(
             payload: BufferedPayload,
         ) -> Result<$enum_name, String> {
             if scope_name == Some("Unknown") {
-                return payload.deserialize_into::<WireCommand>().map($enum_name::Unknown);
+                return payload.deserialize_into::<model::Command>().map($enum_name::Unknown);
             }
             let (_, _, _) = (item_name, item_id, &payload);
             $not_any_cfg
@@ -1138,7 +1147,7 @@ fn dispatch_event_describe_tokens(
             payload: BufferedPayload,
         ) -> Result<ClusterEvent, String> {
             if scope_name == Some("Unknown") {
-                return payload.deserialize_into::<WireEvent>().map(ClusterEvent::Unknown);
+                return payload.deserialize_into::<model::Event>().map(ClusterEvent::Unknown);
             }
             let (_, _, _) = (item_name, item_id, &payload);
             $(ev_not_any_cfg)
@@ -1326,7 +1335,7 @@ fn dispatch_cluster_describe_tokens(
         ) -> Result<ClusterSnapshot, String> {
             if scope_name == Some("Unknown") {
                 let cid = scope_id.ok_or_else(|| String::from("missing 'cluster_id' for Unknown cluster"))?;
-                let attrs = payload.deserialize_into::<Vec<WireAttribute>>()?;
+                let attrs = payload.deserialize_into::<Vec<model::Attribute>>()?;
                 return Ok(ClusterSnapshot::Unknown(ClusterId::new(cid), attrs));
             }
             let _: &BufferedPayload = &payload;
@@ -1470,7 +1479,7 @@ fn dispatch_cluster_patch_tokens(
                 )
             )
             /// Forward-compatible fallback for unrecognized clusters.
-            Unknown(ClusterId, Vec<WireAttribute>),
+            Unknown(ClusterId, Vec<model::Attribute>),
         }
 
         impl From<ClusterPatch> for Cluster {
@@ -1483,7 +1492,7 @@ fn dispatch_cluster_patch_tokens(
                                 ClusterId::new($(format_hex_u32(c.cluster_id))),
                                 PartialCluster::into_attributes(*inner)
                                     .into_iter()
-                                    .map(|(id, val)| WireAttribute::new(id, val))
+                                    .map(|(id, val)| model::Attribute::new(id, val))
                                     .collect(),
                             ),
                         )
@@ -1492,7 +1501,7 @@ fn dispatch_cluster_patch_tokens(
                                 ClusterId::new($(format_hex_u32(c.cluster_id))),
                                 PartialCluster::into_attributes(inner)
                                     .into_iter()
-                                    .map(|(id, val)| WireAttribute::new(id, val))
+                                    .map(|(id, val)| model::Attribute::new(id, val))
                                     .collect(),
                             ),
                         )
@@ -1592,7 +1601,7 @@ fn dispatch_cluster_patch_describe_tokens(
         ) -> Result<ClusterPatch, String> {
             if scope_name == Some("Unknown") {
                 let cid = scope_id.ok_or_else(|| String::from("missing 'cluster_id' for Unknown cluster"))?;
-                let attrs = payload.deserialize_into::<Vec<WireAttribute>>()?;
+                let attrs = payload.deserialize_into::<Vec<model::Attribute>>()?;
                 return Ok(ClusterPatch::Unknown(ClusterId::new(cid), attrs));
             }
             let _: &BufferedPayload = &payload;
@@ -1721,7 +1730,11 @@ fn dispatch_endpoint_meta_tokens(sorted_endpoints: &[DispatchEndpointEntry]) -> 
                             }
                         )
                     )
-                    Self::Unknown(ep) => ep.primary_device_type().map_or(DeviceTypeId::new(0), |d| d.id),
+                    Self::Unknown(ep) => ep
+                        .primary_device_type()
+                        .ok()
+                        .and_then(Optional::into_option)
+                        .map_or(DeviceTypeId::new(0), |d| d.id),
                 }
             }
 
@@ -1757,7 +1770,11 @@ fn dispatch_endpoint_meta_tokens(sorted_endpoints: &[DispatchEndpointEntry]) -> 
                             }
                         )
                     )
-                    Self::Unknown(ep) => ep.primary_device_type().map_or(0, |d| d.revision),
+                    Self::Unknown(ep) => ep
+                        .primary_device_type()
+                        .ok()
+                        .and_then(Optional::into_option)
+                        .map_or(0, |d| d.revision),
                 }
             }
 

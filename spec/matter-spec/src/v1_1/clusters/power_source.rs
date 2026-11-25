@@ -19,10 +19,9 @@ use crate::dispatch::{DescribedVariant, deserialize_enum_described};
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
     model::{
-        ActionId, Attribute as WireAttribute, AttributeId, AttributeValue, Cluster, ClusterId, Command as WireCommand,
-        CommandDirection, CommandId, DataVersion, DeviceTypeId, EndpointId, Event as WireEvent, EventId, EventNumber,
-        EventPriority, FabricId, FabricIndex, FieldId, GroupId, MatterStatus, NodeId, Nullable, Optional,
-        TransactionId, VendorId,
+        self, ActionId, AttributeId, AttributeValue, Cluster, ClusterId, CommandDirection, CommandId, DataVersion,
+        DeviceTypeId, EndpointId, EventId, EventNumber, EventPriority, FabricId, FabricIndex, FieldId, GroupId,
+        MatterStatus, NodeId, Nullable, Optional, TransactionId, VendorId,
     },
     types,
 };
@@ -455,7 +454,7 @@ impl crate::traits::PartialCluster for PowerSourceClusterPatch {
     type Full = PowerSourceCluster;
 
     fn apply_attribute(&mut self, id: AttributeId, value: AttributeValue) -> Result<(), AttributeError> {
-        let attr = Attribute::try_from(WireAttribute::new(id, value))?;
+        let attr = Attribute::try_from(model::Attribute::new(id, value))?;
         self.apply(attr);
         Ok(())
     }
@@ -1280,7 +1279,7 @@ impl PowerSourceCluster {
             if id.is_global() {
                 continue;
             }
-            match Attribute::try_from(WireAttribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
+            match Attribute::try_from(model::Attribute::new(id, val)).map_err(ClusterError::InvalidAttribute)? {
                 Attribute::Status(decoded) => {
                     status.is_none().then_some(()).ok_or(ClusterError::InvalidAttribute(
                         AttributeError::InvalidValue {
@@ -2341,7 +2340,7 @@ impl Attribute {
     }
 
     #[inline]
-    pub fn from_wire(attr: WireAttribute) -> Result<Self, AttributeError> {
+    pub fn from_model(attr: model::Attribute) -> Result<Self, AttributeError> {
         Self::try_from(attr)
     }
 
@@ -2462,50 +2461,50 @@ impl Attribute {
     }
 }
 
-impl From<Attribute> for WireAttribute {
+impl From<Attribute> for model::Attribute {
     #[inline]
     fn from(attr: Attribute) -> Self {
         match attr {
-            Attribute::Status(inner) => WireAttribute::from(inner),
-            Attribute::Order(inner) => WireAttribute::from(inner),
-            Attribute::Description(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedInputVoltage(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedInputFrequency(inner) => WireAttribute::from(inner),
-            Attribute::WiredCurrentType(inner) => WireAttribute::from(inner),
-            Attribute::WiredAssessedCurrent(inner) => WireAttribute::from(inner),
-            Attribute::WiredNominalVoltage(inner) => WireAttribute::from(inner),
-            Attribute::WiredMaximumCurrent(inner) => WireAttribute::from(inner),
-            Attribute::WiredPresent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveWiredFaults(inner) => WireAttribute::from(inner),
-            Attribute::BatVoltage(inner) => WireAttribute::from(inner),
-            Attribute::BatPercentRemaining(inner) => WireAttribute::from(inner),
-            Attribute::BatTimeRemaining(inner) => WireAttribute::from(inner),
-            Attribute::BatChargeLevel(inner) => WireAttribute::from(inner),
-            Attribute::BatReplacementNeeded(inner) => WireAttribute::from(inner),
-            Attribute::BatReplaceability(inner) => WireAttribute::from(inner),
-            Attribute::BatPresent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveBatFaults(inner) => WireAttribute::from(inner),
-            Attribute::BatReplacementDescription(inner) => WireAttribute::from(inner),
-            Attribute::BatCommonDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatAnsiDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatIecDesignation(inner) => WireAttribute::from(inner),
-            Attribute::BatApprovedChemistry(inner) => WireAttribute::from(inner),
-            Attribute::BatCapacity(inner) => WireAttribute::from(inner),
-            Attribute::BatQuantity(inner) => WireAttribute::from(inner),
-            Attribute::BatChargeState(inner) => WireAttribute::from(inner),
-            Attribute::BatTimeToFullCharge(inner) => WireAttribute::from(inner),
-            Attribute::BatFunctionalWhileCharging(inner) => WireAttribute::from(inner),
-            Attribute::BatChargingCurrent(inner) => WireAttribute::from(inner),
-            Attribute::ActiveBatChargeFaults(inner) => WireAttribute::from(inner),
+            Attribute::Status(inner) => model::Attribute::from(inner),
+            Attribute::Order(inner) => model::Attribute::from(inner),
+            Attribute::Description(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedInputVoltage(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedInputFrequency(inner) => model::Attribute::from(inner),
+            Attribute::WiredCurrentType(inner) => model::Attribute::from(inner),
+            Attribute::WiredAssessedCurrent(inner) => model::Attribute::from(inner),
+            Attribute::WiredNominalVoltage(inner) => model::Attribute::from(inner),
+            Attribute::WiredMaximumCurrent(inner) => model::Attribute::from(inner),
+            Attribute::WiredPresent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveWiredFaults(inner) => model::Attribute::from(inner),
+            Attribute::BatVoltage(inner) => model::Attribute::from(inner),
+            Attribute::BatPercentRemaining(inner) => model::Attribute::from(inner),
+            Attribute::BatTimeRemaining(inner) => model::Attribute::from(inner),
+            Attribute::BatChargeLevel(inner) => model::Attribute::from(inner),
+            Attribute::BatReplacementNeeded(inner) => model::Attribute::from(inner),
+            Attribute::BatReplaceability(inner) => model::Attribute::from(inner),
+            Attribute::BatPresent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveBatFaults(inner) => model::Attribute::from(inner),
+            Attribute::BatReplacementDescription(inner) => model::Attribute::from(inner),
+            Attribute::BatCommonDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatAnsiDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatIecDesignation(inner) => model::Attribute::from(inner),
+            Attribute::BatApprovedChemistry(inner) => model::Attribute::from(inner),
+            Attribute::BatCapacity(inner) => model::Attribute::from(inner),
+            Attribute::BatQuantity(inner) => model::Attribute::from(inner),
+            Attribute::BatChargeState(inner) => model::Attribute::from(inner),
+            Attribute::BatTimeToFullCharge(inner) => model::Attribute::from(inner),
+            Attribute::BatFunctionalWhileCharging(inner) => model::Attribute::from(inner),
+            Attribute::BatChargingCurrent(inner) => model::Attribute::from(inner),
+            Attribute::ActiveBatChargeFaults(inner) => model::Attribute::from(inner),
         }
     }
 }
 
-impl TryFrom<WireAttribute> for Attribute {
+impl TryFrom<model::Attribute> for Attribute {
     type Error = AttributeError;
 
     #[inline]
-    fn try_from(attr: WireAttribute) -> Result<Self, Self::Error> {
+    fn try_from(attr: model::Attribute) -> Result<Self, Self::Error> {
         Self::try_from_pair(attr.id, attr.value).map_err(|status| match status {
             MatterStatus::UnsupportedAttribute => AttributeError::UnsupportedAttribute(attr.id),
             status => AttributeError::InvalidValue {
@@ -2815,48 +2814,26 @@ impl Event {
         }
     }
 
-    pub fn from_wire(event_id: EventId, val: AttributeValue) -> Result<Self, EventError> {
-        match event_id {
-            events::WiredFaultChange::EVENT_ID => events::WiredFaultChange::try_from_value_with_field(val)
-                .map(Self::WiredFaultChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::BatFaultChange::EVENT_ID => events::BatFaultChange::try_from_value_with_field(val)
-                .map(Self::BatFaultChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            events::BatChargeFaultChange::EVENT_ID => events::BatChargeFaultChange::try_from_value_with_field(val)
-                .map(Self::BatChargeFaultChange)
-                .map_err(|(field_id, status)| EventError::InvalidPayload {
-                    id: event_id,
-                    field_id,
-                    status,
-                }),
-            other => Err(EventError::UnsupportedEvent(other)),
-        }
+    #[inline]
+    pub fn from_model(ev: model::Event) -> Result<Self, EventError> {
+        Self::try_from(ev)
     }
 }
 
-impl From<Event> for WireEvent {
+impl From<Event> for model::Event {
     fn from(ev: Event) -> Self {
         match ev {
-            Event::WiredFaultChange(inner) => WireEvent::from(inner),
-            Event::BatFaultChange(inner) => WireEvent::from(inner),
-            Event::BatChargeFaultChange(inner) => WireEvent::from(inner),
+            Event::WiredFaultChange(inner) => model::Event::from(inner),
+            Event::BatFaultChange(inner) => model::Event::from(inner),
+            Event::BatChargeFaultChange(inner) => model::Event::from(inner),
         }
     }
 }
 
-impl TryFrom<WireEvent> for Event {
+impl TryFrom<model::Event> for Event {
     type Error = EventError;
 
-    fn try_from(ev: WireEvent) -> Result<Self, Self::Error> {
+    fn try_from(ev: model::Event) -> Result<Self, Self::Error> {
         if ev.cluster_id != Self::CLUSTER_ID {
             return Err(EventError::ClusterIdMismatch {
                 expected: Self::CLUSTER_ID,
@@ -2871,7 +2848,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::WiredFaultChange::try_from_value_with_field(ev.payload)
+                events::WiredFaultChange::decode_fields(ev.payload)
                     .map(Self::WiredFaultChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2886,7 +2863,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::BatFaultChange::try_from_value_with_field(ev.payload)
+                events::BatFaultChange::decode_fields(ev.payload)
                     .map(Self::BatFaultChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -2901,7 +2878,7 @@ impl TryFrom<WireEvent> for Event {
                         actual: ev.priority,
                     });
                 }
-                events::BatChargeFaultChange::try_from_value_with_field(ev.payload)
+                events::BatChargeFaultChange::decode_fields(ev.payload)
                     .map(Self::BatChargeFaultChange)
                     .map_err(|(field_id, status)| EventError::InvalidPayload {
                         id: ev.event_id,
@@ -5626,11 +5603,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_CURRENT,
@@ -5643,7 +5616,12 @@ pub mod events {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut current = None;
@@ -5687,16 +5665,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -5737,11 +5716,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_CURRENT,
@@ -5754,7 +5729,12 @@ pub mod events {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut current = None;
@@ -5798,16 +5778,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 
@@ -5848,11 +5829,7 @@ pub mod events {
         }
 
         #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.encode_fields_inner())
-        }
-
-        pub(crate) fn encode_fields_inner(self) -> Vec<(FieldId, AttributeValue)> {
+        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![
                 (
                     Self::FIELD_CURRENT,
@@ -5865,7 +5842,12 @@ pub mod events {
             ]
         }
 
-        pub(crate) fn decode_fields_inner(
+        #[must_use]
+        pub fn into_value(self) -> AttributeValue {
+            AttributeValue::Struct(self.into_fields())
+        }
+
+        pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
             let mut current = None;
@@ -5909,16 +5891,17 @@ pub mod events {
             })
         }
 
-        pub(crate) fn try_from_value_with_field(val: AttributeValue) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err((None, MatterStatus::InvalidDataType));
-            };
-            Self::decode_fields_inner(fields)
+        #[inline]
+        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
+            Self::decode_fields(fields).map_err(|(_, status)| status)
         }
 
         #[inline]
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            Self::try_from_value_with_field(val).map_err(|(_, status)| status)
+            let AttributeValue::Struct(fields) = val else {
+                return Err(MatterStatus::InvalidDataType);
+            };
+            Self::try_from_fields(fields)
         }
     }
 

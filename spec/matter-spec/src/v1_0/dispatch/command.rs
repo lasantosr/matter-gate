@@ -53,7 +53,7 @@ use crate::v1_0::clusters;
 use crate::{
     dispatch::{CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema},
     error::CommandError,
-    model::{ClusterId, Command as WireCommand, CommandDirection, CommandId},
+    model::{self, ClusterId, CommandDirection, CommandId},
 };
 
 /// Polymorphic client-to-server command across all enabled clusters in this Matter specification version.
@@ -136,99 +136,101 @@ pub enum ClusterCommand {
     #[cfg(cluster_fault_injection)]
     FaultInjection(clusters::fault_injection::Command),
     /// Forward-compatible fallback for unrecognized clusters.
-    Unknown(WireCommand),
+    Unknown(model::Command),
 }
 
 impl ClusterCommand {
-    /// Decodes an owned [`WireCommand`] into this polymorphic enum.
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    /// Decodes an owned [`model::Command`] into this polymorphic enum.
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         match cmd.cluster_id.raw() {
             #[cfg(cluster_identify)]
-            0x0003 => clusters::identify::Command::from_wire(cmd).map(Self::Identify),
+            0x0003 => clusters::identify::Command::from_model(cmd).map(Self::Identify),
             #[cfg(cluster_scenes)]
-            0x0005 => clusters::scenes::Command::from_wire(cmd).map(Self::Scenes),
+            0x0005 => clusters::scenes::Command::from_model(cmd).map(Self::Scenes),
             #[cfg(cluster_on_off)]
-            0x0006 => clusters::on_off::Command::from_wire(cmd).map(Self::OnOff),
+            0x0006 => clusters::on_off::Command::from_model(cmd).map(Self::OnOff),
             #[cfg(cluster_actions)]
-            0x0025 => clusters::actions::Command::from_wire(cmd).map(Self::Actions),
+            0x0025 => clusters::actions::Command::from_model(cmd).map(Self::Actions),
             #[cfg(cluster_basic_information)]
-            0x0028 => clusters::basic_information::Command::from_wire(cmd).map(Self::BasicInformation),
+            0x0028 => clusters::basic_information::Command::from_model(cmd).map(Self::BasicInformation),
             #[cfg(cluster_ota_software_update_provider)]
             0x0029 => {
-                clusters::ota_software_update_provider::Command::from_wire(cmd).map(Self::OtaSoftwareUpdateProvider)
+                clusters::ota_software_update_provider::Command::from_model(cmd).map(Self::OtaSoftwareUpdateProvider)
             }
             #[cfg(cluster_ota_software_update_requestor)]
             0x002A => {
-                clusters::ota_software_update_requestor::Command::from_wire(cmd).map(Self::OtaSoftwareUpdateRequestor)
+                clusters::ota_software_update_requestor::Command::from_model(cmd).map(Self::OtaSoftwareUpdateRequestor)
             }
             #[cfg(cluster_general_commissioning)]
-            0x0030 => clusters::general_commissioning::Command::from_wire(cmd).map(Self::GeneralCommissioning),
+            0x0030 => clusters::general_commissioning::Command::from_model(cmd).map(Self::GeneralCommissioning),
             #[cfg(cluster_network_commissioning)]
-            0x0031 => clusters::network_commissioning::Command::from_wire(cmd).map(Self::NetworkCommissioning),
+            0x0031 => clusters::network_commissioning::Command::from_model(cmd).map(Self::NetworkCommissioning),
             #[cfg(cluster_diagnostic_logs)]
-            0x0032 => clusters::diagnostic_logs::Command::from_wire(cmd).map(Self::DiagnosticLogs),
+            0x0032 => clusters::diagnostic_logs::Command::from_model(cmd).map(Self::DiagnosticLogs),
             #[cfg(cluster_general_diagnostics)]
-            0x0033 => clusters::general_diagnostics::Command::from_wire(cmd).map(Self::GeneralDiagnostics),
+            0x0033 => clusters::general_diagnostics::Command::from_model(cmd).map(Self::GeneralDiagnostics),
             #[cfg(cluster_software_diagnostics)]
-            0x0034 => clusters::software_diagnostics::Command::from_wire(cmd).map(Self::SoftwareDiagnostics),
+            0x0034 => clusters::software_diagnostics::Command::from_model(cmd).map(Self::SoftwareDiagnostics),
             #[cfg(cluster_thread_network_diagnostics)]
-            0x0035 => clusters::thread_network_diagnostics::Command::from_wire(cmd).map(Self::ThreadNetworkDiagnostics),
+            0x0035 => {
+                clusters::thread_network_diagnostics::Command::from_model(cmd).map(Self::ThreadNetworkDiagnostics)
+            }
             #[cfg(cluster_wi_fi_network_diagnostics)]
-            0x0036 => clusters::wi_fi_network_diagnostics::Command::from_wire(cmd).map(Self::WiFiNetworkDiagnostics),
+            0x0036 => clusters::wi_fi_network_diagnostics::Command::from_model(cmd).map(Self::WiFiNetworkDiagnostics),
             #[cfg(cluster_ethernet_network_diagnostics)]
             0x0037 => {
-                clusters::ethernet_network_diagnostics::Command::from_wire(cmd).map(Self::EthernetNetworkDiagnostics)
+                clusters::ethernet_network_diagnostics::Command::from_model(cmd).map(Self::EthernetNetworkDiagnostics)
             }
             #[cfg(cluster_time_synchronization)]
-            0x0038 => clusters::time_synchronization::Command::from_wire(cmd).map(Self::TimeSynchronization),
+            0x0038 => clusters::time_synchronization::Command::from_model(cmd).map(Self::TimeSynchronization),
             #[cfg(cluster_administrator_commissioning)]
             0x003C => {
-                clusters::administrator_commissioning::Command::from_wire(cmd).map(Self::AdministratorCommissioning)
+                clusters::administrator_commissioning::Command::from_model(cmd).map(Self::AdministratorCommissioning)
             }
             #[cfg(cluster_operational_credentials)]
-            0x003E => clusters::operational_credentials::Command::from_wire(cmd).map(Self::OperationalCredentials),
+            0x003E => clusters::operational_credentials::Command::from_model(cmd).map(Self::OperationalCredentials),
             #[cfg(cluster_group_key_management)]
-            0x003F => clusters::group_key_management::Command::from_wire(cmd).map(Self::GroupKeyManagement),
+            0x003F => clusters::group_key_management::Command::from_model(cmd).map(Self::GroupKeyManagement),
             #[cfg(cluster_mode_select)]
-            0x0050 => clusters::mode_select::Command::from_wire(cmd).map(Self::ModeSelect),
+            0x0050 => clusters::mode_select::Command::from_model(cmd).map(Self::ModeSelect),
             #[cfg(cluster_door_lock)]
-            0x0101 => clusters::door_lock::Command::from_wire(cmd).map(Self::DoorLock),
+            0x0101 => clusters::door_lock::Command::from_model(cmd).map(Self::DoorLock),
             #[cfg(cluster_window_covering)]
-            0x0102 => clusters::window_covering::Command::from_wire(cmd).map(Self::WindowCovering),
+            0x0102 => clusters::window_covering::Command::from_model(cmd).map(Self::WindowCovering),
             #[cfg(cluster_thermostat)]
-            0x0201 => clusters::thermostat::Command::from_wire(cmd).map(Self::Thermostat),
+            0x0201 => clusters::thermostat::Command::from_model(cmd).map(Self::Thermostat),
             #[cfg(cluster_channel)]
-            0x0504 => clusters::channel::Command::from_wire(cmd).map(Self::Channel),
+            0x0504 => clusters::channel::Command::from_model(cmd).map(Self::Channel),
             #[cfg(cluster_target_navigator)]
-            0x0505 => clusters::target_navigator::Command::from_wire(cmd).map(Self::TargetNavigator),
+            0x0505 => clusters::target_navigator::Command::from_model(cmd).map(Self::TargetNavigator),
             #[cfg(cluster_media_playback)]
-            0x0506 => clusters::media_playback::Command::from_wire(cmd).map(Self::MediaPlayback),
+            0x0506 => clusters::media_playback::Command::from_model(cmd).map(Self::MediaPlayback),
             #[cfg(cluster_media_input)]
-            0x0507 => clusters::media_input::Command::from_wire(cmd).map(Self::MediaInput),
+            0x0507 => clusters::media_input::Command::from_model(cmd).map(Self::MediaInput),
             #[cfg(cluster_low_power)]
-            0x0508 => clusters::low_power::Command::from_wire(cmd).map(Self::LowPower),
+            0x0508 => clusters::low_power::Command::from_model(cmd).map(Self::LowPower),
             #[cfg(cluster_keypad_input)]
-            0x0509 => clusters::keypad_input::Command::from_wire(cmd).map(Self::KeypadInput),
+            0x0509 => clusters::keypad_input::Command::from_model(cmd).map(Self::KeypadInput),
             #[cfg(cluster_content_launcher)]
-            0x050A => clusters::content_launcher::Command::from_wire(cmd).map(Self::ContentLauncher),
+            0x050A => clusters::content_launcher::Command::from_model(cmd).map(Self::ContentLauncher),
             #[cfg(cluster_audio_output)]
-            0x050B => clusters::audio_output::Command::from_wire(cmd).map(Self::AudioOutput),
+            0x050B => clusters::audio_output::Command::from_model(cmd).map(Self::AudioOutput),
             #[cfg(cluster_application_launcher)]
-            0x050C => clusters::application_launcher::Command::from_wire(cmd).map(Self::ApplicationLauncher),
+            0x050C => clusters::application_launcher::Command::from_model(cmd).map(Self::ApplicationLauncher),
             #[cfg(cluster_account_login)]
-            0x050E => clusters::account_login::Command::from_wire(cmd).map(Self::AccountLogin),
+            0x050E => clusters::account_login::Command::from_model(cmd).map(Self::AccountLogin),
             #[cfg(cluster_client_monitoring)]
-            0x1046 => clusters::client_monitoring::Command::from_wire(cmd).map(Self::ClientMonitoring),
+            0x1046 => clusters::client_monitoring::Command::from_model(cmd).map(Self::ClientMonitoring),
             #[cfg(cluster_unit_testing)]
-            0xFFF1_FC05 => clusters::unit_testing::Command::from_wire(cmd).map(Self::UnitTesting),
+            0xFFF1_FC05 => clusters::unit_testing::Command::from_model(cmd).map(Self::UnitTesting),
             #[cfg(cluster_fault_injection)]
-            0xFFF1_FC06 => clusters::fault_injection::Command::from_wire(cmd).map(Self::FaultInjection),
+            0xFFF1_FC06 => clusters::fault_injection::Command::from_model(cmd).map(Self::FaultInjection),
             _ => Ok(Self::Unknown(cmd)),
         }
     }
 }
 
-impl From<ClusterCommand> for WireCommand {
+impl From<ClusterCommand> for model::Command {
     fn from(cmd: ClusterCommand) -> Self {
         match cmd {
             #[cfg(cluster_identify)]
@@ -308,12 +310,12 @@ impl From<ClusterCommand> for WireCommand {
     }
 }
 
-impl TryFrom<WireCommand> for ClusterCommand {
+impl TryFrom<model::Command> for ClusterCommand {
     type Error = CommandError;
 
     #[inline]
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
-        Self::from_wire(cmd)
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
+        Self::from_model(cmd)
     }
 }
 
@@ -803,7 +805,9 @@ fn select_cluster_command(
     payload: BufferedPayload,
 ) -> Result<ClusterCommand, String> {
     if scope_name == Some("Unknown") {
-        return payload.deserialize_into::<WireCommand>().map(ClusterCommand::Unknown);
+        return payload
+            .deserialize_into::<model::Command>()
+            .map(ClusterCommand::Unknown);
     }
     let (_, _, _) = (item_name, item_id, &payload);
     #[cfg(not(any(
@@ -1535,56 +1539,56 @@ pub enum ClusterCommandResponse {
     #[cfg(cluster_unit_testing)]
     UnitTesting(clusters::unit_testing::CommandResponse),
     /// Forward-compatible fallback for unrecognized clusters.
-    Unknown(WireCommand),
+    Unknown(model::Command),
 }
 
 impl ClusterCommandResponse {
-    /// Decodes an owned [`WireCommand`] into this polymorphic enum.
-    pub fn from_wire(cmd: WireCommand) -> Result<Self, CommandError> {
+    /// Decodes an owned [`model::Command`] into this polymorphic enum.
+    pub fn from_model(cmd: model::Command) -> Result<Self, CommandError> {
         match cmd.cluster_id.raw() {
             #[cfg(cluster_scenes)]
-            0x0005 => clusters::scenes::CommandResponse::from_wire(cmd).map(Self::Scenes),
+            0x0005 => clusters::scenes::CommandResponse::from_model(cmd).map(Self::Scenes),
             #[cfg(cluster_ota_software_update_provider)]
-            0x0029 => clusters::ota_software_update_provider::CommandResponse::from_wire(cmd)
+            0x0029 => clusters::ota_software_update_provider::CommandResponse::from_model(cmd)
                 .map(Self::OtaSoftwareUpdateProvider),
             #[cfg(cluster_general_commissioning)]
-            0x0030 => clusters::general_commissioning::CommandResponse::from_wire(cmd).map(Self::GeneralCommissioning),
+            0x0030 => clusters::general_commissioning::CommandResponse::from_model(cmd).map(Self::GeneralCommissioning),
             #[cfg(cluster_network_commissioning)]
-            0x0031 => clusters::network_commissioning::CommandResponse::from_wire(cmd).map(Self::NetworkCommissioning),
+            0x0031 => clusters::network_commissioning::CommandResponse::from_model(cmd).map(Self::NetworkCommissioning),
             #[cfg(cluster_diagnostic_logs)]
-            0x0032 => clusters::diagnostic_logs::CommandResponse::from_wire(cmd).map(Self::DiagnosticLogs),
+            0x0032 => clusters::diagnostic_logs::CommandResponse::from_model(cmd).map(Self::DiagnosticLogs),
             #[cfg(cluster_operational_credentials)]
             0x003E => {
-                clusters::operational_credentials::CommandResponse::from_wire(cmd).map(Self::OperationalCredentials)
+                clusters::operational_credentials::CommandResponse::from_model(cmd).map(Self::OperationalCredentials)
             }
             #[cfg(cluster_group_key_management)]
-            0x003F => clusters::group_key_management::CommandResponse::from_wire(cmd).map(Self::GroupKeyManagement),
+            0x003F => clusters::group_key_management::CommandResponse::from_model(cmd).map(Self::GroupKeyManagement),
             #[cfg(cluster_door_lock)]
-            0x0101 => clusters::door_lock::CommandResponse::from_wire(cmd).map(Self::DoorLock),
+            0x0101 => clusters::door_lock::CommandResponse::from_model(cmd).map(Self::DoorLock),
             #[cfg(cluster_thermostat)]
-            0x0201 => clusters::thermostat::CommandResponse::from_wire(cmd).map(Self::Thermostat),
+            0x0201 => clusters::thermostat::CommandResponse::from_model(cmd).map(Self::Thermostat),
             #[cfg(cluster_channel)]
-            0x0504 => clusters::channel::CommandResponse::from_wire(cmd).map(Self::Channel),
+            0x0504 => clusters::channel::CommandResponse::from_model(cmd).map(Self::Channel),
             #[cfg(cluster_target_navigator)]
-            0x0505 => clusters::target_navigator::CommandResponse::from_wire(cmd).map(Self::TargetNavigator),
+            0x0505 => clusters::target_navigator::CommandResponse::from_model(cmd).map(Self::TargetNavigator),
             #[cfg(cluster_media_playback)]
-            0x0506 => clusters::media_playback::CommandResponse::from_wire(cmd).map(Self::MediaPlayback),
+            0x0506 => clusters::media_playback::CommandResponse::from_model(cmd).map(Self::MediaPlayback),
             #[cfg(cluster_keypad_input)]
-            0x0509 => clusters::keypad_input::CommandResponse::from_wire(cmd).map(Self::KeypadInput),
+            0x0509 => clusters::keypad_input::CommandResponse::from_model(cmd).map(Self::KeypadInput),
             #[cfg(cluster_content_launcher)]
-            0x050A => clusters::content_launcher::CommandResponse::from_wire(cmd).map(Self::ContentLauncher),
+            0x050A => clusters::content_launcher::CommandResponse::from_model(cmd).map(Self::ContentLauncher),
             #[cfg(cluster_application_launcher)]
-            0x050C => clusters::application_launcher::CommandResponse::from_wire(cmd).map(Self::ApplicationLauncher),
+            0x050C => clusters::application_launcher::CommandResponse::from_model(cmd).map(Self::ApplicationLauncher),
             #[cfg(cluster_account_login)]
-            0x050E => clusters::account_login::CommandResponse::from_wire(cmd).map(Self::AccountLogin),
+            0x050E => clusters::account_login::CommandResponse::from_model(cmd).map(Self::AccountLogin),
             #[cfg(cluster_unit_testing)]
-            0xFFF1_FC05 => clusters::unit_testing::CommandResponse::from_wire(cmd).map(Self::UnitTesting),
+            0xFFF1_FC05 => clusters::unit_testing::CommandResponse::from_model(cmd).map(Self::UnitTesting),
             _ => Ok(Self::Unknown(cmd)),
         }
     }
 }
 
-impl From<ClusterCommandResponse> for WireCommand {
+impl From<ClusterCommandResponse> for model::Command {
     fn from(cmd: ClusterCommandResponse) -> Self {
         match cmd {
             #[cfg(cluster_scenes)]
@@ -1626,12 +1630,12 @@ impl From<ClusterCommandResponse> for WireCommand {
     }
 }
 
-impl TryFrom<WireCommand> for ClusterCommandResponse {
+impl TryFrom<model::Command> for ClusterCommandResponse {
     type Error = CommandError;
 
     #[inline]
-    fn try_from(cmd: WireCommand) -> Result<Self, Self::Error> {
-        Self::from_wire(cmd)
+    fn try_from(cmd: model::Command) -> Result<Self, Self::Error> {
+        Self::from_model(cmd)
     }
 }
 
@@ -1894,7 +1898,7 @@ fn select_cluster_command_response(
 ) -> Result<ClusterCommandResponse, String> {
     if scope_name == Some("Unknown") {
         return payload
-            .deserialize_into::<WireCommand>()
+            .deserialize_into::<model::Command>()
             .map(ClusterCommandResponse::Unknown);
     }
     let (_, _, _) = (item_name, item_id, &payload);
