@@ -1,0 +1,2 @@
+spec/matter-spec/src/__shared/** linguist-generated=true
+spec/matter-spec/src/v[0-9]_*/** linguist-generated=true
