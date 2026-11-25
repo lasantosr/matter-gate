@@ -110,7 +110,9 @@ mod v1_4_specific_tests {
         assert!(matches!(
             err_missing,
             Err(EndpointError::MissingMandatoryServerCluster(cluster))
-                if cluster == DescriptorCluster::CLUSTER_ID || cluster == OnOffCluster::CLUSTER_ID
+                if cluster == DescriptorCluster::CLUSTER_ID
+                    || cluster == ScenesManagementCluster::CLUSTER_ID
+                    || cluster == OnOffCluster::CLUSTER_ID
         ));
     }
 
@@ -207,7 +209,7 @@ mod v1_4_specific_tests {
 
         // Validate endpoint via registry
         validator.endpoint(&ep).expect("validate endpoint in registry");
-        assert!(ep.server_cluster(OnOffCluster::CLUSTER_ID).is_some());
+        assert!(ep.cluster(OnOffCluster::CLUSTER_ID).is_some());
 
         // Validate node missing root endpoint
         let invalid_node = Node::new(NodeId::new(1), vec![ep.clone()]);
@@ -283,7 +285,7 @@ mod v1_4_specific_tests {
     fn root_node_default_endpoint_id_and_composed_validation() {
         use matter_spec::{
             error::EndpointError,
-            model::{Cluster, DeviceTypeEntry, Endpoint, EndpointId},
+            model::{DeviceTypeEntry, Endpoint, EndpointId, Optional},
             traits::EndpointExt as _,
             v1_4::{
                 clusters::{
@@ -313,37 +315,21 @@ mod v1_4_specific_tests {
         assert_eq!(light_ep5.id, EndpointId::new(5));
 
         // Composed/bridged endpoint: [OnOffLight, BridgedNode]
-        let mut composed = light.into_endpoint(EndpointId::new(2));
-        composed
-            .device_types
-            .push(DeviceTypeEntry::new(BridgedNode::DEVICE_TYPE_ID, BridgedNode::REVISION));
-        composed
-            .server_clusters
-            .push(Cluster::from(BridgedDeviceBasicInformationCluster::default()));
-        {
-            use matter_spec::v1_4::globals::DeviceTypeStruct;
-            let new_desc = Cluster::from(DescriptorCluster::new(
-                composed
-                    .device_types
-                    .iter()
-                    .map(|dt| DeviceTypeStruct::new(dt.id, dt.revision))
-                    .collect::<Vec<_>>(),
-                composed.server_clusters.iter().map(|c| c.id).collect::<Vec<_>>(),
-                composed.client_clusters.clone(),
-                composed.parts.clone(),
-            ));
-            if let Some(desc) = composed
-                .server_clusters
-                .iter_mut()
-                .find(|c| c.id == DescriptorCluster::CLUSTER_ID)
-            {
-                *desc = new_desc;
-            }
-        }
+        let composed = light
+            .into_endpoint(EndpointId::new(2))
+            .with_device_type_list([
+                DeviceTypeEntry::new(OnOffLight::DEVICE_TYPE_ID, OnOffLight::REVISION),
+                DeviceTypeEntry::new(BridgedNode::DEVICE_TYPE_ID, BridgedNode::REVISION),
+            ])
+            .with_cluster(BridgedDeviceBasicInformationCluster::default())
+            .with_synced_server_list();
         registry::Validator::full()
             .endpoint(&composed)
             .expect("composed/bridged endpoint should validate");
-        assert_eq!(composed.device_types.len(), 2);
+        let Optional::Present(dts) = composed.device_type_list().expect("decode DeviceTypeList") else {
+            panic!("expected DeviceTypeList");
+        };
+        assert_eq!(dts.count(), 2);
 
         let light_view = composed
             .view_as::<OnOffLight>()
@@ -370,30 +356,10 @@ mod v1_4_specific_tests {
         assert_eq!(decoded_light.on_off.on_off, OnOffState::Off);
 
         // Single-device OnOffLightSwitch rejects GroupsCluster as a server cluster (ConformanceOp::Disallow)
-        let mut switch_ep = OnOffLightSwitch::default().into_endpoint(EndpointId::new(1));
-        switch_ep
-            .server_clusters
-            .push(Cluster::from(GroupsCluster::new(NameSupportBitmap::EMPTY)));
-        {
-            use matter_spec::v1_4::globals::DeviceTypeStruct;
-            let switch_desc = Cluster::from(DescriptorCluster::new(
-                switch_ep
-                    .device_types
-                    .iter()
-                    .map(|dt| DeviceTypeStruct::new(dt.id, dt.revision))
-                    .collect::<Vec<_>>(),
-                switch_ep.server_clusters.iter().map(|c| c.id).collect::<Vec<_>>(),
-                switch_ep.client_clusters.clone(),
-                switch_ep.parts.clone(),
-            ));
-            if let Some(desc) = switch_ep
-                .server_clusters
-                .iter_mut()
-                .find(|c| c.id == DescriptorCluster::CLUSTER_ID)
-            {
-                *desc = switch_desc;
-            }
-        }
+        let switch_ep = OnOffLightSwitch::default()
+            .into_endpoint(EndpointId::new(1))
+            .with_cluster(GroupsCluster::new(NameSupportBitmap::EMPTY))
+            .with_synced_server_list();
         let err = registry::Validator::full()
             .endpoint(&switch_ep)
             .expect_err("single-device switch should reject Groups server");
