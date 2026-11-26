@@ -1,8 +1,4 @@
-#![expect(
-    clippy::print_stdout,
-    clippy::min_ident_chars,
-    reason = "xtask is a CLI build orchestrator using stdout and short iterators"
-)]
+#![expect(clippy::print_stdout, reason = "xtask is a CLI build orchestrator using stdout")]
 
 use anyhow::Result;
 use clap::{Parser, Subcommand};

@@ -45,13 +45,16 @@ mod tests {
         assert!(!cl_code.contains("pub struct FeatureMap(pub u32);"));
         assert!(cl_code.contains("crate::define_matter_bitmap!"));
         assert!(cl_code.contains("impl crate::traits::ClusterSpec for OnOffCluster"));
-        assert!(cl_code.contains("crate::impl_matter_command!(Off, super::OnOffCluster, true);"));
-        assert!(cl_code.contains("crate::impl_matter_attribute!(OnOff, super::OnOff, super::OnOffCluster, copy);"));
+        assert!(cl_code.contains("pub struct Off;"));
+        assert!(cl_code.contains("crate::impl_matter_command!(Off, super::OnOffCluster, (), true);"));
+        assert!(cl_code.contains(
+            "crate::impl_matter_attribute!(OnOff, super::OnOff, super::OnOffCluster, copy, scalar, display);"
+        ));
         assert!(cl_code.contains("Off,"));
         assert!(!cl_code.contains("Off(commands::Off)"));
         assert!(cl_code.contains("impl crate::traits::ClusterSpec for OnOffCluster"));
         assert!(cl_code.contains("impl crate::traits::PartialCluster for OnOffClusterPatch"));
-        assert!(cl_code.contains("impl crate::traits::CommandSpec for Off"));
+        assert!(!cl_code.contains("impl crate::traits::CommandSpec for Off"));
         assert!(cl_code.contains("pub fn apply(&mut self, attr: Attribute)"));
         assert!(cl_code.contains("fn try_into_full(self) -> Result<Self::Full, ClusterError>"));
         assert!(cl_code.contains("crate::impl_cluster_wire_conversions!(OnOffCluster);"));
@@ -74,10 +77,10 @@ mod tests {
 
         let dt_single_code = dt_item.render().expect("render single device type");
         assert!(dt_single_code.contains("pub struct OnOffLight"));
-        assert!(dt_single_code.contains("impl DeviceTypeSpec for OnOffLight"));
-        assert!(dt_single_code.contains("validate_device_view("));
+        assert!(dt_single_code.contains("pub struct OnOffLightView<'a>"));
         assert!(dt_single_code.contains("pub fn on_off(&self) -> Option<&'a Cluster>"));
-        assert!(dt_single_code.contains("crate::impl_matter_describe!(device, OnOffLight, false);"));
+        assert!(dt_single_code.contains("crate::impl_device_type_spec!(OnOffLight, OnOffLightView, false);"));
+        assert!(!dt_single_code.contains("impl DeviceTypeSpec for OnOffLight"));
         assert!(!dt_single_code.contains("impl From<OnOffLight> for Endpoint"));
         assert!(!dt_single_code.contains("pub fn validate("));
         assert!(!dt_single_code.contains("OnOffLightOptional"));
@@ -92,10 +95,13 @@ mod tests {
         let globals_code = ver.globals.render().expect("render globals");
         assert!(globals_code.contains("pub struct ClusterRevision(u16);"));
         assert!(!globals_code.contains("pub struct ClusterRevision(pub u16);"));
+        assert!(globals_code.contains("crate::impl_matter_global_scalar_attr!(ClusterRevision, u16, U16, \"{}\");"));
         assert!(globals_code.contains("pub struct FeatureMap(u32);"));
         assert!(!globals_code.contains("pub struct FeatureMap(pub u32);"));
+        assert!(globals_code.contains("crate::impl_matter_global_scalar_attr!(FeatureMap, u32, U32, \"{:#010x}\");"));
         assert!(globals_code.contains("pub struct AttributeList(Vec<AttributeId>);"));
         assert!(!globals_code.contains("pub struct AttributeList(pub Vec<AttributeId>);"));
+        assert!(globals_code.contains("crate::impl_matter_global_id_list_attr!(AttributeList, AttributeId);"));
 
         // Deterministic output across repeated runs
         let docs2 = vec![

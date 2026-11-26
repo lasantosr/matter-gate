@@ -1,0 +1,132 @@
+use super::*;
+
+#[test]
+fn empty_registry_renders_deterministically() {
+    let globals = GlobalDefs::default();
+    let empty_e = BTreeMap::new();
+    let empty_b = BTreeMap::new();
+    let empty_s = BTreeMap::new();
+    let a = render_registry_tables("1.6", &[], &[], &globals, &empty_e, &empty_b, &empty_s).expect("render a");
+    let b = render_registry_tables("1.6", &[], &[], &globals, &empty_e, &empty_b, &empty_s).expect("render b");
+    assert_eq!(a, b);
+    assert!(a.contains("static CLUSTERS: &[ClusterDescriptor]"));
+    assert!(a.contains("static DEVICE_TYPES: &[DeviceTypeDescriptor]"));
+    assert!(!a.contains("pub static CLUSTERS"));
+    assert!(!a.contains("pub static DEVICE_TYPES"));
+    assert!(a.contains("pub static SPEC_REGISTRY: SpecRegistry"));
+    assert!(a.contains("pub struct Validator;"));
+    assert!(a.contains("pub const fn full() -> RegistryValidator<'static>"));
+    assert!(a.contains("pub const fn partial() -> RegistryValidator<'static>"));
+    assert!(!a.contains("pub fn validate_"));
+    assert!(a.contains("expects_event_list: false"));
+
+    use crate::model::AttributeDef;
+
+    let mut globals_ev = GlobalDefs::default();
+    globals_ev.attributes.push(AttributeDef {
+        name: "EventList".to_owned(),
+        code: 0xFFFA,
+        ..Default::default()
+    });
+    let c = render_registry_tables("1.2", &[], &[], &globals_ev, &empty_e, &empty_b, &empty_s).expect("render c");
+    assert!(c.contains("expects_event_list: true"));
+}
+
+#[test]
+fn array_without_entry_type_uses_type_str_and_required_commands_dedup_client_only() {
+    use crate::model::{CommandDef, FieldDef, ParsedDeviceTypeInclude};
+
+    let globals = GlobalDefs::default();
+    let empty_e = BTreeMap::new();
+    let empty_b = BTreeMap::new();
+    let empty_s = BTreeMap::new();
+
+    let cluster = ClusterDef {
+        name: "Groups".to_owned(),
+        code: 0x0004,
+        commands: vec![
+            CommandDef {
+                name: "AddGroup".to_owned(),
+                code: 0x00,
+                direction: CommandDirection::ClientToServer,
+                args: vec![FieldDef {
+                    field_id: 0,
+                    name: "GroupList".to_owned(),
+                    type_str: "group_id".to_owned(),
+                    entry_type: None,
+                    is_array: true,
+                    ..Default::default()
+                }],
+                ..Default::default()
+            },
+            CommandDef {
+                name: "AddGroupResponse".to_owned(),
+                code: 0x00,
+                direction: CommandDirection::ServerToClient,
+                ..Default::default()
+            },
+        ],
+        ..Default::default()
+    };
+    let dt = ParsedDeviceType {
+        name: "TestLight".to_owned(),
+        device_id: 0x0100,
+        includes: vec![ParsedDeviceTypeInclude {
+            cluster: "Groups".to_owned(),
+            is_server: true,
+            required_attributes: vec![],
+            required_commands: vec![
+                "AddGroup".to_owned(),
+                "AddGroupResponse".to_owned(),
+                "AddGroup".to_owned(),
+            ],
+            required_events: vec![],
+        }],
+        ..Default::default()
+    };
+
+    let rendered = render_registry_tables("1.6", &[&cluster], &[&dt], &globals, &empty_e, &empty_b, &empty_s)
+        .expect("render registry");
+    assert!(
+        rendered.contains("item_constraint: &ValueConstraint { value_type: ValueType::U16"),
+        "GroupList array without entryType must resolve group_id -> ValueType::U16:\n{rendered}"
+    );
+    assert!(
+        rendered.contains("required_commands: &[CommandId::new(0x00)]"),
+        "required_commands must filter ServerToClient and deduplicate CommandId:\n{rendered}"
+    );
+}
+
+#[test]
+fn attribute_descriptor_emits_pascal_name_and_snake_field_name_and_event_priority() {
+    use crate::model::{AttributeDef, EventDef};
+
+    let globals = GlobalDefs::default();
+    let empty_e = BTreeMap::new();
+    let empty_b = BTreeMap::new();
+    let empty_s = BTreeMap::new();
+
+    let cluster = ClusterDef {
+        name: "Identify".to_owned(),
+        code: 0x0003,
+        attributes: vec![AttributeDef {
+            name: "IdentifyTime".to_owned(),
+            code: 0x0000,
+            type_str: "int16u".to_owned(),
+            ..Default::default()
+        }],
+        events: vec![EventDef {
+            name: "StateChanged".to_owned(),
+            code: 0x00,
+            priority: "critical".to_owned(),
+            ..Default::default()
+        }],
+        ..Default::default()
+    };
+
+    let rendered = render_registry_tables("1.6", &[&cluster], &[], &globals, &empty_e, &empty_b, &empty_s)
+        .expect("render registry");
+    assert!(rendered.contains("name: \"IdentifyTime\""), "{rendered}");
+    assert!(rendered.contains("field_name: \"identify_time\""), "{rendered}");
+    assert!(rendered.contains("priority: EventPriority::Critical"), "{rendered}");
+}

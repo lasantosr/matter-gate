@@ -18,10 +18,10 @@ homepage = "https://github.com/lasantosr/matter-gate"
 [workspace.dependencies]
 anyhow     = { version = "1.0.0" }
 bytes      = { version = "1.0.0", default-features = false }
-chrono     = { version = "0.4.35", default-features = false }
 clap       = { version = "4.0.0", default-features = false }
 genco      = { version = "0.20.0" }
 heck       = { version = "0.5.0" }
+jiff       = { version = "1.0.0", default-features = false }
 quick-xml  = { version = "0.42.0" }
 schemars   = { version = "1.1.0", default-features = false }
 serde      = { version = "1.0.194", default-features = false }

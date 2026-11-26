@@ -4,7 +4,9 @@ use genco::{quote, tokens::quoted};
 
 use super::{
     attributes::bound_primitive_type,
-    context::{PushLine as _, Tokens, TypeContext, cluster_cfg_gate, doc_comment, to_rust_field_name},
+    context::{
+        PushLine as _, Tokens, TypeContext, cluster_cfg_gate, doc_comment, is_primitive_int, to_rust_field_name,
+    },
     record::{
         FieldBounds, IdPrefix, MemberFlags, MemberPartition, RecordConstructors, RecordStructDef, ResolvedMember,
         SingleMandatoryFrom, StructAttrs,
@@ -137,7 +139,7 @@ pub(super) fn emit_fields_decode_and_construct(
                             if $(&field.fname).is_some() {
                                 return Err((Some(fid), MatterStatus::ConstraintError));
                             }
-                            let decode_one = || -> Result<(), MatterStatus> {
+                            (|| -> Result<(), MatterStatus> {
                                 $(try_from_field_decoding_tokens(
                                     &field.fname,
                                     &field.resolved,
@@ -150,8 +152,8 @@ pub(super) fn emit_fields_decode_and_construct(
                                     field.length,
                                 ))
                                 Ok(())
-                            };
-                            decode_one().map_err(|st| (Some(fid), st))?;
+                            })()
+                            .map_err(|st| (Some(fid), st))?;
                         }
                     )
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
@@ -269,9 +271,19 @@ pub(super) fn try_from_field_decoding_tokens(
     if is_nullable {
         if is_array {
             let elem_path = array_element_path(resolved, type_path, in_submodule);
+            let elem_ref = elem_path.as_str();
+            let elem_is_int = is_primitive_int(elem_ref);
             let len_str = length.map(|len| format_dec_with_underscores(i128::from(len)));
             quote! {
-                let decoded = crate::traits::decode_nullable_list(fval, <$elem_path>::try_from)?;
+                $(if elem_is_int =>
+                    let decoded = crate::traits::decode_nullable_list(
+                        fval,
+                        |v| crate::traits::decode_scalar::<$elem_ref>(&v),
+                    )?;
+                )
+                $(if !elem_is_int =>
+                    let decoded = crate::traits::decode_nullable_list(fval, <$elem_ref>::try_from)?;
+                )
                 $(if let Some(len) = &len_str =>
                     (!matches!(&decoded, Nullable::NonNull(v) if v.len() > $len))
                         .then_some(())
@@ -332,16 +344,31 @@ pub(super) fn try_from_field_decoding_tokens(
             };
 
             quote! {
-                let decoded = crate::traits::decode_nullable(fval, <$type_path>::try_from)?;
+                $(if is_primitive_int(type_path) =>
+                    let decoded = crate::traits::decode_nullable(
+                        fval,
+                        |v| crate::traits::decode_scalar::<$type_path>(&v),
+                    )?;
+                )
+                $(if !is_primitive_int(type_path) =>
+                    let decoded = crate::traits::decode_nullable(fval, <$type_path>::try_from)?;
+                )
                 $cond_checks
                 $fname = Some(decoded);
             }
         }
     } else if is_array {
         let elem_path = array_element_path(resolved, type_path, in_submodule);
+        let elem_ref = elem_path.as_str();
+        let elem_is_int = is_primitive_int(elem_ref);
         let len_str = length.map(|len| format_dec_with_underscores(i128::from(len)));
         quote! {
-            let decoded = crate::traits::decode_list(fval, <$elem_path>::try_from)?;
+            $(if elem_is_int =>
+                let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<$elem_ref>(&v))?;
+            )
+            $(if !elem_is_int =>
+                let decoded = crate::traits::decode_list(fval, <$elem_ref>::try_from)?;
+            )
             $(if let Some(len) = &len_str =>
                 (decoded.len() <= $len).then_some(()).ok_or(MatterStatus::ConstraintError)?;
             )
@@ -350,7 +377,12 @@ pub(super) fn try_from_field_decoding_tokens(
     } else {
         let validation = field_validation_tokens("decoded", resolved, type_path, min, max, length);
         quote! {
-            let decoded = <$type_path>::try_from(fval)?;
+            $(if is_primitive_int(type_path) =>
+                let decoded = crate::traits::decode_scalar::<$type_path>(&fval)?;
+            )
+            $(if !is_primitive_int(type_path) =>
+                let decoded = <$type_path>::try_from(fval)?;
+            )
             $validation
             $fname = Some(decoded);
         }
@@ -616,24 +648,7 @@ fn single_struct_tokens(
 
         $single_mand_from
 
-        $(&cfg_gate)
-        impl From<$name> for AttributeValue {
-            #[inline]
-            fn from(val: $name) -> Self {
-                AttributeValue::Struct(val.encode_fields_inner())
-            }
-        }
-
-        $(&cfg_gate)
-        impl TryFrom<AttributeValue> for $name {
-            type Error = MatterStatus;
-
-            #[inline]
-            fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::Struct(fields) = val else { return Err(MatterStatus::InvalidDataType); };
-                Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-            }
-        }
+        crate::impl_matter_struct_wire!($(&cfg_gate) $name);
     };
 
     let is_mode_option = name == "ModeOptionStruct" && ctx.cluster_enums.iter().any(|e| e.name == "ModeTag");

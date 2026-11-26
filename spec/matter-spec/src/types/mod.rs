@@ -97,10 +97,7 @@ macro_rules! define_matter_scalar_type {
 
             #[inline]
             fn try_from(val: &crate::model::AttributeValue) -> Result<Self, Self::Error> {
-                match val {
-                    crate::model::AttributeValue::$variant(v) => Ok(Self(*v)),
-                    _ => Err(crate::model::MatterStatus::InvalidDataType),
-                }
+                crate::traits::decode_scalar::<$inner>(val).map(Self)
             }
         }
     };
@@ -321,23 +318,23 @@ macro_rules! impl_matter_epoch_conversions {
             }
         }
 
-        #[cfg(feature = "chrono")]
-        impl TryFrom<$name> for DateTime<Utc> {
+        #[cfg(feature = "jiff")]
+        impl TryFrom<$name> for Timestamp {
             type Error = MatterStatus;
 
             #[inline]
             fn try_from(val: $name) -> Result<Self, Self::Error> {
-                val.to_chrono_utc().ok_or(MatterStatus::ConstraintError)
+                val.to_jiff_timestamp().ok_or(MatterStatus::ConstraintError)
             }
         }
 
-        #[cfg(feature = "chrono")]
-        impl TryFrom<DateTime<Utc>> for $name {
+        #[cfg(feature = "jiff")]
+        impl TryFrom<Timestamp> for $name {
             type Error = MatterStatus;
 
             #[inline]
-            fn try_from(dt: DateTime<Utc>) -> Result<Self, Self::Error> {
-                Self::from_chrono_utc(dt).ok_or(MatterStatus::ConstraintError)
+            fn try_from(ts: Timestamp) -> Result<Self, Self::Error> {
+                Self::from_jiff_timestamp(ts).ok_or(MatterStatus::ConstraintError)
             }
         }
 

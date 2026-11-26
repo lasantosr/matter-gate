@@ -10,12 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -2038,114 +2034,35 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Mode, Mode);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SafetyStatus, SafetyStatus);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        WindowCoveringCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Type(_) => attributes::Type::NAME,
-            Self::PhysicalClosedLimitLift(_) => attributes::PhysicalClosedLimitLift::NAME,
-            Self::PhysicalClosedLimitTilt(_) => attributes::PhysicalClosedLimitTilt::NAME,
-            Self::CurrentPositionLift(_) => attributes::CurrentPositionLift::NAME,
-            Self::CurrentPositionTilt(_) => attributes::CurrentPositionTilt::NAME,
-            Self::NumberOfActuationsLift(_) => attributes::NumberOfActuationsLift::NAME,
-            Self::NumberOfActuationsTilt(_) => attributes::NumberOfActuationsTilt::NAME,
-            Self::ConfigStatus(_) => attributes::ConfigStatus::NAME,
-            Self::CurrentPositionLiftPercentage(_) => attributes::CurrentPositionLiftPercentage::NAME,
-            Self::CurrentPositionTiltPercentage(_) => attributes::CurrentPositionTiltPercentage::NAME,
-            Self::OperationalStatus(_) => attributes::OperationalStatus::NAME,
-            Self::TargetPositionLiftPercent100ths(_) => attributes::TargetPositionLiftPercent100ths::NAME,
-            Self::TargetPositionTiltPercent100ths(_) => attributes::TargetPositionTiltPercent100ths::NAME,
-            Self::EndProductType(_) => attributes::EndProductType::NAME,
-            Self::CurrentPositionLiftPercent100ths(_) => attributes::CurrentPositionLiftPercent100ths::NAME,
-            Self::CurrentPositionTiltPercent100ths(_) => attributes::CurrentPositionTiltPercent100ths::NAME,
-            Self::InstalledOpenLimitLift(_) => attributes::InstalledOpenLimitLift::NAME,
-            Self::InstalledClosedLimitLift(_) => attributes::InstalledClosedLimitLift::NAME,
-            Self::InstalledOpenLimitTilt(_) => attributes::InstalledOpenLimitTilt::NAME,
-            Self::InstalledClosedLimitTilt(_) => attributes::InstalledClosedLimitTilt::NAME,
-            Self::Mode(_) => attributes::Mode::NAME,
-            Self::SafetyStatus(_) => attributes::SafetyStatus::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        WindowCoveringCluster::NAME,
-        WindowCoveringCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: WindowCoveringCluster::NAME,
-            cluster_id: WindowCoveringCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Type(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalClosedLimitLift(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalClosedLimitTilt(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionLift(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionTilt(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfActuationsLift(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfActuationsTilt(inner) => Serialize::serialize(inner, serializer),
-            Self::ConfigStatus(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionLiftPercentage(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionTiltPercentage(inner) => Serialize::serialize(inner, serializer),
-            Self::OperationalStatus(inner) => Serialize::serialize(inner, serializer),
-            Self::TargetPositionLiftPercent100ths(inner) => Serialize::serialize(inner, serializer),
-            Self::TargetPositionTiltPercent100ths(inner) => Serialize::serialize(inner, serializer),
-            Self::EndProductType(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionLiftPercent100ths(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentPositionTiltPercent100ths(inner) => Serialize::serialize(inner, serializer),
-            Self::InstalledOpenLimitLift(inner) => Serialize::serialize(inner, serializer),
-            Self::InstalledClosedLimitLift(inner) => Serialize::serialize(inner, serializer),
-            Self::InstalledOpenLimitTilt(inner) => Serialize::serialize(inner, serializer),
-            Self::InstalledClosedLimitTilt(inner) => Serialize::serialize(inner, serializer),
-            Self::Mode(inner) => Serialize::serialize(inner, serializer),
-            Self::SafetyStatus(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((WindowCoveringCluster::NAME, WindowCoveringCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    WindowCoveringCluster,
+    [
+        Type,
+        PhysicalClosedLimitLift,
+        PhysicalClosedLimitTilt,
+        CurrentPositionLift,
+        CurrentPositionTilt,
+        NumberOfActuationsLift,
+        NumberOfActuationsTilt,
+        ConfigStatus,
+        CurrentPositionLiftPercentage,
+        CurrentPositionTiltPercentage,
+        OperationalStatus,
+        TargetPositionLiftPercent100ths,
+        TargetPositionTiltPercent100ths,
+        EndProductType,
+        CurrentPositionLiftPercent100ths,
+        CurrentPositionTiltPercent100ths,
+        InstalledOpenLimitLift,
+        InstalledClosedLimitLift,
+        InstalledOpenLimitTilt,
+        InstalledClosedLimitTilt,
+        Mode,
+        SafetyStatus,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`WindowCoveringCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2358,110 +2275,13 @@ crate::impl_cluster_member_variant!(command, Command, commands::GoToLiftValue, G
 crate::impl_cluster_member_variant!(command, Command, commands::GoToLiftPercentage, GoToLiftPercentage);
 crate::impl_cluster_member_variant!(command, Command, commands::GoToTiltValue, GoToTiltValue);
 crate::impl_cluster_member_variant!(command, Command, commands::GoToTiltPercentage, GoToTiltPercentage);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        WindowCoveringCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::UpOrOpen => commands::UpOrOpen::NAME,
-            Self::DownOrClose => commands::DownOrClose::NAME,
-            Self::StopMotion => commands::StopMotion::NAME,
-            Self::GoToLiftValue(_) => commands::GoToLiftValue::NAME,
-            Self::GoToLiftPercentage(_) => commands::GoToLiftPercentage::NAME,
-            Self::GoToTiltValue(_) => commands::GoToTiltValue::NAME,
-            Self::GoToTiltPercentage(_) => commands::GoToTiltPercentage::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        WindowCoveringCluster::NAME,
-        WindowCoveringCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: WindowCoveringCluster::NAME,
-            cluster_id: WindowCoveringCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::UpOrOpen | Self::DownOrClose | Self::StopMotion => Serialize::serialize(&(), serializer),
-            Self::GoToLiftValue(inner) => Serialize::serialize(inner, serializer),
-            Self::GoToLiftPercentage(inner) => Serialize::serialize(inner, serializer),
-            Self::GoToTiltValue(inner) => Serialize::serialize(inner, serializer),
-            Self::GoToTiltPercentage(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((WindowCoveringCluster::NAME, WindowCoveringCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((WindowCoveringCluster::NAME, WindowCoveringCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    WindowCoveringCluster,
+    empty = [UpOrOpen, DownOrClose, StopMotion,],
+    payload = [GoToLiftValue, GoToLiftPercentage, GoToTiltValue, GoToTiltPercentage,]
+);
 
 crate::define_matter_bitmap! {
     /// Mode bitmap.
@@ -2593,8 +2413,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2636,11 +2454,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2650,13 +2463,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Type, super::Type, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for Type {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Type, super::Type, super::WindowCoveringCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2683,27 +2490,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PhysicalClosedLimitLift, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for PhysicalClosedLimitLift {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PhysicalClosedLimitLift,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2730,27 +2533,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PhysicalClosedLimitTilt, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for PhysicalClosedLimitTilt {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PhysicalClosedLimitTilt,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2801,19 +2600,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2821,29 +2612,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(CurrentPositionLift, Nullable<u16>, super::WindowCoveringCluster, copy);
-    impl From<u16> for CurrentPositionLift {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for CurrentPositionLift {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionLift {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        CurrentPositionLift,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2894,19 +2671,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2914,29 +2683,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(CurrentPositionTilt, Nullable<u16>, super::WindowCoveringCluster, copy);
-    impl From<u16> for CurrentPositionTilt {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for CurrentPositionTilt {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionTilt {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        CurrentPositionTilt,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2963,27 +2718,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfActuationsLift, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for NumberOfActuationsLift {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NumberOfActuationsLift,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3010,27 +2761,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfActuationsTilt, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for NumberOfActuationsTilt {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NumberOfActuationsTilt,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3057,11 +2804,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3071,13 +2813,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ConfigStatus, super::ConfigStatus, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for ConfigStatus {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ConfigStatus,
+        super::ConfigStatus,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3131,14 +2874,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3149,33 +2884,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentPositionLiftPercentage,
-        Nullable<types::Percent>,
+        types::Percent,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent> for CurrentPositionLiftPercentage {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for CurrentPositionLiftPercentage {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionLiftPercentage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3229,14 +2945,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3247,33 +2955,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentPositionTiltPercentage,
-        Nullable<types::Percent>,
+        types::Percent,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent> for CurrentPositionTiltPercentage {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for CurrentPositionTiltPercentage {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionTiltPercentage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3300,11 +2989,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3318,14 +3002,10 @@ pub mod attributes {
         OperationalStatus,
         super::globals::OperationalStatus,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OperationalStatus {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3379,14 +3059,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3397,33 +3069,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TargetPositionLiftPercent100ths,
-        Nullable<types::Percent100ths>,
+        types::Percent100ths,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent100ths> for TargetPositionLiftPercent100ths {
-        #[inline]
-        fn from(val: types::Percent100ths) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent100ths>> for TargetPositionLiftPercent100ths {
-        #[inline]
-        fn from(val: Option<types::Percent100ths>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TargetPositionLiftPercent100ths {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3477,14 +3130,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3495,33 +3140,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TargetPositionTiltPercent100ths,
-        Nullable<types::Percent100ths>,
+        types::Percent100ths,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent100ths> for TargetPositionTiltPercent100ths {
-        #[inline]
-        fn from(val: types::Percent100ths) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent100ths>> for TargetPositionTiltPercent100ths {
-        #[inline]
-        fn from(val: Option<types::Percent100ths>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TargetPositionTiltPercent100ths {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3548,11 +3174,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3566,14 +3187,10 @@ pub mod attributes {
         EndProductType,
         super::EndProductType,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for EndProductType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3627,14 +3244,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3648,33 +3257,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentPositionLiftPercent100ths,
-        Nullable<types::Percent100ths>,
+        types::Percent100ths,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent100ths> for CurrentPositionLiftPercent100ths {
-        #[inline]
-        fn from(val: types::Percent100ths) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent100ths>> for CurrentPositionLiftPercent100ths {
-        #[inline]
-        fn from(val: Option<types::Percent100ths>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionLiftPercent100ths {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3728,14 +3318,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3749,33 +3331,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentPositionTiltPercent100ths,
-        Nullable<types::Percent100ths>,
+        types::Percent100ths,
         super::WindowCoveringCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent100ths> for CurrentPositionTiltPercent100ths {
-        #[inline]
-        fn from(val: types::Percent100ths) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent100ths>> for CurrentPositionTiltPercent100ths {
-        #[inline]
-        fn from(val: Option<types::Percent100ths>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentPositionTiltPercent100ths {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3802,16 +3365,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3819,13 +3377,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(InstalledOpenLimitLift, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for InstalledOpenLimitLift {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        InstalledOpenLimitLift,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3852,16 +3411,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3869,13 +3423,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(InstalledClosedLimitLift, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for InstalledClosedLimitLift {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        InstalledClosedLimitLift,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3902,16 +3457,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3919,13 +3469,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(InstalledOpenLimitTilt, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for InstalledOpenLimitTilt {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        InstalledOpenLimitTilt,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3952,16 +3503,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3969,13 +3515,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(InstalledClosedLimitTilt, u16, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for InstalledClosedLimitTilt {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        InstalledClosedLimitTilt,
+        u16,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4002,11 +3549,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4016,13 +3558,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Mode, super::Mode, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for Mode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Mode, super::Mode, super::WindowCoveringCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4049,11 +3585,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4063,13 +3594,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SafetyStatus, super::SafetyStatus, super::WindowCoveringCluster, copy);
-
-    impl fmt::Display for SafetyStatus {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SafetyStatus,
+        super::SafetyStatus,
+        super::WindowCoveringCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -4096,62 +3628,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct UpOrOpen;
 
-    impl crate::traits::CommandSpec for UpOrOpen {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl UpOrOpen {
         pub const CLUSTER_ID: ClusterId = super::WindowCoveringCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "UpOrOpen";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(UpOrOpen, super::WindowCoveringCluster, true);
+    crate::impl_matter_command!(UpOrOpen, super::WindowCoveringCluster, (), true);
 
     /// Moves window covering to InstalledClosedLimitLift and InstalledCloseLimitTilt.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -4159,62 +3643,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct DownOrClose;
 
-    impl crate::traits::CommandSpec for DownOrClose {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl DownOrClose {
         pub const CLUSTER_ID: ClusterId = super::WindowCoveringCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "DownOrClose";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(DownOrClose, super::WindowCoveringCluster, true);
+    crate::impl_matter_command!(DownOrClose, super::WindowCoveringCluster, (), true);
 
     /// Stop any adjusting of window covering.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -4222,62 +3658,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct StopMotion;
 
-    impl crate::traits::CommandSpec for StopMotion {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl StopMotion {
         pub const CLUSTER_ID: ClusterId = super::WindowCoveringCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x02);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "StopMotion";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(StopMotion, super::WindowCoveringCluster, true);
+    crate::impl_matter_command!(StopMotion, super::WindowCoveringCluster, (), true);
 
     /// Go to lift value specified.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4290,17 +3678,6 @@ pub mod commands {
     )]
     pub struct GoToLiftValue {
         pub lift_value: u16,
-    }
-
-    impl crate::traits::CommandSpec for GoToLiftValue {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GoToLiftValue {
@@ -4322,11 +3699,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_LIFT_VALUE, AttributeValue::from(self.lift_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4337,7 +3709,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         lift_value = Some(decoded);
                         Ok(())
                     })()
@@ -4350,19 +3722,6 @@ pub mod commands {
                 lift_value: lift_value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for GoToLiftValue {
@@ -4372,7 +3731,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GoToLiftValue, super::WindowCoveringCluster, false);
+    crate::impl_matter_command!(GoToLiftValue, super::WindowCoveringCluster, (), false);
 
     /// Go to lift percentage specified.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4385,17 +3744,6 @@ pub mod commands {
     )]
     pub struct GoToLiftPercentage {
         pub lift_percent100ths_value: types::Percent100ths,
-    }
-
-    impl crate::traits::CommandSpec for GoToLiftPercentage {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GoToLiftPercentage {
@@ -4418,11 +3766,6 @@ pub mod commands {
                 Self::FIELD_LIFT_PERCENT100THS_VALUE,
                 AttributeValue::from(self.lift_percent100ths_value)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -4449,19 +3792,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<types::Percent100ths> for GoToLiftPercentage {
@@ -4471,7 +3801,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GoToLiftPercentage, super::WindowCoveringCluster, false);
+    crate::impl_matter_command!(GoToLiftPercentage, super::WindowCoveringCluster, (), false);
 
     /// Go to tilt value specified.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4484,17 +3814,6 @@ pub mod commands {
     )]
     pub struct GoToTiltValue {
         pub tilt_value: u16,
-    }
-
-    impl crate::traits::CommandSpec for GoToTiltValue {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GoToTiltValue {
@@ -4516,11 +3835,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_TILT_VALUE, AttributeValue::from(self.tilt_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4531,7 +3845,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         tilt_value = Some(decoded);
                         Ok(())
                     })()
@@ -4544,19 +3858,6 @@ pub mod commands {
                 tilt_value: tilt_value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for GoToTiltValue {
@@ -4566,7 +3867,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GoToTiltValue, super::WindowCoveringCluster, false);
+    crate::impl_matter_command!(GoToTiltValue, super::WindowCoveringCluster, (), false);
 
     /// Go to tilt percentage specified.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4579,17 +3880,6 @@ pub mod commands {
     )]
     pub struct GoToTiltPercentage {
         pub tilt_percent100ths_value: types::Percent100ths,
-    }
-
-    impl crate::traits::CommandSpec for GoToTiltPercentage {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WindowCoveringCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GoToTiltPercentage {
@@ -4612,11 +3902,6 @@ pub mod commands {
                 Self::FIELD_TILT_PERCENT100THS_VALUE,
                 AttributeValue::from(self.tilt_percent100ths_value)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -4643,19 +3928,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<types::Percent100ths> for GoToTiltPercentage {
@@ -4665,5 +3937,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GoToTiltPercentage, super::WindowCoveringCluster, false);
+    crate::impl_matter_command!(GoToTiltPercentage, super::WindowCoveringCluster, (), false);
 }

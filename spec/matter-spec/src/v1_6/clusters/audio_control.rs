@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1599,108 +1595,32 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Mid, Mid);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Treble, Treble);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MinCorrection, MinCorrection);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MaxCorrection, MaxCorrection);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        AudioControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::SoftMuted(_) => attributes::SoftMuted::NAME,
-            Self::PhysicallyMuted(_) => attributes::PhysicallyMuted::NAME,
-            Self::Volume(_) => attributes::Volume::NAME,
-            Self::MinDeviceVolume(_) => attributes::MinDeviceVolume::NAME,
-            Self::MaxDeviceVolume(_) => attributes::MaxDeviceVolume::NAME,
-            Self::MaxDeviceVolumeDb(_) => attributes::MaxDeviceVolumeDb::NAME,
-            Self::MaxUserVolume(_) => attributes::MaxUserVolume::NAME,
-            Self::DefaultStepSize(_) => attributes::DefaultStepSize::NAME,
-            Self::SetVolumeUnmutePolicy(_) => attributes::SetVolumeUnmutePolicy::NAME,
-            Self::IncreaseVolumeUnmutePolicy(_) => attributes::IncreaseVolumeUnmutePolicy::NAME,
-            Self::IncreaseVolumeUnmuteVolume(_) => attributes::IncreaseVolumeUnmuteVolume::NAME,
-            Self::DecreaseVolumeUnmutePolicy(_) => attributes::DecreaseVolumeUnmutePolicy::NAME,
-            Self::StartUpMuted(_) => attributes::StartUpMuted::NAME,
-            Self::StartUpVolume(_) => attributes::StartUpVolume::NAME,
-            Self::Bass(_) => attributes::Bass::NAME,
-            Self::Mid(_) => attributes::Mid::NAME,
-            Self::Treble(_) => attributes::Treble::NAME,
-            Self::MinCorrection(_) => attributes::MinCorrection::NAME,
-            Self::MaxCorrection(_) => attributes::MaxCorrection::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        AudioControlCluster::NAME,
-        AudioControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: AudioControlCluster::NAME,
-            cluster_id: AudioControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SoftMuted(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicallyMuted(inner) => Serialize::serialize(inner, serializer),
-            Self::Volume(inner) => Serialize::serialize(inner, serializer),
-            Self::MinDeviceVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxDeviceVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxDeviceVolumeDb(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxUserVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultStepSize(inner) => Serialize::serialize(inner, serializer),
-            Self::SetVolumeUnmutePolicy(inner) => Serialize::serialize(inner, serializer),
-            Self::IncreaseVolumeUnmutePolicy(inner) => Serialize::serialize(inner, serializer),
-            Self::IncreaseVolumeUnmuteVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::DecreaseVolumeUnmutePolicy(inner) => Serialize::serialize(inner, serializer),
-            Self::StartUpMuted(inner) => Serialize::serialize(inner, serializer),
-            Self::StartUpVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::Bass(inner) => Serialize::serialize(inner, serializer),
-            Self::Mid(inner) => Serialize::serialize(inner, serializer),
-            Self::Treble(inner) => Serialize::serialize(inner, serializer),
-            Self::MinCorrection(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxCorrection(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((AudioControlCluster::NAME, AudioControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    AudioControlCluster,
+    [
+        SoftMuted,
+        PhysicallyMuted,
+        Volume,
+        MinDeviceVolume,
+        MaxDeviceVolume,
+        MaxDeviceVolumeDb,
+        MaxUserVolume,
+        DefaultStepSize,
+        SetVolumeUnmutePolicy,
+        IncreaseVolumeUnmutePolicy,
+        IncreaseVolumeUnmuteVolume,
+        DecreaseVolumeUnmutePolicy,
+        StartUpMuted,
+        StartUpVolume,
+        Bass,
+        Mid,
+        Treble,
+        MinCorrection,
+        MaxCorrection,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`AudioControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1882,108 +1802,13 @@ crate::impl_cluster_member_variant!(command_unit, Command, commands::ToggleMuted
 crate::impl_cluster_member_variant!(command, Command, commands::SetVolume, SetVolume);
 crate::impl_cluster_member_variant!(command, Command, commands::IncreaseVolume, IncreaseVolume);
 crate::impl_cluster_member_variant!(command, Command, commands::DecreaseVolume, DecreaseVolume);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        AudioControlCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Mute => commands::Mute::NAME,
-            Self::Unmute => commands::Unmute::NAME,
-            Self::ToggleMuted => commands::ToggleMuted::NAME,
-            Self::SetVolume(_) => commands::SetVolume::NAME,
-            Self::IncreaseVolume(_) => commands::IncreaseVolume::NAME,
-            Self::DecreaseVolume(_) => commands::DecreaseVolume::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        AudioControlCluster::NAME,
-        AudioControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: AudioControlCluster::NAME,
-            cluster_id: AudioControlCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Mute | Self::Unmute | Self::ToggleMuted => Serialize::serialize(&(), serializer),
-            Self::SetVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::IncreaseVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::DecreaseVolume(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((AudioControlCluster::NAME, AudioControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((AudioControlCluster::NAME, AudioControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    AudioControlCluster,
+    empty = [Mute, Unmute, ToggleMuted,],
+    payload = [SetVolume, IncreaseVolume, DecreaseVolume,]
+);
 
 crate::define_matter_enum! {
     /// UnmutePolicyEnum exhaustive specification enum.
@@ -2037,8 +1862,6 @@ crate::define_matter_semantic_bool! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2084,11 +1907,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2098,18 +1916,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SoftMuted, super::SoftMuted, super::AudioControlCluster, copy);
-
+    crate::impl_matter_attribute!(
+        SoftMuted,
+        super::SoftMuted,
+        super::AudioControlCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for SoftMuted {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SoftMuted::from(val))
-        }
-    }
-
-    impl fmt::Display for SoftMuted {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2142,11 +1960,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2160,19 +1973,14 @@ pub mod attributes {
         PhysicallyMuted,
         super::PhysicallyMuted,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for PhysicallyMuted {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::PhysicallyMuted::from(val))
-        }
-    }
-
-    impl fmt::Display for PhysicallyMuted {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2201,16 +2009,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2218,13 +2021,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Volume, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for Volume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Volume, u16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2251,16 +2048,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2268,13 +2060,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinDeviceVolume, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MinDeviceVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MinDeviceVolume, u16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2301,16 +2087,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2318,13 +2099,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxDeviceVolume, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MaxDeviceVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MaxDeviceVolume, u16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2351,27 +2126,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxDeviceVolumeDb, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MaxDeviceVolumeDb {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxDeviceVolumeDb,
+        u16,
+        super::AudioControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2398,16 +2169,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2415,13 +2181,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxUserVolume, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MaxUserVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MaxUserVolume, u16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2448,16 +2208,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2468,13 +2223,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(DefaultStepSize, u16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for DefaultStepSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(DefaultStepSize, u16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2501,11 +2250,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2519,14 +2263,10 @@ pub mod attributes {
         SetVolumeUnmutePolicy,
         super::UnmutePolicyEnum,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SetVolumeUnmutePolicy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2553,11 +2293,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2571,14 +2306,10 @@ pub mod attributes {
         IncreaseVolumeUnmutePolicy,
         super::UnmutePolicyEnum,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for IncreaseVolumeUnmutePolicy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2605,11 +2336,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2623,14 +2349,10 @@ pub mod attributes {
         IncreaseVolumeUnmuteVolume,
         super::UnmuteVolumeEnum,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for IncreaseVolumeUnmuteVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2657,11 +2379,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2675,14 +2392,10 @@ pub mod attributes {
         DecreaseVolumeUnmutePolicy,
         super::UnmutePolicyEnum,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for DecreaseVolumeUnmutePolicy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2733,14 +2446,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2751,38 +2456,18 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         StartUpMuted,
-        Nullable<super::StartUpMuted>,
+        super::StartUpMuted,
         super::AudioControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::StartUpMuted> for StartUpMuted {
-        #[inline]
-        fn from(val: super::StartUpMuted) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::StartUpMuted>> for StartUpMuted {
-        #[inline]
-        fn from(val: Option<super::StartUpMuted>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
     impl From<bool> for StartUpMuted {
         #[inline]
         fn from(val: bool) -> Self {
             Self(Nullable::NonNull(super::StartUpMuted::from(val)))
-        }
-    }
-
-    impl fmt::Display for StartUpMuted {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
         }
     }
 
@@ -2835,19 +2520,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2858,29 +2535,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StartUpVolume, Nullable<u16>, super::AudioControlCluster, copy);
-    impl From<u16> for StartUpVolume {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for StartUpVolume {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for StartUpVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        StartUpVolume,
+        u16,
+        super::AudioControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2907,27 +2570,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Bass, i16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for Bass {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Bass, i16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2954,27 +2606,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Mid, i16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for Mid {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Mid, i16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3001,27 +2642,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Treble, i16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for Treble {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Treble, i16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3048,16 +2678,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw > 0_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3065,13 +2690,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinCorrection, i16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MinCorrection {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MinCorrection, i16, super::AudioControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3098,16 +2717,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < 0_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3115,13 +2729,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxCorrection, i16, super::AudioControlCluster, copy);
-
-    impl fmt::Display for MaxCorrection {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MaxCorrection, i16, super::AudioControlCluster, copy, scalar, display);
 }
 
 pub mod commands {
@@ -3148,62 +2756,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Mute;
 
-    impl crate::traits::CommandSpec for Mute {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Mute {
         pub const CLUSTER_ID: ClusterId = super::AudioControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Mute";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Mute, super::AudioControlCluster, true);
+    crate::impl_matter_command!(Mute, super::AudioControlCluster, (), true);
 
     /// This command SHALL set the value of the SoftMuted attribute to FALSE.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -3211,62 +2771,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Unmute;
 
-    impl crate::traits::CommandSpec for Unmute {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Unmute {
         pub const CLUSTER_ID: ClusterId = super::AudioControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Unmute";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Unmute, super::AudioControlCluster, true);
+    crate::impl_matter_command!(Unmute, super::AudioControlCluster, (), true);
 
     /// This command SHALL toggle the state of the SoftMuted attribute.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -3274,62 +2786,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ToggleMuted;
 
-    impl crate::traits::CommandSpec for ToggleMuted {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ToggleMuted {
         pub const CLUSTER_ID: ClusterId = super::AudioControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x02);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ToggleMuted";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ToggleMuted, super::AudioControlCluster, true);
+    crate::impl_matter_command!(ToggleMuted, super::AudioControlCluster, (), true);
 
     /// Sets the volume to a specified level.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3345,17 +2809,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub unmute_policy: Optional<super::UnmutePolicyEnum>,
-    }
-
-    impl crate::traits::CommandSpec for SetVolume {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetVolume {
@@ -3390,11 +2843,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3406,23 +2854,23 @@ pub mod commands {
                         if new_volume.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             new_volume = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if unmute_policy.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::UnmutePolicyEnum>::try_from(fval)?;
                             unmute_policy = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3431,19 +2879,6 @@ pub mod commands {
                 new_volume: new_volume.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
                 unmute_policy: Optional::from(unmute_policy),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3454,7 +2889,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetVolume, super::AudioControlCluster, false);
+    crate::impl_matter_command!(SetVolume, super::AudioControlCluster, (), false);
 
     /// Increases the volume by a specified level.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3475,17 +2910,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub unmute_volume: Optional<super::UnmuteVolumeEnum>,
-    }
-
-    impl crate::traits::CommandSpec for IncreaseVolume {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl IncreaseVolume {
@@ -3540,11 +2964,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3557,38 +2976,38 @@ pub mod commands {
                         if step_size.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (1_u16..=0xFFFE_u16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             step_size = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if unmute_policy.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::UnmutePolicyEnum>::try_from(fval)?;
                             unmute_policy = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if unmute_volume.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::UnmuteVolumeEnum>::try_from(fval)?;
                             unmute_volume = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3599,22 +3018,9 @@ pub mod commands {
                 unmute_volume: Optional::from(unmute_volume),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(IncreaseVolume, super::AudioControlCluster, false);
+    crate::impl_matter_command!(IncreaseVolume, super::AudioControlCluster, (), false);
 
     /// Decreases the volume by a specified level.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3632,17 +3038,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub unmute_policy: Optional<super::UnmutePolicyEnum>,
-    }
-
-    impl crate::traits::CommandSpec for DecreaseVolume {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::AudioControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl DecreaseVolume {
@@ -3686,11 +3081,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3702,27 +3092,27 @@ pub mod commands {
                         if step_size.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (1_u16..=0xFFFE_u16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             step_size = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if unmute_policy.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::UnmutePolicyEnum>::try_from(fval)?;
                             unmute_policy = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3732,20 +3122,7 @@ pub mod commands {
                 unmute_policy: Optional::from(unmute_policy),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(DecreaseVolume, super::AudioControlCluster, false);
+    crate::impl_matter_command!(DecreaseVolume, super::AudioControlCluster, (), false);
 }

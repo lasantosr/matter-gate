@@ -4,8 +4,8 @@ use core::time::Duration;
 #[cfg(feature = "std")]
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[cfg(feature = "chrono")]
-use chrono::{DateTime, Utc};
+#[cfg(feature = "jiff")]
+use jiff::Timestamp;
 #[cfg(feature = "time")]
 use time::OffsetDateTime;
 
@@ -80,21 +80,21 @@ impl PosixMs {
         u64::try_from(elapsed.as_millis()).ok().map(Self)
     }
 
-    /// Convert to a UTC [`chrono::DateTime<chrono::Utc>`], returning `None` on overflow.
-    #[cfg(feature = "chrono")]
+    /// Convert to a [`jiff::Timestamp`], returning `None` on overflow.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn to_chrono_utc(self) -> Option<DateTime<Utc>> {
+    pub fn to_jiff_timestamp(self) -> Option<Timestamp> {
         let millis = i64::try_from(self.0).ok()?;
-        DateTime::from_timestamp_millis(millis)
+        Timestamp::from_millisecond(millis).ok()
     }
 
-    /// Construct from a UTC [`chrono::DateTime<chrono::Utc>`], returning `None` if before the Unix epoch.
-    #[cfg(feature = "chrono")]
+    /// Construct from a [`jiff::Timestamp`], returning `None` if before the Unix epoch.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn from_chrono_utc(dt: DateTime<Utc>) -> Option<Self> {
-        u64::try_from(dt.timestamp_millis()).ok().map(Self)
+    pub fn from_jiff_timestamp(ts: Timestamp) -> Option<Self> {
+        u64::try_from(ts.as_millisecond()).ok().map(Self)
     }
 
     /// Convert to a [`time::OffsetDateTime`] in UTC, returning `None` on overflow.
@@ -155,8 +155,9 @@ mod tests {
 
         let av = AttributeValue::from(t);
         assert_eq!(PosixMs::try_from(&av), Ok(t));
+        assert_eq!(PosixMs::try_from(&AttributeValue::U32(2_500)), Ok(t));
         assert_eq!(
-            PosixMs::try_from(&AttributeValue::U32(2_500)),
+            PosixMs::try_from(&AttributeValue::I64(2_500)),
             Err(MatterStatus::InvalidDataType)
         );
 
@@ -179,12 +180,12 @@ mod tests {
         assert_eq!(PosixMs::try_from(st), Ok(t));
     }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[test]
-    fn posix_ms_chrono_round_trip() {
+    fn posix_ms_jiff_round_trip() {
         let t = PosixMs::from_raw(2_500);
-        let dt = DateTime::<Utc>::try_from(t).expect("valid chrono DateTime");
-        assert_eq!(PosixMs::try_from(dt), Ok(t));
+        let ts = Timestamp::try_from(t).expect("valid jiff Timestamp");
+        assert_eq!(PosixMs::try_from(ts), Ok(t));
     }
 
     #[cfg(feature = "time")]

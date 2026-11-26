@@ -1,378 +1,6 @@
-//! Internal declarative macros for `matter-spec` generated models.
-//!
-//! These macros collapse repetitive trait implementations, bitmap/enum boilerplate,
-//! and wire/dispatch conversions across generated version modules (`v1_0`..`v1_6`)
-//! to keep the crate compact and fast to parse.
+//! Declarative macros for cluster member variants, attributes, commands, events, and wire conversions.
 
-macro_rules! define_matter_bitmap {
-    (
-        $(#[$meta:meta])*
-        pub struct $name:ident($width:ty);
-        attr_variant = $attr_variant:ident;
-        display_fmt = $display_fmt:literal;
-        flags {
-            $(
-                $(#[$flag_meta:meta])*
-                $const_name:ident : $is_fn:ident = $mask:expr;
-            )*
-        }
-    ) => {
-        $(#[$meta])*
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize), serde(transparent))]
-        #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema), schemars(transparent))]
-        #[repr(transparent)]
-        pub struct $name($width);
-
-        #[rustfmt::skip]
-        impl $name {
-            /// Empty bitmap with no flags set (`0`).
-            pub const EMPTY: Self = Self(0);
-            $(
-                $(#[$flag_meta])*
-                pub const $const_name: Self = Self($mask);
-            )*
-        }
-
-        impl $name {
-            /// Returns an empty bitmap with no flags set (`0`).
-            #[inline]
-            #[must_use]
-            pub const fn empty() -> Self {
-                Self(0)
-            }
-
-            /// Constructs a bitmap directly from raw bits, retaining any unknown bits.
-            #[inline]
-            #[must_use]
-            pub const fn from_bits_retain(bits: $width) -> Self {
-                Self(bits)
-            }
-
-            /// Returns the raw underlying integer bits.
-            #[inline]
-            #[must_use]
-            pub const fn bits(self) -> $width {
-                self.0
-            }
-
-            /// Returns `true` if no flags are set (`0`).
-            #[inline]
-            #[must_use]
-            pub const fn is_empty(self) -> bool {
-                self.0 == 0
-            }
-
-            /// Returns `true` if all flags in `other` are set in `self`.
-            #[inline]
-            #[must_use]
-            pub const fn contains(self, other: Self) -> bool {
-                (self.0 & other.0) == other.0
-            }
-
-            /// Inserts all flags in `other` into `self`.
-            #[inline]
-            pub const fn insert(&mut self, other: Self) {
-                self.0 |= other.0;
-            }
-
-            /// Removes all flags in `other` from `self`.
-            #[inline]
-            pub const fn remove(&mut self, other: Self) {
-                self.0 &= !other.0;
-            }
-
-            /// Returns the bitwise union (`self | other`) of two bitmaps.
-            #[inline]
-            #[must_use]
-            pub const fn union(self, other: Self) -> Self {
-                Self(self.0 | other.0)
-            }
-
-            /// Returns the bitwise intersection (`self & other`) of two bitmaps.
-            #[inline]
-            #[must_use]
-            pub const fn intersection(self, other: Self) -> Self {
-                Self(self.0 & other.0)
-            }
-
-            $(
-                #[doc = concat!("Returns `true` if [`Self::", stringify!($const_name), "`] is set.")]
-                #[inline]
-                #[must_use]
-                pub const fn $is_fn(self) -> bool {
-                    (self.0 & $mask) != 0
-                }
-            )*
-        }
-
-        impl core::fmt::Display for $name {
-            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-                write!(f, $display_fmt, self.0)
-            }
-        }
-
-        impl core::ops::BitOr for $name {
-            type Output = Self;
-
-            #[inline]
-            fn bitor(self, rhs: Self) -> Self {
-                Self(self.0 | rhs.0)
-            }
-        }
-
-        impl core::ops::BitOrAssign for $name {
-            #[inline]
-            fn bitor_assign(&mut self, rhs: Self) {
-                self.0 |= rhs.0;
-            }
-        }
-
-        impl core::ops::BitAnd for $name {
-            type Output = Self;
-
-            #[inline]
-            fn bitand(self, rhs: Self) -> Self {
-                Self(self.0 & rhs.0)
-            }
-        }
-
-        impl core::ops::BitAndAssign for $name {
-            #[inline]
-            fn bitand_assign(&mut self, rhs: Self) {
-                self.0 &= rhs.0;
-            }
-        }
-
-        impl core::ops::BitXor for $name {
-            type Output = Self;
-
-            #[inline]
-            fn bitxor(self, rhs: Self) -> Self {
-                Self(self.0 ^ rhs.0)
-            }
-        }
-
-        impl core::ops::BitXorAssign for $name {
-            #[inline]
-            fn bitxor_assign(&mut self, rhs: Self) {
-                self.0 ^= rhs.0;
-            }
-        }
-
-        impl core::ops::Not for $name {
-            type Output = Self;
-
-            #[inline]
-            fn not(self) -> Self {
-                Self(!self.0)
-            }
-        }
-
-        impl From<$name> for $width {
-            #[inline]
-            fn from(bm: $name) -> Self {
-                bm.0
-            }
-        }
-
-        impl From<$width> for $name {
-            #[inline]
-            fn from(val: $width) -> Self {
-                Self(val)
-            }
-        }
-
-        impl From<$name> for $crate::model::AttributeValue {
-            #[inline]
-            fn from(bm: $name) -> Self {
-                Self::$attr_variant(bm.0)
-            }
-        }
-
-        impl TryFrom<$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            #[inline]
-            fn try_from(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                Self::try_from(&val)
-            }
-        }
-
-        impl TryFrom<&$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            #[inline]
-            fn try_from(val: &$crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                match val {
-                    $crate::model::AttributeValue::$attr_variant(raw_val) => Ok(Self(*raw_val)),
-                    _ => Err($crate::model::MatterStatus::InvalidDataType),
-                }
-            }
-        }
-    };
-}
-
-macro_rules! define_matter_enum {
-    (
-        $(#[$meta:meta])*
-        pub enum $name:ident {
-            $($variant:ident = $val:expr),* $(,)?
-        }
-        repr = $repr_ty:ident;
-        attr_variant = $attr_variant:ident;
-        default = $default_variant:ident;
-    ) => {
-        $(#[$meta])*
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-        #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-        #[repr($repr_ty)]
-        pub enum $name {
-            $(
-                #[doc = concat!("`", stringify!($variant), "` variant.")]
-                $variant = $val,
-            )*
-        }
-
-        impl core::fmt::Display for $name {
-            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-                match self {
-                    $(Self::$variant => write!(f, stringify!($variant)),)*
-                }
-            }
-        }
-
-        impl Default for $name {
-            #[inline]
-            fn default() -> Self {
-                Self::$default_variant
-            }
-        }
-
-        impl TryFrom<$repr_ty> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            fn try_from(val: $repr_ty) -> Result<Self, $crate::model::MatterStatus> {
-                match val {
-                    $($val => Ok(Self::$variant),)*
-                    _ => Err($crate::model::MatterStatus::ConstraintError),
-                }
-            }
-        }
-
-        impl From<$name> for $repr_ty {
-            #[inline]
-            fn from(val: $name) -> Self {
-                match val {
-                    $($name::$variant => $val,)*
-                }
-            }
-        }
-
-        impl From<$name> for $crate::model::AttributeValue {
-            #[inline]
-            fn from(val: $name) -> Self {
-                Self::$attr_variant($repr_ty::from(val))
-            }
-        }
-
-        impl TryFrom<$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            #[inline]
-            fn try_from(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                Self::try_from(&val)
-            }
-        }
-
-        impl TryFrom<&$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            fn try_from(val: &$crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                match val {
-                    $crate::model::AttributeValue::$attr_variant(raw) => Self::try_from(*raw),
-                    _ => Err($crate::model::MatterStatus::InvalidDataType),
-                }
-            }
-        }
-    };
-}
-
-macro_rules! define_matter_semantic_bool {
-    (
-        $(#[$meta:meta])*
-        pub enum $name:ident {
-            $false_variant:ident = 0,
-            $true_variant:ident = 1 $(,)?
-        }
-    ) => {
-        $(#[$meta])*
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-        #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-        #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
-        #[repr(u8)]
-        pub enum $name {
-            #[doc = concat!("`", stringify!($false_variant), "` (`false` / `0`).")]
-            #[default]
-            $false_variant = 0,
-            #[doc = concat!("`", stringify!($true_variant), "` (`true` / `1`).")]
-            $true_variant = 1,
-        }
-
-        impl core::fmt::Display for $name {
-            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-                match self {
-                    Self::$false_variant => write!(f, stringify!($false_variant)),
-                    Self::$true_variant => write!(f, stringify!($true_variant)),
-                }
-            }
-        }
-
-        impl From<bool> for $name {
-            #[inline]
-            fn from(val: bool) -> Self {
-                if val { Self::$true_variant } else { Self::$false_variant }
-            }
-        }
-
-        impl From<$name> for bool {
-            #[inline]
-            fn from(val: $name) -> Self {
-                matches!(val, $name::$true_variant)
-            }
-        }
-
-        impl From<$name> for $crate::model::AttributeValue {
-            #[inline]
-            fn from(val: $name) -> Self {
-                Self::Bool(bool::from(val))
-            }
-        }
-
-        impl TryFrom<$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            #[inline]
-            fn try_from(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                Self::try_from(&val)
-            }
-        }
-
-        impl TryFrom<&$crate::model::AttributeValue> for $name {
-            type Error = $crate::model::MatterStatus;
-
-            #[inline]
-            fn try_from(val: &$crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
-                match val {
-                    $crate::model::AttributeValue::Bool(bool_val) => Ok(Self::from(*bool_val)),
-                    _ => Err($crate::model::MatterStatus::InvalidDataType),
-                }
-            }
-        }
-    };
-}
-
+/// Implements `From` and `TryFrom` conversions between a cluster member struct and its parent cluster enum.
 macro_rules! impl_cluster_member_variant {
     (attribute, $enum_ty:path, $member_ty:ty, $variant:ident) => {
         impl From<$member_ty> for $enum_ty {
@@ -395,6 +23,26 @@ macro_rules! impl_cluster_member_variant {
                         expected: Self::ATTRIBUTE_ID,
                         actual: attr.id(),
                     })
+                }
+            }
+        }
+    };
+    (attribute_single, $enum_ty:path, $member_ty:ty, $variant:ident) => {
+        impl From<$member_ty> for $enum_ty {
+            #[inline]
+            fn from(attr: $member_ty) -> Self {
+                Self::$variant(attr)
+            }
+        }
+
+        impl TryFrom<$enum_ty> for $member_ty {
+            type Error = $crate::error::AttributeError;
+
+            #[inline]
+            fn try_from(attr: $enum_ty) -> Result<Self, Self::Error> {
+                use $enum_ty as __Enum;
+                match attr {
+                    __Enum::$variant(inner) => Ok(inner),
                 }
             }
         }
@@ -429,6 +77,26 @@ macro_rules! impl_cluster_member_variant {
             }
         }
     };
+    (command_single, $enum_ty:path, $member_ty:ty, $variant:ident) => {
+        impl From<$member_ty> for $enum_ty {
+            #[inline]
+            fn from(cmd: $member_ty) -> Self {
+                Self::$variant(cmd)
+            }
+        }
+
+        impl TryFrom<$enum_ty> for $member_ty {
+            type Error = $crate::error::CommandError;
+
+            #[inline]
+            fn try_from(cmd: $enum_ty) -> Result<Self, Self::Error> {
+                use $enum_ty as __Enum;
+                match cmd {
+                    __Enum::$variant(inner) => Ok(inner),
+                }
+            }
+        }
+    };
     (command_unit, $enum_ty:path, $member_ty:ty, $variant:ident) => {
         impl From<$member_ty> for $enum_ty {
             #[inline]
@@ -459,6 +127,26 @@ macro_rules! impl_cluster_member_variant {
             }
         }
     };
+    (command_unit_single, $enum_ty:path, $member_ty:ty, $variant:ident) => {
+        impl From<$member_ty> for $enum_ty {
+            #[inline]
+            fn from(_: $member_ty) -> Self {
+                Self::$variant
+            }
+        }
+
+        impl TryFrom<$enum_ty> for $member_ty {
+            type Error = $crate::error::CommandError;
+
+            #[inline]
+            fn try_from(cmd: $enum_ty) -> Result<Self, Self::Error> {
+                use $enum_ty as __Enum;
+                match cmd {
+                    __Enum::$variant => Ok(<$member_ty>::default()),
+                }
+            }
+        }
+    };
     (event, $enum_ty:path, $member_ty:ty, $variant:ident) => {
         impl From<$member_ty> for $enum_ty {
             #[inline]
@@ -480,6 +168,26 @@ macro_rules! impl_cluster_member_variant {
                         expected: Self::EVENT_ID,
                         actual: ev.id(),
                     })
+                }
+            }
+        }
+    };
+    (event_single, $enum_ty:path, $member_ty:ty, $variant:ident) => {
+        impl From<$member_ty> for $enum_ty {
+            #[inline]
+            fn from(ev: $member_ty) -> Self {
+                Self::$variant(ev)
+            }
+        }
+
+        impl TryFrom<$enum_ty> for $member_ty {
+            type Error = $crate::error::EventError;
+
+            #[inline]
+            fn try_from(ev: $enum_ty) -> Result<Self, Self::Error> {
+                use $enum_ty as __Enum;
+                match ev {
+                    __Enum::$variant(inner) => Ok(inner),
                 }
             }
         }
@@ -509,10 +217,59 @@ macro_rules! impl_cluster_member_variant {
             }
         }
     };
+    (event_unit_single, $enum_ty:path, $member_ty:ty, $variant:ident) => {
+        impl From<$member_ty> for $enum_ty {
+            #[inline]
+            fn from(_: $member_ty) -> Self {
+                Self::$variant
+            }
+        }
+
+        impl TryFrom<$enum_ty> for $member_ty {
+            type Error = $crate::error::EventError;
+
+            #[inline]
+            fn try_from(ev: $enum_ty) -> Result<Self, Self::Error> {
+                use $enum_ty as __Enum;
+                match ev {
+                    __Enum::$variant => Ok(<$member_ty>::default()),
+                }
+            }
+        }
+    };
 }
 
+/// Implements wrapper helpers, `into_value`, `Display`, wire conversions, `AttributeSpec`, and `MatterDescribe` for an
+/// attribute struct.
 macro_rules! impl_matter_attribute {
-    ($name:ident, $inner:ty, $cluster:ty, copy) => {
+    ($name:ident, $base:ty, $cluster:ty, $copy_mode:ident, $val_mode:ident, $disp_mode:ident) => {
+        $crate::impl_matter_attribute!(@inner_accessors $name, $base, $copy_mode);
+        $crate::impl_matter_attribute!(@into_value required, $name, $val_mode);
+        $crate::impl_matter_attribute!(@display required, $name, $disp_mode);
+        $crate::impl_matter_attribute!(@common $name, $base, $cluster);
+    };
+    (nullable, $name:ident, $base:ty, $cluster:ty, $copy_mode:ident, $val_mode:ident, $disp_mode:ident) => {
+        $crate::impl_matter_attribute!(@inner_accessors $name, $crate::model::Nullable<$base>, $copy_mode);
+        $crate::impl_matter_attribute!(@into_value nullable, $name, $val_mode);
+        $crate::impl_matter_attribute!(@display nullable, $name, $disp_mode);
+
+        impl From<$base> for $name {
+            #[inline]
+            fn from(val: $base) -> Self {
+                Self($crate::model::Nullable::NonNull(val))
+            }
+        }
+
+        impl From<Option<$base>> for $name {
+            #[inline]
+            fn from(val: Option<$base>) -> Self {
+                Self($crate::model::Nullable::from(val))
+            }
+        }
+
+        $crate::impl_matter_attribute!(@common $name, $crate::model::Nullable<$base>, $cluster);
+    };
+    (@inner_accessors $name:ident, $inner:ty, copy) => {
         impl $name {
             #[inline]
             #[must_use]
@@ -526,10 +283,8 @@ macro_rules! impl_matter_attribute {
                 self.0
             }
         }
-
-        $crate::impl_matter_attribute!(@common $name, $inner, $cluster);
     };
-    ($name:ident, $inner:ty, $cluster:ty, owned) => {
+    (@inner_accessors $name:ident, $inner:ty, owned) => {
         impl $name {
             #[inline]
             #[must_use]
@@ -543,8 +298,116 @@ macro_rules! impl_matter_attribute {
                 self.0
             }
         }
-
-        $crate::impl_matter_attribute!(@common $name, $inner, $cluster);
+    };
+    (@into_value required, $name:ident, scalar) => {
+        impl $name {
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                $crate::model::AttributeValue::from(self.0)
+            }
+        }
+    };
+    (@into_value required, $name:ident, list) => {
+        impl $name {
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                let items = self.0.into_iter().map($crate::model::AttributeValue::from).collect();
+                $crate::model::AttributeValue::List(items)
+            }
+        }
+    };
+    (@into_value nullable, $name:ident, scalar) => {
+        impl $name {
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                match self.0 {
+                    $crate::model::Nullable::NonNull(val) => $crate::model::AttributeValue::from(val),
+                    $crate::model::Nullable::Null => $crate::model::AttributeValue::Null,
+                }
+            }
+        }
+    };
+    (@into_value nullable, $name:ident, list) => {
+        impl $name {
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                match self.0 {
+                    $crate::model::Nullable::NonNull(list) => {
+                        let items = list.into_iter().map($crate::model::AttributeValue::from).collect();
+                        $crate::model::AttributeValue::List(items)
+                    }
+                    $crate::model::Nullable::Null => $crate::model::AttributeValue::Null,
+                }
+            }
+        }
+    };
+    (@display required, $name:ident, display) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                write!(f, "{}", self.0)
+            }
+        }
+    };
+    (@display required, $name:ident, debug) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                write!(f, "{:?}", self.0)
+            }
+        }
+    };
+    (@display required, $name:ident, list) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                write!(f, "<list of {} items>", self.0.len())
+            }
+        }
+    };
+    (@display required, $name:ident, bytes) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                write!(f, "<{} bytes>", self.0.len())
+            }
+        }
+    };
+    (@display nullable, $name:ident, display) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match &self.0 {
+                    $crate::model::Nullable::NonNull(val) => write!(f, "{val}"),
+                    $crate::model::Nullable::Null => write!(f, "null"),
+                }
+            }
+        }
+    };
+    (@display nullable, $name:ident, debug) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match &self.0 {
+                    $crate::model::Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
+                    $crate::model::Nullable::Null => write!(f, "null"),
+                }
+            }
+        }
+    };
+    (@display nullable, $name:ident, list) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match &self.0 {
+                    $crate::model::Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
+                    $crate::model::Nullable::Null => write!(f, "null"),
+                }
+            }
+        }
+    };
+    (@display nullable, $name:ident, bytes) => {
+        impl core::fmt::Display for $name {
+            fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+                match &self.0 {
+                    $crate::model::Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
+                    $crate::model::Nullable::Null => write!(f, "null"),
+                }
+            }
+        }
     };
     (@common $name:ident, $inner:ty, $cluster:ty) => {
         impl From<$name> for $crate::model::Attribute {
@@ -666,8 +529,78 @@ macro_rules! impl_matter_attribute {
     };
 }
 
+/// Implements [`CommandSpec`](crate::traits::CommandSpec), wire conversions, field/value helpers, and `MatterDescribe` for a command type.
 macro_rules! impl_matter_command {
-    ($name:ident, $cluster:ty, $is_empty:expr) => {
+    ($name:ident, $cluster:ty, $response:ty, true) => {
+        impl $name {
+            #[inline]
+            #[must_use]
+            pub fn into_fields(self) -> alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)> {
+                alloc::vec::Vec::new()
+            }
+
+            #[inline]
+            pub(crate) fn decode_fields(
+                fields: alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)>,
+            ) -> Result<Self, (Option<$crate::model::FieldId>, $crate::model::MatterStatus)> {
+                if let Some((fid, _)) = fields.first() {
+                    Err((Some(*fid), $crate::model::MatterStatus::ConstraintError))
+                } else {
+                    Ok(Self::default())
+                }
+            }
+
+            #[inline]
+            pub fn try_from_value(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
+                match val {
+                    $crate::model::AttributeValue::Null => Ok(Self::default()),
+                    $crate::model::AttributeValue::Struct(fields) => Self::try_from_fields(fields),
+                    _ => Err($crate::model::MatterStatus::InvalidDataType),
+                }
+            }
+        }
+
+        $crate::impl_matter_command!(@common $name, $cluster, $response, true);
+    };
+    ($name:ident, $cluster:ty, $response:ty, false) => {
+        impl $name {
+            #[inline]
+            pub fn try_from_value(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
+                let $crate::model::AttributeValue::Struct(fields) = val else {
+                    return Err($crate::model::MatterStatus::InvalidDataType);
+                };
+                Self::try_from_fields(fields)
+            }
+        }
+
+        $crate::impl_matter_command!(@common $name, $cluster, $response, false);
+    };
+    (@common $name:ident, $cluster:ty, $response:ty, $is_empty:expr) => {
+        impl $name {
+            #[inline]
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                $crate::model::AttributeValue::Struct(self.into_fields())
+            }
+
+            #[inline]
+            pub fn try_from_fields(
+                fields: alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)>,
+            ) -> Result<Self, $crate::model::MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
+            }
+        }
+
+        impl $crate::traits::CommandSpec for $name {
+            const CLUSTER_ID: $crate::model::ClusterId = Self::CLUSTER_ID;
+            const CLUSTER_NAME: &'static str = <$cluster>::NAME;
+            const COMMAND_ID: $crate::model::CommandId = Self::COMMAND_ID;
+            const COMMAND_NAME: &'static str = Self::NAME;
+            const DIRECTION: $crate::model::CommandDirection = Self::DIRECTION;
+            const IS_EMPTY: bool = $is_empty;
+            type Response = $response;
+        }
+
         impl From<$name> for $crate::model::Command {
             #[inline]
             fn from(cmd: $name) -> Self {
@@ -776,8 +709,68 @@ macro_rules! impl_matter_command {
     };
 }
 
+/// Implements [`EventSpec`](crate::traits::EventSpec), wire conversions, field/value helpers, and `MatterDescribe` for an event type.
 macro_rules! impl_matter_event {
-    ($name:ident, $cluster:ty, $is_empty:expr) => {
+    ($name:ident, $cluster:ty, true) => {
+        impl $name {
+            #[inline]
+            #[must_use]
+            pub fn into_fields(self) -> alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)> {
+                alloc::vec::Vec::new()
+            }
+
+            #[inline]
+            pub(crate) fn decode_fields(
+                fields: alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)>,
+            ) -> Result<Self, (Option<$crate::model::FieldId>, $crate::model::MatterStatus)> {
+                if let Some((fid, _)) = fields.first() {
+                    Err((Some(*fid), $crate::model::MatterStatus::ConstraintError))
+                } else {
+                    Ok(Self::default())
+                }
+            }
+
+            #[inline]
+            pub fn try_from_value(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
+                match val {
+                    $crate::model::AttributeValue::Null => Ok(Self::default()),
+                    $crate::model::AttributeValue::Struct(fields) => Self::try_from_fields(fields),
+                    _ => Err($crate::model::MatterStatus::InvalidDataType),
+                }
+            }
+        }
+
+        $crate::impl_matter_event!(@common $name, $cluster, true);
+    };
+    ($name:ident, $cluster:ty, false) => {
+        impl $name {
+            #[inline]
+            pub fn try_from_value(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
+                let $crate::model::AttributeValue::Struct(fields) = val else {
+                    return Err($crate::model::MatterStatus::InvalidDataType);
+                };
+                Self::try_from_fields(fields)
+            }
+        }
+
+        $crate::impl_matter_event!(@common $name, $cluster, false);
+    };
+    (@common $name:ident, $cluster:ty, $is_empty:expr) => {
+        impl $name {
+            #[inline]
+            #[must_use]
+            pub fn into_value(self) -> $crate::model::AttributeValue {
+                $crate::model::AttributeValue::Struct(self.into_fields())
+            }
+
+            #[inline]
+            pub fn try_from_fields(
+                fields: alloc::vec::Vec<($crate::model::FieldId, $crate::model::AttributeValue)>,
+            ) -> Result<Self, $crate::model::MatterStatus> {
+                Self::decode_fields(fields).map_err(|(_, status)| status)
+            }
+        }
+
         impl From<$name> for $crate::model::Event {
             #[inline]
             fn from(ev: $name) -> Self {
@@ -878,6 +871,34 @@ macro_rules! impl_matter_event {
     };
 }
 
+/// Implements `From<Struct> for AttributeValue` and `TryFrom<AttributeValue> for Struct` via `encode_fields_inner` /
+/// `decode_fields_inner`.
+macro_rules! impl_matter_struct_wire {
+    ($(#[$meta:meta])* $name:ident) => {
+        $(#[$meta])*
+        impl From<$name> for $crate::model::AttributeValue {
+            #[inline]
+            fn from(val: $name) -> Self {
+                Self::Struct(val.encode_fields_inner())
+            }
+        }
+
+        $(#[$meta])*
+        impl TryFrom<$crate::model::AttributeValue> for $name {
+            type Error = $crate::model::MatterStatus;
+
+            #[inline]
+            fn try_from(val: $crate::model::AttributeValue) -> Result<Self, $crate::model::MatterStatus> {
+                let $crate::model::AttributeValue::Struct(fields) = val else {
+                    return Err($crate::model::MatterStatus::InvalidDataType);
+                };
+                Self::decode_fields_inner(fields).map_err(|(_, status)| status)
+            }
+        }
+    };
+}
+
+/// Implements `From<Cluster> for model::Cluster` and `TryFrom<model::Cluster> for Cluster`.
 macro_rules! impl_cluster_wire_conversions {
     ($cluster:ident) => {
         impl From<$cluster> for $crate::model::Cluster {
@@ -907,144 +928,9 @@ macro_rules! impl_cluster_wire_conversions {
     };
 }
 
-macro_rules! impl_matter_describe {
-    (cluster, $ty:ident, $is_empty:expr) => {
-        $crate::impl_matter_describe!(
-            @concrete $ty,
-            $crate::dispatch::EntityDescriptor::Cluster {
-                cluster: <$ty>::NAME,
-                cluster_id: <$ty>::CLUSTER_ID.raw(),
-            },
-            $is_empty
-        );
-    };
-    (device, $ty:ident, $is_empty:expr) => {
-        $crate::impl_matter_describe!(
-            @concrete $ty,
-            $crate::dispatch::EntityDescriptor::Device {
-                device_type: <$ty>::NAME,
-                device_type_id: <$ty>::DEVICE_TYPE_ID.raw(),
-            },
-            $is_empty
-        );
-    };
-    (@concrete $ty:ident, $desc:expr, $is_empty:expr) => {
-        #[cfg(feature = "dispatch")]
-        impl $crate::dispatch::MatterDescribe for $ty {
-            const STATIC_SCHEMA: $crate::dispatch::StaticEntitySchema =
-                $crate::dispatch::StaticEntitySchema::concrete($desc, $is_empty);
-
-            #[inline]
-            fn descriptor(&self) -> $crate::dispatch::EntityDescriptor {
-                $desc
-            }
-
-            #[inline]
-            fn is_empty_payload(&self) -> bool {
-                $is_empty
-            }
-
-            #[cfg(feature = "serde")]
-            fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-            where
-                D: serde::Deserializer<'de>,
-            {
-                $crate::dispatch::deserialize_concrete_described(deserializer, $desc, $is_empty)
-            }
-        }
-    };
-}
-
-macro_rules! impl_select_described {
-    (attr, $kind:literal) => {
-        $crate::impl_select_described!(@tuple3 $kind);
-    };
-    (ev, $kind:literal) => {
-        $crate::impl_select_described!(@tuple3 $kind);
-    };
-    (cmd, $kind:literal) => {
-        #[cfg(all(feature = "dispatch", feature = "serde"))]
-        pub(crate) fn select_described(
-            item_name: Option<&str>,
-            item_id: Option<u32>,
-            payload: $crate::dispatch::BufferedPayload,
-        ) -> Result<Self, alloc::string::String> {
-            let deserialize = match (item_name, item_id) {
-                (Some(name), maybe_id) => {
-                    let (_, id, _, f) = Self::DESCRIBED_VARIANTS
-                        .iter()
-                        .copied()
-                        .find(|&(n, _, _, _)| n == name)
-                        .ok_or_else(|| alloc::format!("unknown {} '{name}'", $kind))?;
-                    if let Some(expected_id) = maybe_id {
-                        if id != expected_id {
-                            return Err(alloc::format!(
-                                "conflicting {} '{name}' and {}_id {expected_id}",
-                                $kind,
-                                $kind
-                            ));
-                        }
-                    }
-                    f
-                }
-                (None, Some(id)) => Self::DESCRIBED_VARIANTS
-                    .iter()
-                    .copied()
-                    .find(|&(_, vid, _, _)| vid == id)
-                    .map(|(_, _, _, f)| f)
-                    .ok_or_else(|| alloc::format!("unknown {}_id {id}", $kind))?,
-                (None, None) => return Err(alloc::format!("missing {} discriminator", $kind)),
-            };
-
-            deserialize(payload)
-        }
-    };
-    (@tuple3 $kind:literal) => {
-        #[cfg(all(feature = "dispatch", feature = "serde"))]
-        pub(crate) fn select_described(
-            item_name: Option<&str>,
-            item_id: Option<u32>,
-            payload: $crate::dispatch::BufferedPayload,
-        ) -> Result<Self, alloc::string::String> {
-            let deserialize = match (item_name, item_id) {
-                (Some(name), maybe_id) => {
-                    let (_, id, f) = Self::DESCRIBED_VARIANTS
-                        .iter()
-                        .copied()
-                        .find(|&(n, _, _)| n == name)
-                        .ok_or_else(|| alloc::format!("unknown {} '{name}'", $kind))?;
-                    if let Some(expected_id) = maybe_id {
-                        if id != expected_id {
-                            return Err(alloc::format!(
-                                "conflicting {} '{name}' and {}_id {expected_id}",
-                                $kind,
-                                $kind
-                            ));
-                        }
-                    }
-                    f
-                }
-                (None, Some(id)) => Self::DESCRIBED_VARIANTS
-                    .iter()
-                    .copied()
-                    .find(|&(_, vid, _)| vid == id)
-                    .map(|(_, _, f)| f)
-                    .ok_or_else(|| alloc::format!("unknown {}_id {id}", $kind))?,
-                (None, None) => return Err(alloc::format!("missing {} discriminator", $kind)),
-            };
-
-            deserialize(payload)
-        }
-    };
-}
-
-pub(crate) use define_matter_bitmap;
-pub(crate) use define_matter_enum;
-pub(crate) use define_matter_semantic_bool;
 pub(crate) use impl_cluster_member_variant;
 pub(crate) use impl_cluster_wire_conversions;
 pub(crate) use impl_matter_attribute;
 pub(crate) use impl_matter_command;
-pub(crate) use impl_matter_describe;
 pub(crate) use impl_matter_event;
-pub(crate) use impl_select_described;
+pub(crate) use impl_matter_struct_wire;

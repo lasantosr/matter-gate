@@ -215,13 +215,6 @@ pub(super) fn emit_event_enum_tokens(cluster: &ClusterDef, cluster_struct_name: 
     }
 }
 
-fn emit_event_dispatch_impls(ev_name: &str, cluster_struct: &str, is_empty: bool) -> Tokens {
-    let is_empty_str = if is_empty { "true" } else { "false" };
-    quote! {
-        crate::impl_matter_event!($ev_name, super::$cluster_struct, $is_empty_str);
-    }
-}
-
 fn emit_unit_event_tokens(
     ev_name: &str,
     description: &str,
@@ -241,46 +234,9 @@ fn emit_unit_event_tokens(
             pub const EVENT_ID: EventId = EventId::new($ev_id_hex);
             pub const NAME: &'static str = $(quoted(ev_name));
             pub const PRIORITY: EventPriority = $priority;
-
-            #[inline]
-            #[must_use]
-            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-                Vec::new()
-            }
-
-            #[inline]
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.into_fields())
-            }
-
-            #[inline]
-            pub(crate) fn decode_fields(
-                fields: Vec<(FieldId, AttributeValue)>,
-            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                if let Some((fid, _)) = fields.first() {
-                    Err((Some(*fid), MatterStatus::ConstraintError))
-                } else {
-                    Ok(Self)
-                }
-            }
-
-            #[inline]
-            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-                Self::decode_fields(fields).map_err(|(_, status)| status)
-            }
-
-            #[inline]
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                match val {
-                    AttributeValue::Null => Ok(Self),
-                    AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                    _ => Err(MatterStatus::InvalidDataType),
-                }
-            }
         }
 
-        $(emit_event_dispatch_impls(ev_name, cluster_struct, true))
+        crate::impl_matter_event!($ev_name, super::$cluster_struct, true);
     }
 }
 
@@ -326,8 +282,8 @@ fn emit_struct_event_tokens(
         $(RecordConstructors {
             partition: &partition,
             prefix: IdPrefix::Field,
-            too_many_args_reason: "Command has large mandatory argument set matching CSA specification",
-            single_char_reason: Some("Command field names match CSA specification"),
+            too_many_args_reason: "Event has large mandatory argument set matching CSA specification",
+            single_char_reason: Some("Event field names match CSA specification"),
         })
     };
     let single_mand_from = quote!($(SingleMandatoryFrom::maybe(ev_name, &partition.mandatory)));
@@ -351,11 +307,6 @@ fn emit_struct_event_tokens(
                 $encode_vec_body
             }
 
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.into_fields())
-            }
-
             $(if short_field_count >= 5 =>
                 #[expect(clippy::many_single_char_names, reason = $(quoted(many_single_char_reason)))]
             )
@@ -370,24 +321,11 @@ fn emit_struct_event_tokens(
                     $construct_fields
                 })
             }
-
-            #[inline]
-            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-                Self::decode_fields(fields).map_err(|(_, status)| status)
-            }
-
-            #[inline]
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::Struct(fields) = val else {
-                    return Err(MatterStatus::InvalidDataType);
-                };
-                Self::try_from_fields(fields)
-            }
         }
 
         $single_mand_from
 
-        $(emit_event_dispatch_impls(ev_name, cluster_struct, partition.is_empty()))
+        crate::impl_matter_event!($ev_name, super::$cluster_struct, false);
     })
 }
 
@@ -475,36 +413,13 @@ fn emit_event_enum_wire_impls(cluster: &ClusterDef, has_multiple: bool) -> Token
             )
         )
         $(if !has_multiple =>
-            $(for ev in &cluster.events join ($['\n']) =>
-                impl From<events::$(&ev.name)> for Event {
-                    #[inline]
-                    fn from(
-                        $(if ev.fields.is_empty() => _)$(if !ev.fields.is_empty() => ev): events::$(&ev.name),
-                    ) -> Self {
-                        $(if ev.fields.is_empty() =>
-                            Self::$(&ev.name)
-                        )
-                        $(if !ev.fields.is_empty() =>
-                            Self::$(&ev.name)(ev)
-                        )
-                    }
-                }
-
-                impl TryFrom<Event> for events::$(&ev.name) {
-                    type Error = EventError;
-
-                    #[inline]
-                    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-                        match ev {
-                            $(if ev.fields.is_empty() =>
-                                Event::$(&ev.name) => Ok(Self),
-                            )
-                            $(if !ev.fields.is_empty() =>
-                                Event::$(&ev.name)(inner) => Ok(inner),
-                            )
-                        }
-                    }
-                }
+            $(for ev in &cluster.events join ($['\r']) =>
+                $(if ev.fields.is_empty() =>
+                    crate::impl_cluster_member_variant!(event_unit_single, Event, events::$(&ev.name), $(&ev.name));
+                )
+                $(if !ev.fields.is_empty() =>
+                    crate::impl_cluster_member_variant!(event_single, Event, events::$(&ev.name), $(&ev.name));
+                )
             )
         )
     }
@@ -514,100 +429,20 @@ fn emit_event_enum_dispatch_impls(cluster: &ClusterDef, cluster_struct_name: &st
     let empty_evs: Vec<_> = cluster.events.iter().filter(|e| e.fields.is_empty()).collect();
     let non_empty_evs: Vec<_> = cluster.events.iter().filter(|e| !e.fields.is_empty()).collect();
     quote! {
-        #[cfg(feature = $(quoted("dispatch")))]
-        impl EventMeta for Event {
-            #[inline]
-            fn cluster_id(&self) -> ClusterId {
-                Self::CLUSTER_ID
-            }
-
-            #[inline]
-            fn cluster_name(&self) -> &'static str {
-                $cluster_struct_name::NAME
-            }
-
-            #[inline]
-            fn event_id(&self) -> EventId {
-                self.id()
-            }
-
-            #[inline]
-            fn event_name(&self) -> &'static str {
-                match self {
-                    $(for ev in &cluster.events join ($['\r']) =>
-                        $(if ev.fields.is_empty() =>
-                            Self::$(&ev.name) => events::$(&ev.name)::NAME,
-                        )
-                        $(if !ev.fields.is_empty() =>
-                            Self::$(&ev.name)(_) => events::$(&ev.name)::NAME,
-                        )
-                    )
-                }
-            }
-
-            #[inline]
-            fn priority(&self) -> EventPriority {
-                self.priority()
-            }
-
-            #[inline]
-            fn is_empty_payload(&self) -> bool {
-                self.is_empty_payload()
-            }
-        }
-
-        #[cfg(feature = $(quoted("dispatch")))]
-        impl MatterDescribe for Event {
-            const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-                EntityKind::Event,
-                $cluster_struct_name::NAME,
-                $cluster_struct_name::CLUSTER_ID.raw(),
-            );
-
-            #[inline]
-            fn descriptor(&self) -> EntityDescriptor {
-                EntityDescriptor::Event {
-                    cluster: $cluster_struct_name::NAME,
-                    cluster_id: $cluster_struct_name::CLUSTER_ID.raw(),
-                    event: self.event_name(),
-                    event_id: self.id().raw(),
-                }
-            }
-
-            #[inline]
-            fn is_empty_payload(&self) -> bool {
-                Self::is_empty_payload(self)
-            }
-
-            #[cfg(feature = $(quoted("serde")))]
-            fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                match self {
-                    $(if !empty_evs.is_empty() =>
-                        $(for ev in &empty_evs join ( | ) => Self::$(&ev.name)) => {
-                            Serialize::serialize(&(), serializer)
-                        }
-                    )
-                    $(for ev in &non_empty_evs join ($['\r']) =>
-                        Self::$(&ev.name)(inner) => Serialize::serialize(inner, serializer),
-                    )
-                }
-            }
-
-            #[cfg(feature = $(quoted("serde")))]
-            fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-            where
-                D: serde::Deserializer<'de>,
-            {
-                deserialize_enum_described(
-                    deserializer,
-                    EntityKind::Event,
-                    Some(($cluster_struct_name::NAME, $cluster_struct_name::CLUSTER_ID.raw())),
-                    |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
+        crate::impl_cluster_enum_dispatch!(
+            event,
+            Event,
+            $cluster_struct_name,
+            empty = [
+                $(for ev in &empty_evs join ($['\r']) =>
+                    $(&ev.name),
                 )
-            }
-        }
+            ],
+            payload = [
+                $(for ev in &non_empty_evs join ($['\r']) =>
+                    $(&ev.name),
+                )
+            ]
+        );
     }
 }

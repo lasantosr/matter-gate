@@ -12,10 +12,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -637,83 +635,18 @@ crate::impl_cluster_member_variant!(
     attributes::ServiceEntranceRated,
     ServiceEntranceRated
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalDistributionCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MaxContinuousCurrent(_) => attributes::MaxContinuousCurrent::NAME,
-            Self::MaxVoltage(_) => attributes::MaxVoltage::NAME,
-            Self::NumberOfPoles(_) => attributes::NumberOfPoles::NAME,
-            Self::EndOfLife(_) => attributes::EndOfLife::NAME,
-            Self::ServiceEntranceRated(_) => attributes::ServiceEntranceRated::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ElectricalDistributionCluster::NAME,
-        ElectricalDistributionCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ElectricalDistributionCluster::NAME,
-            cluster_id: ElectricalDistributionCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MaxContinuousCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxVoltage(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfPoles(inner) => Serialize::serialize(inner, serializer),
-            Self::EndOfLife(inner) => Serialize::serialize(inner, serializer),
-            Self::ServiceEntranceRated(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ElectricalDistributionCluster::NAME,
-                ElectricalDistributionCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ElectricalDistributionCluster,
+    [
+        MaxContinuousCurrent,
+        MaxVoltage,
+        NumberOfPoles,
+        EndOfLife,
+        ServiceEntranceRated,
+    ]
+);
 
 crate::define_matter_enum! {
     /// EndOfLifeEnum exhaustive specification enum.
@@ -731,8 +664,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -801,14 +732,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -825,33 +748,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxContinuousCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalDistributionCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for MaxContinuousCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for MaxContinuousCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxContinuousCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -905,14 +809,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -929,33 +825,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxVoltage,
-        Nullable<types::VoltageMv>,
+        types::VoltageMv,
         super::ElectricalDistributionCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::VoltageMv> for MaxVoltage {
-        #[inline]
-        fn from(val: types::VoltageMv) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::VoltageMv>> for MaxVoltage {
-        #[inline]
-        fn from(val: Option<types::VoltageMv>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxVoltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1006,19 +883,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1029,29 +898,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfPoles, Nullable<u16>, super::ElectricalDistributionCluster, copy);
-    impl From<u16> for NumberOfPoles {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for NumberOfPoles {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NumberOfPoles {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NumberOfPoles,
+        u16,
+        super::ElectricalDistributionCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1102,14 +957,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1120,33 +967,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         EndOfLife,
-        Nullable<super::EndOfLifeEnum>,
+        super::EndOfLifeEnum,
         super::ElectricalDistributionCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::EndOfLifeEnum> for EndOfLife {
-        #[inline]
-        fn from(val: super::EndOfLifeEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::EndOfLifeEnum>> for EndOfLife {
-        #[inline]
-        fn from(val: Option<super::EndOfLifeEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for EndOfLife {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1197,14 +1025,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1215,31 +1035,12 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ServiceEntranceRated,
-        Nullable<bool>,
+        bool,
         super::ElectricalDistributionCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<bool> for ServiceEntranceRated {
-        #[inline]
-        fn from(val: bool) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<bool>> for ServiceEntranceRated {
-        #[inline]
-        fn from(val: Option<bool>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ServiceEntranceRated {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }

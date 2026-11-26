@@ -93,8 +93,9 @@ mod tests {
 
         let av = AttributeValue::from(t);
         assert_eq!(SystimeMs::try_from(&av), Ok(t));
+        assert_eq!(SystimeMs::try_from(&AttributeValue::U32(3_500)), Ok(t));
         assert_eq!(
-            SystimeMs::try_from(&AttributeValue::U32(3_500)),
+            SystimeMs::try_from(&AttributeValue::I64(3_500)),
             Err(MatterStatus::InvalidDataType)
         );
         assert_eq!(Duration::from(t), Duration::from_millis(3_500));

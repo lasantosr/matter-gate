@@ -10,14 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1206,99 +1200,26 @@ crate::impl_cluster_member_variant!(
     DstOffsetListMaxSize
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SupportsDnsResolve, SupportsDnsResolve);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TimeSynchronizationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::UtcTime(_) => attributes::UtcTime::NAME,
-            Self::Granularity(_) => attributes::Granularity::NAME,
-            Self::TimeSource(_) => attributes::TimeSource::NAME,
-            Self::TrustedTimeSource(_) => attributes::TrustedTimeSource::NAME,
-            Self::DefaultNtp(_) => attributes::DefaultNtp::NAME,
-            Self::TimeZone(_) => attributes::TimeZone::NAME,
-            Self::DstOffset(_) => attributes::DstOffset::NAME,
-            Self::LocalTime(_) => attributes::LocalTime::NAME,
-            Self::TimeZoneDatabase(_) => attributes::TimeZoneDatabase::NAME,
-            Self::NtpServerAvailable(_) => attributes::NtpServerAvailable::NAME,
-            Self::TimeZoneListMaxSize(_) => attributes::TimeZoneListMaxSize::NAME,
-            Self::DstOffsetListMaxSize(_) => attributes::DstOffsetListMaxSize::NAME,
-            Self::SupportsDnsResolve(_) => attributes::SupportsDnsResolve::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        TimeSynchronizationCluster::NAME,
-        TimeSynchronizationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: TimeSynchronizationCluster::NAME,
-            cluster_id: TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::UtcTime(inner) => Serialize::serialize(inner, serializer),
-            Self::Granularity(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeSource(inner) => Serialize::serialize(inner, serializer),
-            Self::TrustedTimeSource(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultNtp(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeZone(inner) => Serialize::serialize(inner, serializer),
-            Self::DstOffset(inner) => Serialize::serialize(inner, serializer),
-            Self::LocalTime(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeZoneDatabase(inner) => Serialize::serialize(inner, serializer),
-            Self::NtpServerAvailable(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeZoneListMaxSize(inner) => Serialize::serialize(inner, serializer),
-            Self::DstOffsetListMaxSize(inner) => Serialize::serialize(inner, serializer),
-            Self::SupportsDnsResolve(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                TimeSynchronizationCluster::NAME,
-                TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    TimeSynchronizationCluster,
+    [
+        UtcTime,
+        Granularity,
+        TimeSource,
+        TrustedTimeSource,
+        DefaultNtp,
+        TimeZone,
+        DstOffset,
+        LocalTime,
+        TimeZoneDatabase,
+        NtpServerAvailable,
+        TimeZoneListMaxSize,
+        DstOffsetListMaxSize,
+        SupportsDnsResolve,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`TimeSynchronizationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1474,114 +1395,19 @@ crate::impl_cluster_member_variant!(command, Command, commands::SetTrustedTimeSo
 crate::impl_cluster_member_variant!(command, Command, commands::SetTimeZone, SetTimeZone);
 crate::impl_cluster_member_variant!(command, Command, commands::SetDstOffset, SetDstOffset);
 crate::impl_cluster_member_variant!(command, Command, commands::SetDefaultNtp, SetDefaultNtp);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TimeSynchronizationCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SetUtcTime(_) => commands::SetUtcTime::NAME,
-            Self::SetTrustedTimeSource(_) => commands::SetTrustedTimeSource::NAME,
-            Self::SetTimeZone(_) => commands::SetTimeZone::NAME,
-            Self::SetDstOffset(_) => commands::SetDstOffset::NAME,
-            Self::SetDefaultNtp(_) => commands::SetDefaultNtp::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TimeSynchronizationCluster::NAME,
-        TimeSynchronizationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TimeSynchronizationCluster::NAME,
-            cluster_id: TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SetUtcTime(inner) => Serialize::serialize(inner, serializer),
-            Self::SetTrustedTimeSource(inner) => Serialize::serialize(inner, serializer),
-            Self::SetTimeZone(inner) => Serialize::serialize(inner, serializer),
-            Self::SetDstOffset(inner) => Serialize::serialize(inner, serializer),
-            Self::SetDefaultNtp(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TimeSynchronizationCluster::NAME,
-                TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TimeSynchronizationCluster::NAME,
-                TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    TimeSynchronizationCluster,
+    empty = [],
+    payload = [
+        SetUtcTime,
+        SetTrustedTimeSource,
+        SetTimeZone,
+        SetDstOffset,
+        SetDefaultNtp,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`TimeSynchronizationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1673,107 +1499,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::SetTimeZoneResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::SetTimeZoneResponse) -> Self {
-        Self::SetTimeZoneResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::SetTimeZoneResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::SetTimeZoneResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TimeSynchronizationCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SetTimeZoneResponse(_) => commands::SetTimeZoneResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TimeSynchronizationCluster::NAME,
-        TimeSynchronizationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TimeSynchronizationCluster::NAME,
-            cluster_id: TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SetTimeZoneResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TimeSynchronizationCluster::NAME,
-                TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::SetTimeZoneResponse,
+    SetTimeZoneResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    TimeSynchronizationCluster,
+    empty = [],
+    payload = [SetTimeZoneResponse,]
+);
 /// Dynamic event variant matching for [`TimeSynchronizationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1975,98 +1713,13 @@ crate::impl_cluster_member_variant!(
     events::MissingTrustedTimeSource,
     MissingTrustedTimeSource
 );
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TimeSynchronizationCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::DstTableEmpty => events::DstTableEmpty::NAME,
-            Self::DstStatus(_) => events::DstStatus::NAME,
-            Self::TimeZoneStatus(_) => events::TimeZoneStatus::NAME,
-            Self::TimeFailure => events::TimeFailure::NAME,
-            Self::MissingTrustedTimeSource => events::MissingTrustedTimeSource::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        TimeSynchronizationCluster::NAME,
-        TimeSynchronizationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: TimeSynchronizationCluster::NAME,
-            cluster_id: TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::DstTableEmpty | Self::TimeFailure | Self::MissingTrustedTimeSource => {
-                Serialize::serialize(&(), serializer)
-            }
-            Self::DstStatus(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeZoneStatus(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                TimeSynchronizationCluster::NAME,
-                TimeSynchronizationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    TimeSynchronizationCluster,
+    empty = [DstTableEmpty, TimeFailure, MissingTrustedTimeSource,],
+    payload = [DstStatus, TimeZoneStatus,]
+);
 
 crate::define_matter_enum! {
     /// StatusCode exhaustive specification enum.
@@ -2190,34 +1843,34 @@ impl TrustedTimeSourceStruct {
                     if fabric_index.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <FabricIndex>::try_from(fval)?;
                         fabric_index = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if endpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2238,24 +1891,7 @@ impl TrustedTimeSourceStruct {
     }
 }
 
-impl From<TrustedTimeSourceStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TrustedTimeSourceStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TrustedTimeSourceStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TrustedTimeSourceStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2293,23 +1929,23 @@ impl FabricScopedTrustedTimeSourceStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if endpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2328,24 +1964,7 @@ impl FabricScopedTrustedTimeSourceStruct {
     }
 }
 
-impl From<FabricScopedTrustedTimeSourceStruct> for AttributeValue {
-    #[inline]
-    fn from(val: FabricScopedTrustedTimeSourceStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for FabricScopedTrustedTimeSourceStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(FabricScopedTrustedTimeSourceStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2395,41 +2014,41 @@ impl TimeZoneStruct {
                     if offset.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i32>(&fval)?;
                         (-43_200_i32..=50_400_i32)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         offset = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if valid_at.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochUs>::try_from(fval)?;
                         valid_at = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2452,24 +2071,7 @@ impl TimeZoneStruct {
     }
 }
 
-impl From<TimeZoneStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TimeZoneStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TimeZoneStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TimeZoneStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2515,34 +2117,34 @@ impl DstOffsetStruct {
                     if offset.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i32>(&fval)?;
                         offset = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if valid_starting.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochUs>::try_from(fval)?;
                         valid_starting = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if valid_until.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         valid_until = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2569,30 +2171,11 @@ impl DstOffsetStruct {
     }
 }
 
-impl From<DstOffsetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DstOffsetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DstOffsetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DstOffsetStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2661,14 +2244,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2679,33 +2254,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         UtcTime,
-        Nullable<types::EpochUs>,
+        types::EpochUs,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochUs> for UtcTime {
-        #[inline]
-        fn from(val: types::EpochUs) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochUs>> for UtcTime {
-        #[inline]
-        fn from(val: Option<types::EpochUs>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for UtcTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2732,11 +2288,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2750,14 +2301,10 @@ pub mod attributes {
         Granularity,
         super::GranularityEnum,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for Granularity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2784,11 +2331,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2802,14 +2344,10 @@ pub mod attributes {
         TimeSource,
         super::TimeSourceEnum,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TimeSource {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2860,14 +2398,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2878,33 +2408,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TrustedTimeSource,
-        Nullable<super::TrustedTimeSourceStruct>,
+        super::TrustedTimeSourceStruct,
         super::TimeSynchronizationCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::TrustedTimeSourceStruct> for TrustedTimeSource {
-        #[inline]
-        fn from(val: super::TrustedTimeSourceStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::TrustedTimeSourceStruct>> for TrustedTimeSource {
-        #[inline]
-        fn from(val: Option<super::TrustedTimeSourceStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TrustedTimeSource {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2955,14 +2466,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2975,29 +2478,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(DefaultNtp, Nullable<String>, super::TimeSynchronizationCluster, owned);
-    impl From<String> for DefaultNtp {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for DefaultNtp {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DefaultNtp {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        DefaultNtp,
+        String,
+        super::TimeSynchronizationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3024,12 +2513,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3052,14 +2535,10 @@ pub mod attributes {
         TimeZone,
         Vec<super::TimeZoneStruct>,
         super::TimeSynchronizationCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for TimeZone {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3086,12 +2565,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3111,14 +2584,10 @@ pub mod attributes {
         DstOffset,
         Vec<super::DstOffsetStruct>,
         super::TimeSynchronizationCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for DstOffset {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3172,14 +2641,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3190,33 +2651,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         LocalTime,
-        Nullable<types::EpochUs>,
+        types::EpochUs,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochUs> for LocalTime {
-        #[inline]
-        fn from(val: types::EpochUs) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochUs>> for LocalTime {
-        #[inline]
-        fn from(val: Option<types::EpochUs>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LocalTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3243,11 +2685,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3261,14 +2698,10 @@ pub mod attributes {
         TimeZoneDatabase,
         super::TimeZoneDatabaseEnum,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TimeZoneDatabase {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3299,11 +2732,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3317,19 +2745,14 @@ pub mod attributes {
         NtpServerAvailable,
         super::NtpServerAvailable,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for NtpServerAvailable {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::NtpServerAvailable::from(val))
-        }
-    }
-
-    impl fmt::Display for NtpServerAvailable {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -3358,16 +2781,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3378,13 +2796,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(TimeZoneListMaxSize, u8, super::TimeSynchronizationCluster, copy);
-
-    impl fmt::Display for TimeZoneListMaxSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TimeZoneListMaxSize,
+        u8,
+        super::TimeSynchronizationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3411,16 +2830,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3428,13 +2842,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(DstOffsetListMaxSize, u8, super::TimeSynchronizationCluster, copy);
-
-    impl fmt::Display for DstOffsetListMaxSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        DstOffsetListMaxSize,
+        u8,
+        super::TimeSynchronizationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3465,11 +2880,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3483,19 +2893,14 @@ pub mod attributes {
         SupportsDnsResolve,
         super::SupportsDnsResolve,
         super::TimeSynchronizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for SupportsDnsResolve {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SupportsDnsResolve::from(val))
-        }
-    }
-
-    impl fmt::Display for SupportsDnsResolve {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 }
@@ -3535,17 +2940,6 @@ pub mod commands {
         pub time_source: Optional<super::TimeSourceEnum>,
     }
 
-    impl crate::traits::CommandSpec for SetUtcTime {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl SetUtcTime {
         pub const CLUSTER_ID: ClusterId = super::TimeSynchronizationCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -3581,11 +2975,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3598,34 +2987,34 @@ pub mod commands {
                         if utc_time.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EpochUs>::try_from(fval)?;
                             utc_time = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if granularity.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::GranularityEnum>::try_from(fval)?;
                             granularity = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if time_source.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TimeSourceEnum>::try_from(fval)?;
                             time_source = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3636,22 +3025,9 @@ pub mod commands {
                 time_source: Optional::from(time_source),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetUtcTime, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(SetUtcTime, super::TimeSynchronizationCluster, (), false);
 
     /// This command is used to set the TrustedTimeSource attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3664,17 +3040,6 @@ pub mod commands {
     )]
     pub struct SetTrustedTimeSource {
         pub trusted_time_source: Nullable<super::FabricScopedTrustedTimeSourceStruct>,
-    }
-
-    impl crate::traits::CommandSpec for SetTrustedTimeSource {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTrustedTimeSource {
@@ -3700,11 +3065,6 @@ pub mod commands {
                     Nullable::Null => AttributeValue::Null,
                 }
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3734,19 +3094,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Nullable<super::FabricScopedTrustedTimeSourceStruct>> for SetTrustedTimeSource {
@@ -3770,7 +3117,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetTrustedTimeSource, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(SetTrustedTimeSource, super::TimeSynchronizationCluster, (), false);
 
     /// This command is used to set the time zone of the node.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3783,17 +3130,6 @@ pub mod commands {
     )]
     pub struct SetTimeZone {
         pub time_zone: Vec<super::TimeZoneStruct>,
-    }
-
-    impl crate::traits::CommandSpec for SetTimeZone {
-        type Response = SetTimeZoneResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTimeZone {
@@ -3816,11 +3152,6 @@ pub mod commands {
                 Self::FIELD_TIME_ZONE,
                 AttributeValue::List(self.time_zone.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3849,19 +3180,6 @@ pub mod commands {
                 time_zone: time_zone.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::TimeZoneStruct>> for SetTimeZone {
@@ -3871,7 +3189,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetTimeZone, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(
+        SetTimeZone,
+        super::TimeSynchronizationCluster,
+        SetTimeZoneResponse,
+        false
+    );
 
     /// THis command is used to report the result of a SetTimeZone command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3884,17 +3207,6 @@ pub mod commands {
     )]
     pub struct SetTimeZoneResponse {
         pub dst_offset_required: bool,
-    }
-
-    impl crate::traits::CommandSpec for SetTimeZoneResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTimeZoneResponse {
@@ -3917,11 +3229,6 @@ pub mod commands {
                 Self::FIELD_DST_OFFSET_REQUIRED,
                 AttributeValue::from(self.dst_offset_required)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3948,19 +3255,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<bool> for SetTimeZoneResponse {
@@ -3970,7 +3264,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetTimeZoneResponse, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(SetTimeZoneResponse, super::TimeSynchronizationCluster, (), false);
 
     /// This command is used to set the DST offsets for a node.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3983,17 +3277,6 @@ pub mod commands {
     )]
     pub struct SetDstOffset {
         pub dst_offset: Vec<super::DstOffsetStruct>,
-    }
-
-    impl crate::traits::CommandSpec for SetDstOffset {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetDstOffset {
@@ -4016,11 +3299,6 @@ pub mod commands {
                 Self::FIELD_DST_OFFSET,
                 AttributeValue::List(self.dst_offset.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -4046,19 +3324,6 @@ pub mod commands {
                 dst_offset: dst_offset.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::DstOffsetStruct>> for SetDstOffset {
@@ -4068,7 +3333,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetDstOffset, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(SetDstOffset, super::TimeSynchronizationCluster, (), false);
 
     /// This command is used to set the DefaultNTP attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4081,17 +3346,6 @@ pub mod commands {
     )]
     pub struct SetDefaultNtp {
         pub default_ntp: Nullable<String>,
-    }
-
-    impl crate::traits::CommandSpec for SetDefaultNtp {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TimeSynchronizationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetDefaultNtp {
@@ -4119,11 +3373,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4149,19 +3398,6 @@ pub mod commands {
             Ok(Self {
                 default_ntp: default_ntp.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -4193,7 +3429,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetDefaultNtp, super::TimeSynchronizationCluster, false);
+    crate::impl_matter_command!(SetDefaultNtp, super::TimeSynchronizationCluster, (), false);
 }
 
 pub mod events {
@@ -4226,43 +3462,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x00);
         pub const NAME: &'static str = "DstTableEmpty";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(DstTableEmpty, super::TimeSynchronizationCluster, true);
@@ -4302,11 +3501,6 @@ pub mod events {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4329,19 +3523,6 @@ pub mod events {
             Ok(Self {
                 dst_offset_active: dst_offset_active.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -4402,11 +3583,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4418,30 +3594,30 @@ pub mod events {
                         if offset.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i32>(&fval)?;
                             (-43_200_i32..=50_400_i32)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             offset = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -4450,19 +3626,6 @@ pub mod events {
                 offset: offset.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 name: Optional::from(name),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -4487,43 +3650,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x03);
         pub const NAME: &'static str = "TimeFailure";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(TimeFailure, super::TimeSynchronizationCluster, true);
@@ -4540,43 +3666,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x04);
         pub const NAME: &'static str = "MissingTrustedTimeSource";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(MissingTrustedTimeSource, super::TimeSynchronizationCluster, true);

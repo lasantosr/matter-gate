@@ -33,7 +33,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "identify_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -66,7 +66,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "effect_identifier",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 11, 254, 255] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 11, 254, 255] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -76,7 +76,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "effect_variant",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -100,7 +100,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "name_support",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x80 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x80 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -356,7 +356,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "start_up_on_off",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -398,7 +398,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "effect_identifier",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -431,7 +431,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "on_off_control",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -563,7 +563,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "options",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -601,7 +601,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -611,7 +611,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -630,7 +630,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -646,7 +646,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -656,7 +656,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -675,7 +675,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -697,7 +697,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -707,7 +707,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -726,7 +726,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -736,7 +736,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -767,7 +767,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -777,7 +777,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -796,7 +796,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -812,7 +812,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -822,7 +822,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -841,7 +841,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -863,7 +863,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -873,7 +873,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -892,7 +892,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -902,7 +902,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -1162,7 +1162,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "privilege",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1172,7 +1172,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "auth_mode",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1330,7 +1330,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x00),
                                                         name: "r#type",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -1400,7 +1400,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x00),
                                                         name: "r#type",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -1476,7 +1476,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x00),
                                                                 name: "r#type",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -1550,7 +1550,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "change_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -1566,7 +1566,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "privilege",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1576,7 +1576,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "auth_mode",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1665,7 +1665,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "change_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -1755,7 +1755,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "r#type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1771,7 +1771,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x04),
                                     name: "supported_commands",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0xFFF },
+                                        value_type: ValueType::Bitmap { bits: 16, valid_mask: 0xFFF },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1781,7 +1781,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "state",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -1825,7 +1825,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "r#type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -2171,7 +2171,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "new_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2202,7 +2202,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "new_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2212,7 +2212,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "error",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2419,7 +2419,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "finish",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -2429,7 +2429,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "primary_color",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -2571,7 +2571,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -2618,7 +2618,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2700,7 +2700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "action",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2793,7 +2793,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "update_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -2831,7 +2831,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "announcement_reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2864,7 +2864,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "previous_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2874,7 +2874,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "new_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -2884,7 +2884,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3001,7 +3001,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "hour_format",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3013,7 +3013,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "active_calendar_type",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3029,7 +3029,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 255] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 255] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3055,7 +3055,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "temperature_unit",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3071,7 +3071,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 2,
                         max: 3,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3123,7 +3123,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3167,7 +3167,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "wired_current_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3215,7 +3215,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: 8,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3255,7 +3255,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bat_charge_level",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3275,7 +3275,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bat_replaceability",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3299,7 +3299,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: 8,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3323,7 +3323,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bat_common_designation",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80] },
+                    value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3351,7 +3351,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bat_approved_chemistry",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32] },
+                    value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3379,7 +3379,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bat_charge_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3419,7 +3419,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: 16,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3462,7 +3462,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 8,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3480,7 +3480,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 8,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3507,7 +3507,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 8,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3525,7 +3525,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 8,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3552,7 +3552,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 16,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3570,7 +3570,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 16,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -3631,7 +3631,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "regulatory_config",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3643,7 +3643,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "location_capability",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -3711,7 +3711,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "network_recovery_reason",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -3750,7 +3750,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "error_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3775,7 +3775,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "new_regulatory_config",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3806,7 +3806,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "error_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3839,7 +3839,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "error_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3885,7 +3885,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "error_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -3987,7 +3987,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "last_networking_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -4019,7 +4019,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4035,7 +4035,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported_thread_features",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -4082,7 +4082,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "networking_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4108,7 +4108,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "security",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x3F },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -4136,7 +4136,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x04),
                                             name: "wi_fi_band",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -4326,7 +4326,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "networking_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4390,7 +4390,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "networking_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4500,7 +4500,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "intent",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4510,7 +4510,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "requested_protocol",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4535,7 +4535,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4645,7 +4645,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x07),
                                     name: "r#type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -4691,7 +4691,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "boot_reason",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -4707,7 +4707,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4727,7 +4727,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4747,7 +4747,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -4875,7 +4875,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -4893,7 +4893,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -4920,7 +4920,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -4938,7 +4938,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -4965,7 +4965,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -4983,7 +4983,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -5006,7 +5006,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "boot_reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -5160,7 +5160,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "routing_role",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -5924,7 +5924,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: 4,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -5972,7 +5972,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "connection_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -5995,7 +5995,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 4,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -6013,7 +6013,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: 4,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -6048,7 +6048,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "security_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -6060,7 +6060,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "wi_fi_version",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -6183,7 +6183,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "association_failure_cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -6208,7 +6208,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "connection_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -6231,7 +6231,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "phy_rate",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -6334,7 +6334,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "granularity",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -6346,7 +6346,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "time_source",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -6486,7 +6486,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "time_zone_database",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -6542,7 +6542,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "granularity",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -6552,7 +6552,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "time_source",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -6928,7 +6928,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "finish",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -6938,7 +6938,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "primary_color",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -7210,7 +7210,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "window_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -7491,7 +7491,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "certificate_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -7627,7 +7627,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 9, 10, 11] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 9, 10, 11] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -7899,7 +7899,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "group_key_security_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -7987,7 +7987,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "group_key_security_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -8294,7 +8294,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x04),
                                     name: "client_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -8332,7 +8332,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "user_active_mode_trigger_hint",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1_FFFF },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x1_FFFF },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -8352,7 +8352,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operating_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -8402,7 +8402,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "client_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -8508,7 +8508,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "timer_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -8650,7 +8650,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operational_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -8952,7 +8952,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 1,
                         max: 4,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -8968,7 +8968,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "selected_dryness_level",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -9388,7 +9388,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "number_of_rinses",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -9404,7 +9404,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -9760,7 +9760,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "mask",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -9772,7 +9772,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -9784,7 +9784,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -9803,7 +9803,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "active",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -9813,7 +9813,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "inactive",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -9823,7 +9823,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -9833,7 +9833,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -9977,7 +9977,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "air_quality",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -9999,7 +9999,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "expressed_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10011,7 +10011,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "smoke_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10023,7 +10023,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "co_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10035,7 +10035,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "battery_alert",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10047,7 +10047,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "device_muted",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10075,7 +10075,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "end_of_service_alert",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10087,7 +10087,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "interconnect_smoke_alarm",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10099,7 +10099,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "interconnect_co_alarm",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10111,7 +10111,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "contamination_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10123,7 +10123,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "smoke_sensitivity_level",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10159,7 +10159,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_severity_level",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10178,7 +10178,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_severity_level",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10197,7 +10197,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_severity_level",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10256,7 +10256,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_severity_level",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10275,7 +10275,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_severity_level",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10306,7 +10306,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "mask",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10318,7 +10318,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "latch",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10330,7 +10330,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10342,7 +10342,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -10360,7 +10360,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarms",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10379,7 +10379,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10400,7 +10400,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "active",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10410,7 +10410,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "inactive",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10420,7 +10420,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10430,7 +10430,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -10748,7 +10748,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operational_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -11507,7 +11507,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -11872,7 +11872,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "degradation_direction",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -11884,7 +11884,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "change_indication",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -11922,7 +11922,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "product_identifier_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -11977,7 +11977,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "degradation_direction",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -11989,7 +11989,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "change_indication",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12027,7 +12027,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "product_identifier_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -12098,7 +12098,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "alarms_active",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12110,7 +12110,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "alarms_suppressed",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12122,7 +12122,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "alarms_enabled",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12134,7 +12134,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "alarms_supported",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12146,7 +12146,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "sensor_fault",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12164,7 +12164,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarms_to_suppress",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12183,7 +12183,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarms_to_enable_disable",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12204,7 +12204,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarms_active",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12214,7 +12214,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "alarms_suppressed",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12233,7 +12233,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "sensor_fault",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12288,7 +12288,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "current_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -12300,7 +12300,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "target_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -12336,7 +12336,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "valve_fault",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12393,7 +12393,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "valve_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12418,7 +12418,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "valve_fault",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                            value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x3F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -12441,7 +12441,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "power_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -12471,7 +12471,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "measurement_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                                        value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -12589,7 +12589,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "measurement_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                                        value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -12860,7 +12860,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "measurement_type",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                                                value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -12959,7 +12959,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "measurement_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                                value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -13570,7 +13570,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "heater_types",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -13582,7 +13582,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "heat_demand",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -13618,7 +13618,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "boost_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -13772,7 +13772,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "tariff_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -13862,7 +13862,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "source",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -13958,7 +13958,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x01),
                                                         name: "source",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -14008,7 +14008,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "details",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -14079,7 +14079,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x01),
                                                         name: "source",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -14126,7 +14126,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "details",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -14201,7 +14201,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x01),
                                                                 name: "source",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -14306,7 +14306,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x01),
                                                         name: "source",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -14373,7 +14373,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "priority",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -14383,7 +14383,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "message_control",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x1F },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -14483,7 +14483,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "priority",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -14493,7 +14493,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "message_control",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x1F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -14635,7 +14635,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "future_messages_preference",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -14658,7 +14658,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "esa_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -14678,7 +14678,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "esa_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -14756,7 +14756,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "cause",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -14920,7 +14920,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                     id: FieldId::new(0x00),
                                                                     name: "cost_type",
                                                                     constraint: ValueConstraint {
-                                                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                                         bounds: ValueBounds::None,
                                                                         nullable: false,
                                                                     },
@@ -14992,7 +14992,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x08),
                             name: "forecast_update_reason",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -15010,7 +15010,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "opt_out_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -15040,7 +15040,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15073,7 +15073,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15098,7 +15098,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15169,7 +15169,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15238,7 +15238,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15275,7 +15275,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15314,7 +15314,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "cause",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15337,7 +15337,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -15349,7 +15349,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supply_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -15361,7 +15361,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "fault_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -15613,7 +15613,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "day_of_week_for_sequence",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -15706,7 +15706,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "day_of_week_for_sequence",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -15796,7 +15796,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15839,7 +15839,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15876,7 +15876,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15886,7 +15886,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15923,7 +15923,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15933,7 +15933,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "fault_state_previous_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -15943,7 +15943,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "fault_state_current_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 255] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -16027,7 +16027,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 2,
                         max: 2,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -16532,7 +16532,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x03),
                             name: "grid_carbon_level",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -16548,7 +16548,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x05),
                             name: "local_carbon_level",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -16594,7 +16594,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x03),
                                     name: "grid_carbon_level",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -16610,7 +16610,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "local_carbon_level",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -16663,7 +16663,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x03),
                                     name: "grid_carbon_level",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -16679,7 +16679,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "local_carbon_level",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -16708,7 +16708,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "lock_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -16720,7 +16720,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "lock_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -16740,7 +16740,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "door_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -16856,7 +16856,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "credential_rules_support",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -16908,7 +16908,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operating_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -16920,7 +16920,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported_operating_modes",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -16932,7 +16932,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "default_configuration_register",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0xE7 },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0xE7 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -16976,7 +16976,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "local_programming_features",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x0F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x0F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -17185,7 +17185,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "days_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17261,7 +17261,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 133, 137, 139] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 133, 137, 139] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17271,7 +17271,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "days_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17401,7 +17401,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 133, 137, 139] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 133, 137, 139] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17471,7 +17471,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "operating_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17511,7 +17511,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 133, 137, 139] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 133, 137, 139] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17533,7 +17533,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "operating_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17567,7 +17567,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "operation_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17595,7 +17595,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "user_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17605,7 +17605,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "user_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17615,7 +17615,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x06),
                         name: "credential_rule",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17667,7 +17667,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "user_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17677,7 +17677,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "user_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17687,7 +17687,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "credential_rule",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17707,7 +17707,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "credential_type",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -17775,7 +17775,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "operation_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17791,7 +17791,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "credential_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -17825,7 +17825,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "user_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17835,7 +17835,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "user_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9] },
                             bounds: ValueBounds::None,
                             nullable: true,
                         },
@@ -17854,7 +17854,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 133, 137, 139] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 133, 137, 139] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -17891,7 +17891,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "credential_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -17973,7 +17973,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "credential_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -18062,7 +18062,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "alarm_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3, 4, 5, 6, 7, 8] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3, 4, 5, 6, 7, 8] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18081,7 +18081,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "door_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18100,7 +18100,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "lock_operation_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18110,7 +18110,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "operation_source",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18148,7 +18148,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "credential_type",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -18183,7 +18183,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "lock_operation_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18193,7 +18193,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "operation_source",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18203,7 +18203,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "operation_error",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18241,7 +18241,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x00),
                                             name: "credential_type",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -18276,7 +18276,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "lock_data_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18286,7 +18286,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "data_operation_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18296,7 +18296,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "operation_source",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18343,7 +18343,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "r#type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18403,7 +18403,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "config_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18431,7 +18431,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operational_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18459,7 +18459,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "end_product_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 255] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 255] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18519,7 +18519,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x0F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x0F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18531,7 +18531,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "safety_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0xFFF },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0xFFF },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18646,7 +18646,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "main_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18662,7 +18662,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: 10,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18684,7 +18684,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "position",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -18700,7 +18700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "speed",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -18730,7 +18730,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "position",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -18746,7 +18746,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "speed",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -18764,7 +18764,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "latch_control_modes",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -18790,7 +18790,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "position",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18806,7 +18806,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "speed",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -18839,7 +18839,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 1,
                                 max: 10,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -18922,7 +18922,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "speed",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -18958,7 +18958,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "speed",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -18992,7 +18992,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19056,7 +19056,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "translation_direction",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19068,7 +19068,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "rotation_axis",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19080,7 +19080,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "overflow",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19092,7 +19092,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "modulation_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19122,7 +19122,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "speed",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -19141,7 +19141,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "direction",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -19157,7 +19157,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "speed",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -19227,7 +19227,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "area_type",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: true,
                                                             },
@@ -19249,7 +19249,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x00),
                                                             name: "landmark_tag",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -19259,7 +19259,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x01),
                                                             name: "relative_position_tag",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: true,
                                                             },
@@ -19375,7 +19375,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "status",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -19438,7 +19438,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -19478,7 +19478,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -19612,7 +19612,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "pump_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1FF },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x1FF },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19624,7 +19624,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "effective_operation_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19636,7 +19636,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "effective_control_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 5, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 5, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19688,7 +19688,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "operation_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19700,7 +19700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "control_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 5, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 5, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19875,7 +19875,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "occupancy",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -19935,7 +19935,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "hvac_system_type_configuration",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x3F },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x3F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20027,7 +20027,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "remote_sensing",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20039,7 +20039,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "control_sequence_of_operation",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20051,7 +20051,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "system_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20063,7 +20063,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "thermostat_running_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20075,7 +20075,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "start_of_week",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20103,7 +20103,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "temperature_setpoint_hold",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20123,7 +20123,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "thermostat_programming_operation_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20135,7 +20135,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "thermostat_running_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x7F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20147,7 +20147,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "setpoint_change_source",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20231,7 +20231,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_type",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20251,7 +20251,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_refrigerant_type",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20263,7 +20263,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_compressor_type",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20275,7 +20275,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_error_code",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20287,7 +20287,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_louver_position",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20307,7 +20307,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ac_capacityformat",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -20329,7 +20329,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "preset_scenario",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5, 6, 254] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5, 6, 254] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20345,7 +20345,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "preset_type_features",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                        value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x03 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20377,7 +20377,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "system_mode",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20393,7 +20393,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "schedule_type_features",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x0F },
+                                        value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x0F },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20479,7 +20479,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "preset_scenario",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5, 6, 254] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5, 6, 254] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20541,7 +20541,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "system_mode",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -20573,7 +20573,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x00),
                                                         name: "day_of_week",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Bitmap { valid_mask: 0xFF },
+                                                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0xFF },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -20595,7 +20595,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x03),
                                                         name: "system_mode",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3, 4, 5, 6, 7, 8, 9] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -20659,7 +20659,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20690,7 +20690,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "day_of_week_for_sequence",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0xFF },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0xFF },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20700,7 +20700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "mode_for_sequence",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20757,7 +20757,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "days_to_return",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0xFF },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0xFF },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20767,7 +20767,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "mode_to_return",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20830,7 +20830,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "day_of_week_for_sequence",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0xFF },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0xFF },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20840,7 +20840,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "mode_for_sequence",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20950,7 +20950,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "request_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -20994,7 +20994,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "fan_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21006,7 +21006,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "fan_mode_sequence",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21058,7 +21058,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "rock_support",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21070,7 +21070,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "rock_setting",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21082,7 +21082,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "wind_support",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21094,7 +21094,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "wind_setting",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21106,7 +21106,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "airflow_direction",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21124,7 +21124,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "direction",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21160,7 +21160,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "temperature_display_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21172,7 +21172,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "keypad_lockout",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21184,7 +21184,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "schedule_programming_visibility",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21246,7 +21246,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "drift_compensation",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21274,7 +21274,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "color_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21286,7 +21286,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "options",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21562,7 +21562,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "enhanced_color_mode",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21614,7 +21614,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "color_capabilities",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x1F },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x1F },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -21654,7 +21654,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "direction",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21670,7 +21670,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21680,7 +21680,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21699,7 +21699,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21715,7 +21715,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21725,7 +21725,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21744,7 +21744,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21766,7 +21766,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21776,7 +21776,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21807,7 +21807,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21817,7 +21817,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21836,7 +21836,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21852,7 +21852,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21862,7 +21862,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21881,7 +21881,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21903,7 +21903,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21913,7 +21913,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21950,7 +21950,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21960,7 +21960,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -21997,7 +21997,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22007,7 +22007,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22038,7 +22038,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22048,7 +22048,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22085,7 +22085,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22095,7 +22095,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22126,7 +22126,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22136,7 +22136,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22161,7 +22161,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "direction",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22177,7 +22177,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22187,7 +22187,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22206,7 +22206,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22222,7 +22222,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22232,7 +22232,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22251,7 +22251,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22273,7 +22273,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22283,7 +22283,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22320,7 +22320,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x03),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22330,7 +22330,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22349,7 +22349,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "update_flags",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x0F },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x0F },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22359,7 +22359,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "action",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22369,7 +22369,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "direction",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22391,7 +22391,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22401,7 +22401,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x06),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22420,7 +22420,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22430,7 +22430,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22449,7 +22449,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "move_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22477,7 +22477,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22487,7 +22487,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22506,7 +22506,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "step_mode",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22540,7 +22540,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "options_mask",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22550,7 +22550,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x06),
                         name: "options_override",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -22590,7 +22590,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "ballast_status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -22674,7 +22674,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "lamp_alarm_mode",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -22736,7 +22736,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "light_sensor_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -22966,7 +22966,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "occupancy",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -22978,7 +22978,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "occupancy_sensor_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -22990,7 +22990,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "occupancy_sensor_type_bitmap",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23121,7 +23121,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "occupancy",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x01 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -23208,7 +23208,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23220,7 +23220,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23232,7 +23232,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23318,7 +23318,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23330,7 +23330,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23342,7 +23342,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23428,7 +23428,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23440,7 +23440,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23452,7 +23452,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23538,7 +23538,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23550,7 +23550,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23562,7 +23562,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23648,7 +23648,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23660,7 +23660,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23672,7 +23672,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23758,7 +23758,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23770,7 +23770,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23782,7 +23782,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23868,7 +23868,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23880,7 +23880,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23892,7 +23892,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23978,7 +23978,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -23990,7 +23990,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24002,7 +24002,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24088,7 +24088,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24100,7 +24100,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24112,7 +24112,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24198,7 +24198,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24210,7 +24210,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_medium",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24222,7 +24222,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "level_value",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -24250,7 +24250,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "measurement_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
+                                value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -24753,7 +24753,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x06),
                                     name: "r#type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -24799,7 +24799,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x03),
                             name: "lineup_info_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -24859,7 +24859,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x06),
                             name: "r#type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -24934,7 +24934,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -25017,7 +25017,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x06),
                                             name: "r#type",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -25067,7 +25067,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "recording_flag",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                            value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x07 },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -25254,7 +25254,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x06),
                                                         name: "r#type",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -25358,7 +25358,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x0E),
                                             name: "recording_flag",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x07 },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -25699,7 +25699,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -25783,7 +25783,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "current_state",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -26182,7 +26182,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -26253,7 +26253,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "current_state",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -26358,7 +26358,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "input_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -26486,7 +26486,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "key_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 113, 114, 115, 116, 117, 118] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16, 17, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 113, 114, 115, 116, 117, 118] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -26505,7 +26505,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -26545,7 +26545,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported_streaming_protocols",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -26579,7 +26579,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x00),
                                                         name: "r#type",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -26683,7 +26683,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         min: 0,
                                                         max: usize::MAX,
                                                         item_constraint: &ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -26729,7 +26729,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 min: 0,
                                                                 max: usize::MAX,
                                                                 item_constraint: &ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -26840,7 +26840,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "metric",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -26898,7 +26898,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "metric",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -26956,7 +26956,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "metric",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -27014,7 +27014,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "metric",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -27072,7 +27072,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x02),
                                                             name: "metric",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -27109,7 +27109,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -27155,7 +27155,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "output_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -27409,7 +27409,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -27497,7 +27497,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "status",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -27945,7 +27945,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -28013,7 +28013,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "zone_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28023,7 +28023,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "zone_source",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28045,7 +28045,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "r#use",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -28229,7 +28229,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "r#use",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28325,7 +28325,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "r#use",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28483,7 +28483,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -28508,7 +28508,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -28629,7 +28629,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "codec",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28705,7 +28705,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     min: 1,
                                     max: usize::MAX,
                                     item_constraint: &ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28771,7 +28771,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     min: 1,
                                     max: usize::MAX,
                                     item_constraint: &ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28821,7 +28821,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "two_way_talk_support",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -28873,7 +28873,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "image_codec",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28935,7 +28935,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -28967,7 +28967,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -28977,7 +28977,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "video_codec",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -29117,7 +29117,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -29127,7 +29127,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "audio_codec",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -29195,7 +29195,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "image_codec",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -29311,7 +29311,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         min: 0,
                         max: usize::MAX,
                         item_constraint: &ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29351,7 +29351,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "night_vision",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -29363,7 +29363,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "night_vision_illum",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -29533,7 +29533,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "status_light_brightness",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -29551,7 +29551,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "stream_usage",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29561,7 +29561,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "audio_codec",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29634,7 +29634,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "stream_usage",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29644,7 +29644,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "video_codec",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29816,7 +29816,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "image_codec",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -29968,7 +29968,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -30036,7 +30036,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "image_codec",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -30527,7 +30527,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x03),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -30573,7 +30573,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "stream_usage",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -30719,7 +30719,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "stream_usage",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -30927,7 +30927,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -30979,7 +30979,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x03),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31184,7 +31184,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -31218,7 +31218,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "container_format",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31228,7 +31228,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "ingest_method",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31266,7 +31266,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "transport_status",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31282,7 +31282,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "stream_usage",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31322,7 +31322,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x00),
                                                             name: "trigger_type",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -31418,7 +31418,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x06),
                                                 name: "ingest_method",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31434,7 +31434,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x00),
                                                             name: "container_type",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -31522,7 +31522,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31562,7 +31562,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "trigger_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31658,7 +31658,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x06),
                                     name: "ingest_method",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31674,7 +31674,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "container_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31759,7 +31759,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "transport_status",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -31775,7 +31775,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "stream_usage",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31815,7 +31815,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x00),
                                                             name: "trigger_type",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -31911,7 +31911,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x06),
                                                 name: "ingest_method",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -31927,7 +31927,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                             id: FieldId::new(0x00),
                                                             name: "container_type",
                                                             constraint: ValueConstraint {
-                                                                value_type: ValueType::Enum { valid_values: &[0] },
+                                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                                 bounds: ValueBounds::None,
                                                                 nullable: false,
                                                             },
@@ -32033,7 +32033,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x00),
                                     name: "stream_usage",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -32073,7 +32073,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "trigger_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -32169,7 +32169,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x06),
                                     name: "ingest_method",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -32185,7 +32185,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "container_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -32264,7 +32264,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "transport_status",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32289,7 +32289,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "activation_reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32375,7 +32375,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x01),
                                             name: "transport_status",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -32391,7 +32391,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x00),
                                                         name: "stream_usage",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -32431,7 +32431,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                     id: FieldId::new(0x00),
                                                                     name: "trigger_type",
                                                                     constraint: ValueConstraint {
-                                                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                         bounds: ValueBounds::None,
                                                                         nullable: false,
                                                                     },
@@ -32527,7 +32527,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x06),
                                                         name: "ingest_method",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -32543,7 +32543,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                     id: FieldId::new(0x00),
                                                                     name: "container_type",
                                                                     constraint: ValueConstraint {
-                                                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                                                         bounds: ValueBounds::None,
                                                                         nullable: false,
                                                                     },
@@ -32634,7 +32634,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "trigger_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32644,7 +32644,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "activation_reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32669,7 +32669,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "trigger_type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32679,7 +32679,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "activation_reason",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -32813,7 +32813,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x03),
                             name: "block_mode",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -32831,7 +32831,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "tariff_unit",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -32885,7 +32885,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x04),
                                     name: "randomization_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -32923,7 +32923,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "days_of_week",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x7F },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x7F },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -33017,7 +33017,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "day_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -33065,7 +33065,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "day_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -33109,7 +33109,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "day_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -33171,7 +33171,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x04),
                             name: "randomization_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -33227,7 +33227,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x04),
                             name: "randomization_type",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -33275,7 +33275,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "price_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33321,7 +33321,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "required_state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33343,7 +33343,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "severity",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33383,7 +33383,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "power_threshold_source",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -33507,7 +33507,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "price_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33553,7 +33553,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "required_state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33575,7 +33575,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "severity",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33615,7 +33615,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "power_threshold_source",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -33683,7 +33683,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "price_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33729,7 +33729,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "required_state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33751,7 +33751,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "severity",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33791,7 +33791,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "power_threshold_source",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -33845,7 +33845,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "default_randomization_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -33916,7 +33916,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "price_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33962,7 +33962,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "required_state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -33984,7 +33984,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "severity",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -34024,7 +34024,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "power_threshold_source",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -34118,7 +34118,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x04),
                                     name: "randomization_type",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -34280,7 +34280,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "area_type",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 41, 42, 43, 44, 45, 46, 47, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -34324,7 +34324,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "supported_device_categories",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x01 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x01 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -34516,7 +34516,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "group_key_security_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -34562,7 +34562,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "group_key_multicast_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -34624,7 +34624,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "group_permission",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -34674,7 +34674,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -34766,7 +34766,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x00),
                             name: "state",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -34830,7 +34830,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -34940,7 +34940,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35008,7 +35008,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35076,7 +35076,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "privilege",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35086,7 +35086,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "auth_mode",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35160,7 +35160,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35234,7 +35234,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x00),
                                                 name: "state",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -35292,7 +35292,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "group_key_security_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -35338,7 +35338,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "group_key_multicast_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -35375,7 +35375,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "group_key_security_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -35421,7 +35421,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "group_key_multicast_policy",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -35491,7 +35491,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "group_permission",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -35540,7 +35540,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x05),
                         name: "group_permission",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -35898,7 +35898,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "privilege",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3, 4, 5] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3, 4, 5] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -35908,7 +35908,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "auth_mode",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -36063,7 +36063,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -36129,7 +36129,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "status_code",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -36680,7 +36680,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "status",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -36813,7 +36813,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "status",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -36858,7 +36858,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "meter_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -36912,7 +36912,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "power_threshold_source",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -36990,7 +36990,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "measurement_type",
                 access: AccessFlags(1),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
+                    value_type: ValueType::Enum { bits: 16, valid_values: &[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -37020,7 +37020,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bitmap8",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x47 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x47 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -37032,7 +37032,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bitmap16",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4007 },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x4007 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -37044,7 +37044,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bitmap32",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4000_0007 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x4000_0007 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -37056,7 +37056,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "bitmap64",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4000_0000_0000_0007 },
+                    value_type: ValueType::Bitmap { bits: 64, valid_mask: 0x4000_0000_0000_0007 },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -37414,7 +37414,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37436,7 +37436,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37458,7 +37458,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37492,7 +37492,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37514,7 +37514,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37536,7 +37536,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37570,7 +37570,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37592,7 +37592,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37614,7 +37614,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37634,7 +37634,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             min: 0,
                                             max: usize::MAX,
                                             item_constraint: &ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -37652,7 +37652,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             min: 0,
                                             max: usize::MAX,
                                             item_constraint: &ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -37670,7 +37670,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             min: 0,
                                             max: usize::MAX,
                                             item_constraint: &ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -37696,7 +37696,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "enum_attr",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -37726,7 +37726,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "c",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -37748,7 +37748,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x05),
                             name: "f",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -37770,7 +37770,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x08),
                             name: "i",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -37894,7 +37894,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37916,7 +37916,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -37938,7 +37938,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -38004,7 +38004,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "global_enum",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: false,
                 },
@@ -38028,7 +38028,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "my_bitmap",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -38038,7 +38038,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "my_enum",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -38080,7 +38080,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_bitmap8",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x47 },
+                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x47 },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38092,7 +38092,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_bitmap16",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4007 },
+                    value_type: ValueType::Bitmap { bits: 16, valid_mask: 0x4007 },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38104,7 +38104,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_bitmap32",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4000_0007 },
+                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x4000_0007 },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38116,7 +38116,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_bitmap64",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Bitmap { valid_mask: 0x4000_0000_0000_0007 },
+                    value_type: ValueType::Bitmap { bits: 64, valid_mask: 0x4000_0000_0000_0007 },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38304,7 +38304,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_enum_attr",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38334,7 +38334,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "c",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -38356,7 +38356,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x05),
                             name: "f",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -38378,7 +38378,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x08),
                             name: "i",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: false,
                             },
@@ -38436,7 +38436,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 field_name: "nullable_global_enum",
                 access: AccessFlags(3),
                 constraint: ValueConstraint {
-                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                     bounds: ValueBounds::None,
                     nullable: true,
                 },
@@ -38460,7 +38460,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x01),
                             name: "my_bitmap",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -38470,7 +38470,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                             id: FieldId::new(0x02),
                             name: "my_enum",
                             constraint: ValueConstraint {
-                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                 bounds: ValueBounds::None,
                                 nullable: true,
                             },
@@ -38618,7 +38618,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x02),
                                                         name: "c",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -38640,7 +38640,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x05),
                                                         name: "f",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -38662,7 +38662,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x08),
                                                         name: "i",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -38700,7 +38700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x02),
                                                                 name: "c",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -38722,7 +38722,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x05),
                                                                 name: "f",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -38744,7 +38744,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x08),
                                                                 name: "i",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -38838,7 +38838,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x02),
                                             name: "c",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -38860,7 +38860,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x05),
                                             name: "f",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -38882,7 +38882,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x08),
                                             name: "i",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -38906,7 +38906,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -38934,7 +38934,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "arg5",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -38977,7 +38977,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -38999,7 +38999,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -39021,7 +39021,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -39082,7 +39082,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39104,7 +39104,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39126,7 +39126,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39154,7 +39154,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x01),
                                                 name: "my_bitmap",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                                    value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -39164,7 +39164,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "my_enum",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: true,
                                                 },
@@ -39217,7 +39217,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x02),
                                             name: "c",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -39239,7 +39239,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x05),
                                             name: "f",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -39261,7 +39261,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x08),
                                             name: "i",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -39349,7 +39349,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x02),
                                                 name: "c",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39371,7 +39371,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x05),
                                                 name: "f",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39393,7 +39393,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                 id: FieldId::new(0x08),
                                                 name: "i",
                                                 constraint: ValueConstraint {
-                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                     bounds: ValueBounds::None,
                                                     nullable: false,
                                                 },
@@ -39431,7 +39431,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x02),
                                                         name: "c",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39453,7 +39453,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x05),
                                                         name: "f",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39475,7 +39475,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x08),
                                                         name: "i",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39592,7 +39592,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x02),
                                                         name: "c",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39614,7 +39614,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x05),
                                                         name: "f",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39636,7 +39636,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x08),
                                                         name: "i",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -39674,7 +39674,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x02),
                                                                 name: "c",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -39696,7 +39696,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x05),
                                                                 name: "f",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -39718,7 +39718,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x08),
                                                                 name: "i",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -39828,7 +39828,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "arg2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -39916,7 +39916,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -39938,7 +39938,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -39960,7 +39960,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -39994,7 +39994,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40016,7 +40016,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40038,7 +40038,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40072,7 +40072,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40094,7 +40094,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40116,7 +40116,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40136,7 +40136,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -40154,7 +40154,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -40172,7 +40172,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -40213,7 +40213,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40235,7 +40235,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40257,7 +40257,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -40311,7 +40311,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "arg2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -40432,7 +40432,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "my_bitmap",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                        value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                                         bounds: ValueBounds::None,
                                         nullable: true,
                                     },
@@ -40442,7 +40442,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "my_enum",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: true,
                                     },
@@ -40458,7 +40458,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "field2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -40585,7 +40585,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x02),
                                                         name: "c",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -40607,7 +40607,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x05),
                                                         name: "f",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                            value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -40629,7 +40629,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                         id: FieldId::new(0x08),
                                                         name: "i",
                                                         constraint: ValueConstraint {
-                                                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                             bounds: ValueBounds::None,
                                                             nullable: false,
                                                         },
@@ -40667,7 +40667,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x02),
                                                                 name: "c",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -40689,7 +40689,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x05),
                                                                 name: "f",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                                    value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -40711,7 +40711,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                                                 id: FieldId::new(0x08),
                                                                 name: "i",
                                                                 constraint: ValueConstraint {
-                                                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                                     bounds: ValueBounds::None,
                                                                     nullable: false,
                                                                 },
@@ -40805,7 +40805,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x02),
                                             name: "c",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -40827,7 +40827,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x05),
                                             name: "f",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -40849,7 +40849,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x08),
                                             name: "i",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -40873,7 +40873,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -40901,7 +40901,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x04),
                         name: "arg5",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -40955,7 +40955,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "arg2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -41115,7 +41115,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41137,7 +41137,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41159,7 +41159,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41199,7 +41199,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41221,7 +41221,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41243,7 +41243,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41289,7 +41289,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41311,7 +41311,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41333,7 +41333,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41359,7 +41359,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -41383,7 +41383,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -41413,7 +41413,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -41469,7 +41469,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41491,7 +41491,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41513,7 +41513,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41610,7 +41610,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x01),
                                     name: "my_bitmap",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x03 },
+                                        value_type: ValueType::Bitmap { bits: 32, valid_mask: 0x03 },
                                         bounds: ValueBounds::None,
                                         nullable: true,
                                     },
@@ -41620,7 +41620,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "my_enum",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: true,
                                     },
@@ -41636,7 +41636,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x01),
                         name: "field2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -41684,7 +41684,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x02),
                         name: "arg2",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -41718,7 +41718,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x02),
                                     name: "c",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41740,7 +41740,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x05),
                                     name: "f",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                        value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41762,7 +41762,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                     id: FieldId::new(0x08),
                                     name: "i",
                                     constraint: ValueConstraint {
-                                        value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                        value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                         bounds: ValueBounds::None,
                                         nullable: false,
                                     },
@@ -41800,7 +41800,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x02),
                                             name: "c",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -41822,7 +41822,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x05),
                                             name: "f",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Bitmap { valid_mask: 0x07 },
+                                                value_type: ValueType::Bitmap { bits: 8, valid_mask: 0x07 },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -41844,7 +41844,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                             id: FieldId::new(0x08),
                                             name: "i",
                                             constraint: ValueConstraint {
-                                                value_type: ValueType::Enum { valid_values: &[0, 1, 2] },
+                                                value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2] },
                                                 bounds: ValueBounds::None,
                                                 nullable: false,
                                             },
@@ -41868,7 +41868,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                                 min: 0,
                                 max: usize::MAX,
                                 item_constraint: &ValueConstraint {
-                                    value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3] },
+                                    value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3] },
                                     bounds: ValueBounds::None,
                                     nullable: false,
                                 },
@@ -41923,7 +41923,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "r#type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },
@@ -41966,7 +41966,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                         id: FieldId::new(0x00),
                         name: "r#type",
                         constraint: ValueConstraint {
-                            value_type: ValueType::Enum { valid_values: &[0, 1, 2, 3, 4] },
+                            value_type: ValueType::Enum { bits: 8, valid_values: &[0, 1, 2, 3, 4] },
                             bounds: ValueBounds::None,
                             nullable: false,
                         },

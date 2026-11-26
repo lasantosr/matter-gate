@@ -10,14 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1090,95 +1084,24 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::TargetLeve
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::DefaultOpenLevel, DefaultOpenLevel);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ValveFault, ValveFault);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::LevelStep, LevelStep);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ValveConfigurationAndControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::OpenDuration(_) => attributes::OpenDuration::NAME,
-            Self::DefaultOpenDuration(_) => attributes::DefaultOpenDuration::NAME,
-            Self::AutoCloseTime(_) => attributes::AutoCloseTime::NAME,
-            Self::RemainingDuration(_) => attributes::RemainingDuration::NAME,
-            Self::CurrentState(_) => attributes::CurrentState::NAME,
-            Self::TargetState(_) => attributes::TargetState::NAME,
-            Self::CurrentLevel(_) => attributes::CurrentLevel::NAME,
-            Self::TargetLevel(_) => attributes::TargetLevel::NAME,
-            Self::DefaultOpenLevel(_) => attributes::DefaultOpenLevel::NAME,
-            Self::ValveFault(_) => attributes::ValveFault::NAME,
-            Self::LevelStep(_) => attributes::LevelStep::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ValveConfigurationAndControlCluster::NAME,
-        ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ValveConfigurationAndControlCluster::NAME,
-            cluster_id: ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::OpenDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultOpenDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::AutoCloseTime(inner) => Serialize::serialize(inner, serializer),
-            Self::RemainingDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentState(inner) => Serialize::serialize(inner, serializer),
-            Self::TargetState(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::TargetLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultOpenLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::ValveFault(inner) => Serialize::serialize(inner, serializer),
-            Self::LevelStep(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ValveConfigurationAndControlCluster::NAME,
-                ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ValveConfigurationAndControlCluster,
+    [
+        OpenDuration,
+        DefaultOpenDuration,
+        AutoCloseTime,
+        RemainingDuration,
+        CurrentState,
+        TargetState,
+        CurrentLevel,
+        TargetLevel,
+        DefaultOpenLevel,
+        ValveFault,
+        LevelStep,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ValveConfigurationAndControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1283,108 +1206,13 @@ impl TryFrom<model::Command> for Command {
 
 crate::impl_cluster_member_variant!(command, Command, commands::Open, Open);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::Close, Close);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ValveConfigurationAndControlCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Open(_) => commands::Open::NAME,
-            Self::Close => commands::Close::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ValveConfigurationAndControlCluster::NAME,
-        ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ValveConfigurationAndControlCluster::NAME,
-            cluster_id: ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Close => Serialize::serialize(&(), serializer),
-            Self::Open(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ValveConfigurationAndControlCluster::NAME,
-                ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ValveConfigurationAndControlCluster::NAME,
-                ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ValveConfigurationAndControlCluster,
+    empty = [Close,],
+    payload = [Open,]
+);
 /// Dynamic event variant matching for [`ValveConfigurationAndControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1504,92 +1332,13 @@ impl TryFrom<model::Event> for Event {
 
 crate::impl_cluster_member_variant!(event, Event, events::ValveStateChanged, ValveStateChanged);
 crate::impl_cluster_member_variant!(event, Event, events::ValveFault, ValveFault);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ValveConfigurationAndControlCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::ValveStateChanged(_) => events::ValveStateChanged::NAME,
-            Self::ValveFault(_) => events::ValveFault::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ValveConfigurationAndControlCluster::NAME,
-        ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ValveConfigurationAndControlCluster::NAME,
-            cluster_id: ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ValveStateChanged(inner) => Serialize::serialize(inner, serializer),
-            Self::ValveFault(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                ValveConfigurationAndControlCluster::NAME,
-                ValveConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    ValveConfigurationAndControlCluster,
+    empty = [],
+    payload = [ValveStateChanged, ValveFault,]
+);
 
 crate::define_matter_bitmap! {
     /// ValveFaultBitmap bitmap.
@@ -1637,8 +1386,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1707,14 +1454,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1728,33 +1467,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OpenDuration,
-        Nullable<types::ElapsedS>,
+        types::ElapsedS,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::ElapsedS> for OpenDuration {
-        #[inline]
-        fn from(val: types::ElapsedS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::ElapsedS>> for OpenDuration {
-        #[inline]
-        fn from(val: Option<types::ElapsedS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OpenDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1808,14 +1528,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1826,33 +1538,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DefaultOpenDuration,
-        Nullable<types::ElapsedS>,
+        types::ElapsedS,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::ElapsedS> for DefaultOpenDuration {
-        #[inline]
-        fn from(val: types::ElapsedS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::ElapsedS>> for DefaultOpenDuration {
-        #[inline]
-        fn from(val: Option<types::ElapsedS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DefaultOpenDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1906,14 +1599,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1924,33 +1609,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         AutoCloseTime,
-        Nullable<types::EpochUs>,
+        types::EpochUs,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochUs> for AutoCloseTime {
-        #[inline]
-        fn from(val: types::EpochUs) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochUs>> for AutoCloseTime {
-        #[inline]
-        fn from(val: Option<types::EpochUs>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for AutoCloseTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2004,14 +1670,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2022,33 +1680,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         RemainingDuration,
-        Nullable<types::ElapsedS>,
+        types::ElapsedS,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::ElapsedS> for RemainingDuration {
-        #[inline]
-        fn from(val: types::ElapsedS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::ElapsedS>> for RemainingDuration {
-        #[inline]
-        fn from(val: Option<types::ElapsedS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for RemainingDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2099,14 +1738,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2117,33 +1748,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentState,
-        Nullable<super::ValveStateEnum>,
+        super::ValveStateEnum,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::ValveStateEnum> for CurrentState {
-        #[inline]
-        fn from(val: super::ValveStateEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ValveStateEnum>> for CurrentState {
-        #[inline]
-        fn from(val: Option<super::ValveStateEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2194,14 +1806,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2212,33 +1816,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TargetState,
-        Nullable<super::ValveStateEnum>,
+        super::ValveStateEnum,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::ValveStateEnum> for TargetState {
-        #[inline]
-        fn from(val: super::ValveStateEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ValveStateEnum>> for TargetState {
-        #[inline]
-        fn from(val: Option<super::ValveStateEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TargetState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2292,14 +1877,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2313,33 +1890,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentLevel,
-        Nullable<types::Percent>,
+        types::Percent,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent> for CurrentLevel {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for CurrentLevel {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2393,14 +1951,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2414,33 +1964,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TargetLevel,
-        Nullable<types::Percent>,
+        types::Percent,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent> for TargetLevel {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for TargetLevel {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TargetLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2459,11 +1990,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::Percent>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2485,14 +2011,10 @@ pub mod attributes {
         DefaultOpenLevel,
         types::Percent,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for DefaultOpenLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2519,11 +2041,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2537,14 +2054,10 @@ pub mod attributes {
         ValveFault,
         super::ValveFaultBitmap,
         super::ValveConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ValveFault {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2571,16 +2084,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2591,13 +2099,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LevelStep, u8, super::ValveConfigurationAndControlCluster, copy);
-
-    impl fmt::Display for LevelStep {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LevelStep,
+        u8,
+        super::ValveConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -2641,17 +2150,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub target_level: Optional<types::Percent>,
-    }
-
-    impl crate::traits::CommandSpec for Open {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ValveConfigurationAndControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl Open {
@@ -2702,11 +2200,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2718,21 +2211,21 @@ pub mod commands {
                         if open_duration.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <types::ElapsedS>::try_from)?;
                             (!matches!(&decoded, Nullable::NonNull(v) if v.raw() < 1_u32))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             open_duration = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if target_level.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::Percent>::try_from(fval)?;
                             (1_u8..=100_u8)
                                 .contains(&decoded.raw())
@@ -2740,8 +2233,8 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             target_level = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2751,22 +2244,9 @@ pub mod commands {
                 target_level: Optional::from(target_level),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(Open, super::ValveConfigurationAndControlCluster, false);
+    crate::impl_matter_command!(Open, super::ValveConfigurationAndControlCluster, (), false);
 
     /// This command is used to set the valve to its closed position.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2774,62 +2254,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Close;
 
-    impl crate::traits::CommandSpec for Close {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ValveConfigurationAndControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Close {
         pub const CLUSTER_ID: ClusterId = super::ValveConfigurationAndControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Close";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Close, super::ValveConfigurationAndControlCluster, true);
+    crate::impl_matter_command!(Close, super::ValveConfigurationAndControlCluster, (), true);
 }
 
 pub mod events {
@@ -2898,11 +2330,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2914,26 +2341,26 @@ pub mod events {
                         if valve_state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ValveStateEnum>::try_from(fval)?;
                             valve_state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if valve_level.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::Percent>::try_from(fval)?;
                             (decoded.raw() <= 100_u8)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             valve_level = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2942,19 +2369,6 @@ pub mod events {
                 valve_state: valve_state.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 valve_level: Optional::from(valve_level),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3000,11 +2414,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_VALVE_FAULT, AttributeValue::from(self.valve_fault)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3027,19 +2436,6 @@ pub mod events {
             Ok(Self {
                 valve_fault: valve_fault.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
     v1_6::clusters::{
         binding::BindingCluster, color_control::ColorControlCluster, descriptor::DescriptorCluster,
         identify::IdentifyCluster, level_control::LevelControlCluster, on_off::OnOffCluster,
@@ -166,29 +166,4 @@ impl<'a> ColorDimmerSwitchView<'a> {
     }
 }
 
-impl DeviceTypeSpec for ColorDimmerSwitch {
-    type View<'a> = ColorDimmerSwitchView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = false;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(ColorDimmerSwitchView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, ColorDimmerSwitch, false);
+crate::impl_device_type_spec!(ColorDimmerSwitch, ColorDimmerSwitchView, false);

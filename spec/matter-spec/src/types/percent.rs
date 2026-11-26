@@ -79,8 +79,13 @@ mod tests {
         let p = Percent::from_raw(75);
         let av = AttributeValue::from(p);
         assert_eq!(Percent::try_from(&av), Ok(p));
+        assert_eq!(Percent::try_from(&AttributeValue::U16(75)), Ok(p));
         assert_eq!(
-            Percent::try_from(&AttributeValue::U16(75)),
+            Percent::try_from(&AttributeValue::U16(300)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            Percent::try_from(&AttributeValue::I8(75)),
             Err(MatterStatus::InvalidDataType)
         );
     }

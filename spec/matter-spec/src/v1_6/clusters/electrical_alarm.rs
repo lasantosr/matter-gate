@@ -12,14 +12,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1301,98 +1295,27 @@ crate::impl_cluster_member_variant!(
     attributes::PowerExportThreshold,
     PowerExportThreshold
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Mask(_) => attributes::Mask::NAME,
-            Self::Latch(_) => attributes::Latch::NAME,
-            Self::State(_) => attributes::State::NAME,
-            Self::Supported(_) => attributes::Supported::NAME,
-            Self::OverVoltageThreshold(_) => attributes::OverVoltageThreshold::NAME,
-            Self::UnderVoltageThreshold(_) => attributes::UnderVoltageThreshold::NAME,
-            Self::OverFrequencyThreshold(_) => attributes::OverFrequencyThreshold::NAME,
-            Self::UnderFrequencyThreshold(_) => attributes::UnderFrequencyThreshold::NAME,
-            Self::OverPowerThreshold(_) => attributes::OverPowerThreshold::NAME,
-            Self::UnderPowerThreshold(_) => attributes::UnderPowerThreshold::NAME,
-            Self::OverCurrentThreshold(_) => attributes::OverCurrentThreshold::NAME,
-            Self::UnderCurrentThreshold(_) => attributes::UnderCurrentThreshold::NAME,
-            Self::PowerImportThreshold(_) => attributes::PowerImportThreshold::NAME,
-            Self::PowerExportThreshold(_) => attributes::PowerExportThreshold::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ElectricalAlarmCluster::NAME,
-        ElectricalAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ElectricalAlarmCluster::NAME,
-            cluster_id: ElectricalAlarmCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Mask(inner) => Serialize::serialize(inner, serializer),
-            Self::Latch(inner) => Serialize::serialize(inner, serializer),
-            Self::State(inner) => Serialize::serialize(inner, serializer),
-            Self::Supported(inner) => Serialize::serialize(inner, serializer),
-            Self::OverVoltageThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::UnderVoltageThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::OverFrequencyThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::UnderFrequencyThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::OverPowerThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::UnderPowerThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::OverCurrentThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::UnderCurrentThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::PowerImportThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::PowerExportThreshold(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((ElectricalAlarmCluster::NAME, ElectricalAlarmCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ElectricalAlarmCluster,
+    [
+        Mask,
+        Latch,
+        State,
+        Supported,
+        OverVoltageThreshold,
+        UnderVoltageThreshold,
+        OverFrequencyThreshold,
+        UnderFrequencyThreshold,
+        OverPowerThreshold,
+        UnderPowerThreshold,
+        OverCurrentThreshold,
+        UnderCurrentThreshold,
+        PowerImportThreshold,
+        PowerExportThreshold,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ElectricalAlarmCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1531,104 +1454,13 @@ crate::impl_cluster_member_variant!(
     commands::SetElectricalAlarmThresholds,
     SetElectricalAlarmThresholds
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Reset(_) => commands::Reset::NAME,
-            Self::ModifyEnabledAlarms(_) => commands::ModifyEnabledAlarms::NAME,
-            Self::SetElectricalAlarmThresholds(_) => commands::SetElectricalAlarmThresholds::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ElectricalAlarmCluster::NAME,
-        ElectricalAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ElectricalAlarmCluster::NAME,
-            cluster_id: ElectricalAlarmCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Reset(inner) => Serialize::serialize(inner, serializer),
-            Self::ModifyEnabledAlarms(inner) => Serialize::serialize(inner, serializer),
-            Self::SetElectricalAlarmThresholds(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ElectricalAlarmCluster::NAME, ElectricalAlarmCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((ElectricalAlarmCluster::NAME, ElectricalAlarmCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ElectricalAlarmCluster,
+    empty = [],
+    payload = [Reset, ModifyEnabledAlarms, SetElectricalAlarmThresholds,]
+);
 /// Dynamic event variant matching for [`ElectricalAlarmCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1718,104 +1550,8 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::Notify> for Event {
-    #[inline]
-    fn from(ev: events::Notify) -> Self {
-        Self::Notify(ev)
-    }
-}
-
-impl TryFrom<Event> for events::Notify {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::Notify(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::Notify(_) => events::Notify::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ElectricalAlarmCluster::NAME,
-        ElectricalAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ElectricalAlarmCluster::NAME,
-            cluster_id: ElectricalAlarmCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Notify(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((ElectricalAlarmCluster::NAME, ElectricalAlarmCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(event_single, Event, events::Notify, Notify);
+crate::impl_cluster_enum_dispatch!(event, Event, ElectricalAlarmCluster, empty = [], payload = [Notify,]);
 
 crate::define_matter_bitmap! {
     /// AlarmBitmap bitmap.
@@ -1859,8 +1595,6 @@ crate::define_matter_bitmap! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1902,11 +1636,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1916,13 +1645,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Mask, super::AlarmBitmap, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for Mask {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Mask,
+        super::AlarmBitmap,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1949,11 +1679,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1963,13 +1688,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Latch, super::AlarmBitmap, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for Latch {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Latch,
+        super::AlarmBitmap,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1996,11 +1722,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2010,13 +1731,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(State, super::AlarmBitmap, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for State {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        State,
+        super::AlarmBitmap,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2043,11 +1765,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2057,13 +1774,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Supported, super::AlarmBitmap, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for Supported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Supported,
+        super::AlarmBitmap,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2082,11 +1800,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::VoltageMv>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2108,14 +1821,10 @@ pub mod attributes {
         OverVoltageThreshold,
         types::VoltageMv,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OverVoltageThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2134,11 +1843,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::VoltageMv>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2160,14 +1864,10 @@ pub mod attributes {
         UnderVoltageThreshold,
         types::VoltageMv,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UnderVoltageThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2194,16 +1894,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             if raw < -0x7FFF_FFFF_FFFF_FFFF_i64 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2211,13 +1906,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OverFrequencyThreshold, i64, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for OverFrequencyThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        OverFrequencyThreshold,
+        i64,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2244,16 +1940,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             if raw > 0x7FFF_FFFF_FFFF_FFFE_i64 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2261,13 +1952,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UnderFrequencyThreshold, i64, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for UnderFrequencyThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        UnderFrequencyThreshold,
+        i64,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2288,11 +1980,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2308,13 +1995,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OverPowerThreshold, types::PowerMw, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for OverPowerThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        OverPowerThreshold,
+        types::PowerMw,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2335,11 +2023,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2355,13 +2038,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UnderPowerThreshold, types::PowerMw, super::ElectricalAlarmCluster, copy);
-
-    impl fmt::Display for UnderPowerThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        UnderPowerThreshold,
+        types::PowerMw,
+        super::ElectricalAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2380,11 +2064,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::AmperageMa>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2406,14 +2085,10 @@ pub mod attributes {
         OverCurrentThreshold,
         types::AmperageMa,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OverCurrentThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2432,11 +2107,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::AmperageMa>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2458,14 +2128,10 @@ pub mod attributes {
         UnderCurrentThreshold,
         types::AmperageMa,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UnderCurrentThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2484,11 +2150,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::PowerMw>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2510,14 +2171,10 @@ pub mod attributes {
         PowerImportThreshold,
         types::PowerMw,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PowerImportThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2536,11 +2193,6 @@ pub mod attributes {
         #[must_use]
         pub fn new(val: impl Into<types::PowerMw>) -> Self {
             Self(val.into())
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
         }
 
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
@@ -2562,14 +2214,10 @@ pub mod attributes {
         PowerExportThreshold,
         types::PowerMw,
         super::ElectricalAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PowerExportThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -2603,17 +2251,6 @@ pub mod commands {
         pub alarms: super::AlarmBitmap,
     }
 
-    impl crate::traits::CommandSpec for Reset {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ElectricalAlarmCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl Reset {
         pub const CLUSTER_ID: ClusterId = super::ElectricalAlarmCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -2629,11 +2266,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ALARMS, AttributeValue::from(self.alarms)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2659,19 +2291,6 @@ pub mod commands {
                 alarms: alarms.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::AlarmBitmap> for Reset {
@@ -2681,7 +2300,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(Reset, super::ElectricalAlarmCluster, false);
+    crate::impl_matter_command!(Reset, super::ElectricalAlarmCluster, (), false);
 
     /// This command allows a client to request that an alarm be enabled or suppressed at the server.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2694,17 +2313,6 @@ pub mod commands {
     )]
     pub struct ModifyEnabledAlarms {
         pub mask: super::AlarmBitmap,
-    }
-
-    impl crate::traits::CommandSpec for ModifyEnabledAlarms {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ElectricalAlarmCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ModifyEnabledAlarms {
@@ -2722,11 +2330,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_MASK, AttributeValue::from(self.mask)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2752,19 +2355,6 @@ pub mod commands {
                 mask: mask.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::AlarmBitmap> for ModifyEnabledAlarms {
@@ -2774,7 +2364,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(ModifyEnabledAlarms, super::ElectricalAlarmCluster, false);
+    crate::impl_matter_command!(ModifyEnabledAlarms, super::ElectricalAlarmCluster, (), false);
 
     /// This command will set the alarm thresholds for the specified values.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2816,17 +2406,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub power_export_threshold: Optional<types::PowerMw>,
-    }
-
-    impl crate::traits::CommandSpec for SetElectricalAlarmThresholds {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ElectricalAlarmCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetElectricalAlarmThresholds {
@@ -2958,11 +2537,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2982,7 +2556,7 @@ pub mod commands {
                         if over_voltage_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::VoltageMv>::try_from(fval)?;
                             (-0x3FFF_FFFF_FFFF_FFFF_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                                 .contains(&decoded.raw())
@@ -2990,14 +2564,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             over_voltage_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if under_voltage_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::VoltageMv>::try_from(fval)?;
                             (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFE_i64)
                                 .contains(&decoded.raw())
@@ -3005,42 +2579,42 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             under_voltage_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if over_frequency_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                             (decoded >= -0x7FFF_FFFF_FFFF_FFFF_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             over_frequency_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if under_frequency_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                             (decoded <= 0x7FFF_FFFF_FFFF_FFFE_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             under_frequency_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if over_power_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::PowerMw>::try_from(fval)?;
                             (-0x3FFF_FFFF_FFFF_FFFF_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                                 .contains(&decoded.raw())
@@ -3048,14 +2622,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             over_power_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if under_power_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::PowerMw>::try_from(fval)?;
                             (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFE_i64)
                                 .contains(&decoded.raw())
@@ -3063,14 +2637,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             under_power_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if over_current_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (-0x3FFF_FFFF_FFFF_FFFF_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                                 .contains(&decoded.raw())
@@ -3078,14 +2652,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             over_current_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     7 => {
                         if under_current_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFE_i64)
                                 .contains(&decoded.raw())
@@ -3093,14 +2667,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             under_current_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     8 => {
                         if power_import_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::PowerMw>::try_from(fval)?;
                             (0_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                                 .contains(&decoded.raw())
@@ -3108,14 +2682,14 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             power_import_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     9 => {
                         if power_export_threshold.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::PowerMw>::try_from(fval)?;
                             (-0x4000_0000_0000_0000_i64..=0_i64)
                                 .contains(&decoded.raw())
@@ -3123,8 +2697,8 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             power_export_threshold = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3142,22 +2716,9 @@ pub mod commands {
                 power_export_threshold: Optional::from(power_export_threshold),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetElectricalAlarmThresholds, super::ElectricalAlarmCluster, false);
+    crate::impl_matter_command!(SetElectricalAlarmThresholds, super::ElectricalAlarmCluster, (), false);
 }
 
 pub mod events {
@@ -3229,11 +2790,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3247,45 +2803,45 @@ pub mod events {
                         if active.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             active = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if inactive.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             inactive = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if mask.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             mask = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3296,19 +2852,6 @@ pub mod events {
                 state: state.ok_or((Some(FieldId::new(2)), MatterStatus::ConstraintError))?,
                 mask: mask.ok_or((Some(FieldId::new(3)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

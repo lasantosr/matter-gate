@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -484,79 +480,12 @@ crate::impl_cluster_member_variant!(
     attributes::ThreadNetworkTableSize,
     ThreadNetworkTableSize
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThreadNetworkDirectoryCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::PreferredExtendedPanId(_) => attributes::PreferredExtendedPanId::NAME,
-            Self::ThreadNetworks(_) => attributes::ThreadNetworks::NAME,
-            Self::ThreadNetworkTableSize(_) => attributes::ThreadNetworkTableSize::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ThreadNetworkDirectoryCluster::NAME,
-        ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ThreadNetworkDirectoryCluster::NAME,
-            cluster_id: ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::PreferredExtendedPanId(inner) => Serialize::serialize(inner, serializer),
-            Self::ThreadNetworks(inner) => Serialize::serialize(inner, serializer),
-            Self::ThreadNetworkTableSize(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ThreadNetworkDirectoryCluster::NAME,
-                ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ThreadNetworkDirectoryCluster,
+    [PreferredExtendedPanId, ThreadNetworks, ThreadNetworkTableSize,]
+);
 /// Dynamic client-to-server command variant matching for [`ThreadNetworkDirectoryCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -686,110 +615,13 @@ impl TryFrom<model::Command> for Command {
 crate::impl_cluster_member_variant!(command, Command, commands::AddNetwork, AddNetwork);
 crate::impl_cluster_member_variant!(command, Command, commands::RemoveNetwork, RemoveNetwork);
 crate::impl_cluster_member_variant!(command, Command, commands::GetOperationalDataset, GetOperationalDataset);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThreadNetworkDirectoryCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AddNetwork(_) => commands::AddNetwork::NAME,
-            Self::RemoveNetwork(_) => commands::RemoveNetwork::NAME,
-            Self::GetOperationalDataset(_) => commands::GetOperationalDataset::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ThreadNetworkDirectoryCluster::NAME,
-        ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ThreadNetworkDirectoryCluster::NAME,
-            cluster_id: ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AddNetwork(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveNetwork(inner) => Serialize::serialize(inner, serializer),
-            Self::GetOperationalDataset(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ThreadNetworkDirectoryCluster::NAME,
-                ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ThreadNetworkDirectoryCluster::NAME,
-                ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ThreadNetworkDirectoryCluster,
+    empty = [],
+    payload = [AddNetwork, RemoveNetwork, GetOperationalDataset,]
+);
 /// Dynamic server-to-client command response variant matching for [`ThreadNetworkDirectoryCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -883,107 +715,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::OperationalDatasetResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::OperationalDatasetResponse) -> Self {
-        Self::OperationalDatasetResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::OperationalDatasetResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::OperationalDatasetResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThreadNetworkDirectoryCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::OperationalDatasetResponse(_) => commands::OperationalDatasetResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ThreadNetworkDirectoryCluster::NAME,
-        ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ThreadNetworkDirectoryCluster::NAME,
-            cluster_id: ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::OperationalDatasetResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ThreadNetworkDirectoryCluster::NAME,
-                ThreadNetworkDirectoryCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::OperationalDatasetResponse,
+    OperationalDatasetResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    ThreadNetworkDirectoryCluster,
+    empty = [],
+    payload = [OperationalDatasetResponse,]
+);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1035,51 +779,51 @@ impl ThreadNetworkStruct {
                     if extended_pan_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         extended_pan_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if network_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         network_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if channel.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         channel = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if active_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         active_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1105,30 +849,11 @@ impl ThreadNetworkStruct {
     }
 }
 
-impl From<ThreadNetworkStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ThreadNetworkStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ThreadNetworkStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ThreadNetworkStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1196,14 +921,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1217,33 +934,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PreferredExtendedPanId,
-        Nullable<crate::Bytes>,
+        crate::Bytes,
         super::ThreadNetworkDirectoryCluster,
-        owned
+        owned,
+        scalar,
+        bytes
     );
-    impl From<crate::Bytes> for PreferredExtendedPanId {
-        #[inline]
-        fn from(val: crate::Bytes) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<crate::Bytes>> for PreferredExtendedPanId {
-        #[inline]
-        fn from(val: Option<crate::Bytes>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PreferredExtendedPanId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1270,12 +968,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1295,14 +987,10 @@ pub mod attributes {
         ThreadNetworks,
         Vec<super::ThreadNetworkStruct>,
         super::ThreadNetworkDirectoryCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ThreadNetworks {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1329,27 +1017,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(ThreadNetworkTableSize, u8, super::ThreadNetworkDirectoryCluster, copy);
-
-    impl fmt::Display for ThreadNetworkTableSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ThreadNetworkTableSize,
+        u8,
+        super::ThreadNetworkDirectoryCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -1384,17 +1068,6 @@ pub mod commands {
         pub operational_dataset: crate::Bytes,
     }
 
-    impl crate::traits::CommandSpec for AddNetwork {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThreadNetworkDirectoryCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl AddNetwork {
         pub const CLUSTER_ID: ClusterId = super::ThreadNetworkDirectoryCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1415,11 +1088,6 @@ pub mod commands {
                 Self::FIELD_OPERATIONAL_DATASET,
                 AttributeValue::from(self.operational_dataset)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1449,19 +1117,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for AddNetwork {
@@ -1471,7 +1126,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(AddNetwork, super::ThreadNetworkDirectoryCluster, false);
+    crate::impl_matter_command!(AddNetwork, super::ThreadNetworkDirectoryCluster, (), false);
 
     /// Removes the network with the given Extended PAN ID from the ThreadNetworks attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1485,17 +1140,6 @@ pub mod commands {
     pub struct RemoveNetwork {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub extended_pan_id: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for RemoveNetwork {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThreadNetworkDirectoryCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveNetwork {
@@ -1517,11 +1161,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_EXTENDED_PAN_ID, AttributeValue::from(self.extended_pan_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1548,19 +1187,6 @@ pub mod commands {
                 extended_pan_id: extended_pan_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for RemoveNetwork {
@@ -1570,7 +1196,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveNetwork, super::ThreadNetworkDirectoryCluster, false);
+    crate::impl_matter_command!(RemoveNetwork, super::ThreadNetworkDirectoryCluster, (), false);
 
     /// Retrieves the Thread Operational Dataset with the given Extended PAN ID.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1584,17 +1210,6 @@ pub mod commands {
     pub struct GetOperationalDataset {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub extended_pan_id: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for GetOperationalDataset {
-        type Response = OperationalDatasetResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThreadNetworkDirectoryCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetOperationalDataset {
@@ -1616,11 +1231,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_EXTENDED_PAN_ID, AttributeValue::from(self.extended_pan_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1647,19 +1257,6 @@ pub mod commands {
                 extended_pan_id: extended_pan_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for GetOperationalDataset {
@@ -1669,7 +1266,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GetOperationalDataset, super::ThreadNetworkDirectoryCluster, false);
+    crate::impl_matter_command!(
+        GetOperationalDataset,
+        super::ThreadNetworkDirectoryCluster,
+        OperationalDatasetResponse,
+        false
+    );
 
     /// Contains the Thread Operational Dataset for the Extended PAN specified in GetOperationalDataset.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1683,17 +1285,6 @@ pub mod commands {
     pub struct OperationalDatasetResponse {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub operational_dataset: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for OperationalDatasetResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThreadNetworkDirectoryCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl OperationalDatasetResponse {
@@ -1718,11 +1309,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1750,19 +1336,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for OperationalDatasetResponse {
@@ -1772,5 +1345,10 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(OperationalDatasetResponse, super::ThreadNetworkDirectoryCluster, false);
+    crate::impl_matter_command!(
+        OperationalDatasetResponse,
+        super::ThreadNetworkDirectoryCluster,
+        (),
+        false
+    );
 }

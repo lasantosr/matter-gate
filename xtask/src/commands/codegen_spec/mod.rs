@@ -212,7 +212,9 @@ fn prune_stale_version_dirs(src_dir: &Path, active_modules: &BTreeSet<String>) -
         let path = entry.path();
         if path.is_dir()
             && let Some(name) = path.file_name().and_then(|os| os.to_str())
-            && name.starts_with('v')
+            && name
+                .strip_prefix('v')
+                .is_some_and(|rest| rest.starts_with(|c: char| c.is_ascii_digit()))
             && !active_modules.contains(name)
         {
             fs::remove_dir_all(&path)
@@ -675,10 +677,12 @@ mod tests {
         let keep_dir = temp_dir.join("v1_4");
         let stale_dir = temp_dir.join("v9_9");
         let other_dir = temp_dir.join("traits");
+        let validate_dir = temp_dir.join("validate");
 
         fs::create_dir_all(&keep_dir)?;
         fs::create_dir_all(&stale_dir)?;
         fs::create_dir_all(&other_dir)?;
+        fs::create_dir_all(&validate_dir)?;
 
         let mut active = BTreeSet::new();
         active.insert("v1_4".to_owned());
@@ -688,6 +692,7 @@ mod tests {
         assert!(keep_dir.exists());
         assert!(!stale_dir.exists());
         assert!(other_dir.exists());
+        assert!(validate_dir.exists());
 
         fs::remove_dir_all(&temp_dir)?;
         Ok(())

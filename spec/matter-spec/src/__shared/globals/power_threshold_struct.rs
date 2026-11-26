@@ -71,7 +71,7 @@ impl PowerThresholdStruct {
                     if power_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::PowerMw>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -79,14 +79,14 @@ impl PowerThresholdStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         power_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if apparent_power_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::PowerMva>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -94,19 +94,19 @@ impl PowerThresholdStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         apparent_power_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if power_threshold_source.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <PowerThresholdSourceEnum>::try_from)?;
                         power_threshold_source = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -160,21 +160,4 @@ impl From<Option<PowerThresholdSourceEnum>> for PowerThresholdStruct {
     }
 }
 
-impl From<PowerThresholdStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PowerThresholdStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PowerThresholdStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PowerThresholdStruct);

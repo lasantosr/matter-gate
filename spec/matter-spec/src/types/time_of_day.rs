@@ -2,12 +2,15 @@
 
 use core::fmt;
 
-#[cfg(feature = "chrono")]
-use chrono::{NaiveTime, Timelike as _};
+#[cfg(feature = "jiff")]
+use jiff::civil::Time as JiffTime;
 #[cfg(feature = "time")]
 use time::Time as TimeLibTime;
 
-use crate::model::{AttributeValue, MatterStatus};
+use crate::{
+    model::{AttributeValue, MatterStatus},
+    traits::decode_unsigned,
+};
 
 /// Matter Time of Day (`tod`) encoded as a packed `u32` wall-clock bitfield.
 ///
@@ -118,32 +121,28 @@ impl TimeOfDay {
         if hs <= 99 { Some(hs) } else { None }
     }
 
-    /// Convert to a [`chrono::NaiveTime`] if all four components (`hours`, `minutes`, `seconds`, `hundredths`) are
+    /// Convert to a [`jiff::civil::Time`] if all four components (`hours`, `minutes`, `seconds`, `hundredths`) are
     /// specified.
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn to_chrono_naive_time(self) -> Option<NaiveTime> {
-        let h = u32::from(self.hours()?);
-        let m = u32::from(self.minutes()?);
-        let s = u32::from(self.seconds()?);
-        let hs = u32::from(self.hundredths()?);
-        NaiveTime::from_hms_milli_opt(h, m, s, hs.saturating_mul(10))
+    pub fn to_jiff_time(self) -> Option<JiffTime> {
+        let h = i8::try_from(self.hours()?).ok()?;
+        let m = i8::try_from(self.minutes()?).ok()?;
+        let s = i8::try_from(self.seconds()?).ok()?;
+        let ns = i32::from(self.hundredths()?).saturating_mul(10_000_000);
+        JiffTime::new(h, m, s, ns).ok()
     }
 
-    /// Construct from a [`chrono::NaiveTime`], truncating sub-hundredth-second nanoseconds.
-    #[cfg(feature = "chrono")]
+    /// Construct from a [`jiff::civil::Time`], truncating sub-hundredth-second nanoseconds.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    #[expect(
-        clippy::as_conversions,
-        reason = "values are clamped to 0..=23, 0..=59, and 0..=99 before u8 cast"
-    )]
-    pub fn from_chrono_naive_time(time: NaiveTime) -> Self {
-        let h = time.hour().min(23) as u8;
-        let m = time.minute().min(59) as u8;
-        let s = time.second().min(59) as u8;
-        let hs = time.nanosecond().wrapping_div(10_000_000).min(99) as u8;
+    pub fn from_jiff_time(time: JiffTime) -> Self {
+        let h = u8::try_from(time.hour()).unwrap_or(0).min(23);
+        let m = u8::try_from(time.minute()).unwrap_or(0).min(59);
+        let s = u8::try_from(time.second()).unwrap_or(0).min(59);
+        let hs = u8::try_from(time.subsec_nanosecond().max(0).wrapping_div(10_000_000).min(99)).unwrap_or(99);
         Self(u32::from_be_bytes([h, m, s, hs]))
     }
 
@@ -163,10 +162,9 @@ impl TimeOfDay {
     #[cfg(feature = "time")]
     #[inline]
     #[must_use]
-    #[expect(clippy::as_conversions, reason = "ms / 10 is clamped to 0..=99 before u8 cast")]
     pub fn from_time_time(time: TimeLibTime) -> Self {
         let (h, m, s, ms) = time.as_hms_milli();
-        let hs = ms.wrapping_div(10).min(99) as u8;
+        let hs = u8::try_from(ms.wrapping_div(10).min(99)).unwrap_or(99);
         Self(u32::from_be_bytes([h, m, s, hs]))
     }
 }
@@ -198,28 +196,25 @@ impl TryFrom<&AttributeValue> for TimeOfDay {
 
     #[inline]
     fn try_from(val: &AttributeValue) -> Result<Self, Self::Error> {
-        match val {
-            AttributeValue::U32(v) => Ok(Self(*v)),
-            _ => Err(MatterStatus::InvalidDataType),
-        }
+        decode_unsigned::<u32>(val).map(Self)
     }
 }
 
-#[cfg(feature = "chrono")]
-impl TryFrom<TimeOfDay> for NaiveTime {
+#[cfg(feature = "jiff")]
+impl TryFrom<TimeOfDay> for JiffTime {
     type Error = MatterStatus;
 
     #[inline]
     fn try_from(val: TimeOfDay) -> Result<Self, Self::Error> {
-        val.to_chrono_naive_time().ok_or(MatterStatus::ConstraintError)
+        val.to_jiff_time().ok_or(MatterStatus::ConstraintError)
     }
 }
 
-#[cfg(feature = "chrono")]
-impl From<NaiveTime> for TimeOfDay {
+#[cfg(feature = "jiff")]
+impl From<JiffTime> for TimeOfDay {
     #[inline]
-    fn from(time: NaiveTime) -> Self {
-        Self::from_chrono_naive_time(time)
+    fn from(time: JiffTime) -> Self {
+        Self::from_jiff_time(time)
     }
 }
 
@@ -256,8 +251,21 @@ mod tests {
         let av = AttributeValue::from(t);
         assert_eq!(TimeOfDay::try_from(&av), Ok(t));
         assert_eq!(TimeOfDay::try_from(av), Ok(t));
+        assert_eq!(TimeOfDay::try_from(&AttributeValue::U8(0)), Ok(TimeOfDay::from_raw(0)));
         assert_eq!(
-            TimeOfDay::try_from(&AttributeValue::U16(0)),
+            TimeOfDay::try_from(&AttributeValue::U16(42)),
+            Ok(TimeOfDay::from_raw(42))
+        );
+        assert_eq!(
+            TimeOfDay::try_from(&AttributeValue::U64(42)),
+            Ok(TimeOfDay::from_raw(42))
+        );
+        assert_eq!(
+            TimeOfDay::try_from(&AttributeValue::U64(u64::MAX)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            TimeOfDay::try_from(&AttributeValue::I32(0)),
             Err(MatterStatus::InvalidDataType)
         );
     }
@@ -292,16 +300,16 @@ mod tests {
         assert_eq!(invalid_raw.hundredths(), None);
     }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[test]
-    fn time_of_day_chrono_round_trip() {
+    fn time_of_day_jiff_round_trip() {
         let t = TimeOfDay::new(Some(12), Some(30), Some(45), Some(99)).expect("valid time");
-        let nt = NaiveTime::try_from(t).expect("valid NaiveTime");
-        assert_eq!(nt, NaiveTime::from_hms_milli_opt(12, 30, 45, 990).expect("hms"));
-        assert_eq!(TimeOfDay::from(nt), t);
+        let jt = JiffTime::try_from(t).expect("valid jiff::civil::Time");
+        assert_eq!(jt, JiffTime::new(12, 30, 45, 990_000_000).expect("hms"));
+        assert_eq!(TimeOfDay::from(jt), t);
 
         let wildcard = TimeOfDay::new(Some(12), None, Some(0), Some(0)).expect("wildcard");
-        assert_eq!(NaiveTime::try_from(wildcard), Err(MatterStatus::ConstraintError));
+        assert_eq!(JiffTime::try_from(wildcard), Err(MatterStatus::ConstraintError));
     }
 
     #[cfg(feature = "time")]

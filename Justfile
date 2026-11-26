@@ -7,7 +7,7 @@ set windows-powershell
 # Latest Matter specification version targeted by single-spec recipes
 latest := "v1_6"
 # Full capability feature set for single-spec recipes
-feat := "all,registry,dispatch,serde,schemars,chrono,time,uom"
+feat := "all,registry,dispatch,serde,schemars,jiff,time,uom"
 test_feat := "testing," + feat
 
 # Default recipe: display available recipes in source order

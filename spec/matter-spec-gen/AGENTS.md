@@ -18,6 +18,7 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 ## 2. Design & Constraints
 
 - **Flat layout & direction-split commands:** Emit flat cluster structs (with spec-optional fields as `Optional<T>` and `.with_*` builders), sparse patch structs, single-attribute enums, and direction-split `Command` (`ClientToServer`) vs. `CommandResponse` (`ServerToClient`) using non-generic owned decode/encode kernels.
+- **Explicit types, macro-delegated boilerplate:** Emit primary public types (`pub struct`, `pub enum`, `View<'a>`), typed accessors, constructors, and spec constants directly for Ctrl+Click ergonomics and readability. Delegate only repetitive trait/wire `impl` boilerplate to declarative macros when doing so materially reduces generated line count.
 - **Content-addressed `__shared` deduplication:** Hash canonical ASTs, referenced globals, and conformance/access/layout metadata transitively so items shared across 2+ versions are emitted once into `__shared`.
 - **Static `SpecRegistry` & dispatch metadata:** Emit sorted static `SpecRegistry` tables and `> 64B` `TypeLayout` boxing metadata for `dispatch`.
 - **Fixture tests:** Add or update XML fixture tests in `tests/` for every parser, model, or renderer change.

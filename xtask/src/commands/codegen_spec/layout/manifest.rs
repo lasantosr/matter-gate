@@ -81,12 +81,12 @@ pub(in super::super) fn update_spec_cargo_toml(
     insert_feature(&mut features_table, "deny-unknown-fields", deny_unknown_arr, None);
 
     // 2b. Optional Ecosystem Type Conversions
-    let mut chrono_arr = Array::new();
-    chrono_arr.push("dep:chrono");
+    let mut jiff_arr = Array::new();
+    jiff_arr.push("dep:jiff");
     insert_feature(
         &mut features_table,
-        "chrono",
-        chrono_arr,
+        "jiff",
+        jiff_arr,
         Some("\n# Optional Ecosystem Type Conversions\n"),
     );
 

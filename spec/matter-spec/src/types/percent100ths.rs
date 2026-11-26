@@ -100,6 +100,10 @@ mod tests {
         assert_eq!(Percent100ths::try_from(&av), Ok(p));
         assert_eq!(
             Percent100ths::try_from(&AttributeValue::U8(50)),
+            Ok(Percent100ths::from_raw(50))
+        );
+        assert_eq!(
+            Percent100ths::try_from(&AttributeValue::I16(50)),
             Err(MatterStatus::InvalidDataType)
         );
     }

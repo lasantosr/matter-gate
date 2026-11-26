@@ -91,8 +91,7 @@ pub(in super::super) fn generate_version_mod(
         format!("#[cfg(any({}))]", endpoint_conditions.join(", "))
     };
 
-    let doc_markdown_reason =
-        "Upstream CSA Matter XML spec documentation contains raw technical identifiers without code styling";
+    let allow_reason = "Auto-generated CSA Matter specification version modules";
 
     let tokens: Tokens = quote! {
         $header
@@ -108,7 +107,7 @@ pub(in super::super) fn generate_version_mod(
             clippy::too_many_lines,
             clippy::unnecessary_wraps,
             clippy::unreadable_literal,
-            reason = $(quoted(doc_markdown_reason))
+            reason = $(quoted(allow_reason))
         )]
 
         $doc1

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
     v1_3::clusters::{
         descriptor::DescriptorCluster, identify::IdentifyCluster,
         temperature_measurement::TemperatureMeasurementCluster,
@@ -167,29 +167,4 @@ impl<'a> TemperatureSensorView<'a> {
     }
 }
 
-impl DeviceTypeSpec for TemperatureSensor {
-    type View<'a> = TemperatureSensorView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = false;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(TemperatureSensorView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, TemperatureSensor, false);
+crate::impl_device_type_spec!(TemperatureSensor, TemperatureSensorView, false);

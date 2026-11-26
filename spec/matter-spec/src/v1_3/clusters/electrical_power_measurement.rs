@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1738,111 +1736,32 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::HarmonicCu
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::HarmonicPhases, HarmonicPhases);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PowerFactor, PowerFactor);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::NeutralCurrent, NeutralCurrent);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalPowerMeasurementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::PowerMode(_) => attributes::PowerMode::NAME,
-            Self::NumberOfMeasurementTypes(_) => attributes::NumberOfMeasurementTypes::NAME,
-            Self::Accuracy(_) => attributes::Accuracy::NAME,
-            Self::Ranges(_) => attributes::Ranges::NAME,
-            Self::Voltage(_) => attributes::Voltage::NAME,
-            Self::ActiveCurrent(_) => attributes::ActiveCurrent::NAME,
-            Self::ReactiveCurrent(_) => attributes::ReactiveCurrent::NAME,
-            Self::ApparentCurrent(_) => attributes::ApparentCurrent::NAME,
-            Self::ActivePower(_) => attributes::ActivePower::NAME,
-            Self::ReactivePower(_) => attributes::ReactivePower::NAME,
-            Self::ApparentPower(_) => attributes::ApparentPower::NAME,
-            Self::RmsVoltage(_) => attributes::RmsVoltage::NAME,
-            Self::RmsCurrent(_) => attributes::RmsCurrent::NAME,
-            Self::RmsPower(_) => attributes::RmsPower::NAME,
-            Self::Frequency(_) => attributes::Frequency::NAME,
-            Self::HarmonicCurrents(_) => attributes::HarmonicCurrents::NAME,
-            Self::HarmonicPhases(_) => attributes::HarmonicPhases::NAME,
-            Self::PowerFactor(_) => attributes::PowerFactor::NAME,
-            Self::NeutralCurrent(_) => attributes::NeutralCurrent::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ElectricalPowerMeasurementCluster::NAME,
-        ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ElectricalPowerMeasurementCluster::NAME,
-            cluster_id: ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::PowerMode(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfMeasurementTypes(inner) => Serialize::serialize(inner, serializer),
-            Self::Accuracy(inner) => Serialize::serialize(inner, serializer),
-            Self::Ranges(inner) => Serialize::serialize(inner, serializer),
-            Self::Voltage(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::ReactiveCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::ApparentCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::ActivePower(inner) => Serialize::serialize(inner, serializer),
-            Self::ReactivePower(inner) => Serialize::serialize(inner, serializer),
-            Self::ApparentPower(inner) => Serialize::serialize(inner, serializer),
-            Self::RmsVoltage(inner) => Serialize::serialize(inner, serializer),
-            Self::RmsCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::RmsPower(inner) => Serialize::serialize(inner, serializer),
-            Self::Frequency(inner) => Serialize::serialize(inner, serializer),
-            Self::HarmonicCurrents(inner) => Serialize::serialize(inner, serializer),
-            Self::HarmonicPhases(inner) => Serialize::serialize(inner, serializer),
-            Self::PowerFactor(inner) => Serialize::serialize(inner, serializer),
-            Self::NeutralCurrent(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ElectricalPowerMeasurementCluster::NAME,
-                ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ElectricalPowerMeasurementCluster,
+    [
+        PowerMode,
+        NumberOfMeasurementTypes,
+        Accuracy,
+        Ranges,
+        Voltage,
+        ActiveCurrent,
+        ReactiveCurrent,
+        ApparentCurrent,
+        ActivePower,
+        ReactivePower,
+        ApparentPower,
+        RmsVoltage,
+        RmsCurrent,
+        RmsPower,
+        Frequency,
+        HarmonicCurrents,
+        HarmonicPhases,
+        PowerFactor,
+        NeutralCurrent,
+    ]
+);
 /// Dynamic event variant matching for [`ElectricalPowerMeasurementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1937,107 +1856,19 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::MeasurementPeriodRanges> for Event {
-    #[inline]
-    fn from(ev: events::MeasurementPeriodRanges) -> Self {
-        Self::MeasurementPeriodRanges(ev)
-    }
-}
-
-impl TryFrom<Event> for events::MeasurementPeriodRanges {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::MeasurementPeriodRanges(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalPowerMeasurementCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::MeasurementPeriodRanges(_) => events::MeasurementPeriodRanges::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ElectricalPowerMeasurementCluster::NAME,
-        ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ElectricalPowerMeasurementCluster::NAME,
-            cluster_id: ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MeasurementPeriodRanges(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                ElectricalPowerMeasurementCluster::NAME,
-                ElectricalPowerMeasurementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    event_single,
+    Event,
+    events::MeasurementPeriodRanges,
+    MeasurementPeriodRanges
+);
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    ElectricalPowerMeasurementCluster,
+    empty = [],
+    payload = [MeasurementPeriodRanges,]
+);
 
 crate::define_matter_bitmap! {
     /// Feature bitmap.
@@ -2230,130 +2061,130 @@ impl MeasurementRangeStruct {
                     if measurement_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <MeasurementTypeEnum>::try_from(fval)?;
                         measurement_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if min.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         min = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if max.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         max = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if start_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         start_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if end_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         end_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if min_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         min_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if max_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         max_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if start_systime.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::SystimeMs>::try_from(fval)?;
                         start_systime = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if end_systime.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::SystimeMs>::try_from(fval)?;
                         end_systime = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 9 => {
                     if min_systime.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::SystimeMs>::try_from(fval)?;
                         min_systime = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 10 => {
                     if max_systime.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::SystimeMs>::try_from(fval)?;
                         max_systime = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2409,24 +2240,7 @@ impl MeasurementRangeStruct {
     }
 }
 
-impl From<MeasurementRangeStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MeasurementRangeStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MeasurementRangeStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MeasurementRangeStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2464,20 +2278,21 @@ impl HarmonicMeasurementStruct {
                     if order.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         order = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if measurement.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <i64>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<i64>(&v))?;
                         (!matches!(&decoded, Nullable::NonNull(v) if *v < -0x4000_0000_0000_0000_i64))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -2486,8 +2301,8 @@ impl HarmonicMeasurementStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         measurement = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2512,24 +2327,7 @@ impl HarmonicMeasurementStruct {
     }
 }
 
-impl From<HarmonicMeasurementStruct> for AttributeValue {
-    #[inline]
-    fn from(val: HarmonicMeasurementStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for HarmonicMeasurementStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(HarmonicMeasurementStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2639,106 +2437,106 @@ impl MeasurementAccuracyRangeStruct {
                     if range_min.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         range_min = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if range_max.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         range_max = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if percent_max.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent100ths>::try_from(fval)?;
                         percent_max = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if percent_min.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent100ths>::try_from(fval)?;
                         percent_min = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if percent_typical.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent100ths>::try_from(fval)?;
                         percent_typical = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if fixed_max.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded <= 0x3FFF_FFFF_FFFF_FFFF_u64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         fixed_max = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if fixed_min.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded <= 0x3FFF_FFFF_FFFF_FFFF_u64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         fixed_min = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if fixed_typical.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded <= 0x3FFF_FFFF_FFFF_FFFF_u64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         fixed_typical = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2781,24 +2579,7 @@ impl MeasurementAccuracyRangeStruct {
     }
 }
 
-impl From<MeasurementAccuracyRangeStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MeasurementAccuracyRangeStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MeasurementAccuracyRangeStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MeasurementAccuracyRangeStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2854,64 +2635,64 @@ impl MeasurementAccuracyStruct {
                     if measurement_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <MeasurementTypeEnum>::try_from(fval)?;
                         measurement_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if measured.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         measured = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if min_measured_value.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         min_measured_value = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if max_measured_value.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_measured_value = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if accuracy_ranges.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <MeasurementAccuracyRangeStruct>::try_from)?;
                         accuracy_ranges = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2948,30 +2729,11 @@ impl MeasurementAccuracyStruct {
     }
 }
 
-impl From<MeasurementAccuracyStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MeasurementAccuracyStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MeasurementAccuracyStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MeasurementAccuracyStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3013,11 +2775,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3031,14 +2788,10 @@ pub mod attributes {
         PowerMode,
         super::PowerModeEnum,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PowerMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3065,16 +2818,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3086,14 +2834,10 @@ pub mod attributes {
         NumberOfMeasurementTypes,
         u8,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for NumberOfMeasurementTypes {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3120,12 +2864,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3145,14 +2883,10 @@ pub mod attributes {
         Accuracy,
         Vec<super::MeasurementAccuracyStruct>,
         super::ElectricalPowerMeasurementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for Accuracy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3179,12 +2913,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3204,14 +2932,10 @@ pub mod attributes {
         Ranges,
         Vec<super::MeasurementRangeStruct>,
         super::ElectricalPowerMeasurementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for Ranges {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3265,14 +2989,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3289,33 +3005,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         Voltage,
-        Nullable<types::VoltageMv>,
+        types::VoltageMv,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::VoltageMv> for Voltage {
-        #[inline]
-        fn from(val: types::VoltageMv) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::VoltageMv>> for Voltage {
-        #[inline]
-        fn from(val: Option<types::VoltageMv>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Voltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3369,14 +3066,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3393,33 +3082,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ActiveCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for ActiveCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for ActiveCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ActiveCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3473,14 +3143,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3497,33 +3159,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ReactiveCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for ReactiveCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for ReactiveCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ReactiveCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3577,14 +3220,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3601,33 +3236,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ApparentCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for ApparentCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for ApparentCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ApparentCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3681,14 +3297,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3705,33 +3313,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ActivePower,
-        Nullable<types::PowerMw>,
+        types::PowerMw,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::PowerMw> for ActivePower {
-        #[inline]
-        fn from(val: types::PowerMw) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::PowerMw>> for ActivePower {
-        #[inline]
-        fn from(val: Option<types::PowerMw>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ActivePower {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3785,14 +3374,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3809,33 +3390,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ReactivePower,
-        Nullable<types::PowerMw>,
+        types::PowerMw,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::PowerMw> for ReactivePower {
-        #[inline]
-        fn from(val: types::PowerMw) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::PowerMw>> for ReactivePower {
-        #[inline]
-        fn from(val: Option<types::PowerMw>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ReactivePower {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3889,14 +3451,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3913,33 +3467,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ApparentPower,
-        Nullable<types::PowerMw>,
+        types::PowerMw,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::PowerMw> for ApparentPower {
-        #[inline]
-        fn from(val: types::PowerMw) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::PowerMw>> for ApparentPower {
-        #[inline]
-        fn from(val: Option<types::PowerMw>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ApparentPower {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3993,14 +3528,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4017,33 +3544,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         RmsVoltage,
-        Nullable<types::VoltageMv>,
+        types::VoltageMv,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::VoltageMv> for RmsVoltage {
-        #[inline]
-        fn from(val: types::VoltageMv) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::VoltageMv>> for RmsVoltage {
-        #[inline]
-        fn from(val: Option<types::VoltageMv>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for RmsVoltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4097,14 +3605,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4121,33 +3621,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         RmsCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for RmsCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for RmsCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for RmsCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4201,14 +3682,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4225,33 +3698,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         RmsPower,
-        Nullable<types::PowerMw>,
+        types::PowerMw,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::PowerMw> for RmsPower {
-        #[inline]
-        fn from(val: types::PowerMw) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::PowerMw>> for RmsPower {
-        #[inline]
-        fn from(val: Option<types::PowerMw>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for RmsPower {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4302,19 +3756,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             if raw < 0_i64 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4325,29 +3771,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Frequency, Nullable<i64>, super::ElectricalPowerMeasurementCluster, copy);
-    impl From<i64> for Frequency {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for Frequency {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Frequency {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        Frequency,
+        i64,
+        super::ElectricalPowerMeasurementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4398,17 +3830,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4425,33 +3846,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         HarmonicCurrents,
-        Nullable<Vec<super::HarmonicMeasurementStruct>>,
+        Vec<super::HarmonicMeasurementStruct>,
         super::ElectricalPowerMeasurementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::HarmonicMeasurementStruct>> for HarmonicCurrents {
-        #[inline]
-        fn from(val: Vec<super::HarmonicMeasurementStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::HarmonicMeasurementStruct>>> for HarmonicCurrents {
-        #[inline]
-        fn from(val: Option<Vec<super::HarmonicMeasurementStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for HarmonicCurrents {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4502,17 +3904,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4529,33 +3920,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         HarmonicPhases,
-        Nullable<Vec<super::HarmonicMeasurementStruct>>,
+        Vec<super::HarmonicMeasurementStruct>,
         super::ElectricalPowerMeasurementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::HarmonicMeasurementStruct>> for HarmonicPhases {
-        #[inline]
-        fn from(val: Vec<super::HarmonicMeasurementStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::HarmonicMeasurementStruct>>> for HarmonicPhases {
-        #[inline]
-        fn from(val: Option<Vec<super::HarmonicMeasurementStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for HarmonicPhases {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4606,19 +3978,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             if raw < -10_000_i64 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4630,33 +3994,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PowerFactor,
-        Nullable<i64>,
+        i64,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i64> for PowerFactor {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for PowerFactor {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PowerFactor {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4710,14 +4055,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4734,33 +4071,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NeutralCurrent,
-        Nullable<types::AmperageMa>,
+        types::AmperageMa,
         super::ElectricalPowerMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::AmperageMa> for NeutralCurrent {
-        #[inline]
-        fn from(val: types::AmperageMa) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::AmperageMa>> for NeutralCurrent {
-        #[inline]
-        fn from(val: Option<types::AmperageMa>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NeutralCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod events {
@@ -4814,11 +4132,6 @@ pub mod events {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4841,19 +4154,6 @@ pub mod events {
             Ok(Self {
                 ranges: ranges.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

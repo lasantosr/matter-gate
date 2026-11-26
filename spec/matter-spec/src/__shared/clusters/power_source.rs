@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -2708,134 +2706,45 @@ crate::impl_cluster_member_variant!(
     ActiveBatChargeFaults
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::EndpointList, EndpointList);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        PowerSourceCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Status(_) => attributes::Status::NAME,
-            Self::Order(_) => attributes::Order::NAME,
-            Self::Description(_) => attributes::Description::NAME,
-            Self::WiredAssessedInputVoltage(_) => attributes::WiredAssessedInputVoltage::NAME,
-            Self::WiredAssessedInputFrequency(_) => attributes::WiredAssessedInputFrequency::NAME,
-            Self::WiredCurrentType(_) => attributes::WiredCurrentType::NAME,
-            Self::WiredAssessedCurrent(_) => attributes::WiredAssessedCurrent::NAME,
-            Self::WiredNominalVoltage(_) => attributes::WiredNominalVoltage::NAME,
-            Self::WiredMaximumCurrent(_) => attributes::WiredMaximumCurrent::NAME,
-            Self::WiredPresent(_) => attributes::WiredPresent::NAME,
-            Self::ActiveWiredFaults(_) => attributes::ActiveWiredFaults::NAME,
-            Self::BatVoltage(_) => attributes::BatVoltage::NAME,
-            Self::BatPercentRemaining(_) => attributes::BatPercentRemaining::NAME,
-            Self::BatTimeRemaining(_) => attributes::BatTimeRemaining::NAME,
-            Self::BatChargeLevel(_) => attributes::BatChargeLevel::NAME,
-            Self::BatReplacementNeeded(_) => attributes::BatReplacementNeeded::NAME,
-            Self::BatReplaceability(_) => attributes::BatReplaceability::NAME,
-            Self::BatPresent(_) => attributes::BatPresent::NAME,
-            Self::ActiveBatFaults(_) => attributes::ActiveBatFaults::NAME,
-            Self::BatReplacementDescription(_) => attributes::BatReplacementDescription::NAME,
-            Self::BatCommonDesignation(_) => attributes::BatCommonDesignation::NAME,
-            Self::BatAnsiDesignation(_) => attributes::BatAnsiDesignation::NAME,
-            Self::BatIecDesignation(_) => attributes::BatIecDesignation::NAME,
-            Self::BatApprovedChemistry(_) => attributes::BatApprovedChemistry::NAME,
-            Self::BatCapacity(_) => attributes::BatCapacity::NAME,
-            Self::BatQuantity(_) => attributes::BatQuantity::NAME,
-            Self::BatChargeState(_) => attributes::BatChargeState::NAME,
-            Self::BatTimeToFullCharge(_) => attributes::BatTimeToFullCharge::NAME,
-            Self::BatFunctionalWhileCharging(_) => attributes::BatFunctionalWhileCharging::NAME,
-            Self::BatChargingCurrent(_) => attributes::BatChargingCurrent::NAME,
-            Self::ActiveBatChargeFaults(_) => attributes::ActiveBatChargeFaults::NAME,
-            Self::EndpointList(_) => attributes::EndpointList::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        PowerSourceCluster::NAME,
-        PowerSourceCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: PowerSourceCluster::NAME,
-            cluster_id: PowerSourceCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Status(inner) => Serialize::serialize(inner, serializer),
-            Self::Order(inner) => Serialize::serialize(inner, serializer),
-            Self::Description(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredAssessedInputVoltage(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredAssessedInputFrequency(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredCurrentType(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredAssessedCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredNominalVoltage(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredMaximumCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::WiredPresent(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveWiredFaults(inner) => Serialize::serialize(inner, serializer),
-            Self::BatVoltage(inner) => Serialize::serialize(inner, serializer),
-            Self::BatPercentRemaining(inner) => Serialize::serialize(inner, serializer),
-            Self::BatTimeRemaining(inner) => Serialize::serialize(inner, serializer),
-            Self::BatChargeLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::BatReplacementNeeded(inner) => Serialize::serialize(inner, serializer),
-            Self::BatReplaceability(inner) => Serialize::serialize(inner, serializer),
-            Self::BatPresent(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveBatFaults(inner) => Serialize::serialize(inner, serializer),
-            Self::BatReplacementDescription(inner) => Serialize::serialize(inner, serializer),
-            Self::BatCommonDesignation(inner) => Serialize::serialize(inner, serializer),
-            Self::BatAnsiDesignation(inner) => Serialize::serialize(inner, serializer),
-            Self::BatIecDesignation(inner) => Serialize::serialize(inner, serializer),
-            Self::BatApprovedChemistry(inner) => Serialize::serialize(inner, serializer),
-            Self::BatCapacity(inner) => Serialize::serialize(inner, serializer),
-            Self::BatQuantity(inner) => Serialize::serialize(inner, serializer),
-            Self::BatChargeState(inner) => Serialize::serialize(inner, serializer),
-            Self::BatTimeToFullCharge(inner) => Serialize::serialize(inner, serializer),
-            Self::BatFunctionalWhileCharging(inner) => Serialize::serialize(inner, serializer),
-            Self::BatChargingCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveBatChargeFaults(inner) => Serialize::serialize(inner, serializer),
-            Self::EndpointList(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((PowerSourceCluster::NAME, PowerSourceCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    PowerSourceCluster,
+    [
+        Status,
+        Order,
+        Description,
+        WiredAssessedInputVoltage,
+        WiredAssessedInputFrequency,
+        WiredCurrentType,
+        WiredAssessedCurrent,
+        WiredNominalVoltage,
+        WiredMaximumCurrent,
+        WiredPresent,
+        ActiveWiredFaults,
+        BatVoltage,
+        BatPercentRemaining,
+        BatTimeRemaining,
+        BatChargeLevel,
+        BatReplacementNeeded,
+        BatReplaceability,
+        BatPresent,
+        ActiveBatFaults,
+        BatReplacementDescription,
+        BatCommonDesignation,
+        BatAnsiDesignation,
+        BatIecDesignation,
+        BatApprovedChemistry,
+        BatCapacity,
+        BatQuantity,
+        BatChargeState,
+        BatTimeToFullCharge,
+        BatFunctionalWhileCharging,
+        BatChargingCurrent,
+        ActiveBatChargeFaults,
+        EndpointList,
+    ]
+);
 /// Dynamic event variant matching for [`PowerSourceCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2985,91 +2894,13 @@ impl TryFrom<model::Event> for Event {
 crate::impl_cluster_member_variant!(event, Event, events::WiredFaultChange, WiredFaultChange);
 crate::impl_cluster_member_variant!(event, Event, events::BatFaultChange, BatFaultChange);
 crate::impl_cluster_member_variant!(event, Event, events::BatChargeFaultChange, BatChargeFaultChange);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        PowerSourceCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::WiredFaultChange(_) => events::WiredFaultChange::NAME,
-            Self::BatFaultChange(_) => events::BatFaultChange::NAME,
-            Self::BatChargeFaultChange(_) => events::BatChargeFaultChange::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        PowerSourceCluster::NAME,
-        PowerSourceCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: PowerSourceCluster::NAME,
-            cluster_id: PowerSourceCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::WiredFaultChange(inner) => Serialize::serialize(inner, serializer),
-            Self::BatFaultChange(inner) => Serialize::serialize(inner, serializer),
-            Self::BatChargeFaultChange(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((PowerSourceCluster::NAME, PowerSourceCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    PowerSourceCluster,
+    empty = [],
+    payload = [WiredFaultChange, BatFaultChange, BatChargeFaultChange,]
+);
 
 crate::define_matter_enum! {
     /// WiredFaultEnum exhaustive specification enum.
@@ -3377,29 +3208,29 @@ impl WiredFaultChangeType {
                     if current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <WiredFaultEnum>::try_from)?;
                         (decoded.len() <= 8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if previous.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <WiredFaultEnum>::try_from)?;
                         (decoded.len() <= 8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         previous = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3424,24 +3255,7 @@ impl WiredFaultChangeType {
     }
 }
 
-impl From<WiredFaultChangeType> for AttributeValue {
-    #[inline]
-    fn from(val: WiredFaultChangeType) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for WiredFaultChangeType {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(WiredFaultChangeType);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3479,29 +3293,29 @@ impl BatFaultChangeType {
                     if current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <BatFaultEnum>::try_from)?;
                         (decoded.len() <= 8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if previous.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <BatFaultEnum>::try_from)?;
                         (decoded.len() <= 8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         previous = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3526,24 +3340,7 @@ impl BatFaultChangeType {
     }
 }
 
-impl From<BatFaultChangeType> for AttributeValue {
-    #[inline]
-    fn from(val: BatFaultChangeType) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for BatFaultChangeType {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(BatFaultChangeType);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3581,29 +3378,29 @@ impl BatChargeFaultChangeType {
                     if current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <BatChargeFaultEnum>::try_from)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if previous.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <BatChargeFaultEnum>::try_from)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         previous = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3628,30 +3425,11 @@ impl BatChargeFaultChangeType {
     }
 }
 
-impl From<BatChargeFaultChangeType> for AttributeValue {
-    #[inline]
-    fn from(val: BatChargeFaultChangeType) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for BatChargeFaultChangeType {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(BatChargeFaultChangeType);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3693,11 +3471,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3707,13 +3480,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Status, super::PowerSourceStatusEnum, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for Status {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Status,
+        super::PowerSourceStatusEnum,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3740,27 +3514,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Order, u8, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for Order {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Order, u8, super::PowerSourceCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3787,11 +3550,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3804,13 +3562,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Description, String, super::PowerSourceCluster, owned);
-
-    impl fmt::Display for Description {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Description, String, super::PowerSourceCluster, owned, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3861,51 +3613,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         WiredAssessedInputVoltage,
-        Nullable<u32>,
+        u32,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u32> for WiredAssessedInputVoltage {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for WiredAssessedInputVoltage {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for WiredAssessedInputVoltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3956,51 +3681,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         WiredAssessedInputFrequency,
-        Nullable<u16>,
+        u16,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for WiredAssessedInputFrequency {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for WiredAssessedInputFrequency {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for WiredAssessedInputFrequency {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4027,11 +3725,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4045,14 +3738,10 @@ pub mod attributes {
         WiredCurrentType,
         super::WiredCurrentTypeEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for WiredCurrentType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4103,46 +3792,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(WiredAssessedCurrent, Nullable<u32>, super::PowerSourceCluster, copy);
-    impl From<u32> for WiredAssessedCurrent {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for WiredAssessedCurrent {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for WiredAssessedCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        WiredAssessedCurrent,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4169,27 +3836,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(WiredNominalVoltage, u32, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for WiredNominalVoltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        WiredNominalVoltage,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4216,27 +3879,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(WiredMaximumCurrent, u32, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for WiredMaximumCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        WiredMaximumCurrent,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4267,11 +3926,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4281,18 +3935,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(WiredPresent, super::WiredPresent, super::PowerSourceCluster, copy);
-
+    crate::impl_matter_attribute!(
+        WiredPresent,
+        super::WiredPresent,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for WiredPresent {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::WiredPresent::from(val))
-        }
-    }
-
-    impl fmt::Display for WiredPresent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -4321,12 +3975,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4349,14 +3997,10 @@ pub mod attributes {
         ActiveWiredFaults,
         Vec<super::WiredFaultEnum>,
         super::PowerSourceCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ActiveWiredFaults {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4407,46 +4051,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(BatVoltage, Nullable<u32>, super::PowerSourceCluster, copy);
-    impl From<u32> for BatVoltage {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for BatVoltage {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatVoltage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        BatVoltage,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4497,19 +4119,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 200_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4517,29 +4131,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BatPercentRemaining, Nullable<u8>, super::PowerSourceCluster, copy);
-    impl From<u8> for BatPercentRemaining {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for BatPercentRemaining {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatPercentRemaining {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        BatPercentRemaining,
+        u8,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4590,46 +4190,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(BatTimeRemaining, Nullable<u32>, super::PowerSourceCluster, copy);
-    impl From<u32> for BatTimeRemaining {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for BatTimeRemaining {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatTimeRemaining {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        BatTimeRemaining,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4656,11 +4234,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4674,14 +4247,10 @@ pub mod attributes {
         BatChargeLevel,
         super::BatChargeLevelEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BatChargeLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4712,11 +4281,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4730,19 +4294,14 @@ pub mod attributes {
         BatReplacementNeeded,
         super::BatReplacementNeeded,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for BatReplacementNeeded {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::BatReplacementNeeded::from(val))
-        }
-    }
-
-    impl fmt::Display for BatReplacementNeeded {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -4771,11 +4330,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4789,14 +4343,10 @@ pub mod attributes {
         BatReplaceability,
         super::BatReplaceabilityEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BatReplaceability {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4827,11 +4377,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4841,18 +4386,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BatPresent, super::BatPresent, super::PowerSourceCluster, copy);
-
+    crate::impl_matter_attribute!(
+        BatPresent,
+        super::BatPresent,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for BatPresent {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::BatPresent::from(val))
-        }
-    }
-
-    impl fmt::Display for BatPresent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -4881,12 +4426,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4909,14 +4448,10 @@ pub mod attributes {
         ActiveBatFaults,
         Vec<super::BatFaultEnum>,
         super::PowerSourceCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ActiveBatFaults {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4943,11 +4478,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4960,13 +4490,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BatReplacementDescription, String, super::PowerSourceCluster, owned);
-
-    impl fmt::Display for BatReplacementDescription {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        BatReplacementDescription,
+        String,
+        super::PowerSourceCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4993,11 +4524,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5011,14 +4537,10 @@ pub mod attributes {
         BatCommonDesignation,
         super::BatCommonDesignationEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BatCommonDesignation {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5045,11 +4567,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5062,13 +4579,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BatAnsiDesignation, String, super::PowerSourceCluster, owned);
-
-    impl fmt::Display for BatAnsiDesignation {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        BatAnsiDesignation,
+        String,
+        super::PowerSourceCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5095,11 +4613,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5112,13 +4625,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BatIecDesignation, String, super::PowerSourceCluster, owned);
-
-    impl fmt::Display for BatIecDesignation {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        BatIecDesignation,
+        String,
+        super::PowerSourceCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5145,11 +4659,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5163,14 +4672,10 @@ pub mod attributes {
         BatApprovedChemistry,
         super::BatApprovedChemistryEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BatApprovedChemistry {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5197,27 +4702,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(BatCapacity, u32, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for BatCapacity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(BatCapacity, u32, super::PowerSourceCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5244,27 +4738,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(BatQuantity, u8, super::PowerSourceCluster, copy);
-
-    impl fmt::Display for BatQuantity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(BatQuantity, u8, super::PowerSourceCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5291,11 +4774,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5309,14 +4787,10 @@ pub mod attributes {
         BatChargeState,
         super::BatChargeStateEnum,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BatChargeState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5367,46 +4841,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(BatTimeToFullCharge, Nullable<u32>, super::PowerSourceCluster, copy);
-    impl From<u32> for BatTimeToFullCharge {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for BatTimeToFullCharge {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatTimeToFullCharge {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        BatTimeToFullCharge,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5437,11 +4889,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5455,19 +4902,14 @@ pub mod attributes {
         BatFunctionalWhileCharging,
         super::BatFunctionalWhileCharging,
         super::PowerSourceCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for BatFunctionalWhileCharging {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::BatFunctionalWhileCharging::from(val))
-        }
-    }
-
-    impl fmt::Display for BatFunctionalWhileCharging {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -5520,46 +4962,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(BatChargingCurrent, Nullable<u32>, super::PowerSourceCluster, copy);
-    impl From<u32> for BatChargingCurrent {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for BatChargingCurrent {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatChargingCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        BatChargingCurrent,
+        u32,
+        super::PowerSourceCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5586,12 +5006,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5614,14 +5028,10 @@ pub mod attributes {
         ActiveBatChargeFaults,
         Vec<super::BatChargeFaultEnum>,
         super::PowerSourceCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ActiveBatChargeFaults {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5648,12 +5058,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5669,13 +5073,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(EndpointList, Vec<EndpointId>, super::PowerSourceCluster, owned);
-
-    impl fmt::Display for EndpointList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        EndpointList,
+        Vec<EndpointId>,
+        super::PowerSourceCluster,
+        owned,
+        list,
+        list
+    );
 }
 
 pub mod events {
@@ -5744,11 +5149,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5760,29 +5160,29 @@ pub mod events {
                         if current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::WiredFaultEnum>::try_from)?;
                             (decoded.len() <= 8)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if previous.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::WiredFaultEnum>::try_from)?;
                             (decoded.len() <= 8)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             previous = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5791,19 +5191,6 @@ pub mod events {
                 current: current.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 previous: previous.ok_or((Some(FieldId::new(1)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -5857,11 +5244,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5873,29 +5255,29 @@ pub mod events {
                         if current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::BatFaultEnum>::try_from)?;
                             (decoded.len() <= 8)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if previous.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::BatFaultEnum>::try_from)?;
                             (decoded.len() <= 8)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             previous = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5904,19 +5286,6 @@ pub mod events {
                 current: current.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 previous: previous.ok_or((Some(FieldId::new(1)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -5970,11 +5339,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5986,29 +5350,29 @@ pub mod events {
                         if current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::BatChargeFaultEnum>::try_from)?;
                             (decoded.len() <= 16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if previous.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::BatChargeFaultEnum>::try_from)?;
                             (decoded.len() <= 16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             previous = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6017,19 +5381,6 @@ pub mod events {
                 current: current.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 previous: previous.ok_or((Some(FieldId::new(1)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

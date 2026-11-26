@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId, Optional},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
     v1_3::clusters::{
         descriptor::DescriptorCluster, oven_cavity_operational_state::OvenCavityOperationalStateCluster,
         oven_mode::OvenModeCluster, refrigerator_and_temperature_controlled_cabinet_mode as c_refriger,
@@ -289,29 +289,4 @@ impl<'a> TemperatureControlledCabinetView<'a> {
     }
 }
 
-impl DeviceTypeSpec for TemperatureControlledCabinet {
-    type View<'a> = TemperatureControlledCabinetView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = false;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(TemperatureControlledCabinetView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, TemperatureControlledCabinet, false);
+crate::impl_device_type_spec!(TemperatureControlledCabinet, TemperatureControlledCabinetView, false);

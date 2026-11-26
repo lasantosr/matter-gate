@@ -863,6 +863,220 @@ mod v1_6_regression_tests {
         assert_eq!(attr.name(), "IdentifyTime");
         assert_eq!(attr.field_name(), "identify_time");
     }
+
+    #[test]
+    fn real_v1_6_registry_enforces_globals_wildcard_parts_and_tags() {
+        use matter_spec::{
+            error::{AttributeError, ClusterError, EndpointError, NodeError},
+            model::{
+                Attribute, AttributeId, AttributeValue, ClusterId, Endpoint, EndpointId, MatterStatus, Node, NodeId,
+                Nullable, SemanticTag,
+            },
+            v1_6::{
+                clusters::{
+                    groups::GroupsCluster, identify::IdentifyCluster, on_off::OnOffCluster,
+                    scenes_management::ScenesManagementCluster,
+                },
+                endpoints::on_off_light::OnOffLight,
+                registry::Validator,
+            },
+        };
+
+        let validator = Validator::full();
+
+        // §7.13 globals validated via single-attribute and cluster entrypoints, including lenient EventList on v1.6.
+        validator
+            .attribute(
+                OnOffCluster::CLUSTER_ID,
+                &Attribute::new(AttributeId::EVENT_LIST, AttributeValue::List(vec![])),
+            )
+            .expect("v1.6 accepts well-typed EventList");
+        assert_eq!(
+            validator.attribute(
+                OnOffCluster::CLUSTER_ID,
+                &Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::Bool(false)),
+            ),
+            Err(AttributeError::InvalidValue {
+                id: AttributeId::FEATURE_MAP,
+                field_id: None,
+                status: MatterStatus::InvalidDataType,
+            })
+        );
+
+        // Wildcard EndpointId rejected on real registry.
+        let wildcard = Endpoint::empty(EndpointId::WILDCARD);
+        assert_eq!(
+            validator.endpoint(&wildcard),
+            Err(EndpointError::InvalidEndpointId(EndpointId::WILDCARD))
+        );
+
+        // Real OnOffLight endpoint: default OnOffCluster omits Lighting-feature attributes, so Partial mode passes.
+        let light_default = OnOffLight::new(
+            IdentifyCluster::default(),
+            GroupsCluster::default(),
+            ScenesManagementCluster::default(),
+            OnOffCluster::default(),
+        );
+        Validator::partial()
+            .endpoint(&light_default.into_endpoint(EndpointId::new(1)))
+            .expect("partial mode skips DeviceTypeIncludeItem required_attributes");
+
+        // FullSnapshot-valid OnOffLight with Lighting attributes + FeatureMap(0x01).
+        let on_off = OnOffCluster {
+            global_scene_control: Optional::Present(true),
+            on_time: Optional::Present(0),
+            off_wait_time: Optional::Present(0),
+            start_up_on_off: Optional::Present(Nullable::Null),
+            ..Default::default()
+        };
+        let light = OnOffLight::new(
+            IdentifyCluster::default(),
+            GroupsCluster::default(),
+            ScenesManagementCluster::default(),
+            on_off,
+        );
+        let make_valid_light = |id: EndpointId| {
+            let mut ep = light.clone().into_endpoint(id);
+            ep.cluster_mut(OnOffCluster::CLUSTER_ID)
+                .unwrap()
+                .set_attribute(AttributeId::FEATURE_MAP, AttributeValue::U32(0x01));
+            ep
+        };
+
+        let dup_tag = AttributeValue::from(SemanticTag::new(1, 2));
+        let mut ep_dup_tags = make_valid_light(EndpointId::new(1));
+        ep_dup_tags.descriptor_mut().unwrap().set_attribute(
+            AttributeId::new(0x0004),
+            AttributeValue::List(vec![dup_tag.clone(), dup_tag]),
+        );
+        assert_eq!(
+            validator.endpoint(&ep_dup_tags),
+            Err(EndpointError::InvalidCluster {
+                id: ClusterId::DESCRIPTOR,
+                source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                    id: AttributeId::new(0x0004),
+                    field_id: None,
+                    status: MatterStatus::ConstraintError,
+                }),
+            })
+        );
+
+        let ep_dangling = make_valid_light(EndpointId::ROOT).with_parts_list([EndpointId::new(99)]);
+        let node = Node::new(NodeId::new(1), vec![ep_dangling]);
+        assert_eq!(
+            validator.node(&node),
+            Err(NodeError::InvalidEndpoint {
+                id: EndpointId::ROOT,
+                source: EndpointError::InvalidCluster {
+                    id: ClusterId::DESCRIPTOR,
+                    source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                        id: AttributeId::new(0x0003),
+                        field_id: None,
+                        status: MatterStatus::ConstraintError,
+                    }),
+                },
+            })
+        );
+    }
+
+    #[test]
+    fn real_v1_6_fit_try_from_and_validator_integer_modes() {
+        use matter_spec::{
+            error::AttributeError,
+            model::{Attribute, AttributeId, AttributeValue, Cluster as ModelCluster, MatterStatus, Nullable},
+            v1_6::{
+                clusters::on_off::{
+                    OnOffCluster, StartUpOnOffEnum,
+                    attributes::{OnTime, StartUpOnOff},
+                },
+                globals::attributes::{ClusterRevision, FeatureMap},
+                registry::Validator,
+            },
+            validate::IntegerMode,
+            wire::{GlobalAttributes, WireCluster},
+        };
+
+        // TryFrom / try_from_value on generated attributes/enums/structs/globals uses Fit mode (U8 or U64 ->
+        // u16/u8/enum).
+        assert_eq!(OnTime::try_from_value(AttributeValue::U8(12)), Ok(OnTime::new(12_u16)));
+        assert_eq!(OnTime::try_from_value(AttributeValue::U64(12)), Ok(OnTime::new(12_u16)));
+        assert_eq!(
+            OnTime::try_from_value(AttributeValue::U64(u64::from(u16::MAX) + 1)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            StartUpOnOff::try_from_value(AttributeValue::U64(1)),
+            Ok(StartUpOnOff::new(Nullable::NonNull(StartUpOnOffEnum::On)))
+        );
+        assert_eq!(
+            ClusterRevision::try_from_value(AttributeValue::U8(6)),
+            Ok(ClusterRevision::new(6))
+        );
+        assert_eq!(
+            ClusterRevision::try_from_value(AttributeValue::U64(u64::from(u16::MAX) + 1)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            ClusterRevision::try_from_value(AttributeValue::I16(6)),
+            Err(MatterStatus::InvalidDataType)
+        );
+        assert_eq!(
+            FeatureMap::try_from_value(AttributeValue::U8(0x03)),
+            Ok(FeatureMap::new(0x03))
+        );
+        assert_eq!(
+            FeatureMap::try_from_value(AttributeValue::U64(u64::from(u32::MAX) + 1)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            FeatureMap::try_from_value(AttributeValue::I32(1)),
+            Err(MatterStatus::InvalidDataType)
+        );
+
+        let mut globals = GlobalAttributes::<u32>::empty();
+        assert_eq!(
+            globals.apply_global_attribute(AttributeId::CLUSTER_REVISION, AttributeValue::U64(6)),
+            Ok(true)
+        );
+        assert_eq!(globals.cluster_revision, Optional::Present(6));
+
+        let mut model_cluster = ModelCluster::empty(OnOffCluster::CLUSTER_ID);
+        model_cluster.set_attribute(OnOffCluster::ATTR_ON_OFF, AttributeValue::Bool(true));
+        model_cluster.set_attribute(OnOffCluster::ATTR_ON_TIME, AttributeValue::U64(30));
+        model_cluster.set_attribute(AttributeId::CLUSTER_REVISION, AttributeValue::U8(6));
+        let wire = WireCluster::<OnOffCluster>::try_from(model_cluster).expect("Fit TryFrom");
+        assert_eq!(wire.domain.on_time, Optional::Present(30));
+        assert_eq!(wire.globals.cluster_revision, Optional::Present(6));
+
+        // RegistryValidator defaults to Widening, and supports Strict and Fit.
+        let attr_u8_for_u16 = Attribute::new(OnOffCluster::ATTR_ON_TIME, AttributeValue::U8(30));
+        let attr_u64_for_u16 = Attribute::new(OnOffCluster::ATTR_ON_TIME, AttributeValue::U64(30));
+        Validator::full()
+            .attribute(OnOffCluster::CLUSTER_ID, &attr_u8_for_u16)
+            .expect("Widening allows U8 for U16");
+        assert_eq!(
+            Validator::full().attribute(OnOffCluster::CLUSTER_ID, &attr_u64_for_u16),
+            Err(AttributeError::InvalidValue {
+                id: OnOffCluster::ATTR_ON_TIME,
+                field_id: None,
+                status: MatterStatus::InvalidDataType,
+            })
+        );
+        assert_eq!(
+            Validator::full()
+                .with_integer_mode(IntegerMode::Strict)
+                .attribute(OnOffCluster::CLUSTER_ID, &attr_u8_for_u16),
+            Err(AttributeError::InvalidValue {
+                id: OnOffCluster::ATTR_ON_TIME,
+                field_id: None,
+                status: MatterStatus::InvalidDataType,
+            })
+        );
+        Validator::full()
+            .with_integer_mode(IntegerMode::Fit)
+            .attribute(OnOffCluster::CLUSTER_ID, &attr_u64_for_u16)
+            .expect("Fit allows U64 fitting in U16");
+    }
 }
 
 #[cfg(all(

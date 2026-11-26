@@ -85,7 +85,7 @@ mod tests {
 unstable_features = true
 ignore = [
   "spec/matter-spec/src/__shared",
-  "spec/matter-spec/src/v*",
+  "spec/matter-spec/src/v[0-9]*",
 ]
 wrap_comments = true
 "#;
@@ -107,7 +107,7 @@ wrap_comments = true
         let src_dir = tempfile::tempdir()?;
         fs::write(
             src_dir.path().join(".rustfmt.toml"),
-            "max_width = 120\nignore = [\"spec/matter-spec/src/v*\"]\n",
+            "max_width = 120\nignore = [\"spec/matter-spec/src/v[0-9]*\"]\n",
         )?;
 
         let config_path = {

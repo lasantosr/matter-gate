@@ -32,8 +32,8 @@
 //!   alongside [`DeviceTypeSpec::view`](traits::DeviceTypeSpec::view) for zero-alloc endpoint inspection.
 //! - **Semantic newtypes & ergonomics.** Unit, time, and address types in [`types`] (`Temperature`, `Percent100ths`,
 //!   `PowerMw`, `EpochS`, `MatterDate`, `IpAddress`, ...) enforce physical-unit safety via `Deref` on cluster
-//!   attributes, inherent [`Optional<Nullable<T>>`](model::Optional) combinators, and `#![no_std]` `chrono`, `time`,
-//!   and `uom` bridges.
+//!   attributes, inherent [`Optional<Nullable<T>>`](model::Optional) combinators, and `#![no_std]` `jiff`, `time`, and
+//!   `uom` bridges.
 //! - **Boundary dispatch & dynamic schemas.** Feature-gated `#[non_exhaustive]` boundary enums (`ClusterSnapshot`,
 //!   `ClusterPatch`, `ClusterAttribute`, `ClusterCommand`, `ClusterCommandResponse`, `ClusterEvent`, `EndpointDevice`,
 //!   threshold-boxed above 64 bytes with `Unknown` fallback), [`Described<T>`](dispatch::Described) /
@@ -77,7 +77,7 @@
 //! | `serde` | No | `#![no_std]` + `alloc` `Serialize` and `Deserialize` implementations for all models. |
 //! | `schemars` | No | Dynamic `FeatureMap`-pruned `JsonSchema` generation via `schemars` (enables `std` and `registry`). |
 //! | `deny-unknown-fields` | No | Disallow unrecognized fields in Serde deserialization and Schemars JSON schemas (takes effect when `serde` or `schemars` is enabled). **Library crates must NOT enable this feature**, leave it for leaf binary crates to opt in. |
-//! | `chrono` | No | `chrono` conversions for Matter time types. |
+//! | `jiff` | No | `jiff` conversions for Matter time types. |
 //! | `time` | No | `time` crate conversions for Matter time types. |
 //! | `uom` | No | `uom` SI unit conversions for physical quantity types in [`types`]. |
 //! | `testing` | No | Matter test and example clusters. |

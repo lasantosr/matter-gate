@@ -13,12 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -3330,155 +3326,54 @@ crate::impl_cluster_member_variant!(
     attributes::StatusLightBrightness,
     StatusLightBrightness
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CameraAvStreamManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MaxConcurrentEncoders(_) => attributes::MaxConcurrentEncoders::NAME,
-            Self::MaxEncodedPixelRate(_) => attributes::MaxEncodedPixelRate::NAME,
-            Self::VideoSensorParams(_) => attributes::VideoSensorParams::NAME,
-            Self::NightVisionUsesInfrared(_) => attributes::NightVisionUsesInfrared::NAME,
-            Self::MinViewport(_) => attributes::MinViewport::NAME,
-            Self::RateDistortionTradeOffPoints(_) => attributes::RateDistortionTradeOffPoints::NAME,
-            Self::MaxContentBufferSize(_) => attributes::MaxContentBufferSize::NAME,
-            Self::MicrophoneCapabilities(_) => attributes::MicrophoneCapabilities::NAME,
-            Self::SpeakerCapabilities(_) => attributes::SpeakerCapabilities::NAME,
-            Self::TwoWayTalkSupport(_) => attributes::TwoWayTalkSupport::NAME,
-            Self::SnapshotCapabilities(_) => attributes::SnapshotCapabilities::NAME,
-            Self::MaxNetworkBandwidth(_) => attributes::MaxNetworkBandwidth::NAME,
-            Self::CurrentFrameRate(_) => attributes::CurrentFrameRate::NAME,
-            Self::HdrModeEnabled(_) => attributes::HdrModeEnabled::NAME,
-            Self::SupportedStreamUsages(_) => attributes::SupportedStreamUsages::NAME,
-            Self::AllocatedVideoStreams(_) => attributes::AllocatedVideoStreams::NAME,
-            Self::AllocatedAudioStreams(_) => attributes::AllocatedAudioStreams::NAME,
-            Self::AllocatedSnapshotStreams(_) => attributes::AllocatedSnapshotStreams::NAME,
-            Self::StreamUsagePriorities(_) => attributes::StreamUsagePriorities::NAME,
-            Self::SoftRecordingPrivacyModeEnabled(_) => attributes::SoftRecordingPrivacyModeEnabled::NAME,
-            Self::SoftLivestreamPrivacyModeEnabled(_) => attributes::SoftLivestreamPrivacyModeEnabled::NAME,
-            Self::HardPrivacyModeOn(_) => attributes::HardPrivacyModeOn::NAME,
-            Self::NightVision(_) => attributes::NightVision::NAME,
-            Self::NightVisionIllum(_) => attributes::NightVisionIllum::NAME,
-            Self::Viewport(_) => attributes::Viewport::NAME,
-            Self::SpeakerMuted(_) => attributes::SpeakerMuted::NAME,
-            Self::SpeakerVolumeLevel(_) => attributes::SpeakerVolumeLevel::NAME,
-            Self::SpeakerMaxLevel(_) => attributes::SpeakerMaxLevel::NAME,
-            Self::SpeakerMinLevel(_) => attributes::SpeakerMinLevel::NAME,
-            Self::MicrophoneMuted(_) => attributes::MicrophoneMuted::NAME,
-            Self::MicrophoneVolumeLevel(_) => attributes::MicrophoneVolumeLevel::NAME,
-            Self::MicrophoneMaxLevel(_) => attributes::MicrophoneMaxLevel::NAME,
-            Self::MicrophoneMinLevel(_) => attributes::MicrophoneMinLevel::NAME,
-            Self::MicrophoneAgcEnabled(_) => attributes::MicrophoneAgcEnabled::NAME,
-            Self::ImageRotation(_) => attributes::ImageRotation::NAME,
-            Self::ImageFlipHorizontal(_) => attributes::ImageFlipHorizontal::NAME,
-            Self::ImageFlipVertical(_) => attributes::ImageFlipVertical::NAME,
-            Self::LocalVideoRecordingEnabled(_) => attributes::LocalVideoRecordingEnabled::NAME,
-            Self::LocalSnapshotRecordingEnabled(_) => attributes::LocalSnapshotRecordingEnabled::NAME,
-            Self::StatusLightEnabled(_) => attributes::StatusLightEnabled::NAME,
-            Self::StatusLightBrightness(_) => attributes::StatusLightBrightness::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        CameraAvStreamManagementCluster::NAME,
-        CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: CameraAvStreamManagementCluster::NAME,
-            cluster_id: CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MaxConcurrentEncoders(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxEncodedPixelRate(inner) => Serialize::serialize(inner, serializer),
-            Self::VideoSensorParams(inner) => Serialize::serialize(inner, serializer),
-            Self::NightVisionUsesInfrared(inner) => Serialize::serialize(inner, serializer),
-            Self::MinViewport(inner) => Serialize::serialize(inner, serializer),
-            Self::RateDistortionTradeOffPoints(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxContentBufferSize(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneCapabilities(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeakerCapabilities(inner) => Serialize::serialize(inner, serializer),
-            Self::TwoWayTalkSupport(inner) => Serialize::serialize(inner, serializer),
-            Self::SnapshotCapabilities(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxNetworkBandwidth(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentFrameRate(inner) => Serialize::serialize(inner, serializer),
-            Self::HdrModeEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::SupportedStreamUsages(inner) => Serialize::serialize(inner, serializer),
-            Self::AllocatedVideoStreams(inner) => Serialize::serialize(inner, serializer),
-            Self::AllocatedAudioStreams(inner) => Serialize::serialize(inner, serializer),
-            Self::AllocatedSnapshotStreams(inner) => Serialize::serialize(inner, serializer),
-            Self::StreamUsagePriorities(inner) => Serialize::serialize(inner, serializer),
-            Self::SoftRecordingPrivacyModeEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::SoftLivestreamPrivacyModeEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::HardPrivacyModeOn(inner) => Serialize::serialize(inner, serializer),
-            Self::NightVision(inner) => Serialize::serialize(inner, serializer),
-            Self::NightVisionIllum(inner) => Serialize::serialize(inner, serializer),
-            Self::Viewport(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeakerMuted(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeakerVolumeLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeakerMaxLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeakerMinLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneMuted(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneVolumeLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneMaxLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneMinLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::MicrophoneAgcEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::ImageRotation(inner) => Serialize::serialize(inner, serializer),
-            Self::ImageFlipHorizontal(inner) => Serialize::serialize(inner, serializer),
-            Self::ImageFlipVertical(inner) => Serialize::serialize(inner, serializer),
-            Self::LocalVideoRecordingEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::LocalSnapshotRecordingEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::StatusLightEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::StatusLightBrightness(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                CameraAvStreamManagementCluster::NAME,
-                CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    CameraAvStreamManagementCluster,
+    [
+        MaxConcurrentEncoders,
+        MaxEncodedPixelRate,
+        VideoSensorParams,
+        NightVisionUsesInfrared,
+        MinViewport,
+        RateDistortionTradeOffPoints,
+        MaxContentBufferSize,
+        MicrophoneCapabilities,
+        SpeakerCapabilities,
+        TwoWayTalkSupport,
+        SnapshotCapabilities,
+        MaxNetworkBandwidth,
+        CurrentFrameRate,
+        HdrModeEnabled,
+        SupportedStreamUsages,
+        AllocatedVideoStreams,
+        AllocatedAudioStreams,
+        AllocatedSnapshotStreams,
+        StreamUsagePriorities,
+        SoftRecordingPrivacyModeEnabled,
+        SoftLivestreamPrivacyModeEnabled,
+        HardPrivacyModeOn,
+        NightVision,
+        NightVisionIllum,
+        Viewport,
+        SpeakerMuted,
+        SpeakerVolumeLevel,
+        SpeakerMaxLevel,
+        SpeakerMinLevel,
+        MicrophoneMuted,
+        MicrophoneVolumeLevel,
+        MicrophoneMaxLevel,
+        MicrophoneMinLevel,
+        MicrophoneAgcEnabled,
+        ImageRotation,
+        ImageFlipHorizontal,
+        ImageFlipVertical,
+        LocalVideoRecordingEnabled,
+        LocalSnapshotRecordingEnabled,
+        StatusLightEnabled,
+        StatusLightBrightness,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`CameraAvStreamManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3785,124 +3680,24 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(command, Command, commands::SetStreamPriorities, SetStreamPriorities);
 crate::impl_cluster_member_variant!(command, Command, commands::CaptureSnapshot, CaptureSnapshot);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CameraAvStreamManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AudioStreamAllocate(_) => commands::AudioStreamAllocate::NAME,
-            Self::AudioStreamDeallocate(_) => commands::AudioStreamDeallocate::NAME,
-            Self::VideoStreamAllocate(_) => commands::VideoStreamAllocate::NAME,
-            Self::VideoStreamModify(_) => commands::VideoStreamModify::NAME,
-            Self::VideoStreamDeallocate(_) => commands::VideoStreamDeallocate::NAME,
-            Self::SnapshotStreamAllocate(_) => commands::SnapshotStreamAllocate::NAME,
-            Self::SnapshotStreamModify(_) => commands::SnapshotStreamModify::NAME,
-            Self::SnapshotStreamDeallocate(_) => commands::SnapshotStreamDeallocate::NAME,
-            Self::SetStreamPriorities(_) => commands::SetStreamPriorities::NAME,
-            Self::CaptureSnapshot(_) => commands::CaptureSnapshot::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        CameraAvStreamManagementCluster::NAME,
-        CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: CameraAvStreamManagementCluster::NAME,
-            cluster_id: CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AudioStreamAllocate(inner) => Serialize::serialize(inner, serializer),
-            Self::AudioStreamDeallocate(inner) => Serialize::serialize(inner, serializer),
-            Self::VideoStreamAllocate(inner) => Serialize::serialize(inner, serializer),
-            Self::VideoStreamModify(inner) => Serialize::serialize(inner, serializer),
-            Self::VideoStreamDeallocate(inner) => Serialize::serialize(inner, serializer),
-            Self::SnapshotStreamAllocate(inner) => Serialize::serialize(inner, serializer),
-            Self::SnapshotStreamModify(inner) => Serialize::serialize(inner, serializer),
-            Self::SnapshotStreamDeallocate(inner) => Serialize::serialize(inner, serializer),
-            Self::SetStreamPriorities(inner) => Serialize::serialize(inner, serializer),
-            Self::CaptureSnapshot(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                CameraAvStreamManagementCluster::NAME,
-                CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                CameraAvStreamManagementCluster::NAME,
-                CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    CameraAvStreamManagementCluster,
+    empty = [],
+    payload = [
+        AudioStreamAllocate,
+        AudioStreamDeallocate,
+        VideoStreamAllocate,
+        VideoStreamModify,
+        VideoStreamDeallocate,
+        SnapshotStreamAllocate,
+        SnapshotStreamModify,
+        SnapshotStreamDeallocate,
+        SetStreamPriorities,
+        CaptureSnapshot,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`CameraAvStreamManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -4091,96 +3886,18 @@ crate::impl_cluster_member_variant!(
     commands::CaptureSnapshotResponse,
     CaptureSnapshotResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CameraAvStreamManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AudioStreamAllocateResponse(_) => commands::AudioStreamAllocateResponse::NAME,
-            Self::VideoStreamAllocateResponse(_) => commands::VideoStreamAllocateResponse::NAME,
-            Self::SnapshotStreamAllocateResponse(_) => commands::SnapshotStreamAllocateResponse::NAME,
-            Self::CaptureSnapshotResponse(_) => commands::CaptureSnapshotResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        CameraAvStreamManagementCluster::NAME,
-        CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: CameraAvStreamManagementCluster::NAME,
-            cluster_id: CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AudioStreamAllocateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::VideoStreamAllocateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::SnapshotStreamAllocateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::CaptureSnapshotResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                CameraAvStreamManagementCluster::NAME,
-                CameraAvStreamManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    CameraAvStreamManagementCluster,
+    empty = [],
+    payload = [
+        AudioStreamAllocateResponse,
+        VideoStreamAllocateResponse,
+        SnapshotStreamAllocateResponse,
+        CaptureSnapshotResponse,
+    ]
+);
 
 crate::define_matter_enum! {
     /// AudioCodecEnum exhaustive specification enum.
@@ -4385,46 +4102,46 @@ impl AudioCapabilitiesStruct {
                     if max_number_of_channels.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_number_of_channels = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if supported_codecs.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <AudioCodecEnum>::try_from)?;
                         supported_codecs = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if supported_sample_rates.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         supported_sample_rates = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if supported_bit_depths.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         supported_bit_depths = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -4471,24 +4188,7 @@ impl AudioCapabilitiesStruct {
     }
 }
 
-impl From<AudioCapabilitiesStruct> for AttributeValue {
-    #[inline]
-    fn from(val: AudioCapabilitiesStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for AudioCapabilitiesStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(AudioCapabilitiesStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -4559,99 +4259,99 @@ impl AudioStreamStruct {
                     if audio_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         audio_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if stream_usage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::StreamUsageEnum>::try_from(fval)?;
                         stream_usage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if audio_codec.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <AudioCodecEnum>::try_from(fval)?;
                         audio_codec = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if channel_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (1_u8..=8_u8)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         channel_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if sample_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         sample_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if bit_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         bit_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if bit_depth.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (8_u8..=32_u8)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         bit_depth = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if reference_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         reference_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -4682,24 +4382,7 @@ impl AudioStreamStruct {
     }
 }
 
-impl From<AudioStreamStruct> for AttributeValue {
-    #[inline]
-    fn from(val: AudioStreamStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for AudioStreamStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(AudioStreamStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -4745,35 +4428,35 @@ impl RateDistortionTradeOffPointsStruct {
                     if codec.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoCodecEnum>::try_from(fval)?;
                         codec = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if min_bit_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         min_bit_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -4794,24 +4477,7 @@ impl RateDistortionTradeOffPointsStruct {
     }
 }
 
-impl From<RateDistortionTradeOffPointsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: RateDistortionTradeOffPointsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for RateDistortionTradeOffPointsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(RateDistortionTradeOffPointsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -4874,57 +4540,57 @@ impl SnapshotCapabilitiesStruct {
                     if resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if max_frame_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_frame_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if image_codec.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ImageCodecEnum>::try_from(fval)?;
                         image_codec = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if requires_encoded_pixels.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         requires_encoded_pixels = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if requires_hardware_encoder.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         requires_hardware_encoder = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -4955,24 +4621,7 @@ impl SnapshotCapabilitiesStruct {
     }
 }
 
-impl From<SnapshotCapabilitiesStruct> for AttributeValue {
-    #[inline]
-    fn from(val: SnapshotCapabilitiesStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for SnapshotCapabilitiesStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(SnapshotCapabilitiesStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5072,127 +4721,127 @@ impl SnapshotStreamStruct {
                     if snapshot_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         snapshot_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if image_codec.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ImageCodecEnum>::try_from(fval)?;
                         image_codec = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if frame_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         frame_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if min_resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         min_resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if max_resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         max_resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if quality.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (1_u8..=100_u8)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         quality = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if reference_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         reference_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if encoded_pixels.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         encoded_pixels = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if hardware_encoder.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         hardware_encoder = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 9 => {
                     if watermark_enabled.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         watermark_enabled = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 10 => {
                     if osd_enabled.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         osd_enabled = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -5239,24 +4888,7 @@ impl SnapshotStreamStruct {
     }
 }
 
-impl From<SnapshotStreamStruct> for AttributeValue {
-    #[inline]
-    fn from(val: SnapshotStreamStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for SnapshotStreamStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(SnapshotStreamStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5294,25 +4926,25 @@ impl VideoResolutionStruct {
                     if width.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         width = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if height.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         height = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -5331,24 +4963,7 @@ impl VideoResolutionStruct {
     }
 }
 
-impl From<VideoResolutionStruct> for AttributeValue {
-    #[inline]
-    fn from(val: VideoResolutionStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for VideoResolutionStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(VideoResolutionStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5402,49 +5017,49 @@ impl VideoSensorParamsStruct {
                     if sensor_width.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 64_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         sensor_width = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if sensor_height.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 64_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         sensor_height = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if max_fps.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_fps = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if max_hdrfps.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_hdrfps = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -5469,24 +5084,7 @@ impl VideoSensorParamsStruct {
     }
 }
 
-impl From<VideoSensorParamsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: VideoSensorParamsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for VideoSensorParamsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(VideoSensorParamsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5601,165 +5199,165 @@ impl VideoStreamStruct {
                     if video_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         video_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if stream_usage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::StreamUsageEnum>::try_from(fval)?;
                         stream_usage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if video_codec.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoCodecEnum>::try_from(fval)?;
                         video_codec = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if min_frame_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         min_frame_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if max_frame_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_frame_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if min_resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         min_resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if max_resolution.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VideoResolutionStruct>::try_from(fval)?;
                         max_resolution = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if min_bit_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         min_bit_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if max_bit_rate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         max_bit_rate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 9 => {
                     if min_key_frame_interval.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 65_500_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         min_key_frame_interval = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 10 => {
                     if max_key_frame_interval.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 65_500_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_key_frame_interval = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 11 => {
                     if watermark_enabled.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         watermark_enabled = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 12 => {
                     if osd_enabled.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         osd_enabled = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 13 => {
                     if reference_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         reference_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -5814,30 +5412,11 @@ impl VideoStreamStruct {
     }
 }
 
-impl From<VideoStreamStruct> for AttributeValue {
-    #[inline]
-    fn from(val: VideoStreamStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for VideoStreamStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(VideoStreamStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -5879,27 +5458,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxConcurrentEncoders, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MaxConcurrentEncoders {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxConcurrentEncoders,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5926,27 +5501,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxEncodedPixelRate, u32, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MaxEncodedPixelRate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxEncodedPixelRate,
+        u32,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5973,11 +5544,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -5991,14 +5557,10 @@ pub mod attributes {
         VideoSensorParams,
         super::VideoSensorParamsStruct,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for VideoSensorParams {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6029,11 +5591,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6047,14 +5604,10 @@ pub mod attributes {
         NightVisionUsesInfrared,
         bool,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for NightVisionUsesInfrared {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6081,11 +5634,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6099,14 +5647,10 @@ pub mod attributes {
         MinViewport,
         super::VideoResolutionStruct,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for MinViewport {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6133,12 +5677,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6158,14 +5696,10 @@ pub mod attributes {
         RateDistortionTradeOffPoints,
         Vec<super::RateDistortionTradeOffPointsStruct>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for RateDistortionTradeOffPoints {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6192,27 +5726,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxContentBufferSize, u32, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MaxContentBufferSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxContentBufferSize,
+        u32,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6239,11 +5769,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6257,14 +5782,10 @@ pub mod attributes {
         MicrophoneCapabilities,
         super::AudioCapabilitiesStruct,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for MicrophoneCapabilities {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6291,11 +5812,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6309,14 +5825,10 @@ pub mod attributes {
         SpeakerCapabilities,
         super::AudioCapabilitiesStruct,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for SpeakerCapabilities {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6343,11 +5855,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6361,14 +5868,10 @@ pub mod attributes {
         TwoWayTalkSupport,
         super::TwoWayTalkSupportTypeEnum,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TwoWayTalkSupport {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6395,12 +5898,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6420,14 +5917,10 @@ pub mod attributes {
         SnapshotCapabilities,
         Vec<super::SnapshotCapabilitiesStruct>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for SnapshotCapabilities {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6454,27 +5947,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxNetworkBandwidth, u32, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MaxNetworkBandwidth {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxNetworkBandwidth,
+        u32,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6501,27 +5990,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(CurrentFrameRate, u16, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for CurrentFrameRate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        CurrentFrameRate,
+        u16,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6552,11 +6037,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6570,19 +6050,14 @@ pub mod attributes {
         HdrModeEnabled,
         super::HdrModeEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for HdrModeEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::HdrModeEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for HdrModeEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -6611,12 +6086,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6636,14 +6105,10 @@ pub mod attributes {
         SupportedStreamUsages,
         Vec<super::globals::StreamUsageEnum>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for SupportedStreamUsages {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6670,12 +6135,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6695,14 +6154,10 @@ pub mod attributes {
         AllocatedVideoStreams,
         Vec<super::VideoStreamStruct>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AllocatedVideoStreams {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6729,12 +6184,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6754,14 +6203,10 @@ pub mod attributes {
         AllocatedAudioStreams,
         Vec<super::AudioStreamStruct>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AllocatedAudioStreams {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6788,12 +6233,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6813,14 +6252,10 @@ pub mod attributes {
         AllocatedSnapshotStreams,
         Vec<super::SnapshotStreamStruct>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AllocatedSnapshotStreams {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6847,12 +6282,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6872,14 +6301,10 @@ pub mod attributes {
         StreamUsagePriorities,
         Vec<super::globals::StreamUsageEnum>,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for StreamUsagePriorities {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -6910,11 +6335,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6928,19 +6348,14 @@ pub mod attributes {
         SoftRecordingPrivacyModeEnabled,
         super::SoftRecordingPrivacyModeEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for SoftRecordingPrivacyModeEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SoftRecordingPrivacyModeEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for SoftRecordingPrivacyModeEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -6973,11 +6388,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -6991,19 +6401,14 @@ pub mod attributes {
         SoftLivestreamPrivacyModeEnabled,
         super::SoftLivestreamPrivacyModeEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for SoftLivestreamPrivacyModeEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SoftLivestreamPrivacyModeEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for SoftLivestreamPrivacyModeEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7036,11 +6441,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7054,19 +6454,14 @@ pub mod attributes {
         HardPrivacyModeOn,
         super::HardPrivacyModeOn,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for HardPrivacyModeOn {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::HardPrivacyModeOn::from(val))
-        }
-    }
-
-    impl fmt::Display for HardPrivacyModeOn {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7095,11 +6490,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7113,14 +6503,10 @@ pub mod attributes {
         NightVision,
         super::TriStateAutoEnum,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for NightVision {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7147,11 +6533,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7165,14 +6546,10 @@ pub mod attributes {
         NightVisionIllum,
         super::TriStateAutoEnum,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for NightVisionIllum {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7199,11 +6576,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7217,14 +6589,10 @@ pub mod attributes {
         Viewport,
         super::globals::ViewportStruct,
         super::CameraAvStreamManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for Viewport {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7255,11 +6623,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7273,19 +6636,14 @@ pub mod attributes {
         SpeakerMuted,
         super::SpeakerMuted,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for SpeakerMuted {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SpeakerMuted::from(val))
-        }
-    }
-
-    impl fmt::Display for SpeakerMuted {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7314,16 +6672,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7331,13 +6684,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeakerVolumeLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for SpeakerVolumeLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SpeakerVolumeLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7364,16 +6718,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7381,13 +6730,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeakerMaxLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for SpeakerMaxLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SpeakerMaxLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7414,16 +6764,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7431,13 +6776,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeakerMinLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for SpeakerMinLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SpeakerMinLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7468,11 +6814,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7486,19 +6827,14 @@ pub mod attributes {
         MicrophoneMuted,
         super::MicrophoneMuted,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for MicrophoneMuted {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::MicrophoneMuted::from(val))
-        }
-    }
-
-    impl fmt::Display for MicrophoneMuted {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7527,16 +6863,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7544,13 +6875,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MicrophoneVolumeLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MicrophoneVolumeLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MicrophoneVolumeLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7577,16 +6909,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7594,13 +6921,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MicrophoneMaxLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MicrophoneMaxLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MicrophoneMaxLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7627,16 +6955,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7644,13 +6967,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MicrophoneMinLevel, u8, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for MicrophoneMinLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MicrophoneMinLevel,
+        u8,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7681,11 +7005,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7699,19 +7018,14 @@ pub mod attributes {
         MicrophoneAgcEnabled,
         super::MicrophoneAgcEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for MicrophoneAgcEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::MicrophoneAgcEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for MicrophoneAgcEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7740,16 +7054,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 359_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7757,13 +7066,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ImageRotation, u16, super::CameraAvStreamManagementCluster, copy);
-
-    impl fmt::Display for ImageRotation {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ImageRotation,
+        u16,
+        super::CameraAvStreamManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7794,11 +7104,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7812,19 +7117,14 @@ pub mod attributes {
         ImageFlipHorizontal,
         super::ImageFlipHorizontal,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for ImageFlipHorizontal {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::ImageFlipHorizontal::from(val))
-        }
-    }
-
-    impl fmt::Display for ImageFlipHorizontal {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7857,11 +7157,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7875,19 +7170,14 @@ pub mod attributes {
         ImageFlipVertical,
         super::ImageFlipVertical,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for ImageFlipVertical {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::ImageFlipVertical::from(val))
-        }
-    }
-
-    impl fmt::Display for ImageFlipVertical {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7920,11 +7210,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7938,19 +7223,14 @@ pub mod attributes {
         LocalVideoRecordingEnabled,
         super::LocalVideoRecordingEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for LocalVideoRecordingEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::LocalVideoRecordingEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for LocalVideoRecordingEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -7983,11 +7263,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8001,19 +7276,14 @@ pub mod attributes {
         LocalSnapshotRecordingEnabled,
         super::LocalSnapshotRecordingEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for LocalSnapshotRecordingEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::LocalSnapshotRecordingEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for LocalSnapshotRecordingEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -8046,11 +7316,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8064,19 +7329,14 @@ pub mod attributes {
         StatusLightEnabled,
         super::StatusLightEnabled,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for StatusLightEnabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::StatusLightEnabled::from(val))
-        }
-    }
-
-    impl fmt::Display for StatusLightEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -8105,11 +7365,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8123,14 +7378,10 @@ pub mod attributes {
         StatusLightBrightness,
         super::globals::ThreeLevelAutoEnum,
         super::CameraAvStreamManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for StatusLightBrightness {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -8167,17 +7418,6 @@ pub mod commands {
         pub sample_rate: u32,
         pub bit_rate: u32,
         pub bit_depth: u8,
-    }
-
-    impl crate::traits::CommandSpec for AudioStreamAllocate {
-        type Response = AudioStreamAllocateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AudioStreamAllocate {
@@ -8223,11 +7463,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -8243,77 +7478,77 @@ pub mod commands {
                         if stream_usage.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::StreamUsageEnum>::try_from(fval)?;
                             stream_usage = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if audio_codec.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AudioCodecEnum>::try_from(fval)?;
                             audio_codec = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if channel_count.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             (1_u8..=8_u8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             channel_count = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if sample_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             sample_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if bit_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             bit_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if bit_depth.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             (8_u8..=32_u8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             bit_depth = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -8327,22 +7562,14 @@ pub mod commands {
                 bit_depth: bit_depth.ok_or((Some(FieldId::new(5)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AudioStreamAllocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        AudioStreamAllocate,
+        super::CameraAvStreamManagementCluster,
+        AudioStreamAllocateResponse,
+        false
+    );
 
     /// This command SHALL be sent by the camera in response to the AudioStreamAllocate command, carrying the newly
     /// allocated or re-used audio stream identifier.
@@ -8356,17 +7583,6 @@ pub mod commands {
     )]
     pub struct AudioStreamAllocateResponse {
         pub audio_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for AudioStreamAllocateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AudioStreamAllocateResponse {
@@ -8388,11 +7604,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_AUDIO_STREAM_ID, AttributeValue::from(self.audio_stream_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -8403,7 +7614,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         audio_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -8415,19 +7626,6 @@ pub mod commands {
             Ok(Self {
                 audio_stream_id: audio_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -8441,6 +7639,7 @@ pub mod commands {
     crate::impl_matter_command!(
         AudioStreamAllocateResponse,
         super::CameraAvStreamManagementCluster,
+        (),
         false
     );
 
@@ -8455,17 +7654,6 @@ pub mod commands {
     )]
     pub struct AudioStreamDeallocate {
         pub audio_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for AudioStreamDeallocate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AudioStreamDeallocate {
@@ -8487,11 +7675,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_AUDIO_STREAM_ID, AttributeValue::from(self.audio_stream_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -8502,7 +7685,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         audio_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -8515,19 +7698,6 @@ pub mod commands {
                 audio_stream_id: audio_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for AudioStreamDeallocate {
@@ -8537,7 +7707,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(AudioStreamDeallocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(AudioStreamDeallocate, super::CameraAvStreamManagementCluster, (), false);
 
     /// This command SHALL allocate a video stream on the camera and return an allocated video stream identifier.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -8565,17 +7735,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub osd_enabled: Optional<bool>,
-    }
-
-    impl crate::traits::CommandSpec for VideoStreamAllocate {
-        type Response = VideoStreamAllocateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl VideoStreamAllocate {
@@ -8665,11 +7824,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -8691,143 +7845,143 @@ pub mod commands {
                         if stream_usage.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::StreamUsageEnum>::try_from(fval)?;
                             stream_usage = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if video_codec.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoCodecEnum>::try_from(fval)?;
                             video_codec = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if min_frame_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             min_frame_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if max_frame_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             max_frame_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if min_resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             min_resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if max_resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             max_resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if min_bit_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             min_bit_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     7 => {
                         if max_bit_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             (decoded >= 1_u32).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             max_bit_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     8 => {
                         if min_key_frame_interval.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded <= 65_500_u16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             min_key_frame_interval = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     9 => {
                         if max_key_frame_interval.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded <= 65_500_u16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             max_key_frame_interval = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     10 => {
                         if watermark_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             watermark_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     11 => {
                         if osd_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             osd_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -8849,22 +8003,14 @@ pub mod commands {
                 osd_enabled: Optional::from(osd_enabled),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(VideoStreamAllocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        VideoStreamAllocate,
+        super::CameraAvStreamManagementCluster,
+        VideoStreamAllocateResponse,
+        false
+    );
 
     /// This command SHALL be sent by the camera in response to the VideoStreamAllocate command, carrying the newly
     /// allocated or re-used video stream identifier.
@@ -8878,17 +8024,6 @@ pub mod commands {
     )]
     pub struct VideoStreamAllocateResponse {
         pub video_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for VideoStreamAllocateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl VideoStreamAllocateResponse {
@@ -8910,11 +8045,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_VIDEO_STREAM_ID, AttributeValue::from(self.video_stream_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -8925,7 +8055,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         video_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -8937,19 +8067,6 @@ pub mod commands {
             Ok(Self {
                 video_stream_id: video_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -8963,6 +8080,7 @@ pub mod commands {
     crate::impl_matter_command!(
         VideoStreamAllocateResponse,
         super::CameraAvStreamManagementCluster,
+        (),
         false
     );
 
@@ -8983,17 +8101,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub osd_enabled: Optional<bool>,
-    }
-
-    impl crate::traits::CommandSpec for VideoStreamModify {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl VideoStreamModify {
@@ -9039,11 +8146,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9056,34 +8158,34 @@ pub mod commands {
                         if video_stream_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             video_stream_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if watermark_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             watermark_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if osd_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             osd_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -9094,19 +8196,6 @@ pub mod commands {
                 osd_enabled: Optional::from(osd_enabled),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for VideoStreamModify {
@@ -9116,7 +8205,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(VideoStreamModify, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(VideoStreamModify, super::CameraAvStreamManagementCluster, (), false);
 
     /// This command SHALL deallocate a video stream on the camera, corresponding to the given video stream identifier.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -9129,17 +8218,6 @@ pub mod commands {
     )]
     pub struct VideoStreamDeallocate {
         pub video_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for VideoStreamDeallocate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl VideoStreamDeallocate {
@@ -9161,11 +8239,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_VIDEO_STREAM_ID, AttributeValue::from(self.video_stream_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9176,7 +8249,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         video_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -9189,19 +8262,6 @@ pub mod commands {
                 video_stream_id: video_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for VideoStreamDeallocate {
@@ -9211,7 +8271,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(VideoStreamDeallocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(VideoStreamDeallocate, super::CameraAvStreamManagementCluster, (), false);
 
     /// This command SHALL allocate a snapshot stream on the device and return an allocated snapshot stream identifier.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -9234,17 +8294,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub osd_enabled: Optional<bool>,
-    }
-
-    impl crate::traits::CommandSpec for SnapshotStreamAllocate {
-        type Response = SnapshotStreamAllocateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SnapshotStreamAllocate {
@@ -9308,11 +8357,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9329,83 +8373,83 @@ pub mod commands {
                         if image_codec.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ImageCodecEnum>::try_from(fval)?;
                             image_codec = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if max_frame_rate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             max_frame_rate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if min_resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             min_resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if max_resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             max_resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if quality.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             (1_u8..=100_u8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             quality = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if watermark_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             watermark_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if osd_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             osd_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -9420,22 +8464,14 @@ pub mod commands {
                 osd_enabled: Optional::from(osd_enabled),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SnapshotStreamAllocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        SnapshotStreamAllocate,
+        super::CameraAvStreamManagementCluster,
+        SnapshotStreamAllocateResponse,
+        false
+    );
 
     /// This command SHALL be sent by the device in response to the SnapshotStreamAllocate command, carrying the newly
     /// allocated or re-used snapshot stream identifier.
@@ -9449,17 +8485,6 @@ pub mod commands {
     )]
     pub struct SnapshotStreamAllocateResponse {
         pub snapshot_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for SnapshotStreamAllocateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SnapshotStreamAllocateResponse {
@@ -9484,11 +8509,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9499,7 +8519,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         snapshot_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -9511,19 +8531,6 @@ pub mod commands {
             Ok(Self {
                 snapshot_stream_id: snapshot_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -9537,6 +8544,7 @@ pub mod commands {
     crate::impl_matter_command!(
         SnapshotStreamAllocateResponse,
         super::CameraAvStreamManagementCluster,
+        (),
         false
     );
 
@@ -9557,17 +8565,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub osd_enabled: Optional<bool>,
-    }
-
-    impl crate::traits::CommandSpec for SnapshotStreamModify {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SnapshotStreamModify {
@@ -9616,11 +8613,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9633,34 +8625,34 @@ pub mod commands {
                         if snapshot_stream_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             snapshot_stream_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if watermark_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             watermark_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if osd_enabled.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             osd_enabled = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -9671,19 +8663,6 @@ pub mod commands {
                 osd_enabled: Optional::from(osd_enabled),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for SnapshotStreamModify {
@@ -9693,7 +8672,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SnapshotStreamModify, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(SnapshotStreamModify, super::CameraAvStreamManagementCluster, (), false);
 
     /// This command SHALL deallocate an snapshot stream on the camera, corresponding to the given snapshot stream
     /// identifier.
@@ -9707,17 +8686,6 @@ pub mod commands {
     )]
     pub struct SnapshotStreamDeallocate {
         pub snapshot_stream_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for SnapshotStreamDeallocate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SnapshotStreamDeallocate {
@@ -9742,11 +8710,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9757,7 +8720,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         snapshot_stream_id = Some(decoded);
                         Ok(())
                     })()
@@ -9770,19 +8733,6 @@ pub mod commands {
                 snapshot_stream_id: snapshot_stream_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for SnapshotStreamDeallocate {
@@ -9792,7 +8742,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SnapshotStreamDeallocate, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        SnapshotStreamDeallocate,
+        super::CameraAvStreamManagementCluster,
+        (),
+        false
+    );
 
     /// This command SHALL set the relative priorities of the various stream usages on the camera.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -9805,17 +8760,6 @@ pub mod commands {
     )]
     pub struct SetStreamPriorities {
         pub stream_priorities: Vec<super::globals::StreamUsageEnum>,
-    }
-
-    impl crate::traits::CommandSpec for SetStreamPriorities {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetStreamPriorities {
@@ -9838,11 +8782,6 @@ pub mod commands {
                 Self::FIELD_STREAM_PRIORITIES,
                 AttributeValue::List(self.stream_priorities.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -9868,19 +8807,6 @@ pub mod commands {
                 stream_priorities: stream_priorities.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::globals::StreamUsageEnum>> for SetStreamPriorities {
@@ -9890,7 +8816,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetStreamPriorities, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(SetStreamPriorities, super::CameraAvStreamManagementCluster, (), false);
 
     /// This command SHALL return a Snapshot from the camera.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -9904,17 +8830,6 @@ pub mod commands {
     pub struct CaptureSnapshot {
         pub snapshot_stream_id: Nullable<u16>,
         pub requested_resolution: super::VideoResolutionStruct,
-    }
-
-    impl crate::traits::CommandSpec for CaptureSnapshot {
-        type Response = CaptureSnapshotResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl CaptureSnapshot {
@@ -9953,11 +8868,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -9969,23 +8879,24 @@ pub mod commands {
                         if snapshot_stream_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             snapshot_stream_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if requested_resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             requested_resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -9996,22 +8907,14 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(CaptureSnapshot, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        CaptureSnapshot,
+        super::CameraAvStreamManagementCluster,
+        CaptureSnapshotResponse,
+        false
+    );
 
     /// This command SHALL be sent by the device in response to the CaptureSnapshot command, carrying the requested
     /// snapshot.
@@ -10028,17 +8931,6 @@ pub mod commands {
         pub data: crate::Bytes,
         pub image_codec: super::ImageCodecEnum,
         pub resolution: super::VideoResolutionStruct,
-    }
-
-    impl crate::traits::CommandSpec for CaptureSnapshotResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvStreamManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl CaptureSnapshotResponse {
@@ -10072,11 +8964,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -10089,34 +8976,34 @@ pub mod commands {
                         if data.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             data = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if image_codec.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ImageCodecEnum>::try_from(fval)?;
                             image_codec = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if resolution.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::VideoResolutionStruct>::try_from(fval)?;
                             resolution = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -10127,20 +9014,12 @@ pub mod commands {
                 resolution: resolution.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(CaptureSnapshotResponse, super::CameraAvStreamManagementCluster, false);
+    crate::impl_matter_command!(
+        CaptureSnapshotResponse,
+        super::CameraAvStreamManagementCluster,
+        (),
+        false
+    );
 }

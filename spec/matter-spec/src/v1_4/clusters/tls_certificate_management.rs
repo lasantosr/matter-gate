@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -560,81 +556,17 @@ crate::impl_cluster_member_variant!(
     attributes::ProvisionedClientCertificates,
     ProvisionedClientCertificates
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsCertificateManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MaxRootCertificates(_) => attributes::MaxRootCertificates::NAME,
-            Self::ProvisionedRootCertificates(_) => attributes::ProvisionedRootCertificates::NAME,
-            Self::MaxClientCertificates(_) => attributes::MaxClientCertificates::NAME,
-            Self::ProvisionedClientCertificates(_) => attributes::ProvisionedClientCertificates::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        TlsCertificateManagementCluster::NAME,
-        TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: TlsCertificateManagementCluster::NAME,
-            cluster_id: TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MaxRootCertificates(inner) => Serialize::serialize(inner, serializer),
-            Self::ProvisionedRootCertificates(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxClientCertificates(inner) => Serialize::serialize(inner, serializer),
-            Self::ProvisionedClientCertificates(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                TlsCertificateManagementCluster::NAME,
-                TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    TlsCertificateManagementCluster,
+    [
+        MaxRootCertificates,
+        ProvisionedRootCertificates,
+        MaxClientCertificates,
+        ProvisionedClientCertificates,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`TlsCertificateManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -933,122 +865,23 @@ crate::impl_cluster_member_variant!(
     commands::RemoveClientCertificate,
     RemoveClientCertificate
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsCertificateManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ProvisionRootCertificate(_) => commands::ProvisionRootCertificate::NAME,
-            Self::FindRootCertificate(_) => commands::FindRootCertificate::NAME,
-            Self::LookupRootCertificate(_) => commands::LookupRootCertificate::NAME,
-            Self::RemoveRootCertificate(_) => commands::RemoveRootCertificate::NAME,
-            Self::TlsClientCsr(_) => commands::TlsClientCsr::NAME,
-            Self::ProvisionClientCertificate(_) => commands::ProvisionClientCertificate::NAME,
-            Self::FindClientCertificate(_) => commands::FindClientCertificate::NAME,
-            Self::LookupClientCertificate(_) => commands::LookupClientCertificate::NAME,
-            Self::RemoveClientCertificate(_) => commands::RemoveClientCertificate::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TlsCertificateManagementCluster::NAME,
-        TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TlsCertificateManagementCluster::NAME,
-            cluster_id: TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ProvisionRootCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::FindRootCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::LookupRootCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveRootCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::TlsClientCsr(inner) => Serialize::serialize(inner, serializer),
-            Self::ProvisionClientCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::FindClientCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::LookupClientCertificate(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveClientCertificate(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsCertificateManagementCluster::NAME,
-                TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsCertificateManagementCluster::NAME,
-                TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    TlsCertificateManagementCluster,
+    empty = [],
+    payload = [
+        ProvisionRootCertificate,
+        FindRootCertificate,
+        LookupRootCertificate,
+        RemoveRootCertificate,
+        TlsClientCsr,
+        ProvisionClientCertificate,
+        FindClientCertificate,
+        LookupClientCertificate,
+        RemoveClientCertificate,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`TlsCertificateManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1293,100 +1126,20 @@ crate::impl_cluster_member_variant!(
     commands::LookupClientCertificateResponse,
     LookupClientCertificateResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsCertificateManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ProvisionRootCertificateResponse(_) => commands::ProvisionRootCertificateResponse::NAME,
-            Self::FindRootCertificateResponse(_) => commands::FindRootCertificateResponse::NAME,
-            Self::LookupRootCertificateResponse(_) => commands::LookupRootCertificateResponse::NAME,
-            Self::TlsClientCsrResponse(_) => commands::TlsClientCsrResponse::NAME,
-            Self::FindClientCertificateResponse(_) => commands::FindClientCertificateResponse::NAME,
-            Self::LookupClientCertificateResponse(_) => commands::LookupClientCertificateResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TlsCertificateManagementCluster::NAME,
-        TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TlsCertificateManagementCluster::NAME,
-            cluster_id: TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ProvisionRootCertificateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::FindRootCertificateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::LookupRootCertificateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TlsClientCsrResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::FindClientCertificateResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::LookupClientCertificateResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsCertificateManagementCluster::NAME,
-                TlsCertificateManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    TlsCertificateManagementCluster,
+    empty = [],
+    payload = [
+        ProvisionRootCertificateResponse,
+        FindRootCertificateResponse,
+        LookupRootCertificateResponse,
+        TlsClientCsrResponse,
+        FindClientCertificateResponse,
+        LookupClientCertificateResponse,
+    ]
+);
 
 crate::define_matter_enum! {
     /// StatusCodeEnum exhaustive specification enum.
@@ -1445,26 +1198,26 @@ impl TlsCertStruct {
                     if caid.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         caid = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if certificate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 3_000)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         certificate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1492,24 +1245,7 @@ impl From<u16> for TlsCertStruct {
     }
 }
 
-impl From<TlsCertStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TlsCertStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TlsCertStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TlsCertStruct);
 
 /// Fabric-scoped data structure.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1570,40 +1306,40 @@ impl TlsClientCertificateDetailStruct {
                     if ccdid.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         ccdid = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if client_certificate.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 3_000)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         client_certificate = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if intermediate_certificates.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <crate::Bytes>::try_from)?;
                         (decoded.len() <= 10)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         intermediate_certificates = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1638,30 +1374,11 @@ impl From<u16> for TlsClientCertificateDetailStruct {
     }
 }
 
-impl From<TlsClientCertificateDetailStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TlsClientCertificateDetailStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TlsClientCertificateDetailStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TlsClientCertificateDetailStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1703,16 +1420,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 5_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1723,13 +1435,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxRootCertificates, u8, super::TlsCertificateManagementCluster, copy);
-
-    impl fmt::Display for MaxRootCertificates {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxRootCertificates,
+        u8,
+        super::TlsCertificateManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1756,12 +1469,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1784,14 +1491,10 @@ pub mod attributes {
         ProvisionedRootCertificates,
         Vec<super::TlsCertStruct>,
         super::TlsCertificateManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ProvisionedRootCertificates {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1818,16 +1521,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 5_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1838,13 +1536,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxClientCertificates, u8, super::TlsCertificateManagementCluster, copy);
-
-    impl fmt::Display for MaxClientCertificates {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxClientCertificates,
+        u8,
+        super::TlsCertificateManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1871,12 +1570,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1899,14 +1592,10 @@ pub mod attributes {
         ProvisionedClientCertificates,
         Vec<super::TlsClientCertificateDetailStruct>,
         super::TlsCertificateManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ProvisionedClientCertificates {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 }
 
 pub mod commands {
@@ -1943,17 +1632,6 @@ pub mod commands {
         pub caid: Nullable<u16>,
     }
 
-    impl crate::traits::CommandSpec for ProvisionRootCertificate {
-        type Response = ProvisionRootCertificateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl ProvisionRootCertificate {
         pub const CLUSTER_ID: ClusterId = super::TlsCertificateManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1984,11 +1662,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2000,26 +1673,27 @@ pub mod commands {
                         if certificate.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 3_000)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             certificate = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if caid.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             caid = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2029,22 +1703,14 @@ pub mod commands {
                 caid: caid.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(ProvisionRootCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        ProvisionRootCertificate,
+        super::TlsCertificateManagementCluster,
+        ProvisionRootCertificateResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a ProvisionRootCertificate command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2057,17 +1723,6 @@ pub mod commands {
     )]
     pub struct ProvisionRootCertificateResponse {
         pub caid: u16,
-    }
-
-    impl crate::traits::CommandSpec for ProvisionRootCertificateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ProvisionRootCertificateResponse {
@@ -2087,11 +1742,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CAID, AttributeValue::from(self.caid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2102,7 +1752,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         caid = Some(decoded);
                         Ok(())
                     })()
@@ -2114,19 +1764,6 @@ pub mod commands {
             Ok(Self {
                 caid: caid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2140,6 +1777,7 @@ pub mod commands {
     crate::impl_matter_command!(
         ProvisionRootCertificateResponse,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -2155,17 +1793,6 @@ pub mod commands {
     )]
     pub struct FindRootCertificate {
         pub caid: Nullable<u16>,
-    }
-
-    impl crate::traits::CommandSpec for FindRootCertificate {
-        type Response = FindRootCertificateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindRootCertificate {
@@ -2191,11 +1818,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2206,7 +1828,8 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         caid = Some(decoded);
                         Ok(())
                     })()
@@ -2218,19 +1841,6 @@ pub mod commands {
             Ok(Self {
                 caid: caid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2255,7 +1865,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(FindRootCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        FindRootCertificate,
+        super::TlsCertificateManagementCluster,
+        FindRootCertificateResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a FindRootCertificate command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2268,17 +1883,6 @@ pub mod commands {
     )]
     pub struct FindRootCertificateResponse {
         pub certificate_details: Vec<super::TlsCertStruct>,
-    }
-
-    impl crate::traits::CommandSpec for FindRootCertificateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindRootCertificateResponse {
@@ -2301,11 +1905,6 @@ pub mod commands {
                 Self::FIELD_CERTIFICATE_DETAILS,
                 AttributeValue::List(self.certificate_details.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2335,19 +1934,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::TlsCertStruct>> for FindRootCertificateResponse {
@@ -2360,6 +1946,7 @@ pub mod commands {
     crate::impl_matter_command!(
         FindRootCertificateResponse,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -2375,17 +1962,6 @@ pub mod commands {
     pub struct LookupRootCertificate {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub fingerprint: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for LookupRootCertificate {
-        type Response = LookupRootCertificateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl LookupRootCertificate {
@@ -2405,11 +1981,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_FINGERPRINT, AttributeValue::from(self.fingerprint)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2438,19 +2009,6 @@ pub mod commands {
                 fingerprint: fingerprint.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for LookupRootCertificate {
@@ -2460,7 +2018,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(LookupRootCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        LookupRootCertificate,
+        super::TlsCertificateManagementCluster,
+        LookupRootCertificateResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a LookupRootCertificate command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2473,17 +2036,6 @@ pub mod commands {
     )]
     pub struct LookupRootCertificateResponse {
         pub caid: u16,
-    }
-
-    impl crate::traits::CommandSpec for LookupRootCertificateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl LookupRootCertificateResponse {
@@ -2503,11 +2055,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CAID, AttributeValue::from(self.caid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2518,7 +2065,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         caid = Some(decoded);
                         Ok(())
                     })()
@@ -2530,19 +2077,6 @@ pub mod commands {
             Ok(Self {
                 caid: caid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2556,6 +2090,7 @@ pub mod commands {
     crate::impl_matter_command!(
         LookupRootCertificateResponse,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -2571,17 +2106,6 @@ pub mod commands {
     )]
     pub struct RemoveRootCertificate {
         pub caid: u16,
-    }
-
-    impl crate::traits::CommandSpec for RemoveRootCertificate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveRootCertificate {
@@ -2601,11 +2125,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CAID, AttributeValue::from(self.caid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2616,7 +2135,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         caid = Some(decoded);
                         Ok(())
                     })()
@@ -2629,19 +2148,6 @@ pub mod commands {
                 caid: caid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for RemoveRootCertificate {
@@ -2651,7 +2157,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveRootCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(RemoveRootCertificate, super::TlsCertificateManagementCluster, (), false);
 
     /// This command SHALL be generated to request the Node generates a Certificate Signing Request.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2665,17 +2171,6 @@ pub mod commands {
     pub struct TlsClientCsr {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub nonce: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for TlsClientCsr {
-        type Response = TlsClientCsrResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TlsClientCsr {
@@ -2693,11 +2188,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_NONCE, AttributeValue::from(self.nonce)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2726,19 +2216,6 @@ pub mod commands {
                 nonce: nonce.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for TlsClientCsr {
@@ -2748,7 +2225,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TlsClientCsr, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        TlsClientCsr,
+        super::TlsCertificateManagementCluster,
+        TlsClientCsrResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a TLSClientCSR command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2765,17 +2247,6 @@ pub mod commands {
         pub csr: crate::Bytes,
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub nonce: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for TlsClientCsrResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TlsClientCsrResponse {
@@ -2805,11 +2276,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2822,40 +2288,40 @@ pub mod commands {
                         if ccdid.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             ccdid = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if csr.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 3_000)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             csr = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if nonce.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 128)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             nonce = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2866,22 +2332,9 @@ pub mod commands {
                 nonce: nonce.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TlsClientCsrResponse, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(TlsClientCsrResponse, super::TlsCertificateManagementCluster, (), false);
 
     /// This command SHALL be generated to request the Node provisions newly provided Client Certificate Details, or
     /// rotate an existing client certificate.
@@ -2896,17 +2349,6 @@ pub mod commands {
     pub struct ProvisionClientCertificate {
         pub ccdid: u16,
         pub client_certificate_details: super::TlsClientCertificateDetailStruct,
-    }
-
-    impl crate::traits::CommandSpec for ProvisionClientCertificate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ProvisionClientCertificate {
@@ -2939,11 +2381,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2955,23 +2392,23 @@ pub mod commands {
                         if ccdid.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             ccdid = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if client_certificate_details.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TlsClientCertificateDetailStruct>::try_from(fval)?;
                             client_certificate_details = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2982,24 +2419,12 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         ProvisionClientCertificate,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -3015,17 +2440,6 @@ pub mod commands {
     )]
     pub struct FindClientCertificate {
         pub ccdid: Nullable<u16>,
-    }
-
-    impl crate::traits::CommandSpec for FindClientCertificate {
-        type Response = FindClientCertificateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindClientCertificate {
@@ -3051,11 +2465,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3066,7 +2475,8 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         ccdid = Some(decoded);
                         Ok(())
                     })()
@@ -3078,19 +2488,6 @@ pub mod commands {
             Ok(Self {
                 ccdid: ccdid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3115,7 +2512,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(FindClientCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        FindClientCertificate,
+        super::TlsCertificateManagementCluster,
+        FindClientCertificateResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a FindClientCertificate command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3128,17 +2530,6 @@ pub mod commands {
     )]
     pub struct FindClientCertificateResponse {
         pub certificate_details: Vec<super::TlsClientCertificateDetailStruct>,
-    }
-
-    impl crate::traits::CommandSpec for FindClientCertificateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindClientCertificateResponse {
@@ -3161,11 +2552,6 @@ pub mod commands {
                 Self::FIELD_CERTIFICATE_DETAILS,
                 AttributeValue::List(self.certificate_details.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3196,19 +2582,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::TlsClientCertificateDetailStruct>> for FindClientCertificateResponse {
@@ -3221,6 +2594,7 @@ pub mod commands {
     crate::impl_matter_command!(
         FindClientCertificateResponse,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -3236,17 +2610,6 @@ pub mod commands {
     pub struct LookupClientCertificate {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub fingerprint: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for LookupClientCertificate {
-        type Response = LookupClientCertificateResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl LookupClientCertificate {
@@ -3266,11 +2629,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_FINGERPRINT, AttributeValue::from(self.fingerprint)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3299,19 +2657,6 @@ pub mod commands {
                 fingerprint: fingerprint.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for LookupClientCertificate {
@@ -3321,7 +2666,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(LookupClientCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        LookupClientCertificate,
+        super::TlsCertificateManagementCluster,
+        LookupClientCertificateResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a LookupClientCertificate command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3334,17 +2684,6 @@ pub mod commands {
     )]
     pub struct LookupClientCertificateResponse {
         pub ccdid: u16,
-    }
-
-    impl crate::traits::CommandSpec for LookupClientCertificateResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl LookupClientCertificateResponse {
@@ -3364,11 +2703,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CCDID, AttributeValue::from(self.ccdid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3379,7 +2713,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         ccdid = Some(decoded);
                         Ok(())
                     })()
@@ -3391,19 +2725,6 @@ pub mod commands {
             Ok(Self {
                 ccdid: ccdid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3417,6 +2738,7 @@ pub mod commands {
     crate::impl_matter_command!(
         LookupClientCertificateResponse,
         super::TlsCertificateManagementCluster,
+        (),
         false
     );
 
@@ -3431,17 +2753,6 @@ pub mod commands {
     )]
     pub struct RemoveClientCertificate {
         pub ccdid: u16,
-    }
-
-    impl crate::traits::CommandSpec for RemoveClientCertificate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsCertificateManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveClientCertificate {
@@ -3461,11 +2772,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CCDID, AttributeValue::from(self.ccdid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3476,7 +2782,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         ccdid = Some(decoded);
                         Ok(())
                     })()
@@ -3489,19 +2795,6 @@ pub mod commands {
                 ccdid: ccdid.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for RemoveClientCertificate {
@@ -3511,5 +2804,10 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveClientCertificate, super::TlsCertificateManagementCluster, false);
+    crate::impl_matter_command!(
+        RemoveClientCertificate,
+        super::TlsCertificateManagementCluster,
+        (),
+        false
+    );
 }
