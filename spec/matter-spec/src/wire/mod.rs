@@ -61,14 +61,26 @@ where
                     "payload" => {
                         payload = Some(map.next_value::<T>()?);
                     }
+                    "cluster" if cluster_name.is_some() => {
+                        return Err(de::Error::duplicate_field("cluster"));
+                    }
                     "cluster" => {
                         cluster_name = Some(map.next_value::<String>()?);
+                    }
+                    "cluster_id" if cluster_id.is_some() => {
+                        return Err(de::Error::duplicate_field("cluster_id"));
                     }
                     "cluster_id" => {
                         cluster_id = Some(map.next_value::<u32>()?);
                     }
+                    "event" if event_name.is_some() => {
+                        return Err(de::Error::duplicate_field("event"));
+                    }
                     "event" => {
                         event_name = Some(map.next_value::<String>()?);
+                    }
+                    "event_id" if event_id.is_some() => {
+                        return Err(de::Error::duplicate_field("event_id"));
                     }
                     "event_id" => {
                         event_id = Some(map.next_value::<u32>()?);

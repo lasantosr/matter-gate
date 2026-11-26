@@ -454,7 +454,7 @@ fn hash_conformance(h: &mut DeterministicHasher, ops: &[ConformanceOp]) {
                 h.write_str(s);
             }
             ConformanceOp::Command(s) => {
-                h.write_u32(15);
+                h.write_u32(16);
                 h.write_str(s);
             }
             ConformanceOp::Literal(s) => {
