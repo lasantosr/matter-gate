@@ -73,48 +73,48 @@ impl SemanticTagStruct {
                     if mfg_code.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <VendorId>::try_from)?;
                         mfg_code = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if namespace_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         namespace_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if tag.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         tag = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if label.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 64))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         label = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -153,21 +153,4 @@ impl SemanticTagStruct {
     }
 }
 
-impl From<SemanticTagStruct> for AttributeValue {
-    #[inline]
-    fn from(val: SemanticTagStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for SemanticTagStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(SemanticTagStruct);

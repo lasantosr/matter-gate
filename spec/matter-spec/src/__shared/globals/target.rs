@@ -58,34 +58,34 @@ impl Target {
                     if cluster.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <ClusterId>::try_from)?;
                         cluster = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if endpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <EndpointId>::try_from)?;
                         endpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if device_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <DeviceTypeId>::try_from)?;
                         device_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -124,21 +124,4 @@ impl Target {
     }
 }
 
-impl From<Target> for AttributeValue {
-    #[inline]
-    fn from(val: Target) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for Target {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(Target);

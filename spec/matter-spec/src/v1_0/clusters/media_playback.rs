@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -805,84 +801,20 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SampledPos
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PlaybackSpeed, PlaybackSpeed);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SeekRangeEnd, SeekRangeEnd);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SeekRangeStart, SeekRangeStart);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        MediaPlaybackCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::CurrentState(_) => attributes::CurrentState::NAME,
-            Self::StartTime(_) => attributes::StartTime::NAME,
-            Self::Duration(_) => attributes::Duration::NAME,
-            Self::SampledPosition(_) => attributes::SampledPosition::NAME,
-            Self::PlaybackSpeed(_) => attributes::PlaybackSpeed::NAME,
-            Self::SeekRangeEnd(_) => attributes::SeekRangeEnd::NAME,
-            Self::SeekRangeStart(_) => attributes::SeekRangeStart::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        MediaPlaybackCluster::NAME,
-        MediaPlaybackCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: MediaPlaybackCluster::NAME,
-            cluster_id: MediaPlaybackCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::CurrentState(inner) => Serialize::serialize(inner, serializer),
-            Self::StartTime(inner) => Serialize::serialize(inner, serializer),
-            Self::Duration(inner) => Serialize::serialize(inner, serializer),
-            Self::SampledPosition(inner) => Serialize::serialize(inner, serializer),
-            Self::PlaybackSpeed(inner) => Serialize::serialize(inner, serializer),
-            Self::SeekRangeEnd(inner) => Serialize::serialize(inner, serializer),
-            Self::SeekRangeStart(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((MediaPlaybackCluster::NAME, MediaPlaybackCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    MediaPlaybackCluster,
+    [
+        CurrentState,
+        StartTime,
+        Duration,
+        SampledPosition,
+        PlaybackSpeed,
+        SeekRangeEnd,
+        SeekRangeStart,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`MediaPlaybackCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1154,120 +1086,22 @@ crate::impl_cluster_member_variant!(command_unit, Command, commands::FastForward
 crate::impl_cluster_member_variant!(command, Command, commands::SkipForward, SkipForward);
 crate::impl_cluster_member_variant!(command, Command, commands::SkipBackward, SkipBackward);
 crate::impl_cluster_member_variant!(command, Command, commands::Seek, Seek);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        MediaPlaybackCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Play => commands::Play::NAME,
-            Self::Pause => commands::Pause::NAME,
-            Self::StopPlayback => commands::StopPlayback::NAME,
-            Self::StartOver => commands::StartOver::NAME,
-            Self::Previous => commands::Previous::NAME,
-            Self::Next => commands::Next::NAME,
-            Self::Rewind => commands::Rewind::NAME,
-            Self::FastForward => commands::FastForward::NAME,
-            Self::SkipForward(_) => commands::SkipForward::NAME,
-            Self::SkipBackward(_) => commands::SkipBackward::NAME,
-            Self::Seek(_) => commands::Seek::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        MediaPlaybackCluster::NAME,
-        MediaPlaybackCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: MediaPlaybackCluster::NAME,
-            cluster_id: MediaPlaybackCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Play
-            | Self::Pause
-            | Self::StopPlayback
-            | Self::StartOver
-            | Self::Previous
-            | Self::Next
-            | Self::Rewind
-            | Self::FastForward => Serialize::serialize(&(), serializer),
-            Self::SkipForward(inner) => Serialize::serialize(inner, serializer),
-            Self::SkipBackward(inner) => Serialize::serialize(inner, serializer),
-            Self::Seek(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((MediaPlaybackCluster::NAME, MediaPlaybackCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((MediaPlaybackCluster::NAME, MediaPlaybackCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    MediaPlaybackCluster,
+    empty = [
+        Play,
+        Pause,
+        StopPlayback,
+        StartOver,
+        Previous,
+        Next,
+        Rewind,
+        FastForward,
+    ],
+    payload = [SkipForward, SkipBackward, Seek,]
+);
 /// Dynamic server-to-client command response variant matching for [`MediaPlaybackCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1359,104 +1193,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::PlaybackResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::PlaybackResponse) -> Self {
-        Self::PlaybackResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::PlaybackResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::PlaybackResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        MediaPlaybackCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::PlaybackResponse(_) => commands::PlaybackResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        MediaPlaybackCluster::NAME,
-        MediaPlaybackCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: MediaPlaybackCluster::NAME,
-            cluster_id: MediaPlaybackCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::PlaybackResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((MediaPlaybackCluster::NAME, MediaPlaybackCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::PlaybackResponse,
+    PlaybackResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    MediaPlaybackCluster,
+    empty = [],
+    payload = [PlaybackResponse,]
+);
 
 crate::define_matter_bitmap! {
     /// MediaPlaybackFeature bitmap.
@@ -1535,23 +1284,24 @@ impl PlaybackPosition {
                     if updated_at.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         updated_at = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if position.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u64>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u64>(&v))?;
                         position = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1576,30 +1326,11 @@ impl PlaybackPosition {
     }
 }
 
-impl From<PlaybackPosition> for AttributeValue {
-    #[inline]
-    fn from(val: PlaybackPosition) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PlaybackPosition {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PlaybackPosition);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1641,11 +1372,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1659,14 +1385,10 @@ pub mod attributes {
         CurrentState,
         super::PlaybackStateEnum,
         super::MediaPlaybackCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for CurrentState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1720,14 +1442,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1737,29 +1451,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StartTime, Nullable<types::EpochUs>, super::MediaPlaybackCluster, copy);
-    impl From<types::EpochUs> for StartTime {
-        #[inline]
-        fn from(val: types::EpochUs) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochUs>> for StartTime {
-        #[inline]
-        fn from(val: Option<types::EpochUs>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for StartTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        StartTime,
+        types::EpochUs,
+        super::MediaPlaybackCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1810,46 +1510,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(Duration, Nullable<u64>, super::MediaPlaybackCluster, copy);
-    impl From<u64> for Duration {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for Duration {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Duration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        Duration,
+        u64,
+        super::MediaPlaybackCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1900,14 +1578,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1918,33 +1588,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SampledPosition,
-        Nullable<super::PlaybackPosition>,
+        super::PlaybackPosition,
         super::MediaPlaybackCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::PlaybackPosition> for SampledPosition {
-        #[inline]
-        fn from(val: super::PlaybackPosition) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::PlaybackPosition>> for SampledPosition {
-        #[inline]
-        fn from(val: Option<super::PlaybackPosition>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SampledPosition {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1971,11 +1622,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1985,13 +1631,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PlaybackSpeed, f32, super::MediaPlaybackCluster, copy);
-
-    impl fmt::Display for PlaybackSpeed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(PlaybackSpeed, f32, super::MediaPlaybackCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2042,46 +1682,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(SeekRangeEnd, Nullable<u64>, super::MediaPlaybackCluster, copy);
-    impl From<u64> for SeekRangeEnd {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for SeekRangeEnd {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SeekRangeEnd {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        SeekRangeEnd,
+        u64,
+        super::MediaPlaybackCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2132,46 +1750,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(SeekRangeStart, Nullable<u64>, super::MediaPlaybackCluster, copy);
-    impl From<u64> for SeekRangeStart {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for SeekRangeStart {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SeekRangeStart {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        SeekRangeStart,
+        u64,
+        super::MediaPlaybackCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -2198,62 +1794,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Play;
 
-    impl crate::traits::CommandSpec for Play {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Play {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Play";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Play, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(Play, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL pause media.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2261,62 +1809,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Pause;
 
-    impl crate::traits::CommandSpec for Pause {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Pause {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Pause";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Pause, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(Pause, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL stop media. User experience is context-specific. This will often navigate the user back
     /// to the location where media was originally launched.
@@ -2325,62 +1825,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct StopPlayback;
 
-    impl crate::traits::CommandSpec for StopPlayback {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl StopPlayback {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x02);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "StopPlayback";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(StopPlayback, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(StopPlayback, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL Start Over with the current media playback item.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2388,62 +1840,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct StartOver;
 
-    impl crate::traits::CommandSpec for StartOver {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl StartOver {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x03);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "StartOver";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(StartOver, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(StartOver, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL cause the handler to be invoked for "Previous". User experience is context-specific.
     /// This will often Go back to the previous media playback item.
@@ -2452,62 +1856,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Previous;
 
-    impl crate::traits::CommandSpec for Previous {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Previous {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x04);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Previous";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Previous, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(Previous, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL cause the handler to be invoked for "Next". User experience is context-specific. This
     /// will often Go forward to the next media playback item.
@@ -2516,62 +1872,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Next;
 
-    impl crate::traits::CommandSpec for Next {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Next {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x05);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Next";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Next, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(Next, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL Rewind through media. Different Rewind speeds can be used on the TV based upon the
     /// number of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast,
@@ -2581,62 +1889,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Rewind;
 
-    impl crate::traits::CommandSpec for Rewind {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Rewind {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x06);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Rewind";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Rewind, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(Rewind, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL Advance through media. Different FF speeds can be used on the TV based upon the number
     /// of sequential calls to this function. This is to avoid needing to define every speed now (multiple fast, slow
@@ -2646,62 +1906,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct FastForward;
 
-    impl crate::traits::CommandSpec for FastForward {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl FastForward {
         pub const CLUSTER_ID: ClusterId = super::MediaPlaybackCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x07);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "FastForward";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(FastForward, super::MediaPlaybackCluster, true);
+    crate::impl_matter_command!(FastForward, super::MediaPlaybackCluster, PlaybackResponse, true);
 
     /// Upon receipt, this SHALL Skip forward in the media by the given number of seconds, using the data as follows:
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2714,17 +1926,6 @@ pub mod commands {
     )]
     pub struct SkipForward {
         pub delta_position_milliseconds: u64,
-    }
-
-    impl crate::traits::CommandSpec for SkipForward {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SkipForward {
@@ -2749,11 +1950,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2764,7 +1960,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         delta_position_milliseconds = Some(decoded);
                         Ok(())
                     })()
@@ -2778,19 +1974,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u64> for SkipForward {
@@ -2800,7 +1983,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SkipForward, super::MediaPlaybackCluster, false);
+    crate::impl_matter_command!(SkipForward, super::MediaPlaybackCluster, PlaybackResponse, false);
 
     /// Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2813,17 +1996,6 @@ pub mod commands {
     )]
     pub struct SkipBackward {
         pub delta_position_milliseconds: u64,
-    }
-
-    impl crate::traits::CommandSpec for SkipBackward {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SkipBackward {
@@ -2848,11 +2020,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2863,7 +2030,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         delta_position_milliseconds = Some(decoded);
                         Ok(())
                     })()
@@ -2877,19 +2044,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u64> for SkipBackward {
@@ -2899,7 +2053,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SkipBackward, super::MediaPlaybackCluster, false);
+    crate::impl_matter_command!(SkipBackward, super::MediaPlaybackCluster, PlaybackResponse, false);
 
     /// Upon receipt, this SHALL Skip backward in the media by the given number of seconds, using the data as follows:
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2912,17 +2066,6 @@ pub mod commands {
     )]
     pub struct Seek {
         pub position: u64,
-    }
-
-    impl crate::traits::CommandSpec for Seek {
-        type Response = PlaybackResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl Seek {
@@ -2944,11 +2087,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_POSITION, AttributeValue::from(self.position)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2959,7 +2097,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         position = Some(decoded);
                         Ok(())
                     })()
@@ -2972,19 +2110,6 @@ pub mod commands {
                 position: position.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u64> for Seek {
@@ -2994,7 +2119,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(Seek, super::MediaPlaybackCluster, false);
+    crate::impl_matter_command!(Seek, super::MediaPlaybackCluster, PlaybackResponse, false);
 
     /// This command SHALL be generated in response to various Playback Request commands.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3010,17 +2135,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub data: Optional<String>,
-    }
-
-    impl crate::traits::CommandSpec for PlaybackResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::MediaPlaybackCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl PlaybackResponse {
@@ -3055,11 +2169,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3071,23 +2180,23 @@ pub mod commands {
                         if status.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::MediaPlaybackStatusEnum>::try_from(fval)?;
                             status = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if data.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             data = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3096,19 +2205,6 @@ pub mod commands {
                 status: status.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
                 data: Optional::from(data),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3119,5 +2215,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(PlaybackResponse, super::MediaPlaybackCluster, false);
+    crate::impl_matter_command!(PlaybackResponse, super::MediaPlaybackCluster, (), false);
 }

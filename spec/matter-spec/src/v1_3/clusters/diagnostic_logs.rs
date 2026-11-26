@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedCommandVariant, deserialize_enum_described, deserialize_enum_invocation};
+use crate::dispatch::DescribedCommandVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -227,117 +225,19 @@ impl TryFrom<model::Command> for Command {
     }
 }
 
-impl From<commands::RetrieveLogsRequest> for Command {
-    #[inline]
-    fn from(cmd: commands::RetrieveLogsRequest) -> Self {
-        Self::RetrieveLogsRequest(cmd)
-    }
-}
-
-impl TryFrom<Command> for commands::RetrieveLogsRequest {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: Command) -> Result<Self, Self::Error> {
-        match cmd {
-            Command::RetrieveLogsRequest(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        DiagnosticLogsCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::RetrieveLogsRequest(_) => commands::RetrieveLogsRequest::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        DiagnosticLogsCluster::NAME,
-        DiagnosticLogsCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: DiagnosticLogsCluster::NAME,
-            cluster_id: DiagnosticLogsCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::RetrieveLogsRequest(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((DiagnosticLogsCluster::NAME, DiagnosticLogsCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((DiagnosticLogsCluster::NAME, DiagnosticLogsCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    Command,
+    commands::RetrieveLogsRequest,
+    RetrieveLogsRequest
+);
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    DiagnosticLogsCluster,
+    empty = [],
+    payload = [RetrieveLogsRequest,]
+);
 /// Dynamic server-to-client command response variant matching for [`DiagnosticLogsCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -429,104 +329,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::RetrieveLogsResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::RetrieveLogsResponse) -> Self {
-        Self::RetrieveLogsResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::RetrieveLogsResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::RetrieveLogsResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        DiagnosticLogsCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::RetrieveLogsResponse(_) => commands::RetrieveLogsResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        DiagnosticLogsCluster::NAME,
-        DiagnosticLogsCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: DiagnosticLogsCluster::NAME,
-            cluster_id: DiagnosticLogsCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::RetrieveLogsResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((DiagnosticLogsCluster::NAME, DiagnosticLogsCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::RetrieveLogsResponse,
+    RetrieveLogsResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    DiagnosticLogsCluster,
+    empty = [],
+    payload = [RetrieveLogsResponse,]
+);
 
 crate::define_matter_enum! {
     /// IntentEnum exhaustive specification enum.
@@ -600,17 +415,6 @@ pub mod commands {
         pub transfer_file_designator: Optional<String>,
     }
 
-    impl crate::traits::CommandSpec for RetrieveLogsRequest {
-        type Response = RetrieveLogsResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::DiagnosticLogsCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl RetrieveLogsRequest {
         pub const CLUSTER_ID: ClusterId = super::DiagnosticLogsCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -652,11 +456,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -669,37 +468,37 @@ pub mod commands {
                         if intent.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::IntentEnum>::try_from(fval)?;
                             intent = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if requested_protocol.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TransferProtocolEnum>::try_from(fval)?;
                             requested_protocol = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if transfer_file_designator.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             transfer_file_designator = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -710,22 +509,14 @@ pub mod commands {
                 transfer_file_designator: Optional::from(transfer_file_designator),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(RetrieveLogsRequest, super::DiagnosticLogsCluster, false);
+    crate::impl_matter_command!(
+        RetrieveLogsRequest,
+        super::DiagnosticLogsCluster,
+        RetrieveLogsResponse,
+        false
+    );
 
     /// Response to the RetrieveLogsRequest.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -746,17 +537,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub time_since_boot: Optional<types::SystimeUs>,
-    }
-
-    impl crate::traits::CommandSpec for RetrieveLogsResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::DiagnosticLogsCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RetrieveLogsResponse {
@@ -805,11 +585,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -823,45 +598,45 @@ pub mod commands {
                         if status.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::StatusEnum>::try_from(fval)?;
                             status = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if log_content.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             log_content = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if utc_time_stamp.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EpochUs>::try_from(fval)?;
                             utc_time_stamp = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if time_since_boot.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::SystimeUs>::try_from(fval)?;
                             time_since_boot = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -873,20 +648,7 @@ pub mod commands {
                 time_since_boot: Optional::from(time_since_boot),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(RetrieveLogsResponse, super::DiagnosticLogsCluster, false);
+    crate::impl_matter_command!(RetrieveLogsResponse, super::DiagnosticLogsCluster, (), false);
 }

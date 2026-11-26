@@ -2,12 +2,15 @@
 
 use core::fmt;
 
-#[cfg(feature = "chrono")]
-use chrono::{Datelike as _, NaiveDate};
+#[cfg(feature = "jiff")]
+use jiff::civil::Date as JiffDate;
 #[cfg(feature = "time")]
 use time::{Date as TimeDate, Month as TimeMonth};
 
-use crate::model::{AttributeValue, MatterStatus};
+use crate::{
+    model::{AttributeValue, MatterStatus},
+    traits::decode_unsigned,
+};
 
 /// Matter Date (`date`) encoded as a packed `u32` calendar bitfield.
 ///
@@ -123,27 +126,27 @@ impl MatterDate {
         if dow >= 1 && dow <= 7 { Some(dow) } else { None }
     }
 
-    /// Convert to a [`chrono::NaiveDate`] if `year`, `month`, and `day` are all specified and form a valid calendar
+    /// Convert to a [`jiff::civil::Date`] if `year`, `month`, and `day` are all specified and form a valid calendar
     /// date.
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn to_chrono_naive_date(self) -> Option<NaiveDate> {
-        let year = i32::from(self.year()?);
-        let month = u32::from(self.month()?);
-        let day = u32::from(self.day()?);
-        NaiveDate::from_ymd_opt(year, month, day)
+    pub fn to_jiff_date(self) -> Option<JiffDate> {
+        let year = i16::try_from(self.year()?).ok()?;
+        let month = i8::try_from(self.month()?).ok()?;
+        let day = i8::try_from(self.day()?).ok()?;
+        JiffDate::new(year, month, day).ok()
     }
 
-    /// Construct from a [`chrono::NaiveDate`], returning `None` if the year is outside `1900..=2154`.
-    #[cfg(feature = "chrono")]
+    /// Construct from a [`jiff::civil::Date`], returning `None` if the year is outside `1900..=2154`.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn from_chrono_naive_date(date: NaiveDate) -> Option<Self> {
+    pub fn from_jiff_date(date: JiffDate) -> Option<Self> {
         let year = u16::try_from(date.year()).ok()?;
         let month = u8::try_from(date.month()).ok()?;
         let day = u8::try_from(date.day()).ok()?;
-        let dow = u8::try_from(date.weekday().number_from_monday()).ok()?;
+        let dow = u8::try_from(date.weekday().to_monday_one_offset()).ok()?;
         Self::new(Some(year), Some(month), Some(day), Some(dow))
     }
 
@@ -198,30 +201,27 @@ impl TryFrom<&AttributeValue> for MatterDate {
 
     #[inline]
     fn try_from(val: &AttributeValue) -> Result<Self, Self::Error> {
-        match val {
-            AttributeValue::U32(v) => Ok(Self(*v)),
-            _ => Err(MatterStatus::InvalidDataType),
-        }
+        decode_unsigned::<u32>(val).map(Self)
     }
 }
 
-#[cfg(feature = "chrono")]
-impl TryFrom<MatterDate> for NaiveDate {
+#[cfg(feature = "jiff")]
+impl TryFrom<MatterDate> for JiffDate {
     type Error = MatterStatus;
 
     #[inline]
     fn try_from(val: MatterDate) -> Result<Self, Self::Error> {
-        val.to_chrono_naive_date().ok_or(MatterStatus::ConstraintError)
+        val.to_jiff_date().ok_or(MatterStatus::ConstraintError)
     }
 }
 
-#[cfg(feature = "chrono")]
-impl TryFrom<NaiveDate> for MatterDate {
+#[cfg(feature = "jiff")]
+impl TryFrom<JiffDate> for MatterDate {
     type Error = MatterStatus;
 
     #[inline]
-    fn try_from(date: NaiveDate) -> Result<Self, Self::Error> {
-        Self::from_chrono_naive_date(date).ok_or(MatterStatus::ConstraintError)
+    fn try_from(date: JiffDate) -> Result<Self, Self::Error> {
+        Self::from_jiff_date(date).ok_or(MatterStatus::ConstraintError)
     }
 }
 
@@ -261,7 +261,23 @@ mod tests {
         assert_eq!(MatterDate::try_from(&av), Ok(d));
         assert_eq!(MatterDate::try_from(av), Ok(d));
         assert_eq!(
-            MatterDate::try_from(&AttributeValue::U16(0)),
+            MatterDate::try_from(&AttributeValue::U8(0)),
+            Ok(MatterDate::from_raw(0))
+        );
+        assert_eq!(
+            MatterDate::try_from(&AttributeValue::U16(42)),
+            Ok(MatterDate::from_raw(42))
+        );
+        assert_eq!(
+            MatterDate::try_from(&AttributeValue::U64(42)),
+            Ok(MatterDate::from_raw(42))
+        );
+        assert_eq!(
+            MatterDate::try_from(&AttributeValue::U64(u64::MAX)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            MatterDate::try_from(&AttributeValue::I32(0)),
             Err(MatterStatus::InvalidDataType)
         );
     }
@@ -300,16 +316,16 @@ mod tests {
         assert_eq!(invalid_raw.day_of_week(), None);
     }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[test]
-    fn matter_date_chrono_round_trip() {
+    fn matter_date_jiff_round_trip() {
         let d = MatterDate::new(Some(2026), Some(11), Some(15), Some(7)).expect("valid date");
-        let nd = NaiveDate::try_from(d).expect("valid NaiveDate");
-        assert_eq!(nd, NaiveDate::from_ymd_opt(2026, 11, 15).expect("ymd"));
-        assert_eq!(MatterDate::try_from(nd), Ok(d));
+        let jd = JiffDate::try_from(d).expect("valid jiff::civil::Date");
+        assert_eq!(jd, JiffDate::new(2026, 11, 15).expect("ymd"));
+        assert_eq!(MatterDate::try_from(jd), Ok(d));
 
         let wildcard = MatterDate::new(None, Some(11), Some(15), None).expect("wildcard");
-        assert_eq!(NaiveDate::try_from(wildcard), Err(MatterStatus::ConstraintError));
+        assert_eq!(JiffDate::try_from(wildcard), Err(MatterStatus::ConstraintError));
     }
 
     #[cfg(feature = "time")]

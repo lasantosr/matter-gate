@@ -14,14 +14,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1821,116 +1815,36 @@ crate::impl_cluster_member_variant!(
     SpecificationVersion
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MaxPathsPerInvoke, MaxPathsPerInvoke);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BasicInformationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::DataModelRevision(_) => attributes::DataModelRevision::NAME,
-            Self::VendorName(_) => attributes::VendorName::NAME,
-            Self::VendorId(_) => attributes::VendorId::NAME,
-            Self::ProductName(_) => attributes::ProductName::NAME,
-            Self::ProductId(_) => attributes::ProductId::NAME,
-            Self::NodeLabel(_) => attributes::NodeLabel::NAME,
-            Self::Location(_) => attributes::Location::NAME,
-            Self::HardwareVersion(_) => attributes::HardwareVersion::NAME,
-            Self::HardwareVersionString(_) => attributes::HardwareVersionString::NAME,
-            Self::SoftwareVersion(_) => attributes::SoftwareVersion::NAME,
-            Self::SoftwareVersionString(_) => attributes::SoftwareVersionString::NAME,
-            Self::ManufacturingDate(_) => attributes::ManufacturingDate::NAME,
-            Self::PartNumber(_) => attributes::PartNumber::NAME,
-            Self::ProductUrl(_) => attributes::ProductUrl::NAME,
-            Self::ProductLabel(_) => attributes::ProductLabel::NAME,
-            Self::SerialNumber(_) => attributes::SerialNumber::NAME,
-            Self::LocalConfigDisabled(_) => attributes::LocalConfigDisabled::NAME,
-            Self::Reachable(_) => attributes::Reachable::NAME,
-            Self::UniqueId(_) => attributes::UniqueId::NAME,
-            Self::CapabilityMinima(_) => attributes::CapabilityMinima::NAME,
-            Self::ProductAppearance(_) => attributes::ProductAppearance::NAME,
-            Self::SpecificationVersion(_) => attributes::SpecificationVersion::NAME,
-            Self::MaxPathsPerInvoke(_) => attributes::MaxPathsPerInvoke::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        BasicInformationCluster::NAME,
-        BasicInformationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: BasicInformationCluster::NAME,
-            cluster_id: BasicInformationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::DataModelRevision(inner) => Serialize::serialize(inner, serializer),
-            Self::VendorName(inner) => Serialize::serialize(inner, serializer),
-            Self::VendorId(inner) => Serialize::serialize(inner, serializer),
-            Self::ProductName(inner) => Serialize::serialize(inner, serializer),
-            Self::ProductId(inner) => Serialize::serialize(inner, serializer),
-            Self::NodeLabel(inner) => Serialize::serialize(inner, serializer),
-            Self::Location(inner) => Serialize::serialize(inner, serializer),
-            Self::HardwareVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::HardwareVersionString(inner) => Serialize::serialize(inner, serializer),
-            Self::SoftwareVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::SoftwareVersionString(inner) => Serialize::serialize(inner, serializer),
-            Self::ManufacturingDate(inner) => Serialize::serialize(inner, serializer),
-            Self::PartNumber(inner) => Serialize::serialize(inner, serializer),
-            Self::ProductUrl(inner) => Serialize::serialize(inner, serializer),
-            Self::ProductLabel(inner) => Serialize::serialize(inner, serializer),
-            Self::SerialNumber(inner) => Serialize::serialize(inner, serializer),
-            Self::LocalConfigDisabled(inner) => Serialize::serialize(inner, serializer),
-            Self::Reachable(inner) => Serialize::serialize(inner, serializer),
-            Self::UniqueId(inner) => Serialize::serialize(inner, serializer),
-            Self::CapabilityMinima(inner) => Serialize::serialize(inner, serializer),
-            Self::ProductAppearance(inner) => Serialize::serialize(inner, serializer),
-            Self::SpecificationVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxPathsPerInvoke(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((BasicInformationCluster::NAME, BasicInformationCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    BasicInformationCluster,
+    [
+        DataModelRevision,
+        VendorName,
+        VendorId,
+        ProductName,
+        ProductId,
+        NodeLabel,
+        Location,
+        HardwareVersion,
+        HardwareVersionString,
+        SoftwareVersion,
+        SoftwareVersionString,
+        ManufacturingDate,
+        PartNumber,
+        ProductUrl,
+        ProductLabel,
+        SerialNumber,
+        LocalConfigDisabled,
+        Reachable,
+        UniqueId,
+        CapabilityMinima,
+        ProductAppearance,
+        SpecificationVersion,
+        MaxPathsPerInvoke,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`BasicInformationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2022,117 +1936,14 @@ impl TryFrom<model::Command> for Command {
     }
 }
 
-impl From<commands::MfgSpecificPing> for Command {
-    #[inline]
-    fn from(_: commands::MfgSpecificPing) -> Self {
-        Self::MfgSpecificPing
-    }
-}
-
-impl TryFrom<Command> for commands::MfgSpecificPing {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: Command) -> Result<Self, Self::Error> {
-        match cmd {
-            Command::MfgSpecificPing => Ok(Self),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BasicInformationCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::MfgSpecificPing => commands::MfgSpecificPing::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        BasicInformationCluster::NAME,
-        BasicInformationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: BasicInformationCluster::NAME,
-            cluster_id: BasicInformationCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MfgSpecificPing => Serialize::serialize(&(), serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((BasicInformationCluster::NAME, BasicInformationCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((BasicInformationCluster::NAME, BasicInformationCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(command_unit_single, Command, commands::MfgSpecificPing, MfgSpecificPing);
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    BasicInformationCluster,
+    empty = [MfgSpecificPing,],
+    payload = []
+);
 /// Dynamic event variant matching for [`BasicInformationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2298,93 +2109,13 @@ crate::impl_cluster_member_variant!(event, Event, events::StartUp, StartUp);
 crate::impl_cluster_member_variant!(event_unit, Event, events::ShutDown, ShutDown);
 crate::impl_cluster_member_variant!(event, Event, events::Leave, Leave);
 crate::impl_cluster_member_variant!(event, Event, events::ReachableChanged, ReachableChanged);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BasicInformationCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::StartUp(_) => events::StartUp::NAME,
-            Self::ShutDown => events::ShutDown::NAME,
-            Self::Leave(_) => events::Leave::NAME,
-            Self::ReachableChanged(_) => events::ReachableChanged::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        BasicInformationCluster::NAME,
-        BasicInformationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: BasicInformationCluster::NAME,
-            cluster_id: BasicInformationCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ShutDown => Serialize::serialize(&(), serializer),
-            Self::StartUp(inner) => Serialize::serialize(inner, serializer),
-            Self::Leave(inner) => Serialize::serialize(inner, serializer),
-            Self::ReachableChanged(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((BasicInformationCluster::NAME, BasicInformationCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    BasicInformationCluster,
+    empty = [ShutDown,],
+    payload = [StartUp, Leave, ReachableChanged,]
+);
 
 crate::define_matter_semantic_bool! {
     /// Specification 2-variant semantic boolean enum for [`LocalConfigDisabled`].
@@ -2438,23 +2169,23 @@ impl CapabilityMinimaStruct {
                     if case_sessions_per_fabric.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         case_sessions_per_fabric = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if subscriptions_per_fabric.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         subscriptions_per_fabric = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2481,30 +2212,11 @@ impl CapabilityMinimaStruct {
     }
 }
 
-impl From<CapabilityMinimaStruct> for AttributeValue {
-    #[inline]
-    fn from(val: CapabilityMinimaStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for CapabilityMinimaStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(CapabilityMinimaStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2546,27 +2258,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(DataModelRevision, u16, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for DataModelRevision {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        DataModelRevision,
+        u16,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2593,11 +2301,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2610,13 +2313,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(VendorName, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for VendorName {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        VendorName,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2643,11 +2347,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2657,13 +2356,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(VendorId, model::VendorId, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for VendorId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        VendorId,
+        model::VendorId,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2690,11 +2390,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2707,13 +2402,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ProductName, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for ProductName {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ProductName,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2740,27 +2436,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(ProductId, u16, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for ProductId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(ProductId, u16, super::BasicInformationCluster, copy, scalar, display);
 
     /// NodeLabel.
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2788,11 +2473,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2805,13 +2485,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NodeLabel, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for NodeLabel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NodeLabel,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     /// Location.
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -2839,11 +2520,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2856,13 +2532,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Location, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for Location {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Location, String, super::BasicInformationCluster, owned, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2889,27 +2559,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(HardwareVersion, u16, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for HardwareVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        HardwareVersion,
+        u16,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2936,11 +2602,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2953,13 +2614,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(HardwareVersionString, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for HardwareVersionString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        HardwareVersionString,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2986,27 +2648,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(SoftwareVersion, u32, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for SoftwareVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SoftwareVersion,
+        u32,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3033,11 +2691,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3050,13 +2703,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SoftwareVersionString, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for SoftwareVersionString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SoftwareVersionString,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3083,11 +2737,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3100,13 +2749,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ManufacturingDate, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for ManufacturingDate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ManufacturingDate,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3133,11 +2783,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3150,13 +2795,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PartNumber, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for PartNumber {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PartNumber,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3183,11 +2829,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3200,13 +2841,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ProductUrl, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for ProductUrl {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ProductUrl,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3233,11 +2875,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3250,13 +2887,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ProductLabel, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for ProductLabel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ProductLabel,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3283,11 +2921,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3300,13 +2933,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SerialNumber, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for SerialNumber {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SerialNumber,
+        String,
+        super::BasicInformationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     /// LocalConfigDisabled.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -3338,11 +2972,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3356,19 +2985,14 @@ pub mod attributes {
         LocalConfigDisabled,
         super::LocalConfigDisabled,
         super::BasicInformationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for LocalConfigDisabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::LocalConfigDisabled::from(val))
-        }
-    }
-
-    impl fmt::Display for LocalConfigDisabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -3401,11 +3025,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3415,18 +3034,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Reachable, super::Reachable, super::BasicInformationCluster, copy);
-
+    crate::impl_matter_attribute!(
+        Reachable,
+        super::Reachable,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for Reachable {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::Reachable::from(val))
-        }
-    }
-
-    impl fmt::Display for Reachable {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -3455,11 +3074,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3472,13 +3086,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UniqueId, String, super::BasicInformationCluster, owned);
-
-    impl fmt::Display for UniqueId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(UniqueId, String, super::BasicInformationCluster, owned, scalar, display);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3505,11 +3113,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3523,14 +3126,10 @@ pub mod attributes {
         CapabilityMinima,
         super::CapabilityMinimaStruct,
         super::BasicInformationCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for CapabilityMinima {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3557,11 +3156,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3575,14 +3169,10 @@ pub mod attributes {
         ProductAppearance,
         super::globals::ProductAppearanceStruct,
         super::BasicInformationCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for ProductAppearance {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3609,27 +3199,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(SpecificationVersion, u32, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for SpecificationVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SpecificationVersion,
+        u32,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3656,27 +3242,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxPathsPerInvoke, u16, super::BasicInformationCluster, copy);
-
-    impl fmt::Display for MaxPathsPerInvoke {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxPathsPerInvoke,
+        u16,
+        super::BasicInformationCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -3702,62 +3284,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct MfgSpecificPing;
 
-    impl crate::traits::CommandSpec for MfgSpecificPing {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::BasicInformationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl MfgSpecificPing {
         pub const CLUSTER_ID: ClusterId = super::BasicInformationCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "MfgSpecificPing";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(MfgSpecificPing, super::BasicInformationCluster, true);
+    crate::impl_matter_command!(MfgSpecificPing, super::BasicInformationCluster, (), true);
 }
 
 pub mod events {
@@ -3813,11 +3347,6 @@ pub mod events {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3828,7 +3357,7 @@ pub mod events {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         software_version = Some(decoded);
                         Ok(())
                     })()
@@ -3840,19 +3369,6 @@ pub mod events {
             Ok(Self {
                 software_version: software_version.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3876,43 +3392,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x01);
         pub const NAME: &'static str = "ShutDown";
         pub const PRIORITY: EventPriority = EventPriority::Critical;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(ShutDown, super::BasicInformationCluster, true);
@@ -3949,11 +3428,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_FABRIC_INDEX, AttributeValue::from(self.fabric_index)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3976,19 +3450,6 @@ pub mod events {
             Ok(Self {
                 fabric_index: fabric_index.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -4036,11 +3497,6 @@ pub mod events {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4064,19 +3520,6 @@ pub mod events {
                 reachable_new_value: reachable_new_value
                     .ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

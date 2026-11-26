@@ -12,14 +12,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -2132,116 +2126,36 @@ crate::impl_cluster_member_variant!(
     attributes::SessionEnergyDischarged,
     SessionEnergyDischarged
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EnergyEvseCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::State(_) => attributes::State::NAME,
-            Self::SupplyState(_) => attributes::SupplyState::NAME,
-            Self::FaultState(_) => attributes::FaultState::NAME,
-            Self::ChargingEnabledUntil(_) => attributes::ChargingEnabledUntil::NAME,
-            Self::DischargingEnabledUntil(_) => attributes::DischargingEnabledUntil::NAME,
-            Self::CircuitCapacity(_) => attributes::CircuitCapacity::NAME,
-            Self::MinimumChargeCurrent(_) => attributes::MinimumChargeCurrent::NAME,
-            Self::MaximumChargeCurrent(_) => attributes::MaximumChargeCurrent::NAME,
-            Self::MaximumDischargeCurrent(_) => attributes::MaximumDischargeCurrent::NAME,
-            Self::UserMaximumChargeCurrent(_) => attributes::UserMaximumChargeCurrent::NAME,
-            Self::RandomizationDelayWindow(_) => attributes::RandomizationDelayWindow::NAME,
-            Self::NextChargeStartTime(_) => attributes::NextChargeStartTime::NAME,
-            Self::NextChargeTargetTime(_) => attributes::NextChargeTargetTime::NAME,
-            Self::NextChargeRequiredEnergy(_) => attributes::NextChargeRequiredEnergy::NAME,
-            Self::NextChargeTargetSoC(_) => attributes::NextChargeTargetSoC::NAME,
-            Self::ApproximateEvEfficiency(_) => attributes::ApproximateEvEfficiency::NAME,
-            Self::StateOfCharge(_) => attributes::StateOfCharge::NAME,
-            Self::BatteryCapacity(_) => attributes::BatteryCapacity::NAME,
-            Self::VehicleId(_) => attributes::VehicleId::NAME,
-            Self::SessionId(_) => attributes::SessionId::NAME,
-            Self::SessionDuration(_) => attributes::SessionDuration::NAME,
-            Self::SessionEnergyCharged(_) => attributes::SessionEnergyCharged::NAME,
-            Self::SessionEnergyDischarged(_) => attributes::SessionEnergyDischarged::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        EnergyEvseCluster::NAME,
-        EnergyEvseCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: EnergyEvseCluster::NAME,
-            cluster_id: EnergyEvseCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::State(inner) => Serialize::serialize(inner, serializer),
-            Self::SupplyState(inner) => Serialize::serialize(inner, serializer),
-            Self::FaultState(inner) => Serialize::serialize(inner, serializer),
-            Self::ChargingEnabledUntil(inner) => Serialize::serialize(inner, serializer),
-            Self::DischargingEnabledUntil(inner) => Serialize::serialize(inner, serializer),
-            Self::CircuitCapacity(inner) => Serialize::serialize(inner, serializer),
-            Self::MinimumChargeCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::MaximumChargeCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::MaximumDischargeCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::UserMaximumChargeCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::RandomizationDelayWindow(inner) => Serialize::serialize(inner, serializer),
-            Self::NextChargeStartTime(inner) => Serialize::serialize(inner, serializer),
-            Self::NextChargeTargetTime(inner) => Serialize::serialize(inner, serializer),
-            Self::NextChargeRequiredEnergy(inner) => Serialize::serialize(inner, serializer),
-            Self::NextChargeTargetSoC(inner) => Serialize::serialize(inner, serializer),
-            Self::ApproximateEvEfficiency(inner) => Serialize::serialize(inner, serializer),
-            Self::StateOfCharge(inner) => Serialize::serialize(inner, serializer),
-            Self::BatteryCapacity(inner) => Serialize::serialize(inner, serializer),
-            Self::VehicleId(inner) => Serialize::serialize(inner, serializer),
-            Self::SessionId(inner) => Serialize::serialize(inner, serializer),
-            Self::SessionDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::SessionEnergyCharged(inner) => Serialize::serialize(inner, serializer),
-            Self::SessionEnergyDischarged(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((EnergyEvseCluster::NAME, EnergyEvseCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    EnergyEvseCluster,
+    [
+        State,
+        SupplyState,
+        FaultState,
+        ChargingEnabledUntil,
+        DischargingEnabledUntil,
+        CircuitCapacity,
+        MinimumChargeCurrent,
+        MaximumChargeCurrent,
+        MaximumDischargeCurrent,
+        UserMaximumChargeCurrent,
+        RandomizationDelayWindow,
+        NextChargeStartTime,
+        NextChargeTargetTime,
+        NextChargeRequiredEnergy,
+        NextChargeTargetSoC,
+        ApproximateEvEfficiency,
+        StateOfCharge,
+        BatteryCapacity,
+        VehicleId,
+        SessionId,
+        SessionDuration,
+        SessionEnergyCharged,
+        SessionEnergyDischarged,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`EnergyEvseCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2444,111 +2358,13 @@ crate::impl_cluster_member_variant!(command_unit, Command, commands::StartDiagno
 crate::impl_cluster_member_variant!(command, Command, commands::SetTargets, SetTargets);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::GetTargets, GetTargets);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::ClearTargets, ClearTargets);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EnergyEvseCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Disable => commands::Disable::NAME,
-            Self::EnableCharging(_) => commands::EnableCharging::NAME,
-            Self::EnableDischarging(_) => commands::EnableDischarging::NAME,
-            Self::StartDiagnostics => commands::StartDiagnostics::NAME,
-            Self::SetTargets(_) => commands::SetTargets::NAME,
-            Self::GetTargets => commands::GetTargets::NAME,
-            Self::ClearTargets => commands::ClearTargets::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        EnergyEvseCluster::NAME,
-        EnergyEvseCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: EnergyEvseCluster::NAME,
-            cluster_id: EnergyEvseCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Disable | Self::StartDiagnostics | Self::GetTargets | Self::ClearTargets => {
-                Serialize::serialize(&(), serializer)
-            }
-            Self::EnableCharging(inner) => Serialize::serialize(inner, serializer),
-            Self::EnableDischarging(inner) => Serialize::serialize(inner, serializer),
-            Self::SetTargets(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((EnergyEvseCluster::NAME, EnergyEvseCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((EnergyEvseCluster::NAME, EnergyEvseCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    EnergyEvseCluster,
+    empty = [Disable, StartDiagnostics, GetTargets, ClearTargets,],
+    payload = [EnableCharging, EnableDischarging, SetTargets,]
+);
 /// Dynamic server-to-client command response variant matching for [`EnergyEvseCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2640,104 +2456,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::GetTargetsResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::GetTargetsResponse) -> Self {
-        Self::GetTargetsResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::GetTargetsResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::GetTargetsResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EnergyEvseCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::GetTargetsResponse(_) => commands::GetTargetsResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        EnergyEvseCluster::NAME,
-        EnergyEvseCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: EnergyEvseCluster::NAME,
-            cluster_id: EnergyEvseCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::GetTargetsResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((EnergyEvseCluster::NAME, EnergyEvseCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::GetTargetsResponse,
+    GetTargetsResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    EnergyEvseCluster,
+    empty = [],
+    payload = [GetTargetsResponse,]
+);
 /// Dynamic event variant matching for [`EnergyEvseCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2963,97 +2694,20 @@ crate::impl_cluster_member_variant!(event, Event, events::EnergyTransferStarted,
 crate::impl_cluster_member_variant!(event, Event, events::EnergyTransferStopped, EnergyTransferStopped);
 crate::impl_cluster_member_variant!(event, Event, events::Fault, Fault);
 crate::impl_cluster_member_variant!(event, Event, events::Rfid, Rfid);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EnergyEvseCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::EvConnected(_) => events::EvConnected::NAME,
-            Self::EvNotDetected(_) => events::EvNotDetected::NAME,
-            Self::EnergyTransferStarted(_) => events::EnergyTransferStarted::NAME,
-            Self::EnergyTransferStopped(_) => events::EnergyTransferStopped::NAME,
-            Self::Fault(_) => events::Fault::NAME,
-            Self::Rfid(_) => events::Rfid::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        EnergyEvseCluster::NAME,
-        EnergyEvseCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: EnergyEvseCluster::NAME,
-            cluster_id: EnergyEvseCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::EvConnected(inner) => Serialize::serialize(inner, serializer),
-            Self::EvNotDetected(inner) => Serialize::serialize(inner, serializer),
-            Self::EnergyTransferStarted(inner) => Serialize::serialize(inner, serializer),
-            Self::EnergyTransferStopped(inner) => Serialize::serialize(inner, serializer),
-            Self::Fault(inner) => Serialize::serialize(inner, serializer),
-            Self::Rfid(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((EnergyEvseCluster::NAME, EnergyEvseCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    EnergyEvseCluster,
+    empty = [],
+    payload = [
+        EvConnected,
+        EvNotDetected,
+        EnergyTransferStarted,
+        EnergyTransferStopped,
+        Fault,
+        Rfid,
+    ]
+);
 
 crate::define_matter_bitmap! {
     /// TargetDayOfWeekBitmap bitmap.
@@ -3203,40 +2857,40 @@ impl ChargingTargetStruct {
                     if target_time_minutes_past_midnight.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 1439_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         target_time_minutes_past_midnight = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if target_so_c.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent>::try_from(fval)?;
                         target_so_c = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if added_energy.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EnergyMwh>::try_from(fval)?;
                         (decoded.raw() >= 0_i64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         added_energy = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3272,24 +2926,7 @@ impl From<u16> for ChargingTargetStruct {
     }
 }
 
-impl From<ChargingTargetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ChargingTargetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ChargingTargetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ChargingTargetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3330,26 +2967,26 @@ impl ChargingTargetScheduleStruct {
                     if day_of_week_for_sequence.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <TargetDayOfWeekBitmap>::try_from(fval)?;
                         day_of_week_for_sequence = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if charging_targets.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <ChargingTargetStruct>::try_from)?;
                         (decoded.len() <= 10)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         charging_targets = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3375,30 +3012,11 @@ impl ChargingTargetScheduleStruct {
     }
 }
 
-impl From<ChargingTargetScheduleStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ChargingTargetScheduleStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ChargingTargetScheduleStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ChargingTargetScheduleStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3464,14 +3082,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3481,29 +3091,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(State, Nullable<super::StateEnum>, super::EnergyEvseCluster, copy);
-    impl From<super::StateEnum> for State {
-        #[inline]
-        fn from(val: super::StateEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::StateEnum>> for State {
-        #[inline]
-        fn from(val: Option<super::StateEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for State {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        State,
+        super::StateEnum,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3530,11 +3126,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3544,13 +3135,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SupplyState, super::SupplyStateEnum, super::EnergyEvseCluster, copy);
-
-    impl fmt::Display for SupplyState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SupplyState,
+        super::SupplyStateEnum,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3577,11 +3169,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3591,13 +3178,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(FaultState, super::FaultStateEnum, super::EnergyEvseCluster, copy);
-
-    impl fmt::Display for FaultState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        FaultState,
+        super::FaultStateEnum,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3651,14 +3239,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3669,33 +3249,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ChargingEnabledUntil,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for ChargingEnabledUntil {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for ChargingEnabledUntil {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ChargingEnabledUntil {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3749,14 +3310,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3767,33 +3320,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DischargingEnabledUntil,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for DischargingEnabledUntil {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for DischargingEnabledUntil {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DischargingEnabledUntil {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3814,11 +3348,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3831,13 +3360,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(CircuitCapacity, types::AmperageMa, super::EnergyEvseCluster, copy);
-
-    impl fmt::Display for CircuitCapacity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        CircuitCapacity,
+        types::AmperageMa,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3858,11 +3388,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3875,13 +3400,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinimumChargeCurrent, types::AmperageMa, super::EnergyEvseCluster, copy);
-
-    impl fmt::Display for MinimumChargeCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MinimumChargeCurrent,
+        types::AmperageMa,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3902,11 +3428,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3919,13 +3440,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaximumChargeCurrent, types::AmperageMa, super::EnergyEvseCluster, copy);
-
-    impl fmt::Display for MaximumChargeCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaximumChargeCurrent,
+        types::AmperageMa,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3946,11 +3468,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3967,14 +3484,10 @@ pub mod attributes {
         MaximumDischargeCurrent,
         types::AmperageMa,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for MaximumDischargeCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     /// UserMaximumChargeCurrent.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -3996,11 +3509,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4014,14 +3522,10 @@ pub mod attributes {
         UserMaximumChargeCurrent,
         types::AmperageMa,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UserMaximumChargeCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     /// RandomizationDelayWindow.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4043,11 +3547,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4061,14 +3560,10 @@ pub mod attributes {
         RandomizationDelayWindow,
         types::ElapsedS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for RandomizationDelayWindow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4122,14 +3617,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4140,33 +3627,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextChargeStartTime,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for NextChargeStartTime {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for NextChargeStartTime {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextChargeStartTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4220,14 +3688,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4238,33 +3698,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextChargeTargetTime,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for NextChargeTargetTime {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for NextChargeTargetTime {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextChargeTargetTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4318,14 +3759,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4339,33 +3772,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextChargeRequiredEnergy,
-        Nullable<types::EnergyMwh>,
+        types::EnergyMwh,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EnergyMwh> for NextChargeRequiredEnergy {
-        #[inline]
-        fn from(val: types::EnergyMwh) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EnergyMwh>> for NextChargeRequiredEnergy {
-        #[inline]
-        fn from(val: Option<types::EnergyMwh>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextChargeRequiredEnergy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4419,14 +3833,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4437,33 +3843,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextChargeTargetSoC,
-        Nullable<types::Percent>,
+        types::Percent,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Percent> for NextChargeTargetSoC {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for NextChargeTargetSoC {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextChargeTargetSoC {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     /// ApproximateEVEfficiency.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4515,19 +3902,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4535,29 +3914,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ApproximateEvEfficiency, Nullable<u16>, super::EnergyEvseCluster, copy);
-    impl From<u16> for ApproximateEvEfficiency {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for ApproximateEvEfficiency {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ApproximateEvEfficiency {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        ApproximateEvEfficiency,
+        u16,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4611,14 +3976,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4628,29 +3985,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StateOfCharge, Nullable<types::Percent>, super::EnergyEvseCluster, copy);
-    impl From<types::Percent> for StateOfCharge {
-        #[inline]
-        fn from(val: types::Percent) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Percent>> for StateOfCharge {
-        #[inline]
-        fn from(val: Option<types::Percent>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for StateOfCharge {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        StateOfCharge,
+        types::Percent,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4704,14 +4047,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4725,33 +4060,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         BatteryCapacity,
-        Nullable<types::EnergyMwh>,
+        types::EnergyMwh,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EnergyMwh> for BatteryCapacity {
-        #[inline]
-        fn from(val: types::EnergyMwh) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EnergyMwh>> for BatteryCapacity {
-        #[inline]
-        fn from(val: Option<types::EnergyMwh>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BatteryCapacity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4802,14 +4118,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4822,29 +4130,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(VehicleId, Nullable<String>, super::EnergyEvseCluster, owned);
-    impl From<String> for VehicleId {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for VehicleId {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for VehicleId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        VehicleId,
+        String,
+        super::EnergyEvseCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4895,46 +4189,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(SessionId, Nullable<u32>, super::EnergyEvseCluster, copy);
-    impl From<u32> for SessionId {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for SessionId {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SessionId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        SessionId,
+        u32,
+        super::EnergyEvseCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4988,14 +4260,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5006,33 +4270,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SessionDuration,
-        Nullable<types::ElapsedS>,
+        types::ElapsedS,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::ElapsedS> for SessionDuration {
-        #[inline]
-        fn from(val: types::ElapsedS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::ElapsedS>> for SessionDuration {
-        #[inline]
-        fn from(val: Option<types::ElapsedS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SessionDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5086,14 +4331,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5107,33 +4344,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SessionEnergyCharged,
-        Nullable<types::EnergyMwh>,
+        types::EnergyMwh,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EnergyMwh> for SessionEnergyCharged {
-        #[inline]
-        fn from(val: types::EnergyMwh) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EnergyMwh>> for SessionEnergyCharged {
-        #[inline]
-        fn from(val: Option<types::EnergyMwh>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SessionEnergyCharged {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5187,14 +4405,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5208,33 +4418,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SessionEnergyDischarged,
-        Nullable<types::EnergyMwh>,
+        types::EnergyMwh,
         super::EnergyEvseCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EnergyMwh> for SessionEnergyDischarged {
-        #[inline]
-        fn from(val: types::EnergyMwh) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EnergyMwh>> for SessionEnergyDischarged {
-        #[inline]
-        fn from(val: Option<types::EnergyMwh>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SessionEnergyDischarged {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod commands {
@@ -5261,62 +4452,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Disable;
 
-    impl crate::traits::CommandSpec for Disable {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Disable {
         pub const CLUSTER_ID: ClusterId = super::EnergyEvseCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Disable";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Disable, super::EnergyEvseCluster, true);
+    crate::impl_matter_command!(Disable, super::EnergyEvseCluster, (), true);
 
     /// This command allows a client to enable the EVSE to charge an EV, and to provide or update the maximum and
     /// minimum charge current.
@@ -5332,17 +4475,6 @@ pub mod commands {
         pub charging_enabled_until: Nullable<types::EpochS>,
         pub minimum_charge_current: types::AmperageMa,
         pub maximum_charge_current: types::AmperageMa,
-    }
-
-    impl crate::traits::CommandSpec for EnableCharging {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl EnableCharging {
@@ -5388,11 +4520,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5405,40 +4532,40 @@ pub mod commands {
                         if charging_enabled_until.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <types::EpochS>::try_from)?;
                             charging_enabled_until = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if minimum_charge_current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             minimum_charge_current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if maximum_charge_current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             maximum_charge_current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5452,22 +4579,9 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(EnableCharging, super::EnergyEvseCluster, false);
+    crate::impl_matter_command!(EnableCharging, super::EnergyEvseCluster, (), false);
 
     /// Upon receipt, this SHALL allow a client to enable the discharge of an EV, and to provide or update the maximum
     /// discharge current.
@@ -5482,17 +4596,6 @@ pub mod commands {
     pub struct EnableDischarging {
         pub discharging_enabled_until: Nullable<types::EpochS>,
         pub maximum_discharge_current: types::AmperageMa,
-    }
-
-    impl crate::traits::CommandSpec for EnableDischarging {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl EnableDischarging {
@@ -5531,11 +4634,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5547,26 +4645,26 @@ pub mod commands {
                         if discharging_enabled_until.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <types::EpochS>::try_from)?;
                             discharging_enabled_until = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if maximum_discharge_current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             maximum_discharge_current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5578,22 +4676,9 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(EnableDischarging, super::EnergyEvseCluster, false);
+    crate::impl_matter_command!(EnableDischarging, super::EnergyEvseCluster, (), false);
 
     /// Allows a client to put the EVSE into a self-diagnostics mode.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -5601,62 +4686,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct StartDiagnostics;
 
-    impl crate::traits::CommandSpec for StartDiagnostics {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl StartDiagnostics {
         pub const CLUSTER_ID: ClusterId = super::EnergyEvseCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x04);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "StartDiagnostics";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(StartDiagnostics, super::EnergyEvseCluster, true);
+    crate::impl_matter_command!(StartDiagnostics, super::EnergyEvseCluster, (), true);
 
     /// Allows a client to set the user specified charging targets.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5669,17 +4706,6 @@ pub mod commands {
     )]
     pub struct SetTargets {
         pub charging_target_schedules: Vec<super::ChargingTargetScheduleStruct>,
-    }
-
-    impl crate::traits::CommandSpec for SetTargets {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTargets {
@@ -5709,11 +4735,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5742,19 +4763,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::ChargingTargetScheduleStruct>> for SetTargets {
@@ -5764,7 +4772,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetTargets, super::EnergyEvseCluster, false);
+    crate::impl_matter_command!(SetTargets, super::EnergyEvseCluster, (), false);
 
     /// Allows a client to retrieve the current set of charging targets.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -5772,62 +4780,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct GetTargets;
 
-    impl crate::traits::CommandSpec for GetTargets {
-        type Response = GetTargetsResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl GetTargets {
         pub const CLUSTER_ID: ClusterId = super::EnergyEvseCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x06);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "GetTargets";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(GetTargets, super::EnergyEvseCluster, true);
+    crate::impl_matter_command!(GetTargets, super::EnergyEvseCluster, GetTargetsResponse, true);
 
     /// Allows a client to clear all stored charging targets.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -5835,62 +4795,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ClearTargets;
 
-    impl crate::traits::CommandSpec for ClearTargets {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ClearTargets {
         pub const CLUSTER_ID: ClusterId = super::EnergyEvseCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x07);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ClearTargets";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ClearTargets, super::EnergyEvseCluster, true);
+    crate::impl_matter_command!(ClearTargets, super::EnergyEvseCluster, (), true);
 
     /// The GetTargetsResponse is sent in response to the GetTargets Command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5903,17 +4815,6 @@ pub mod commands {
     )]
     pub struct GetTargetsResponse {
         pub charging_target_schedules: Vec<super::ChargingTargetScheduleStruct>,
-    }
-
-    impl crate::traits::CommandSpec for GetTargetsResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EnergyEvseCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetTargetsResponse {
@@ -5943,11 +4844,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5976,19 +4872,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::ChargingTargetScheduleStruct>> for GetTargetsResponse {
@@ -5998,7 +4881,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GetTargetsResponse, super::EnergyEvseCluster, false);
+    crate::impl_matter_command!(GetTargetsResponse, super::EnergyEvseCluster, (), false);
 }
 
 pub mod events {
@@ -6051,11 +4934,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_SESSION_ID, AttributeValue::from(self.session_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6066,7 +4944,7 @@ pub mod events {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         session_id = Some(decoded);
                         Ok(())
                     })()
@@ -6078,19 +4956,6 @@ pub mod events {
             Ok(Self {
                 session_id: session_id.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -6177,11 +5042,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6196,62 +5056,62 @@ pub mod events {
                         if session_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             session_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::StateEnum>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if session_duration.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::ElapsedS>::try_from(fval)?;
                             session_duration = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if session_energy_charged.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EnergyMwh>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             session_energy_charged = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if session_energy_discharged.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EnergyMwh>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             session_energy_discharged = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6264,19 +5124,6 @@ pub mod events {
                     .ok_or((Some(FieldId::new(3)), MatterStatus::ConstraintError))?,
                 session_energy_discharged: Optional::from(session_energy_discharged),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -6347,11 +5194,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6365,51 +5207,51 @@ pub mod events {
                         if session_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             session_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::StateEnum>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if maximum_current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             maximum_current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if maximum_discharge_current.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::AmperageMa>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             maximum_discharge_current = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6420,19 +5262,6 @@ pub mod events {
                 maximum_current: maximum_current.ok_or((Some(FieldId::new(2)), MatterStatus::ConstraintError))?,
                 maximum_discharge_current: Optional::from(maximum_discharge_current),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -6508,11 +5337,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6527,62 +5351,62 @@ pub mod events {
                         if session_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u32>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                             session_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::StateEnum>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if reason.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::EnergyTransferStoppedReasonEnum>::try_from(fval)?;
                             reason = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if energy_transferred.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EnergyMwh>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             energy_transferred = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if energy_discharged.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::EnergyMwh>::try_from(fval)?;
                             (decoded.raw() >= 0_i64)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             energy_discharged = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6594,19 +5418,6 @@ pub mod events {
                 energy_transferred: energy_transferred.ok_or((Some(FieldId::new(4)), MatterStatus::ConstraintError))?,
                 energy_discharged: Optional::from(energy_discharged),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -6675,11 +5486,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6693,45 +5499,46 @@ pub mod events {
                         if session_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u32>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                             session_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::StateEnum>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if fault_state_previous_state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::FaultStateEnum>::try_from(fval)?;
                             fault_state_previous_state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if fault_state_current_state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::FaultStateEnum>::try_from(fval)?;
                             fault_state_current_state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6744,19 +5551,6 @@ pub mod events {
                 fault_state_current_state: fault_state_current_state
                     .ok_or((Some(FieldId::new(4)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -6793,11 +5587,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_UID, AttributeValue::from(self.uid)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6823,19 +5612,6 @@ pub mod events {
             Ok(Self {
                 uid: uid.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

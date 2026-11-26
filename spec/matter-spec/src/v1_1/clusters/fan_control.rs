@@ -10,10 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -978,92 +976,24 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::RockSuppor
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::RockSetting, RockSetting);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::WindSupport, WindSupport);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::WindSetting, WindSetting);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        FanControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::FanMode(_) => attributes::FanMode::NAME,
-            Self::FanModeSequence(_) => attributes::FanModeSequence::NAME,
-            Self::PercentSetting(_) => attributes::PercentSetting::NAME,
-            Self::PercentCurrent(_) => attributes::PercentCurrent::NAME,
-            Self::SpeedMax(_) => attributes::SpeedMax::NAME,
-            Self::SpeedSetting(_) => attributes::SpeedSetting::NAME,
-            Self::SpeedCurrent(_) => attributes::SpeedCurrent::NAME,
-            Self::RockSupport(_) => attributes::RockSupport::NAME,
-            Self::RockSetting(_) => attributes::RockSetting::NAME,
-            Self::WindSupport(_) => attributes::WindSupport::NAME,
-            Self::WindSetting(_) => attributes::WindSetting::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        FanControlCluster::NAME,
-        FanControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: FanControlCluster::NAME,
-            cluster_id: FanControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::FanMode(inner) => Serialize::serialize(inner, serializer),
-            Self::FanModeSequence(inner) => Serialize::serialize(inner, serializer),
-            Self::PercentSetting(inner) => Serialize::serialize(inner, serializer),
-            Self::PercentCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeedMax(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeedSetting(inner) => Serialize::serialize(inner, serializer),
-            Self::SpeedCurrent(inner) => Serialize::serialize(inner, serializer),
-            Self::RockSupport(inner) => Serialize::serialize(inner, serializer),
-            Self::RockSetting(inner) => Serialize::serialize(inner, serializer),
-            Self::WindSupport(inner) => Serialize::serialize(inner, serializer),
-            Self::WindSetting(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((FanControlCluster::NAME, FanControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    FanControlCluster,
+    [
+        FanMode,
+        FanModeSequence,
+        PercentSetting,
+        PercentCurrent,
+        SpeedMax,
+        SpeedSetting,
+        SpeedCurrent,
+        RockSupport,
+        RockSetting,
+        WindSupport,
+        WindSetting,
+    ]
+);
 
 crate::define_matter_bitmap! {
     /// FanControlFeature bitmap.
@@ -1157,8 +1087,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1200,11 +1128,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1214,13 +1137,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(FanMode, super::FanModeType, super::FanControlCluster, copy);
-
-    impl fmt::Display for FanMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        FanMode,
+        super::FanModeType,
+        super::FanControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1247,11 +1171,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1265,14 +1184,10 @@ pub mod attributes {
         FanModeSequence,
         super::FanModeSequenceType,
         super::FanControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for FanModeSequence {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1323,19 +1238,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1343,29 +1250,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PercentSetting, Nullable<u8>, super::FanControlCluster, copy);
-    impl From<u8> for PercentSetting {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for PercentSetting {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PercentSetting {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        PercentSetting,
+        u8,
+        super::FanControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1392,16 +1285,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1409,13 +1297,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PercentCurrent, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for PercentCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(PercentCurrent, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1442,16 +1324,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1462,13 +1339,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeedMax, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for SpeedMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(SpeedMax, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1519,19 +1390,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1539,29 +1402,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeedSetting, Nullable<u8>, super::FanControlCluster, copy);
-    impl From<u8> for SpeedSetting {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for SpeedSetting {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SpeedSetting {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        SpeedSetting,
+        u8,
+        super::FanControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1588,16 +1437,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1605,13 +1449,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SpeedCurrent, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for SpeedCurrent {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(SpeedCurrent, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1638,27 +1476,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(RockSupport, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for RockSupport {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(RockSupport, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1685,27 +1512,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(RockSetting, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for RockSetting {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(RockSetting, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1732,27 +1548,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(WindSupport, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for WindSupport {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(WindSupport, u8, super::FanControlCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1779,25 +1584,14 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(WindSetting, u8, super::FanControlCluster, copy);
-
-    impl fmt::Display for WindSetting {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(WindSetting, u8, super::FanControlCluster, copy, scalar, display);
 }

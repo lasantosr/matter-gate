@@ -10,12 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1013,90 +1009,23 @@ crate::impl_cluster_member_variant!(
     attributes::MaximumCheckInBackOff,
     MaximumCheckInBackOff
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        IcdManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::IdleModeDuration(_) => attributes::IdleModeDuration::NAME,
-            Self::ActiveModeDuration(_) => attributes::ActiveModeDuration::NAME,
-            Self::ActiveModeThreshold(_) => attributes::ActiveModeThreshold::NAME,
-            Self::RegisteredClients(_) => attributes::RegisteredClients::NAME,
-            Self::IcdCounter(_) => attributes::IcdCounter::NAME,
-            Self::ClientsSupportedPerFabric(_) => attributes::ClientsSupportedPerFabric::NAME,
-            Self::UserActiveModeTriggerHint(_) => attributes::UserActiveModeTriggerHint::NAME,
-            Self::UserActiveModeTriggerInstruction(_) => attributes::UserActiveModeTriggerInstruction::NAME,
-            Self::OperatingMode(_) => attributes::OperatingMode::NAME,
-            Self::MaximumCheckInBackOff(_) => attributes::MaximumCheckInBackOff::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        IcdManagementCluster::NAME,
-        IcdManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: IcdManagementCluster::NAME,
-            cluster_id: IcdManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::IdleModeDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveModeDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveModeThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::RegisteredClients(inner) => Serialize::serialize(inner, serializer),
-            Self::IcdCounter(inner) => Serialize::serialize(inner, serializer),
-            Self::ClientsSupportedPerFabric(inner) => Serialize::serialize(inner, serializer),
-            Self::UserActiveModeTriggerHint(inner) => Serialize::serialize(inner, serializer),
-            Self::UserActiveModeTriggerInstruction(inner) => Serialize::serialize(inner, serializer),
-            Self::OperatingMode(inner) => Serialize::serialize(inner, serializer),
-            Self::MaximumCheckInBackOff(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((IcdManagementCluster::NAME, IcdManagementCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    IcdManagementCluster,
+    [
+        IdleModeDuration,
+        ActiveModeDuration,
+        ActiveModeThreshold,
+        RegisteredClients,
+        IcdCounter,
+        ClientsSupportedPerFabric,
+        UserActiveModeTriggerHint,
+        UserActiveModeTriggerInstruction,
+        OperatingMode,
+        MaximumCheckInBackOff,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`IcdManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1233,104 +1162,13 @@ impl TryFrom<model::Command> for Command {
 crate::impl_cluster_member_variant!(command, Command, commands::RegisterClient, RegisterClient);
 crate::impl_cluster_member_variant!(command, Command, commands::UnregisterClient, UnregisterClient);
 crate::impl_cluster_member_variant!(command, Command, commands::StayActiveRequest, StayActiveRequest);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        IcdManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::RegisterClient(_) => commands::RegisterClient::NAME,
-            Self::UnregisterClient(_) => commands::UnregisterClient::NAME,
-            Self::StayActiveRequest(_) => commands::StayActiveRequest::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        IcdManagementCluster::NAME,
-        IcdManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: IcdManagementCluster::NAME,
-            cluster_id: IcdManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::RegisterClient(inner) => Serialize::serialize(inner, serializer),
-            Self::UnregisterClient(inner) => Serialize::serialize(inner, serializer),
-            Self::StayActiveRequest(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((IcdManagementCluster::NAME, IcdManagementCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((IcdManagementCluster::NAME, IcdManagementCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    IcdManagementCluster,
+    empty = [],
+    payload = [RegisterClient, UnregisterClient, StayActiveRequest,]
+);
 /// Dynamic server-to-client command response variant matching for [`IcdManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1458,89 +1296,13 @@ crate::impl_cluster_member_variant!(
     commands::StayActiveResponse,
     StayActiveResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        IcdManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::RegisterClientResponse(_) => commands::RegisterClientResponse::NAME,
-            Self::StayActiveResponse(_) => commands::StayActiveResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        IcdManagementCluster::NAME,
-        IcdManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: IcdManagementCluster::NAME,
-            cluster_id: IcdManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::RegisterClientResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::StayActiveResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((IcdManagementCluster::NAME, IcdManagementCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    IcdManagementCluster,
+    empty = [],
+    payload = [RegisterClientResponse, StayActiveResponse,]
+);
 
 crate::define_matter_bitmap! {
     /// UserActiveModeTriggerBitmap bitmap.
@@ -1652,34 +1414,34 @@ impl MonitoringRegistrationStruct {
                     if check_in_node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         check_in_node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if monitored_subject.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         monitored_subject = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if client_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ClientTypeEnum>::try_from(fval)?;
                         client_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1706,30 +1468,11 @@ impl MonitoringRegistrationStruct {
     }
 }
 
-impl From<MonitoringRegistrationStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MonitoringRegistrationStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MonitoringRegistrationStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MonitoringRegistrationStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1771,16 +1514,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             if raw < 1_u32 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1791,13 +1529,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(IdleModeDuration, u32, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for IdleModeDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        IdleModeDuration,
+        u32,
+        super::IcdManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1824,27 +1563,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(ActiveModeDuration, u32, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for ActiveModeDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ActiveModeDuration,
+        u32,
+        super::IcdManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1871,27 +1606,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(ActiveModeThreshold, u16, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for ActiveModeThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ActiveModeThreshold,
+        u16,
+        super::IcdManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1918,12 +1649,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1943,14 +1668,10 @@ pub mod attributes {
         RegisteredClients,
         Vec<super::MonitoringRegistrationStruct>,
         super::IcdManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for RegisteredClients {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1977,27 +1698,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(IcdCounter, u32, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for IcdCounter {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(IcdCounter, u32, super::IcdManagementCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2024,16 +1734,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2041,13 +1746,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ClientsSupportedPerFabric, u16, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for ClientsSupportedPerFabric {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ClientsSupportedPerFabric,
+        u16,
+        super::IcdManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2074,11 +1780,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2092,14 +1793,10 @@ pub mod attributes {
         UserActiveModeTriggerHint,
         super::UserActiveModeTriggerBitmap,
         super::IcdManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UserActiveModeTriggerHint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2126,11 +1823,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2147,14 +1839,10 @@ pub mod attributes {
         UserActiveModeTriggerInstruction,
         String,
         super::IcdManagementCluster,
-        owned
+        owned,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UserActiveModeTriggerInstruction {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2181,11 +1869,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2199,14 +1882,10 @@ pub mod attributes {
         OperatingMode,
         super::OperatingModeEnum,
         super::IcdManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OperatingMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2233,16 +1912,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             if raw > 64_800_u32 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2250,13 +1924,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaximumCheckInBackOff, u32, super::IcdManagementCluster, copy);
-
-    impl fmt::Display for MaximumCheckInBackOff {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaximumCheckInBackOff,
+        u32,
+        super::IcdManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -2296,17 +1971,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub verification_key: Optional<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for RegisterClient {
-        type Response = RegisterClientResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::IcdManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RegisterClient {
@@ -2361,11 +2025,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2380,62 +2039,62 @@ pub mod commands {
                         if check_in_node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             check_in_node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if monitored_subject.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                             monitored_subject = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if key.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             key = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if verification_key.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             verification_key = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if client_type.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ClientTypeEnum>::try_from(fval)?;
                             client_type = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2448,22 +2107,14 @@ pub mod commands {
                 client_type: client_type.ok_or((Some(FieldId::new(4)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(RegisterClient, super::IcdManagementCluster, false);
+    crate::impl_matter_command!(
+        RegisterClient,
+        super::IcdManagementCluster,
+        RegisterClientResponse,
+        false
+    );
 
     /// RegisterClient response command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2476,17 +2127,6 @@ pub mod commands {
     )]
     pub struct RegisterClientResponse {
         pub icd_counter: u32,
-    }
-
-    impl crate::traits::CommandSpec for RegisterClientResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::IcdManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RegisterClientResponse {
@@ -2508,11 +2148,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ICD_COUNTER, AttributeValue::from(self.icd_counter)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2523,7 +2158,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         icd_counter = Some(decoded);
                         Ok(())
                     })()
@@ -2536,19 +2171,6 @@ pub mod commands {
                 icd_counter: icd_counter.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u32> for RegisterClientResponse {
@@ -2558,7 +2180,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RegisterClientResponse, super::IcdManagementCluster, false);
+    crate::impl_matter_command!(RegisterClientResponse, super::IcdManagementCluster, (), false);
 
     /// Unregister a client from an end device.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2575,17 +2197,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub verification_key: Optional<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for UnregisterClient {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::IcdManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UnregisterClient {
@@ -2623,11 +2234,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2639,26 +2245,26 @@ pub mod commands {
                         if check_in_node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             check_in_node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if verification_key.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             verification_key = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2667,19 +2273,6 @@ pub mod commands {
                 check_in_node_id: check_in_node_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
                 verification_key: Optional::from(verification_key),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2690,7 +2283,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(UnregisterClient, super::IcdManagementCluster, false);
+    crate::impl_matter_command!(UnregisterClient, super::IcdManagementCluster, (), false);
 
     /// Request the end device to stay in Active Mode for an additional ActiveModeThreshold.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2703,17 +2296,6 @@ pub mod commands {
     )]
     pub struct StayActiveRequest {
         pub stay_active_duration: u32,
-    }
-
-    impl crate::traits::CommandSpec for StayActiveRequest {
-        type Response = StayActiveResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::IcdManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl StayActiveRequest {
@@ -2738,11 +2320,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2753,7 +2330,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         stay_active_duration = Some(decoded);
                         Ok(())
                     })()
@@ -2767,19 +2344,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u32> for StayActiveRequest {
@@ -2789,7 +2353,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(StayActiveRequest, super::IcdManagementCluster, false);
+    crate::impl_matter_command!(
+        StayActiveRequest,
+        super::IcdManagementCluster,
+        StayActiveResponse,
+        false
+    );
 
     /// StayActiveRequest response command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2802,17 +2371,6 @@ pub mod commands {
     )]
     pub struct StayActiveResponse {
         pub promised_active_duration: u32,
-    }
-
-    impl crate::traits::CommandSpec for StayActiveResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::IcdManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl StayActiveResponse {
@@ -2837,11 +2395,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2852,7 +2405,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         promised_active_duration = Some(decoded);
                         Ok(())
                     })()
@@ -2866,19 +2419,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u32> for StayActiveResponse {
@@ -2888,5 +2428,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(StayActiveResponse, super::IcdManagementCluster, false);
+    crate::impl_matter_command!(StayActiveResponse, super::IcdManagementCluster, (), false);
 }

@@ -11,14 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -674,85 +668,19 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::TankPercentage, TankPercentage);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::BoostState, BoostState);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        WaterHeaterManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::HeaterTypes(_) => attributes::HeaterTypes::NAME,
-            Self::HeatDemand(_) => attributes::HeatDemand::NAME,
-            Self::TankVolume(_) => attributes::TankVolume::NAME,
-            Self::EstimatedHeatRequired(_) => attributes::EstimatedHeatRequired::NAME,
-            Self::TankPercentage(_) => attributes::TankPercentage::NAME,
-            Self::BoostState(_) => attributes::BoostState::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        WaterHeaterManagementCluster::NAME,
-        WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: WaterHeaterManagementCluster::NAME,
-            cluster_id: WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::HeaterTypes(inner) => Serialize::serialize(inner, serializer),
-            Self::HeatDemand(inner) => Serialize::serialize(inner, serializer),
-            Self::TankVolume(inner) => Serialize::serialize(inner, serializer),
-            Self::EstimatedHeatRequired(inner) => Serialize::serialize(inner, serializer),
-            Self::TankPercentage(inner) => Serialize::serialize(inner, serializer),
-            Self::BoostState(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                WaterHeaterManagementCluster::NAME,
-                WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    WaterHeaterManagementCluster,
+    [
+        HeaterTypes,
+        HeatDemand,
+        TankVolume,
+        EstimatedHeatRequired,
+        TankPercentage,
+        BoostState,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`WaterHeaterManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -864,108 +792,13 @@ impl TryFrom<model::Command> for Command {
 
 crate::impl_cluster_member_variant!(command, Command, commands::Boost, Boost);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::CancelBoost, CancelBoost);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        WaterHeaterManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Boost(_) => commands::Boost::NAME,
-            Self::CancelBoost => commands::CancelBoost::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        WaterHeaterManagementCluster::NAME,
-        WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: WaterHeaterManagementCluster::NAME,
-            cluster_id: WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::CancelBoost => Serialize::serialize(&(), serializer),
-            Self::Boost(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                WaterHeaterManagementCluster::NAME,
-                WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                WaterHeaterManagementCluster::NAME,
-                WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    WaterHeaterManagementCluster,
+    empty = [CancelBoost,],
+    payload = [Boost,]
+);
 /// Dynamic event variant matching for [`WaterHeaterManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1084,92 +917,13 @@ impl TryFrom<model::Event> for Event {
 
 crate::impl_cluster_member_variant!(event, Event, events::BoostStarted, BoostStarted);
 crate::impl_cluster_member_variant!(event_unit, Event, events::BoostEnded, BoostEnded);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        WaterHeaterManagementCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::BoostStarted(_) => events::BoostStarted::NAME,
-            Self::BoostEnded => events::BoostEnded::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        WaterHeaterManagementCluster::NAME,
-        WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: WaterHeaterManagementCluster::NAME,
-            cluster_id: WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::BoostEnded => Serialize::serialize(&(), serializer),
-            Self::BoostStarted(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                WaterHeaterManagementCluster::NAME,
-                WaterHeaterManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    WaterHeaterManagementCluster,
+    empty = [BoostEnded,],
+    payload = [BoostStarted,]
+);
 
 crate::define_matter_bitmap! {
     /// WaterHeaterHeatSourceBitmap bitmap.
@@ -1293,70 +1047,70 @@ impl WaterHeaterBoostInfoStruct {
                     if duration.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::ElapsedS>::try_from(fval)?;
                         (decoded.raw() >= 1_u32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         duration = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if one_shot.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         one_shot = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if emergency_boost.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         emergency_boost = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if temporary_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Temperature>::try_from(fval)?;
                         temporary_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if target_percentage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent>::try_from(fval)?;
                         target_percentage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if target_reheat.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent>::try_from(fval)?;
                         target_reheat = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1400,30 +1154,11 @@ impl From<types::ElapsedS> for WaterHeaterBoostInfoStruct {
     }
 }
 
-impl From<WaterHeaterBoostInfoStruct> for AttributeValue {
-    #[inline]
-    fn from(val: WaterHeaterBoostInfoStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for WaterHeaterBoostInfoStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(WaterHeaterBoostInfoStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1465,11 +1200,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1483,14 +1213,10 @@ pub mod attributes {
         HeaterTypes,
         super::WaterHeaterHeatSourceBitmap,
         super::WaterHeaterManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for HeaterTypes {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1517,11 +1243,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1535,14 +1256,10 @@ pub mod attributes {
         HeatDemand,
         super::WaterHeaterHeatSourceBitmap,
         super::WaterHeaterManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for HeatDemand {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1569,27 +1286,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TankVolume, u16, super::WaterHeaterManagementCluster, copy);
-
-    impl fmt::Display for TankVolume {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TankVolume,
+        u16,
+        super::WaterHeaterManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1610,11 +1323,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1631,14 +1339,10 @@ pub mod attributes {
         EstimatedHeatRequired,
         types::EnergyMwh,
         super::WaterHeaterManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for EstimatedHeatRequired {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1659,11 +1363,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1677,14 +1376,10 @@ pub mod attributes {
         TankPercentage,
         types::Percent,
         super::WaterHeaterManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TankPercentage {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1711,11 +1406,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1729,14 +1419,10 @@ pub mod attributes {
         BoostState,
         super::BoostStateEnum,
         super::WaterHeaterManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BoostState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -1770,17 +1456,6 @@ pub mod commands {
         pub boost_info: super::WaterHeaterBoostInfoStruct,
     }
 
-    impl crate::traits::CommandSpec for Boost {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WaterHeaterManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl Boost {
         pub const CLUSTER_ID: ClusterId = super::WaterHeaterManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1798,11 +1473,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_BOOST_INFO, AttributeValue::from(self.boost_info)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1828,19 +1498,6 @@ pub mod commands {
                 boost_info: boost_info.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::WaterHeaterBoostInfoStruct> for Boost {
@@ -1850,7 +1507,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(Boost, super::WaterHeaterManagementCluster, false);
+    crate::impl_matter_command!(Boost, super::WaterHeaterManagementCluster, (), false);
 
     /// Allows a client to cancel an ongoing Boost operation.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -1858,62 +1515,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct CancelBoost;
 
-    impl crate::traits::CommandSpec for CancelBoost {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::WaterHeaterManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl CancelBoost {
         pub const CLUSTER_ID: ClusterId = super::WaterHeaterManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "CancelBoost";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(CancelBoost, super::WaterHeaterManagementCluster, true);
+    crate::impl_matter_command!(CancelBoost, super::WaterHeaterManagementCluster, (), true);
 }
 
 pub mod events {
@@ -1966,11 +1575,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_BOOST_INFO, AttributeValue::from(self.boost_info)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1994,19 +1598,6 @@ pub mod events {
                 boost_info: boost_info.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::WaterHeaterBoostInfoStruct> for BoostStarted {
@@ -2029,43 +1620,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x01);
         pub const NAME: &'static str = "BoostEnded";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(BoostEnded, super::WaterHeaterManagementCluster, true);

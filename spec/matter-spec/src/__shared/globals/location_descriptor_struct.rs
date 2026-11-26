@@ -59,37 +59,38 @@ impl LocationDescriptorStruct {
                     if location_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 128)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         location_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if floor_number.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <i16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<i16>(&v))?;
                         floor_number = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if area_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <AreaTypeTag>::try_from)?;
                         area_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -122,21 +123,4 @@ impl LocationDescriptorStruct {
     }
 }
 
-impl From<LocationDescriptorStruct> for AttributeValue {
-    #[inline]
-    fn from(val: LocationDescriptorStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for LocationDescriptorStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(LocationDescriptorStruct);

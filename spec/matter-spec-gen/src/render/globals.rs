@@ -250,350 +250,45 @@ fn emit_global_id_list_attr(name: &str, item_id: &str, attr_id_hex: &str) -> Tok
             pub const IS_NULLABLE: bool = false;
             pub const IS_WRITABLE: bool = false;
             pub const IS_OPTIONAL: bool = false;
-
-            #[inline]
-            #[must_use]
-            pub fn new(val: Vec<$item_id>) -> Self { Self(val) }
-
-            #[inline]
-            #[must_use]
-            pub fn raw(&self) -> &[$item_id] { &self.0 }
-
-            #[inline]
-            #[must_use]
-            pub const fn as_inner(&self) -> &Vec<$item_id> { &self.0 }
-
-            #[inline]
-            #[must_use]
-            pub fn into_inner(self) -> Vec<$item_id> { self.0 }
-
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                let items = self.0.into_iter().map(AttributeValue::from).collect();
-                AttributeValue::List(items)
-            }
-
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::List(items) = val else {
-                    return Err(MatterStatus::InvalidDataType);
-                };
-                let res = items.into_iter().map($item_id::try_from).collect::<Result<Vec<_>, _>>()?;
-                Ok(Self(res))
-            }
-
-            pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-                Self::try_from(attr).map(Into::into)
-            }
         }
 
-        impl From<$name> for Attribute {
-            #[inline]
-            fn from(attr: $name) -> Self {
-                Self::new($name::ATTRIBUTE_ID, attr.into_value())
-            }
-        }
-
-        impl TryFrom<Attribute> for $name {
-            type Error = AttributeError;
-
-            fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-                if attr.id != Self::ATTRIBUTE_ID {
-                    return Err(AttributeError::AttributeIdMismatch {
-                        expected: Self::ATTRIBUTE_ID,
-                        actual: attr.id,
-                    });
-                }
-                Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                    id: Self::ATTRIBUTE_ID,
-                    field_id: None,
-                    status,
-                })
-            }
-        }
-
-        impl From<Vec<$item_id>> for $name {
-            #[inline]
-            fn from(val: Vec<$item_id>) -> Self {
-                Self(val)
-            }
-        }
-
-        impl From<$name> for Vec<$item_id> {
-            #[inline]
-            fn from(attr: $name) -> Self {
-                attr.0
-            }
-        }
-
-        impl ops::Deref for $name {
-            type Target = Vec<$item_id>;
-
-            #[inline]
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
-        impl AsRef<Vec<$item_id>> for $name {
-            #[inline]
-            fn as_ref(&self) -> &Vec<$item_id> {
-                &self.0
-            }
-        }
-
-        impl AsRef<[$item_id]> for $name {
-            #[inline]
-            fn as_ref(&self) -> &[$item_id] {
-                &self.0
-            }
-        }
-
-        impl fmt::Display for $name {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "<list of {} items>", self.0.len())
-            }
-        }
+        crate::impl_matter_global_id_list_attr!($name, $item_id);
     }
 }
 
-fn emit_cluster_revision_attr() -> Tokens {
+fn emit_global_scalar_attr(name: &str, inner: &str, attr_id_hex: &str, variant: &str, display_fmt: &str) -> Tokens {
     quote! {
-        /// ClusterRevision global attribute.
+        $(format!("/// {name} global attribute."))
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
         #[cfg_attr(feature = $(quoted("serde")), derive(Serialize, Deserialize), serde(transparent))]
         #[cfg_attr(feature = $(quoted("schemars")), derive(schemars::JsonSchema), schemars(transparent))]
-        pub struct ClusterRevision(u16);
+        pub struct $name($inner);
 
-        impl ClusterRevision {
-            pub const ATTRIBUTE_ID: AttributeId = AttributeId::new(0xFFFD);
+        impl $name {
+            pub const ATTRIBUTE_ID: AttributeId = AttributeId::new($attr_id_hex);
             pub const CLUSTER_ID: ClusterId = ClusterId::WILDCARD;
-            pub const NAME: &'static str = "ClusterRevision";
+            pub const NAME: &'static str = $(quoted(name));
             pub const IS_NULLABLE: bool = false;
             pub const IS_WRITABLE: bool = false;
             pub const IS_OPTIONAL: bool = false;
-
-            #[inline]
-            #[must_use]
-            pub const fn new(val: u16) -> Self { Self(val) }
-
-            #[inline]
-            #[must_use]
-            pub const fn raw(self) -> u16 { self.0 }
-
-            #[inline]
-            #[must_use]
-            pub const fn as_inner(&self) -> &u16 { &self.0 }
-
-            #[inline]
-            #[must_use]
-            pub const fn into_inner(self) -> u16 { self.0 }
-
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue { AttributeValue::U16(self.0) }
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::U16(v) = val else {
-                    return Err(MatterStatus::InvalidDataType);
-                };
-                Ok(Self(v))
-            }
-
-            pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-                Self::try_from(attr).map(Into::into)
-            }
         }
 
-        impl From<ClusterRevision> for Attribute {
-            #[inline]
-            fn from(attr: ClusterRevision) -> Self {
-                Self::new(ClusterRevision::ATTRIBUTE_ID, attr.into_value())
-            }
-        }
-
-        impl TryFrom<Attribute> for ClusterRevision {
-            type Error = AttributeError;
-
-            fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-                if attr.id != Self::ATTRIBUTE_ID {
-                    return Err(AttributeError::AttributeIdMismatch {
-                        expected: Self::ATTRIBUTE_ID,
-                        actual: attr.id,
-                    });
-                }
-                Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                    id: Self::ATTRIBUTE_ID,
-                    field_id: None,
-                    status,
-                })
-            }
-        }
-
-        impl From<u16> for ClusterRevision {
-            #[inline]
-            fn from(val: u16) -> Self {
-                Self(val)
-            }
-        }
-
-        impl From<ClusterRevision> for u16 {
-            #[inline]
-            fn from(attr: ClusterRevision) -> Self {
-                attr.0
-            }
-        }
-
-        impl ops::Deref for ClusterRevision {
-            type Target = u16;
-
-            #[inline]
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
-        impl AsRef<u16> for ClusterRevision {
-            #[inline]
-            fn as_ref(&self) -> &u16 {
-                &self.0
-            }
-        }
-
-        impl fmt::Display for ClusterRevision {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "{}", self.0)
-            }
-        }
-    }
-}
-
-fn emit_feature_map_attr() -> Tokens {
-    quote! {
-        /// FeatureMap global attribute.
-        #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
-        #[cfg_attr(feature = $(quoted("serde")), derive(Serialize, Deserialize), serde(transparent))]
-        #[cfg_attr(feature = $(quoted("schemars")), derive(schemars::JsonSchema), schemars(transparent))]
-        pub struct FeatureMap(u32);
-
-        impl FeatureMap {
-            pub const ATTRIBUTE_ID: AttributeId = AttributeId::new(0xFFFC);
-            pub const CLUSTER_ID: ClusterId = ClusterId::WILDCARD;
-            pub const NAME: &'static str = "FeatureMap";
-            pub const IS_NULLABLE: bool = false;
-            pub const IS_WRITABLE: bool = false;
-            pub const IS_OPTIONAL: bool = false;
-
-            #[inline]
-            #[must_use]
-            pub const fn new(val: u32) -> Self { Self(val) }
-
-            #[inline]
-            #[must_use]
-            pub const fn raw(self) -> u32 { self.0 }
-
-            #[inline]
-            #[must_use]
-            pub const fn as_inner(&self) -> &u32 { &self.0 }
-
-            #[inline]
-            #[must_use]
-            pub const fn into_inner(self) -> u32 { self.0 }
-
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue { AttributeValue::U32(self.0) }
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::U32(v) = val else {
-                    return Err(MatterStatus::InvalidDataType);
-                };
-                Ok(Self(v))
-            }
-
-            pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-                Self::try_from(attr).map(Into::into)
-            }
-        }
-
-        impl From<FeatureMap> for Attribute {
-            #[inline]
-            fn from(attr: FeatureMap) -> Self {
-                Self::new(FeatureMap::ATTRIBUTE_ID, attr.into_value())
-            }
-        }
-
-        impl TryFrom<Attribute> for FeatureMap {
-            type Error = AttributeError;
-
-            fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-                if attr.id != Self::ATTRIBUTE_ID {
-                    return Err(AttributeError::AttributeIdMismatch {
-                        expected: Self::ATTRIBUTE_ID,
-                        actual: attr.id,
-                    });
-                }
-                Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                    id: Self::ATTRIBUTE_ID,
-                    field_id: None,
-                    status,
-                })
-            }
-        }
-
-        impl From<u32> for FeatureMap {
-            #[inline]
-            fn from(val: u32) -> Self {
-                Self(val)
-            }
-        }
-
-        impl From<FeatureMap> for u32 {
-            #[inline]
-            fn from(attr: FeatureMap) -> Self {
-                attr.0
-            }
-        }
-
-        impl ops::Deref for FeatureMap {
-            type Target = u32;
-
-            #[inline]
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
-        impl AsRef<u32> for FeatureMap {
-            #[inline]
-            fn as_ref(&self) -> &u32 {
-                &self.0
-            }
-        }
-
-        impl fmt::Display for FeatureMap {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                write!(f, "{:#010x}", self.0)
-            }
-        }
+        crate::impl_matter_global_scalar_attr!($name, $inner, $variant, $(quoted(display_fmt)));
     }
 }
 
 fn emit_global_attributes_submodule(has_event_list: bool) -> Tokens {
-    let cluster_rev = emit_cluster_revision_attr();
-    let feat_map = emit_feature_map_attr();
     quote! {
         pub mod attributes {
             use alloc::vec::Vec;
-            use core::{fmt, ops};
 
-            use crate::{
-                model::{
-                    Attribute, AttributeId, AttributeValue, ClusterId, CommandId, $(if has_event_list => EventId,)
-                    MatterStatus,
-                },
-                error::AttributeError,
-            };
+            use crate::model::{AttributeId, ClusterId, CommandId $(if has_event_list => , EventId)};
             #[cfg(feature = $(quoted("serde")))]
             use serde::{Deserialize, Serialize};
 
-            $cluster_rev
-            $feat_map
+            $(emit_global_scalar_attr("ClusterRevision", "u16", "0xFFFD", "U16", "{}"))
+
+            $(emit_global_scalar_attr("FeatureMap", "u32", "0xFFFC", "U32", "{:#010x}"))
 
             $(emit_global_id_list_attr("AttributeList", "AttributeId", "0xFFFB"))
 

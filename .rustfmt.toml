@@ -17,4 +17,4 @@ group_imports = "StdExternalCrate"
 reorder_impl_items = true
 normalize_doc_attributes = true
 wrap_comments = true
-ignore = ["spec/matter-spec/src/__shared", "spec/matter-spec/src/v*"]
+ignore = ["spec/matter-spec/src/__shared", "spec/matter-spec/src/v[0-9]*"]

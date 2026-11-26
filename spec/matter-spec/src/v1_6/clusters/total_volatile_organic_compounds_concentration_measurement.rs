@@ -13,10 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1172,101 +1170,28 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Uncertaint
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MeasurementUnit, MeasurementUnit);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MeasurementMedium, MeasurementMedium);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::LevelValue, LevelValue);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MeasuredValue(_) => attributes::MeasuredValue::NAME,
-            Self::MinMeasuredValue(_) => attributes::MinMeasuredValue::NAME,
-            Self::MaxMeasuredValue(_) => attributes::MaxMeasuredValue::NAME,
-            Self::PeakMeasuredValue(_) => attributes::PeakMeasuredValue::NAME,
-            Self::PeakMeasuredValueWindow(_) => attributes::PeakMeasuredValueWindow::NAME,
-            Self::AverageMeasuredValue(_) => attributes::AverageMeasuredValue::NAME,
-            Self::AverageMeasuredValueWindow(_) => attributes::AverageMeasuredValueWindow::NAME,
-            Self::Uncertainty(_) => attributes::Uncertainty::NAME,
-            Self::MeasurementUnit(_) => attributes::MeasurementUnit::NAME,
-            Self::MeasurementMedium(_) => attributes::MeasurementMedium::NAME,
-            Self::LevelValue(_) => attributes::LevelValue::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::NAME,
-        TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::NAME,
-            cluster_id: TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::MinMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::PeakMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::PeakMeasuredValueWindow(inner) => Serialize::serialize(inner, serializer),
-            Self::AverageMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::AverageMeasuredValueWindow(inner) => Serialize::serialize(inner, serializer),
-            Self::Uncertainty(inner) => Serialize::serialize(inner, serializer),
-            Self::MeasurementUnit(inner) => Serialize::serialize(inner, serializer),
-            Self::MeasurementMedium(inner) => Serialize::serialize(inner, serializer),
-            Self::LevelValue(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::NAME,
-                TotalVolatileOrganicCompoundsConcentrationMeasurementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
+    [
+        MeasuredValue,
+        MinMeasuredValue,
+        MaxMeasuredValue,
+        PeakMeasuredValue,
+        PeakMeasuredValueWindow,
+        AverageMeasuredValue,
+        AverageMeasuredValueWindow,
+        Uncertainty,
+        MeasurementUnit,
+        MeasurementMedium,
+        LevelValue,
+    ]
+);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1333,14 +1258,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1351,33 +1268,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MeasuredValue,
-        Nullable<f32>,
+        f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<f32> for MeasuredValue {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for MeasuredValue {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1429,14 +1327,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1447,33 +1337,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinMeasuredValue,
-        Nullable<f32>,
+        f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<f32> for MinMeasuredValue {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for MinMeasuredValue {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1525,14 +1396,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1543,33 +1406,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxMeasuredValue,
-        Nullable<f32>,
+        f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<f32> for MaxMeasuredValue {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for MaxMeasuredValue {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1621,14 +1465,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1639,33 +1475,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PeakMeasuredValue,
-        Nullable<f32>,
+        f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<f32> for PeakMeasuredValue {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for PeakMeasuredValue {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PeakMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1687,11 +1504,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1708,14 +1520,10 @@ pub mod attributes {
         PeakMeasuredValueWindow,
         types::ElapsedS,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PeakMeasuredValueWindow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1767,14 +1575,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1785,33 +1585,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         AverageMeasuredValue,
-        Nullable<f32>,
+        f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<f32> for AverageMeasuredValue {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for AverageMeasuredValue {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for AverageMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1833,11 +1614,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1854,14 +1630,10 @@ pub mod attributes {
         AverageMeasuredValueWindow,
         types::ElapsedS,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AverageMeasuredValueWindow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1889,11 +1661,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1907,14 +1674,10 @@ pub mod attributes {
         Uncertainty,
         f32,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for Uncertainty {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1942,11 +1705,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1960,14 +1718,10 @@ pub mod attributes {
         MeasurementUnit,
         super::globals::MeasurementUnitEnum,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for MeasurementUnit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1995,11 +1749,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2013,14 +1762,10 @@ pub mod attributes {
         MeasurementMedium,
         super::globals::MeasurementMediumEnum,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for MeasurementMedium {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2048,11 +1793,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2066,12 +1806,8 @@ pub mod attributes {
         LevelValue,
         super::globals::LevelValueEnum,
         super::TotalVolatileOrganicCompoundsConcentrationMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for LevelValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }

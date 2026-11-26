@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedCommandVariant, deserialize_enum_described, deserialize_enum_invocation};
+use crate::dispatch::DescribedCommandVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -234,117 +232,8 @@ impl TryFrom<model::Command> for Command {
     }
 }
 
-impl From<commands::SendKey> for Command {
-    #[inline]
-    fn from(cmd: commands::SendKey) -> Self {
-        Self::SendKey(cmd)
-    }
-}
-
-impl TryFrom<Command> for commands::SendKey {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: Command) -> Result<Self, Self::Error> {
-        match cmd {
-            Command::SendKey(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        KeypadInputCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SendKey(_) => commands::SendKey::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        KeypadInputCluster::NAME,
-        KeypadInputCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: KeypadInputCluster::NAME,
-            cluster_id: KeypadInputCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SendKey(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((KeypadInputCluster::NAME, KeypadInputCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((KeypadInputCluster::NAME, KeypadInputCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(command_single, Command, commands::SendKey, SendKey);
+crate::impl_cluster_enum_dispatch!(command, Command, KeypadInputCluster, empty = [], payload = [SendKey,]);
 /// Dynamic server-to-client command response variant matching for [`KeypadInputCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -436,104 +325,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::SendKeyResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::SendKeyResponse) -> Self {
-        Self::SendKeyResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::SendKeyResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::SendKeyResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        KeypadInputCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SendKeyResponse(_) => commands::SendKeyResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        KeypadInputCluster::NAME,
-        KeypadInputCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: KeypadInputCluster::NAME,
-            cluster_id: KeypadInputCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SendKeyResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((KeypadInputCluster::NAME, KeypadInputCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::SendKeyResponse,
+    SendKeyResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    KeypadInputCluster,
+    empty = [],
+    payload = [SendKeyResponse,]
+);
 
 crate::define_matter_enum! {
     /// StatusEnum exhaustive specification enum.
@@ -673,17 +477,6 @@ pub mod commands {
         pub key_code: super::CecKeyCodeEnum,
     }
 
-    impl crate::traits::CommandSpec for SendKey {
-        type Response = SendKeyResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::KeypadInputCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl SendKey {
         pub const CLUSTER_ID: ClusterId = super::KeypadInputCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -701,11 +494,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_KEY_CODE, AttributeValue::from(self.key_code)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -731,19 +519,6 @@ pub mod commands {
                 key_code: key_code.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::CecKeyCodeEnum> for SendKey {
@@ -753,7 +528,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SendKey, super::KeypadInputCluster, false);
+    crate::impl_matter_command!(SendKey, super::KeypadInputCluster, SendKeyResponse, false);
 
     /// This command SHALL be generated in response to a SendKey command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -766,17 +541,6 @@ pub mod commands {
     )]
     pub struct SendKeyResponse {
         pub status: super::StatusEnum,
-    }
-
-    impl crate::traits::CommandSpec for SendKeyResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::KeypadInputCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SendKeyResponse {
@@ -794,11 +558,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_STATUS, AttributeValue::from(self.status)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -824,19 +583,6 @@ pub mod commands {
                 status: status.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::StatusEnum> for SendKeyResponse {
@@ -846,5 +592,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SendKeyResponse, super::KeypadInputCluster, false);
+    crate::impl_matter_command!(SendKeyResponse, super::KeypadInputCluster, (), false);
 }

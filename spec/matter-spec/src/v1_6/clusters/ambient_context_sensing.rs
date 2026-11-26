@@ -13,10 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1241,99 +1239,26 @@ crate::impl_cluster_member_variant!(
     attributes::SensorFusionSupported,
     SensorFusionSupported
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        AmbientContextSensingCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::HumanActivityDetected(_) => attributes::HumanActivityDetected::NAME,
-            Self::ObjectIdentified(_) => attributes::ObjectIdentified::NAME,
-            Self::AudioContextDetected(_) => attributes::AudioContextDetected::NAME,
-            Self::AmbientContextType(_) => attributes::AmbientContextType::NAME,
-            Self::AmbientContextTypeSupported(_) => attributes::AmbientContextTypeSupported::NAME,
-            Self::ObjectCountThresholdReached(_) => attributes::ObjectCountThresholdReached::NAME,
-            Self::ObjectCountConfig(_) => attributes::ObjectCountConfig::NAME,
-            Self::ObjectCount(_) => attributes::ObjectCount::NAME,
-            Self::SimultaneousDetectionLimit(_) => attributes::SimultaneousDetectionLimit::NAME,
-            Self::HoldTime(_) => attributes::HoldTime::NAME,
-            Self::HoldTimeLimits(_) => attributes::HoldTimeLimits::NAME,
-            Self::PredictedActivity(_) => attributes::PredictedActivity::NAME,
-            Self::SensorFusionSupported(_) => attributes::SensorFusionSupported::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        AmbientContextSensingCluster::NAME,
-        AmbientContextSensingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: AmbientContextSensingCluster::NAME,
-            cluster_id: AmbientContextSensingCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::HumanActivityDetected(inner) => Serialize::serialize(inner, serializer),
-            Self::ObjectIdentified(inner) => Serialize::serialize(inner, serializer),
-            Self::AudioContextDetected(inner) => Serialize::serialize(inner, serializer),
-            Self::AmbientContextType(inner) => Serialize::serialize(inner, serializer),
-            Self::AmbientContextTypeSupported(inner) => Serialize::serialize(inner, serializer),
-            Self::ObjectCountThresholdReached(inner) => Serialize::serialize(inner, serializer),
-            Self::ObjectCountConfig(inner) => Serialize::serialize(inner, serializer),
-            Self::ObjectCount(inner) => Serialize::serialize(inner, serializer),
-            Self::SimultaneousDetectionLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::HoldTime(inner) => Serialize::serialize(inner, serializer),
-            Self::HoldTimeLimits(inner) => Serialize::serialize(inner, serializer),
-            Self::PredictedActivity(inner) => Serialize::serialize(inner, serializer),
-            Self::SensorFusionSupported(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                AmbientContextSensingCluster::NAME,
-                AmbientContextSensingCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    AmbientContextSensingCluster,
+    [
+        HumanActivityDetected,
+        ObjectIdentified,
+        AudioContextDetected,
+        AmbientContextType,
+        AmbientContextTypeSupported,
+        ObjectCountThresholdReached,
+        ObjectCountConfig,
+        ObjectCount,
+        SimultaneousDetectionLimit,
+        HoldTime,
+        HoldTimeLimits,
+        PredictedActivity,
+        SensorFusionSupported,
+    ]
+);
 /// Dynamic event variant matching for [`AmbientContextSensingCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1469,92 +1394,13 @@ crate::impl_cluster_member_variant!(
     events::AmbientContextDetectEnded,
     AmbientContextDetectEnded
 );
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        AmbientContextSensingCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::AmbientContextDetectStarted(_) => events::AmbientContextDetectStarted::NAME,
-            Self::AmbientContextDetectEnded(_) => events::AmbientContextDetectEnded::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        AmbientContextSensingCluster::NAME,
-        AmbientContextSensingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: AmbientContextSensingCluster::NAME,
-            cluster_id: AmbientContextSensingCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AmbientContextDetectStarted(inner) => Serialize::serialize(inner, serializer),
-            Self::AmbientContextDetectEnded(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                AmbientContextSensingCluster::NAME,
-                AmbientContextSensingCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    AmbientContextSensingCluster,
+    empty = [],
+    payload = [AmbientContextDetectStarted, AmbientContextDetectEnded,]
+);
 
 crate::define_matter_semantic_bool! {
     /// Specification 2-variant semantic boolean enum for [`HumanActivityDetected`].
@@ -1639,21 +1485,21 @@ impl AmbientContextTypeStruct {
                     if ambient_context_sensed.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <globals::SemanticTagStruct>::try_from)?;
                         (decoded.len() <= 2)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         ambient_context_sensed = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if detection_confidence.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::Percent>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.raw() < 1_u8))
                             .then_some(())
@@ -1663,8 +1509,8 @@ impl AmbientContextTypeStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         detection_confidence = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1708,24 +1554,7 @@ impl From<Vec<globals::SemanticTagStruct>> for AmbientContextTypeStruct {
     }
 }
 
-impl From<AmbientContextTypeStruct> for AttributeValue {
-    #[inline]
-    fn from(val: AmbientContextTypeStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for AmbientContextTypeStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(AmbientContextTypeStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1763,24 +1592,24 @@ impl ObjectCountConfigStruct {
                     if counting_object.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::SemanticTagStruct>::try_from(fval)?;
                         counting_object = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if object_count_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         object_count_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1803,24 +1632,7 @@ impl ObjectCountConfigStruct {
     }
 }
 
-impl From<ObjectCountConfigStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ObjectCountConfigStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ObjectCountConfigStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ObjectCountConfigStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1905,83 +1717,83 @@ impl PredictedActivityStruct {
                     if start_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         (decoded.raw() <= 0xFFFF_FFFE_u32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         start_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if end_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         (decoded.raw() >= 1_u32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         end_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if ambient_context_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <globals::SemanticTagStruct>::try_from)?;
                         (decoded.len() <= 100)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         ambient_context_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if crowd_detected.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         crowd_detected = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if crowd_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (1_u8..=254_u8)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         crowd_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if confidence.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent>::try_from(fval)?;
                         (decoded.raw() <= 100_u8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         confidence = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2017,30 +1829,11 @@ impl PredictedActivityStruct {
     }
 }
 
-impl From<PredictedActivityStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PredictedActivityStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PredictedActivityStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PredictedActivityStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2086,11 +1879,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2104,19 +1892,14 @@ pub mod attributes {
         HumanActivityDetected,
         super::HumanActivityDetected,
         super::AmbientContextSensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for HumanActivityDetected {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::HumanActivityDetected::from(val))
-        }
-    }
-
-    impl fmt::Display for HumanActivityDetected {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2149,11 +1932,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2167,19 +1945,14 @@ pub mod attributes {
         ObjectIdentified,
         super::ObjectIdentified,
         super::AmbientContextSensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for ObjectIdentified {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::ObjectIdentified::from(val))
-        }
-    }
-
-    impl fmt::Display for ObjectIdentified {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2212,11 +1985,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2230,19 +1998,14 @@ pub mod attributes {
         AudioContextDetected,
         super::AudioContextDetected,
         super::AmbientContextSensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for AudioContextDetected {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::AudioContextDetected::from(val))
-        }
-    }
-
-    impl fmt::Display for AudioContextDetected {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2271,12 +2034,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2299,14 +2056,10 @@ pub mod attributes {
         AmbientContextType,
         Vec<super::AmbientContextTypeStruct>,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AmbientContextType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2333,12 +2086,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2361,14 +2108,10 @@ pub mod attributes {
         AmbientContextTypeSupported,
         Vec<super::globals::SemanticTagStruct>,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AmbientContextTypeSupported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2399,11 +2142,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2417,19 +2155,14 @@ pub mod attributes {
         ObjectCountThresholdReached,
         super::ObjectCountThresholdReached,
         super::AmbientContextSensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for ObjectCountThresholdReached {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::ObjectCountThresholdReached::from(val))
-        }
-    }
-
-    impl fmt::Display for ObjectCountThresholdReached {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2458,11 +2191,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2476,14 +2204,10 @@ pub mod attributes {
         ObjectCountConfig,
         super::ObjectCountConfigStruct,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for ObjectCountConfig {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2510,16 +2234,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 1_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2527,13 +2246,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ObjectCount, u16, super::AmbientContextSensingCluster, copy);
-
-    impl fmt::Display for ObjectCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ObjectCount,
+        u16,
+        super::AmbientContextSensingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2560,16 +2280,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2584,14 +2299,10 @@ pub mod attributes {
         SimultaneousDetectionLimit,
         u8,
         super::AmbientContextSensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SimultaneousDetectionLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2618,27 +2329,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(HoldTime, u16, super::AmbientContextSensingCluster, copy);
-
-    impl fmt::Display for HoldTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        HoldTime,
+        u16,
+        super::AmbientContextSensingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2665,11 +2372,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2683,14 +2385,10 @@ pub mod attributes {
         HoldTimeLimits,
         super::globals::HoldTimeLimitsStruct,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for HoldTimeLimits {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2717,12 +2415,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2745,14 +2437,10 @@ pub mod attributes {
         PredictedActivity,
         Vec<super::PredictedActivityStruct>,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for PredictedActivity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2779,12 +2467,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2807,14 +2489,10 @@ pub mod attributes {
         SensorFusionSupported,
         Vec<super::globals::SemanticTagStruct>,
         super::AmbientContextSensingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for SensorFusionSupported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 }
 
 pub mod events {
@@ -2914,11 +2592,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2931,35 +2604,35 @@ pub mod events {
                         if ambient_context_detected.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AmbientContextTypeStruct>::try_from(fval)?;
                             ambient_context_detected = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if object_count_threshold_reached.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ObjectCountThresholdReached>::try_from(fval)?;
                             object_count_threshold_reached = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if object_count.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             object_count = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2969,19 +2642,6 @@ pub mod events {
                 object_count_threshold_reached: Optional::from(object_count_threshold_reached),
                 object_count: Optional::from(object_count),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3047,11 +2707,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3063,23 +2718,23 @@ pub mod events {
                         if event_start_time_pos.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::PosixMs>::try_from(fval)?;
                             event_start_time_pos = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if event_start_time_sys.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::SystimeMs>::try_from(fval)?;
                             event_start_time_sys = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3088,19 +2743,6 @@ pub mod events {
                 event_start_time_pos: Optional::from(event_start_time_pos),
                 event_start_time_sys: Optional::from(event_start_time_sys),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

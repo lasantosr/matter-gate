@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -458,79 +454,12 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Clients, Clients);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ClientTableSize, ClientTableSize);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        NetworkIdentityManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::ActiveNetworkIdentities(_) => attributes::ActiveNetworkIdentities::NAME,
-            Self::Clients(_) => attributes::Clients::NAME,
-            Self::ClientTableSize(_) => attributes::ClientTableSize::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        NetworkIdentityManagementCluster::NAME,
-        NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: NetworkIdentityManagementCluster::NAME,
-            cluster_id: NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ActiveNetworkIdentities(inner) => Serialize::serialize(inner, serializer),
-            Self::Clients(inner) => Serialize::serialize(inner, serializer),
-            Self::ClientTableSize(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                NetworkIdentityManagementCluster::NAME,
-                NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    NetworkIdentityManagementCluster,
+    [ActiveNetworkIdentities, Clients, ClientTableSize,]
+);
 /// Dynamic client-to-server command variant matching for [`NetworkIdentityManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -703,114 +632,13 @@ crate::impl_cluster_member_variant!(command, Command, commands::RemoveClient, Re
 crate::impl_cluster_member_variant!(command, Command, commands::QueryIdentity, QueryIdentity);
 crate::impl_cluster_member_variant!(command, Command, commands::ImportAdminSecret, ImportAdminSecret);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::ExportAdminSecret, ExportAdminSecret);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        NetworkIdentityManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AddClient(_) => commands::AddClient::NAME,
-            Self::RemoveClient(_) => commands::RemoveClient::NAME,
-            Self::QueryIdentity(_) => commands::QueryIdentity::NAME,
-            Self::ImportAdminSecret(_) => commands::ImportAdminSecret::NAME,
-            Self::ExportAdminSecret => commands::ExportAdminSecret::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        NetworkIdentityManagementCluster::NAME,
-        NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: NetworkIdentityManagementCluster::NAME,
-            cluster_id: NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ExportAdminSecret => Serialize::serialize(&(), serializer),
-            Self::AddClient(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveClient(inner) => Serialize::serialize(inner, serializer),
-            Self::QueryIdentity(inner) => Serialize::serialize(inner, serializer),
-            Self::ImportAdminSecret(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                NetworkIdentityManagementCluster::NAME,
-                NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                NetworkIdentityManagementCluster::NAME,
-                NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    NetworkIdentityManagementCluster,
+    empty = [ExportAdminSecret,],
+    payload = [AddClient, RemoveClient, QueryIdentity, ImportAdminSecret,]
+);
 /// Dynamic server-to-client command response variant matching for [`NetworkIdentityManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -959,94 +787,13 @@ crate::impl_cluster_member_variant!(
     commands::ExportAdminSecretResponse,
     ExportAdminSecretResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        NetworkIdentityManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AddClientResponse(_) => commands::AddClientResponse::NAME,
-            Self::QueryIdentityResponse(_) => commands::QueryIdentityResponse::NAME,
-            Self::ExportAdminSecretResponse(_) => commands::ExportAdminSecretResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        NetworkIdentityManagementCluster::NAME,
-        NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: NetworkIdentityManagementCluster::NAME,
-            cluster_id: NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AddClientResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::QueryIdentityResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::ExportAdminSecretResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                NetworkIdentityManagementCluster::NAME,
-                NetworkIdentityManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    NetworkIdentityManagementCluster,
+    empty = [],
+    payload = [AddClientResponse, QueryIdentityResponse, ExportAdminSecretResponse,]
+);
 
 crate::define_matter_enum! {
     /// IdentityTypeEnum exhaustive specification enum.
@@ -1118,74 +865,75 @@ impl ActiveNetworkIdentityStruct {
                     if index.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (1_u16..=0xFFFE_u16)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         index = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if r#type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <IdentityTypeEnum>::try_from(fval)?;
                         r#type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if identifier.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 20)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         identifier = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if created_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         created_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if remaining_clients.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         remaining_clients = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1221,24 +969,7 @@ impl ActiveNetworkIdentityStruct {
     }
 }
 
-impl From<ActiveNetworkIdentityStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ActiveNetworkIdentityStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ActiveNetworkIdentityStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ActiveNetworkIdentityStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1290,48 +1021,49 @@ impl ClientStruct {
                     if client_index.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (1_u16..=2047_u16)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         client_index = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if client_identifier.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 20)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         client_identifier = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if client_identity_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <IdentityTypeEnum>::try_from(fval)?;
                         client_identity_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if network_identity_index.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -1340,8 +1072,8 @@ impl ClientStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         network_identity_index = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1377,30 +1109,11 @@ impl ClientStruct {
     }
 }
 
-impl From<ClientStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ClientStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ClientStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ClientStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1442,12 +1155,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1470,14 +1177,10 @@ pub mod attributes {
         ActiveNetworkIdentities,
         Vec<super::ActiveNetworkIdentityStruct>,
         super::NetworkIdentityManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ActiveNetworkIdentities {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1504,12 +1207,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1532,14 +1229,10 @@ pub mod attributes {
         Clients,
         Vec<super::ClientStruct>,
         super::NetworkIdentityManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for Clients {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1566,16 +1259,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 500_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1586,13 +1274,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ClientTableSize, u16, super::NetworkIdentityManagementCluster, copy);
-
-    impl fmt::Display for ClientTableSize {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ClientTableSize,
+        u16,
+        super::NetworkIdentityManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -1627,17 +1316,6 @@ pub mod commands {
         pub client_identity: crate::Bytes,
     }
 
-    impl crate::traits::CommandSpec for AddClient {
-        type Response = AddClientResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl AddClient {
         pub const CLUSTER_ID: ClusterId = super::NetworkIdentityManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1655,11 +1333,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_CLIENT_IDENTITY, AttributeValue::from(self.client_identity)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1688,19 +1361,6 @@ pub mod commands {
                 client_identity: client_identity.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for AddClient {
@@ -1710,7 +1370,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(AddClient, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(
+        AddClient,
+        super::NetworkIdentityManagementCluster,
+        AddClientResponse,
+        false
+    );
 
     /// This command is the response to the AddClient command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1723,17 +1388,6 @@ pub mod commands {
     )]
     pub struct AddClientResponse {
         pub client_index: u16,
-    }
-
-    impl crate::traits::CommandSpec for AddClientResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddClientResponse {
@@ -1755,11 +1409,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_CLIENT_INDEX, AttributeValue::from(self.client_index)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1770,7 +1419,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (1_u16..=2047_u16)
                             .contains(&decoded)
                             .then_some(())
@@ -1787,19 +1436,6 @@ pub mod commands {
                 client_index: client_index.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for AddClientResponse {
@@ -1809,7 +1445,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(AddClientResponse, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(AddClientResponse, super::NetworkIdentityManagementCluster, (), false);
 
     /// Removes the specified client from the Client Table and from the network.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1828,17 +1464,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub client_identifier: Optional<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for RemoveClient {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveClient {
@@ -1882,11 +1507,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1898,30 +1518,30 @@ pub mod commands {
                         if client_index.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (1_u16..=2047_u16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             client_index = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if client_identifier.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 20)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             client_identifier = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -1931,22 +1551,9 @@ pub mod commands {
                 client_identifier: Optional::from(client_identifier),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(RemoveClient, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(RemoveClient, super::NetworkIdentityManagementCluster, (), false);
 
     /// Resolves the full identity certificate for a Network Identity or Network Client Identity.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1971,17 +1578,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub identifier: Optional<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for QueryIdentity {
-        type Response = QueryIdentityResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl QueryIdentity {
@@ -2047,11 +1643,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2065,48 +1656,48 @@ pub mod commands {
                         if network_identity_index.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             network_identity_index = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if network_identity_type.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::IdentityTypeEnum>::try_from(fval)?;
                             network_identity_type = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if client_index.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             client_index = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if identifier.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 20)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             identifier = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2118,22 +1709,14 @@ pub mod commands {
                 identifier: Optional::from(identifier),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(QueryIdentity, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(
+        QueryIdentity,
+        super::NetworkIdentityManagementCluster,
+        QueryIdentityResponse,
+        false
+    );
 
     /// This command SHALL be generated in response to a successful QueryIdentity command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2147,17 +1730,6 @@ pub mod commands {
     pub struct QueryIdentityResponse {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub identity: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for QueryIdentityResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl QueryIdentityResponse {
@@ -2177,11 +1749,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_IDENTITY, AttributeValue::from(self.identity)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2207,19 +1774,6 @@ pub mod commands {
                 identity: identity.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for QueryIdentityResponse {
@@ -2229,7 +1783,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(QueryIdentityResponse, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(
+        QueryIdentityResponse,
+        super::NetworkIdentityManagementCluster,
+        (),
+        false
+    );
 
     /// Imports a Network Administrator Shared Secret (NASS) and derives and activates the corresponding Network
     /// Identity for PDC authentication.
@@ -2244,17 +1803,6 @@ pub mod commands {
     pub struct ImportAdminSecret {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub network_administrator_shared_secret: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for ImportAdminSecret {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ImportAdminSecret {
@@ -2279,11 +1827,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2311,19 +1854,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for ImportAdminSecret {
@@ -2333,7 +1863,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(ImportAdminSecret, super::NetworkIdentityManagementCluster, false);
+    crate::impl_matter_command!(ImportAdminSecret, super::NetworkIdentityManagementCluster, (), false);
 
     /// Exports the current Network Administrator Shared Secret.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2341,62 +1871,19 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ExportAdminSecret;
 
-    impl crate::traits::CommandSpec for ExportAdminSecret {
-        type Response = ExportAdminSecretResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ExportAdminSecret {
         pub const CLUSTER_ID: ClusterId = super::NetworkIdentityManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x41);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ExportAdminSecret";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ExportAdminSecret, super::NetworkIdentityManagementCluster, true);
+    crate::impl_matter_command!(
+        ExportAdminSecret,
+        super::NetworkIdentityManagementCluster,
+        ExportAdminSecretResponse,
+        true
+    );
 
     /// This command SHALL be generated in response to a successful ExportAdminSecret command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2410,17 +1897,6 @@ pub mod commands {
     pub struct ExportAdminSecretResponse {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub network_administrator_shared_secret: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for ExportAdminSecretResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::NetworkIdentityManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ExportAdminSecretResponse {
@@ -2445,11 +1921,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2477,19 +1948,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for ExportAdminSecretResponse {
@@ -2502,6 +1960,7 @@ pub mod commands {
     crate::impl_matter_command!(
         ExportAdminSecretResponse,
         super::NetworkIdentityManagementCluster,
+        (),
         false
     );
 }

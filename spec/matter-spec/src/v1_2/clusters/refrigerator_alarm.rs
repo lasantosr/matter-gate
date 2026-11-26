@@ -10,10 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -410,79 +408,12 @@ impl From<Attribute> for (AttributeId, AttributeValue) {
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Mask, Mask);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::State, State);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Supported, Supported);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        RefrigeratorAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Mask(_) => attributes::Mask::NAME,
-            Self::State(_) => attributes::State::NAME,
-            Self::Supported(_) => attributes::Supported::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        RefrigeratorAlarmCluster::NAME,
-        RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: RefrigeratorAlarmCluster::NAME,
-            cluster_id: RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Mask(inner) => Serialize::serialize(inner, serializer),
-            Self::State(inner) => Serialize::serialize(inner, serializer),
-            Self::Supported(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                RefrigeratorAlarmCluster::NAME,
-                RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    RefrigeratorAlarmCluster,
+    [Mask, State, Supported,]
+);
 /// Dynamic event variant matching for [`RefrigeratorAlarmCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -572,107 +503,8 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::Notify> for Event {
-    #[inline]
-    fn from(ev: events::Notify) -> Self {
-        Self::Notify(ev)
-    }
-}
-
-impl TryFrom<Event> for events::Notify {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::Notify(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        RefrigeratorAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::Notify(_) => events::Notify::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        RefrigeratorAlarmCluster::NAME,
-        RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: RefrigeratorAlarmCluster::NAME,
-            cluster_id: RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Notify(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                RefrigeratorAlarmCluster::NAME,
-                RefrigeratorAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(event_single, Event, events::Notify, Notify);
+crate::impl_cluster_enum_dispatch!(event, Event, RefrigeratorAlarmCluster, empty = [], payload = [Notify,]);
 
 crate::define_matter_bitmap! {
     /// AlarmMap bitmap.
@@ -688,8 +520,6 @@ crate::define_matter_bitmap! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -731,11 +561,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -745,13 +570,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Mask, super::AlarmMap, super::RefrigeratorAlarmCluster, copy);
-
-    impl fmt::Display for Mask {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Mask,
+        super::AlarmMap,
+        super::RefrigeratorAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -778,11 +604,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -792,13 +613,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(State, super::AlarmMap, super::RefrigeratorAlarmCluster, copy);
-
-    impl fmt::Display for State {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        State,
+        super::AlarmMap,
+        super::RefrigeratorAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -825,11 +647,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -839,13 +656,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Supported, super::AlarmMap, super::RefrigeratorAlarmCluster, copy);
-
-    impl fmt::Display for Supported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Supported,
+        super::AlarmMap,
+        super::RefrigeratorAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod events {
@@ -917,11 +735,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -935,45 +748,45 @@ pub mod events {
                         if active.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmMap>::try_from(fval)?;
                             active = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if inactive.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmMap>::try_from(fval)?;
                             inactive = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmMap>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if mask.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmMap>::try_from(fval)?;
                             mask = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -984,19 +797,6 @@ pub mod events {
                 state: state.ok_or((Some(FieldId::new(2)), MatterStatus::ConstraintError))?,
                 mask: mask.ok_or((Some(FieldId::new(3)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

@@ -12,14 +12,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -752,82 +746,19 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::OverallTargetState, OverallTargetState);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::LatchControlModes, LatchControlModes);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ClosureControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::CountdownTime(_) => attributes::CountdownTime::NAME,
-            Self::MainState(_) => attributes::MainState::NAME,
-            Self::CurrentErrorList(_) => attributes::CurrentErrorList::NAME,
-            Self::OverallCurrentState(_) => attributes::OverallCurrentState::NAME,
-            Self::OverallTargetState(_) => attributes::OverallTargetState::NAME,
-            Self::LatchControlModes(_) => attributes::LatchControlModes::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ClosureControlCluster::NAME,
-        ClosureControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ClosureControlCluster::NAME,
-            cluster_id: ClosureControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::CountdownTime(inner) => Serialize::serialize(inner, serializer),
-            Self::MainState(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentErrorList(inner) => Serialize::serialize(inner, serializer),
-            Self::OverallCurrentState(inner) => Serialize::serialize(inner, serializer),
-            Self::OverallTargetState(inner) => Serialize::serialize(inner, serializer),
-            Self::LatchControlModes(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((ClosureControlCluster::NAME, ClosureControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ClosureControlCluster,
+    [
+        CountdownTime,
+        MainState,
+        CurrentErrorList,
+        OverallCurrentState,
+        OverallTargetState,
+        LatchControlModes,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ClosureControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -971,105 +902,13 @@ crate::impl_cluster_member_variant!(command_unit, Command, commands::Stop, Stop)
 crate::impl_cluster_member_variant!(command, Command, commands::MoveTo, MoveTo);
 crate::impl_cluster_member_variant!(command_unit, Command, commands::Calibrate, Calibrate);
 crate::impl_cluster_member_variant!(command, Command, commands::GroupedMoveTo, GroupedMoveTo);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ClosureControlCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Stop => commands::Stop::NAME,
-            Self::MoveTo(_) => commands::MoveTo::NAME,
-            Self::Calibrate => commands::Calibrate::NAME,
-            Self::GroupedMoveTo(_) => commands::GroupedMoveTo::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ClosureControlCluster::NAME,
-        ClosureControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ClosureControlCluster::NAME,
-            cluster_id: ClosureControlCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Stop | Self::Calibrate => Serialize::serialize(&(), serializer),
-            Self::MoveTo(inner) => Serialize::serialize(inner, serializer),
-            Self::GroupedMoveTo(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ClosureControlCluster::NAME, ClosureControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((ClosureControlCluster::NAME, ClosureControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ClosureControlCluster,
+    empty = [Stop, Calibrate,],
+    payload = [MoveTo, GroupedMoveTo,]
+);
 /// Dynamic event variant matching for [`ClosureControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1253,93 +1092,13 @@ crate::impl_cluster_member_variant!(event, Event, events::OperationalError, Oper
 crate::impl_cluster_member_variant!(event_unit, Event, events::MovementCompleted, MovementCompleted);
 crate::impl_cluster_member_variant!(event, Event, events::EngageStateChanged, EngageStateChanged);
 crate::impl_cluster_member_variant!(event, Event, events::SecureStateChanged, SecureStateChanged);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ClosureControlCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::OperationalError(_) => events::OperationalError::NAME,
-            Self::MovementCompleted => events::MovementCompleted::NAME,
-            Self::EngageStateChanged(_) => events::EngageStateChanged::NAME,
-            Self::SecureStateChanged(_) => events::SecureStateChanged::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ClosureControlCluster::NAME,
-        ClosureControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ClosureControlCluster::NAME,
-            cluster_id: ClosureControlCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MovementCompleted => Serialize::serialize(&(), serializer),
-            Self::OperationalError(inner) => Serialize::serialize(inner, serializer),
-            Self::EngageStateChanged(inner) => Serialize::serialize(inner, serializer),
-            Self::SecureStateChanged(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((ClosureControlCluster::NAME, ClosureControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    ClosureControlCluster,
+    empty = [MovementCompleted,],
+    payload = [OperationalError, EngageStateChanged, SecureStateChanged,]
+);
 
 crate::define_matter_enum! {
     /// ClosureErrorEnum exhaustive specification enum.
@@ -1483,45 +1242,45 @@ impl OverallCurrentStateStruct {
                     if position.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <CurrentPositionEnum>::try_from)?;
                         position = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if latch.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <bool>::try_from)?;
                         latch = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if speed.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::ThreeLevelAutoEnum>::try_from(fval)?;
                         speed = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if secure_state.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <bool>::try_from)?;
                         secure_state = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1592,24 +1351,7 @@ impl From<Option<bool>> for OverallCurrentStateStruct {
     }
 }
 
-impl From<OverallCurrentStateStruct> for AttributeValue {
-    #[inline]
-    fn from(val: OverallCurrentStateStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for OverallCurrentStateStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(OverallCurrentStateStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1690,34 +1432,34 @@ impl OverallTargetStateStruct {
                     if position.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <TargetPositionEnum>::try_from)?;
                         position = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if latch.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <bool>::try_from)?;
                         latch = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if speed.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::ThreeLevelAutoEnum>::try_from(fval)?;
                         speed = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1758,30 +1500,11 @@ impl OverallTargetStateStruct {
     }
 }
 
-impl From<OverallTargetStateStruct> for AttributeValue {
-    #[inline]
-    fn from(val: OverallTargetStateStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for OverallTargetStateStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(OverallTargetStateStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1850,14 +1573,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1871,33 +1586,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CountdownTime,
-        Nullable<types::ElapsedS>,
+        types::ElapsedS,
         super::ClosureControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::ElapsedS> for CountdownTime {
-        #[inline]
-        fn from(val: types::ElapsedS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::ElapsedS>> for CountdownTime {
-        #[inline]
-        fn from(val: Option<types::ElapsedS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CountdownTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1924,11 +1620,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1938,13 +1629,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MainState, super::MainStateEnum, super::ClosureControlCluster, copy);
-
-    impl fmt::Display for MainState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MainState,
+        super::MainStateEnum,
+        super::ClosureControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1971,12 +1663,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1999,14 +1685,10 @@ pub mod attributes {
         CurrentErrorList,
         Vec<super::ClosureErrorEnum>,
         super::ClosureControlCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for CurrentErrorList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2057,14 +1739,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2075,33 +1749,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OverallCurrentState,
-        Nullable<super::OverallCurrentStateStruct>,
+        super::OverallCurrentStateStruct,
         super::ClosureControlCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::OverallCurrentStateStruct> for OverallCurrentState {
-        #[inline]
-        fn from(val: super::OverallCurrentStateStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::OverallCurrentStateStruct>> for OverallCurrentState {
-        #[inline]
-        fn from(val: Option<super::OverallCurrentStateStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OverallCurrentState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2152,14 +1807,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2170,33 +1817,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OverallTargetState,
-        Nullable<super::OverallTargetStateStruct>,
+        super::OverallTargetStateStruct,
         super::ClosureControlCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::OverallTargetStateStruct> for OverallTargetState {
-        #[inline]
-        fn from(val: super::OverallTargetStateStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::OverallTargetStateStruct>> for OverallTargetState {
-        #[inline]
-        fn from(val: Option<super::OverallTargetStateStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OverallTargetState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2223,11 +1851,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2241,14 +1864,10 @@ pub mod attributes {
         LatchControlModes,
         super::globals::LatchControlModesBitmap,
         super::ClosureControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for LatchControlModes {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -2275,62 +1894,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Stop;
 
-    impl crate::traits::CommandSpec for Stop {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ClosureControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Stop {
         pub const CLUSTER_ID: ClusterId = super::ClosureControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Stop";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Stop, super::ClosureControlCluster, true);
+    crate::impl_matter_command!(Stop, super::ClosureControlCluster, (), true);
 
     /// On receipt of this command, the closure SHALL operate to update its position, latch state and/or motion speed.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2351,17 +1922,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub speed: Optional<super::globals::ThreeLevelAutoEnum>,
-    }
-
-    impl crate::traits::CommandSpec for MoveTo {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ClosureControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MoveTo {
@@ -2416,11 +1976,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2433,34 +1988,34 @@ pub mod commands {
                         if position.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TargetPositionEnum>::try_from(fval)?;
                             position = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if latch.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             latch = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if speed.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::ThreeLevelAutoEnum>::try_from(fval)?;
                             speed = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2471,22 +2026,9 @@ pub mod commands {
                 speed: Optional::from(speed),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(MoveTo, super::ClosureControlCluster, false);
+    crate::impl_matter_command!(MoveTo, super::ClosureControlCluster, (), false);
 
     /// This command is used to trigger a calibration of the closure.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2494,62 +2036,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Calibrate;
 
-    impl crate::traits::CommandSpec for Calibrate {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ClosureControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Calibrate {
         pub const CLUSTER_ID: ClusterId = super::ClosureControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x02);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Calibrate";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Calibrate, super::ClosureControlCluster, true);
+    crate::impl_matter_command!(Calibrate, super::ClosureControlCluster, (), true);
 
     /// This command is intended to be invoked using groupcast addressing to move a group of closures to a target
     /// position, latch, and/or perform the movement at a specific speed.
@@ -2571,17 +2065,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub speed: Optional<super::globals::ThreeLevelAutoEnum>,
-    }
-
-    impl crate::traits::CommandSpec for GroupedMoveTo {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ClosureControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GroupedMoveTo {
@@ -2636,11 +2119,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2653,34 +2131,34 @@ pub mod commands {
                         if position.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TargetPositionEnum>::try_from(fval)?;
                             position = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if latch.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             latch = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if speed.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::ThreeLevelAutoEnum>::try_from(fval)?;
                             speed = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2691,22 +2169,9 @@ pub mod commands {
                 speed: Optional::from(speed),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GroupedMoveTo, super::ClosureControlCluster, false);
+    crate::impl_matter_command!(GroupedMoveTo, super::ClosureControlCluster, (), false);
 }
 
 pub mod events {
@@ -2762,11 +2227,6 @@ pub mod events {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2793,19 +2253,6 @@ pub mod events {
                 error_state: error_state.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::ClosureErrorEnum>> for OperationalError {
@@ -2828,43 +2275,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x01);
         pub const NAME: &'static str = "MovementCompleted";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(MovementCompleted, super::ClosureControlCluster, true);
@@ -2902,11 +2312,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_ENGAGE_VALUE, AttributeValue::from(self.engage_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2929,19 +2334,6 @@ pub mod events {
             Ok(Self {
                 engage_value: engage_value.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2987,11 +2379,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_SECURE_VALUE, AttributeValue::from(self.secure_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3014,19 +2401,6 @@ pub mod events {
             Ok(Self {
                 secure_value: secure_value.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

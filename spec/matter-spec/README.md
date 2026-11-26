@@ -21,7 +21,7 @@ It is completely independent of any network stack, transport, or async runtime. 
 - **Zero-clone owned conversions:** Owned wire payloads (strings, byte buffers, and vectors) convert into domain models with zero intermediate clones.
 - **Exhaustive enums & bitmaps:** Cluster enums are exhaustive for their Matter release so matches are compiler-verified. Bitmaps provide named flag constants, bitwise operators, and set helpers. Error enums are also exhaustive by design (see [Exhaustive Error Enums & SemVer](#exhaustive-error-enums--semver)).
 - **Zero-alloc conformance validation:** Static read-only specification tables power non-mutating, zero-allocation full-snapshot and partial-delta validation, alongside zero-alloc typed endpoint inspection.
-- **Semantic unit & time newtypes:** Physical unit, time, and address types (temperature, percentage, power, epochs, dates, IP addresses, and more) with optional/nullable combinators and optional `chrono`, `time`, and `uom` bridges.
+- **Semantic unit & time newtypes:** Physical unit, time, and address types (temperature, percentage, power, epochs, dates, IP addresses, and more) with optional/nullable combinators and optional `jiff`, `time`, and `uom` bridges.
 - **Boundary dispatch & dynamic schemas:** Feature-gated boundary enums for dynamic dispatch, self-describing JSON wrappers, and feature-map-pruned JSON schemas.
 - **Embedded & `no_std` ready:** Compiles on bare-metal targets (using `alloc`) when default features are disabled, including the static registry and serialization.
 
@@ -55,7 +55,7 @@ Features are layered from coarse to fine. Pick the narrowest tier that fits your
 | `serde` | No | `#![no_std]` + `alloc` `Serialize` and `Deserialize` implementations for all models. |
 | `schemars` | No | Dynamic `FeatureMap`-pruned `JsonSchema` generation via `schemars` (enables `std` and `registry`). |
 | `deny-unknown-fields` | No | Disallow unrecognized fields in Serde deserialization and Schemars JSON schemas (takes effect when `serde` or `schemars` is enabled). **Library crates must NOT enable this feature**, leave it for leaf binary crates to opt in. |
-| `chrono` | No | `chrono` conversions for Matter time types. |
+| `jiff` | No | `jiff` conversions for Matter time types. |
 | `time` | No | `time` crate conversions for Matter time types. |
 | `uom` | No | `uom` SI unit conversions for physical quantity types in `types`. |
 | `testing` | No | Matter test and example clusters. |

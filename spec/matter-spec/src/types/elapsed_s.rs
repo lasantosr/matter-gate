@@ -108,8 +108,14 @@ mod tests {
 
         let av = AttributeValue::from(e);
         assert_eq!(ElapsedS::try_from(&av), Ok(e));
+        assert_eq!(ElapsedS::try_from(&AttributeValue::U16(42)), Ok(e));
+        assert_eq!(ElapsedS::try_from(&AttributeValue::U64(42)), Ok(e));
         assert_eq!(
-            ElapsedS::try_from(&AttributeValue::U16(42)),
+            ElapsedS::try_from(&AttributeValue::U64(u64::MAX)),
+            Err(MatterStatus::ConstraintError)
+        );
+        assert_eq!(
+            ElapsedS::try_from(&AttributeValue::I32(42)),
             Err(MatterStatus::InvalidDataType)
         );
         assert_eq!(Duration::from(e), Duration::from_secs(42));

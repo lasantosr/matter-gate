@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
     v1_2::clusters::{descriptor::DescriptorCluster, network_commissioning::NetworkCommissioningCluster},
 };
 
@@ -136,29 +136,8 @@ impl<'a> SecondaryNetworkCommissioningDeviceTypeView<'a> {
     }
 }
 
-impl DeviceTypeSpec for SecondaryNetworkCommissioningDeviceType {
-    type View<'a> = SecondaryNetworkCommissioningDeviceTypeView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = false;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(SecondaryNetworkCommissioningDeviceTypeView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, SecondaryNetworkCommissioningDeviceType, false);
+crate::impl_device_type_spec!(
+    SecondaryNetworkCommissioningDeviceType,
+    SecondaryNetworkCommissioningDeviceTypeView,
+    false
+);

@@ -10,14 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -837,89 +831,21 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::AlarmsSupp
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::AlarmsEnabled, AlarmsEnabled);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::AlarmsSupported, AlarmsSupported);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::SensorFault, SensorFault);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BooleanStateConfigurationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::CurrentSensitivityLevel(_) => attributes::CurrentSensitivityLevel::NAME,
-            Self::SupportedSensitivityLevels(_) => attributes::SupportedSensitivityLevels::NAME,
-            Self::DefaultSensitivityLevel(_) => attributes::DefaultSensitivityLevel::NAME,
-            Self::AlarmsActive(_) => attributes::AlarmsActive::NAME,
-            Self::AlarmsSuppressed(_) => attributes::AlarmsSuppressed::NAME,
-            Self::AlarmsEnabled(_) => attributes::AlarmsEnabled::NAME,
-            Self::AlarmsSupported(_) => attributes::AlarmsSupported::NAME,
-            Self::SensorFault(_) => attributes::SensorFault::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        BooleanStateConfigurationCluster::NAME,
-        BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: BooleanStateConfigurationCluster::NAME,
-            cluster_id: BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::CurrentSensitivityLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::SupportedSensitivityLevels(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultSensitivityLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::AlarmsActive(inner) => Serialize::serialize(inner, serializer),
-            Self::AlarmsSuppressed(inner) => Serialize::serialize(inner, serializer),
-            Self::AlarmsEnabled(inner) => Serialize::serialize(inner, serializer),
-            Self::AlarmsSupported(inner) => Serialize::serialize(inner, serializer),
-            Self::SensorFault(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                BooleanStateConfigurationCluster::NAME,
-                BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    BooleanStateConfigurationCluster,
+    [
+        CurrentSensitivityLevel,
+        SupportedSensitivityLevels,
+        DefaultSensitivityLevel,
+        AlarmsActive,
+        AlarmsSuppressed,
+        AlarmsEnabled,
+        AlarmsSupported,
+        SensorFault,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`BooleanStateConfigurationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1035,108 +961,13 @@ impl TryFrom<model::Command> for Command {
 
 crate::impl_cluster_member_variant!(command, Command, commands::SuppressAlarm, SuppressAlarm);
 crate::impl_cluster_member_variant!(command, Command, commands::EnableDisableAlarm, EnableDisableAlarm);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BooleanStateConfigurationCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SuppressAlarm(_) => commands::SuppressAlarm::NAME,
-            Self::EnableDisableAlarm(_) => commands::EnableDisableAlarm::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        BooleanStateConfigurationCluster::NAME,
-        BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: BooleanStateConfigurationCluster::NAME,
-            cluster_id: BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SuppressAlarm(inner) => Serialize::serialize(inner, serializer),
-            Self::EnableDisableAlarm(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                BooleanStateConfigurationCluster::NAME,
-                BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                BooleanStateConfigurationCluster::NAME,
-                BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    BooleanStateConfigurationCluster,
+    empty = [],
+    payload = [SuppressAlarm, EnableDisableAlarm,]
+);
 /// Dynamic event variant matching for [`BooleanStateConfigurationCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1256,92 +1087,13 @@ impl TryFrom<model::Event> for Event {
 
 crate::impl_cluster_member_variant!(event, Event, events::AlarmsStateChanged, AlarmsStateChanged);
 crate::impl_cluster_member_variant!(event, Event, events::SensorFault, SensorFault);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BooleanStateConfigurationCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::AlarmsStateChanged(_) => events::AlarmsStateChanged::NAME,
-            Self::SensorFault(_) => events::SensorFault::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        BooleanStateConfigurationCluster::NAME,
-        BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: BooleanStateConfigurationCluster::NAME,
-            cluster_id: BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AlarmsStateChanged(inner) => Serialize::serialize(inner, serializer),
-            Self::SensorFault(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                BooleanStateConfigurationCluster::NAME,
-                BooleanStateConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    BooleanStateConfigurationCluster,
+    empty = [],
+    payload = [AlarmsStateChanged, SensorFault,]
+);
 
 crate::define_matter_bitmap! {
     /// Feature bitmap.
@@ -1387,8 +1139,6 @@ crate::define_matter_bitmap! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1430,16 +1180,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -1448,14 +1193,10 @@ pub mod attributes {
         CurrentSensitivityLevel,
         u8,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for CurrentSensitivityLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1482,16 +1223,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 2_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1506,14 +1242,10 @@ pub mod attributes {
         SupportedSensitivityLevels,
         u8,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SupportedSensitivityLevels {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1540,16 +1272,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -1558,14 +1285,10 @@ pub mod attributes {
         DefaultSensitivityLevel,
         u8,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for DefaultSensitivityLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1592,11 +1315,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1610,14 +1328,10 @@ pub mod attributes {
         AlarmsActive,
         super::AlarmModeBitmap,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AlarmsActive {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1644,11 +1358,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1662,14 +1371,10 @@ pub mod attributes {
         AlarmsSuppressed,
         super::AlarmModeBitmap,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AlarmsSuppressed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1696,11 +1401,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1714,14 +1414,10 @@ pub mod attributes {
         AlarmsEnabled,
         super::AlarmModeBitmap,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AlarmsEnabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1748,11 +1444,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1766,14 +1457,10 @@ pub mod attributes {
         AlarmsSupported,
         super::AlarmModeBitmap,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AlarmsSupported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1800,11 +1487,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1818,14 +1500,10 @@ pub mod attributes {
         SensorFault,
         super::SensorFaultBitmap,
         super::BooleanStateConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SensorFault {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -1859,17 +1537,6 @@ pub mod commands {
         pub alarms_to_suppress: super::AlarmModeBitmap,
     }
 
-    impl crate::traits::CommandSpec for SuppressAlarm {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::BooleanStateConfigurationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl SuppressAlarm {
         pub const CLUSTER_ID: ClusterId = super::BooleanStateConfigurationCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1890,11 +1557,6 @@ pub mod commands {
                 Self::FIELD_ALARMS_TO_SUPPRESS,
                 AttributeValue::from(self.alarms_to_suppress)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1920,19 +1582,6 @@ pub mod commands {
                 alarms_to_suppress: alarms_to_suppress.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::AlarmModeBitmap> for SuppressAlarm {
@@ -1942,7 +1591,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SuppressAlarm, super::BooleanStateConfigurationCluster, false);
+    crate::impl_matter_command!(SuppressAlarm, super::BooleanStateConfigurationCluster, (), false);
 
     /// This command is used to enable or disable the specified alarm mode.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1955,17 +1604,6 @@ pub mod commands {
     )]
     pub struct EnableDisableAlarm {
         pub alarms_to_enable_disable: super::AlarmModeBitmap,
-    }
-
-    impl crate::traits::CommandSpec for EnableDisableAlarm {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::BooleanStateConfigurationCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl EnableDisableAlarm {
@@ -1988,11 +1626,6 @@ pub mod commands {
                 Self::FIELD_ALARMS_TO_ENABLE_DISABLE,
                 AttributeValue::from(self.alarms_to_enable_disable)
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2019,19 +1652,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::AlarmModeBitmap> for EnableDisableAlarm {
@@ -2041,7 +1661,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(EnableDisableAlarm, super::BooleanStateConfigurationCluster, false);
+    crate::impl_matter_command!(EnableDisableAlarm, super::BooleanStateConfigurationCluster, (), false);
 }
 
 pub mod events {
@@ -2110,11 +1730,6 @@ pub mod events {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2126,23 +1741,23 @@ pub mod events {
                         if alarms_active.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmModeBitmap>::try_from(fval)?;
                             alarms_active = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if alarms_suppressed.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmModeBitmap>::try_from(fval)?;
                             alarms_suppressed = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2151,19 +1766,6 @@ pub mod events {
                 alarms_active: alarms_active.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
                 alarms_suppressed: Optional::from(alarms_suppressed),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2208,11 +1810,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_SENSOR_FAULT, AttributeValue::from(self.sensor_fault)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2235,19 +1832,6 @@ pub mod events {
             Ok(Self {
                 sensor_fault: sensor_fault.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

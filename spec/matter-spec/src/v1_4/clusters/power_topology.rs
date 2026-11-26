@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -414,80 +412,16 @@ impl From<Attribute> for (AttributeId, AttributeValue) {
 
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::AvailableEndpoints, AvailableEndpoints);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ActiveEndpoints, ActiveEndpoints);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        PowerTopologyCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::AvailableEndpoints(_) => attributes::AvailableEndpoints::NAME,
-            Self::ActiveEndpoints(_) => attributes::ActiveEndpoints::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        PowerTopologyCluster::NAME,
-        PowerTopologyCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: PowerTopologyCluster::NAME,
-            cluster_id: PowerTopologyCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AvailableEndpoints(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveEndpoints(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((PowerTopologyCluster::NAME, PowerTopologyCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    PowerTopologyCluster,
+    [AvailableEndpoints, ActiveEndpoints,]
+);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -529,12 +463,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -553,13 +481,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(AvailableEndpoints, Vec<EndpointId>, super::PowerTopologyCluster, owned);
-
-    impl fmt::Display for AvailableEndpoints {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        AvailableEndpoints,
+        Vec<EndpointId>,
+        super::PowerTopologyCluster,
+        owned,
+        list,
+        list
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -586,12 +515,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -610,11 +533,12 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ActiveEndpoints, Vec<EndpointId>, super::PowerTopologyCluster, owned);
-
-    impl fmt::Display for ActiveEndpoints {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        ActiveEndpoints,
+        Vec<EndpointId>,
+        super::PowerTopologyCluster,
+        owned,
+        list,
+        list
+    );
 }

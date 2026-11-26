@@ -14,10 +14,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1460,108 +1458,28 @@ crate::impl_cluster_member_variant!(
     attributes::PhysicalContactUnoccupiedToOccupiedThreshold,
     PhysicalContactUnoccupiedToOccupiedThreshold
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        OccupancySensingCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Occupancy(_) => attributes::Occupancy::NAME,
-            Self::OccupancySensorType(_) => attributes::OccupancySensorType::NAME,
-            Self::OccupancySensorTypeBitmap(_) => attributes::OccupancySensorTypeBitmap::NAME,
-            Self::HoldTime(_) => attributes::HoldTime::NAME,
-            Self::HoldTimeLimits(_) => attributes::HoldTimeLimits::NAME,
-            Self::PredictedOccupancy(_) => attributes::PredictedOccupancy::NAME,
-            Self::PirOccupiedToUnoccupiedDelay(_) => attributes::PirOccupiedToUnoccupiedDelay::NAME,
-            Self::PirUnoccupiedToOccupiedDelay(_) => attributes::PirUnoccupiedToOccupiedDelay::NAME,
-            Self::PirUnoccupiedToOccupiedThreshold(_) => attributes::PirUnoccupiedToOccupiedThreshold::NAME,
-            Self::UltrasonicOccupiedToUnoccupiedDelay(_) => attributes::UltrasonicOccupiedToUnoccupiedDelay::NAME,
-            Self::UltrasonicUnoccupiedToOccupiedDelay(_) => attributes::UltrasonicUnoccupiedToOccupiedDelay::NAME,
-            Self::UltrasonicUnoccupiedToOccupiedThreshold(_) => {
-                attributes::UltrasonicUnoccupiedToOccupiedThreshold::NAME
-            }
-            Self::PhysicalContactOccupiedToUnoccupiedDelay(_) => {
-                attributes::PhysicalContactOccupiedToUnoccupiedDelay::NAME
-            }
-            Self::PhysicalContactUnoccupiedToOccupiedDelay(_) => {
-                attributes::PhysicalContactUnoccupiedToOccupiedDelay::NAME
-            }
-            Self::PhysicalContactUnoccupiedToOccupiedThreshold(_) => {
-                attributes::PhysicalContactUnoccupiedToOccupiedThreshold::NAME
-            }
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        OccupancySensingCluster::NAME,
-        OccupancySensingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: OccupancySensingCluster::NAME,
-            cluster_id: OccupancySensingCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Occupancy(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupancySensorType(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupancySensorTypeBitmap(inner) => Serialize::serialize(inner, serializer),
-            Self::HoldTime(inner) => Serialize::serialize(inner, serializer),
-            Self::HoldTimeLimits(inner) => Serialize::serialize(inner, serializer),
-            Self::PredictedOccupancy(inner) => Serialize::serialize(inner, serializer),
-            Self::PirOccupiedToUnoccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::PirUnoccupiedToOccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::PirUnoccupiedToOccupiedThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::UltrasonicOccupiedToUnoccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::UltrasonicUnoccupiedToOccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::UltrasonicUnoccupiedToOccupiedThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalContactOccupiedToUnoccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalContactUnoccupiedToOccupiedDelay(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalContactUnoccupiedToOccupiedThreshold(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((OccupancySensingCluster::NAME, OccupancySensingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    OccupancySensingCluster,
+    [
+        Occupancy,
+        OccupancySensorType,
+        OccupancySensorTypeBitmap,
+        HoldTime,
+        HoldTimeLimits,
+        PredictedOccupancy,
+        PirOccupiedToUnoccupiedDelay,
+        PirUnoccupiedToOccupiedDelay,
+        PirUnoccupiedToOccupiedThreshold,
+        UltrasonicOccupiedToUnoccupiedDelay,
+        UltrasonicUnoccupiedToOccupiedDelay,
+        UltrasonicUnoccupiedToOccupiedThreshold,
+        PhysicalContactOccupiedToUnoccupiedDelay,
+        PhysicalContactUnoccupiedToOccupiedDelay,
+        PhysicalContactUnoccupiedToOccupiedThreshold,
+    ]
+);
 /// Dynamic event variant matching for [`OccupancySensingCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1656,104 +1574,14 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::OccupancyChanged> for Event {
-    #[inline]
-    fn from(ev: events::OccupancyChanged) -> Self {
-        Self::OccupancyChanged(ev)
-    }
-}
-
-impl TryFrom<Event> for events::OccupancyChanged {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::OccupancyChanged(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        OccupancySensingCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::OccupancyChanged(_) => events::OccupancyChanged::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        OccupancySensingCluster::NAME,
-        OccupancySensingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: OccupancySensingCluster::NAME,
-            cluster_id: OccupancySensingCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::OccupancyChanged(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((OccupancySensingCluster::NAME, OccupancySensingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(event_single, Event, events::OccupancyChanged, OccupancyChanged);
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    OccupancySensingCluster,
+    empty = [],
+    payload = [OccupancyChanged,]
+);
 
 crate::define_matter_bitmap! {
     /// OccupancySensorTypeBitmap bitmap.
@@ -1832,51 +1660,51 @@ impl PredictedOccupancyStruct {
                     if start_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         start_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if end_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         (decoded.raw() >= 1_u32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         end_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if occupancy.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::OccupancyBitmap>::try_from(fval)?;
                         occupancy = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if confidence.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Percent>::try_from(fval)?;
                         (decoded.raw() <= 100_u8)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         confidence = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1899,30 +1727,11 @@ impl PredictedOccupancyStruct {
     }
 }
 
-impl From<PredictedOccupancyStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PredictedOccupancyStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PredictedOccupancyStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PredictedOccupancyStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1964,11 +1773,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1982,14 +1786,10 @@ pub mod attributes {
         Occupancy,
         super::globals::OccupancyBitmap,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for Occupancy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2016,11 +1816,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2034,14 +1829,10 @@ pub mod attributes {
         OccupancySensorType,
         super::OccupancySensorTypeEnum,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OccupancySensorType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2068,11 +1859,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2086,14 +1872,10 @@ pub mod attributes {
         OccupancySensorTypeBitmap,
         super::OccupancySensorTypeBitmap,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OccupancySensorTypeBitmap {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2120,27 +1902,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(HoldTime, u16, super::OccupancySensingCluster, copy);
-
-    impl fmt::Display for HoldTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(HoldTime, u16, super::OccupancySensingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2167,11 +1938,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2185,14 +1951,10 @@ pub mod attributes {
         HoldTimeLimits,
         super::globals::HoldTimeLimitsStruct,
         super::OccupancySensingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for HoldTimeLimits {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2219,12 +1981,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2244,14 +2000,10 @@ pub mod attributes {
         PredictedOccupancy,
         Vec<super::PredictedOccupancyStruct>,
         super::OccupancySensingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for PredictedOccupancy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2278,27 +2030,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PirOccupiedToUnoccupiedDelay, u16, super::OccupancySensingCluster, copy);
-
-    impl fmt::Display for PirOccupiedToUnoccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PirOccupiedToUnoccupiedDelay,
+        u16,
+        super::OccupancySensingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2325,27 +2073,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PirUnoccupiedToOccupiedDelay, u16, super::OccupancySensingCluster, copy);
-
-    impl fmt::Display for PirUnoccupiedToOccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PirUnoccupiedToOccupiedDelay,
+        u16,
+        super::OccupancySensingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2372,16 +2116,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2396,14 +2135,10 @@ pub mod attributes {
         PirUnoccupiedToOccupiedThreshold,
         u8,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PirUnoccupiedToOccupiedThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2430,16 +2165,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -2448,14 +2178,10 @@ pub mod attributes {
         UltrasonicOccupiedToUnoccupiedDelay,
         u16,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UltrasonicOccupiedToUnoccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2482,16 +2208,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -2500,14 +2221,10 @@ pub mod attributes {
         UltrasonicUnoccupiedToOccupiedDelay,
         u16,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UltrasonicUnoccupiedToOccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2534,16 +2251,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2558,14 +2270,10 @@ pub mod attributes {
         UltrasonicUnoccupiedToOccupiedThreshold,
         u8,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UltrasonicUnoccupiedToOccupiedThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2592,16 +2300,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -2610,14 +2313,10 @@ pub mod attributes {
         PhysicalContactOccupiedToUnoccupiedDelay,
         u16,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PhysicalContactOccupiedToUnoccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2644,16 +2343,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
@@ -2662,14 +2356,10 @@ pub mod attributes {
         PhysicalContactUnoccupiedToOccupiedDelay,
         u16,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PhysicalContactUnoccupiedToOccupiedDelay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2696,16 +2386,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2720,14 +2405,10 @@ pub mod attributes {
         PhysicalContactUnoccupiedToOccupiedThreshold,
         u8,
         super::OccupancySensingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PhysicalContactUnoccupiedToOccupiedThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod events {
@@ -2780,11 +2461,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_OCCUPANCY, AttributeValue::from(self.occupancy)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2807,19 +2483,6 @@ pub mod events {
             Ok(Self {
                 occupancy: occupancy.ok_or((Some(FieldId::new(0)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

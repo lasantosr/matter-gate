@@ -10,12 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -395,77 +391,12 @@ crate::impl_cluster_member_variant!(
     attributes::ProvisionedEndpoints,
     ProvisionedEndpoints
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsClientManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MaxProvisioned(_) => attributes::MaxProvisioned::NAME,
-            Self::ProvisionedEndpoints(_) => attributes::ProvisionedEndpoints::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        TlsClientManagementCluster::NAME,
-        TlsClientManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: TlsClientManagementCluster::NAME,
-            cluster_id: TlsClientManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MaxProvisioned(inner) => Serialize::serialize(inner, serializer),
-            Self::ProvisionedEndpoints(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                TlsClientManagementCluster::NAME,
-                TlsClientManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    TlsClientManagementCluster,
+    [MaxProvisioned, ProvisionedEndpoints,]
+);
 /// Dynamic client-to-server command variant matching for [`TlsClientManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -602,110 +533,13 @@ impl TryFrom<model::Command> for Command {
 crate::impl_cluster_member_variant!(command, Command, commands::ProvisionEndpoint, ProvisionEndpoint);
 crate::impl_cluster_member_variant!(command, Command, commands::FindEndpoint, FindEndpoint);
 crate::impl_cluster_member_variant!(command, Command, commands::RemoveEndpoint, RemoveEndpoint);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsClientManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ProvisionEndpoint(_) => commands::ProvisionEndpoint::NAME,
-            Self::FindEndpoint(_) => commands::FindEndpoint::NAME,
-            Self::RemoveEndpoint(_) => commands::RemoveEndpoint::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TlsClientManagementCluster::NAME,
-        TlsClientManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TlsClientManagementCluster::NAME,
-            cluster_id: TlsClientManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ProvisionEndpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::FindEndpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveEndpoint(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsClientManagementCluster::NAME,
-                TlsClientManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsClientManagementCluster::NAME,
-                TlsClientManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    TlsClientManagementCluster,
+    empty = [],
+    payload = [ProvisionEndpoint, FindEndpoint, RemoveEndpoint,]
+);
 /// Dynamic server-to-client command response variant matching for [`TlsClientManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -833,92 +667,13 @@ crate::impl_cluster_member_variant!(
     commands::FindEndpointResponse,
     FindEndpointResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TlsClientManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ProvisionEndpointResponse(_) => commands::ProvisionEndpointResponse::NAME,
-            Self::FindEndpointResponse(_) => commands::FindEndpointResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        TlsClientManagementCluster::NAME,
-        TlsClientManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: TlsClientManagementCluster::NAME,
-            cluster_id: TlsClientManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ProvisionEndpointResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::FindEndpointResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                TlsClientManagementCluster::NAME,
-                TlsClientManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    TlsClientManagementCluster,
+    empty = [],
+    payload = [ProvisionEndpointResponse, FindEndpointResponse,]
+);
 
 crate::define_matter_enum! {
     /// StatusCodeEnum exhaustive specification enum.
@@ -995,77 +750,78 @@ impl TlsEndpointStruct {
                     if endpoint_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 0xFFFE_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         endpoint_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if hostname.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 253)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         hostname = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if port.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         port = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if caid.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 0xFFFE_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         caid = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if ccdid.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         ccdid = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if reference_count.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         reference_count = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1098,30 +854,11 @@ impl TlsEndpointStruct {
     }
 }
 
-impl From<TlsEndpointStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TlsEndpointStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TlsEndpointStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TlsEndpointStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1163,16 +900,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 5_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1183,13 +915,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxProvisioned, u8, super::TlsClientManagementCluster, copy);
-
-    impl fmt::Display for MaxProvisioned {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxProvisioned,
+        u8,
+        super::TlsClientManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1216,12 +949,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1241,14 +968,10 @@ pub mod attributes {
         ProvisionedEndpoints,
         Vec<super::TlsEndpointStruct>,
         super::TlsClientManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ProvisionedEndpoints {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 }
 
 pub mod commands {
@@ -1285,17 +1008,6 @@ pub mod commands {
         pub caid: u16,
         pub ccdid: Nullable<u16>,
         pub endpoint_id: Nullable<u16>,
-    }
-
-    impl crate::traits::CommandSpec for ProvisionEndpoint {
-        type Response = ProvisionEndpointResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsClientManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ProvisionEndpoint {
@@ -1349,11 +1061,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1368,63 +1075,65 @@ pub mod commands {
                         if hostname.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 253)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             hostname = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if port.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             port = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if caid.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded <= 0xFFFE_u16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             caid = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if ccdid.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             ccdid = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -1437,22 +1146,14 @@ pub mod commands {
                 endpoint_id: endpoint_id.ok_or((Some(FieldId::new(4)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(ProvisionEndpoint, super::TlsClientManagementCluster, false);
+    crate::impl_matter_command!(
+        ProvisionEndpoint,
+        super::TlsClientManagementCluster,
+        ProvisionEndpointResponse,
+        false
+    );
 
     /// This command is used to report the result of the ProvisionEndpoint command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1465,17 +1166,6 @@ pub mod commands {
     )]
     pub struct ProvisionEndpointResponse {
         pub endpoint_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for ProvisionEndpointResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsClientManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ProvisionEndpointResponse {
@@ -1497,11 +1187,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ENDPOINT_ID, AttributeValue::from(self.endpoint_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1512,7 +1197,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 0xFFFE_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -1528,19 +1213,6 @@ pub mod commands {
                 endpoint_id: endpoint_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for ProvisionEndpointResponse {
@@ -1550,7 +1222,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(ProvisionEndpointResponse, super::TlsClientManagementCluster, false);
+    crate::impl_matter_command!(ProvisionEndpointResponse, super::TlsClientManagementCluster, (), false);
 
     /// This command is used to find a TLS Endpoint by its ID.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1563,17 +1235,6 @@ pub mod commands {
     )]
     pub struct FindEndpoint {
         pub endpoint_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for FindEndpoint {
-        type Response = FindEndpointResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsClientManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindEndpoint {
@@ -1595,11 +1256,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ENDPOINT_ID, AttributeValue::from(self.endpoint_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1610,7 +1266,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 0xFFFE_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -1626,19 +1282,6 @@ pub mod commands {
                 endpoint_id: endpoint_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for FindEndpoint {
@@ -1648,7 +1291,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(FindEndpoint, super::TlsClientManagementCluster, false);
+    crate::impl_matter_command!(
+        FindEndpoint,
+        super::TlsClientManagementCluster,
+        FindEndpointResponse,
+        false
+    );
 
     /// This command is used to report the result of the FindEndpoint command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1661,17 +1309,6 @@ pub mod commands {
     )]
     pub struct FindEndpointResponse {
         pub endpoint: super::TlsEndpointStruct,
-    }
-
-    impl crate::traits::CommandSpec for FindEndpointResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsClientManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl FindEndpointResponse {
@@ -1691,11 +1328,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ENDPOINT, AttributeValue::from(self.endpoint)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1721,19 +1353,6 @@ pub mod commands {
                 endpoint: endpoint.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::TlsEndpointStruct> for FindEndpointResponse {
@@ -1743,7 +1362,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(FindEndpointResponse, super::TlsClientManagementCluster, false);
+    crate::impl_matter_command!(FindEndpointResponse, super::TlsClientManagementCluster, (), false);
 
     /// This command is used to remove a TLS Endpoint by its ID.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1756,17 +1375,6 @@ pub mod commands {
     )]
     pub struct RemoveEndpoint {
         pub endpoint_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for RemoveEndpoint {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::TlsClientManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveEndpoint {
@@ -1788,11 +1396,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ENDPOINT_ID, AttributeValue::from(self.endpoint_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1803,7 +1406,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 0xFFFE_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -1819,19 +1422,6 @@ pub mod commands {
                 endpoint_id: endpoint_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for RemoveEndpoint {
@@ -1841,5 +1431,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveEndpoint, super::TlsClientManagementCluster, false);
+    crate::impl_matter_command!(RemoveEndpoint, super::TlsClientManagementCluster, (), false);
 }

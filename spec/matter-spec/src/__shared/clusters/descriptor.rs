@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -651,88 +649,23 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ClientList
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PartsList, PartsList);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::TagList, TagList);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::EndpointUniqueId, EndpointUniqueId);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        DescriptorCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::DeviceTypeList(_) => attributes::DeviceTypeList::NAME,
-            Self::ServerList(_) => attributes::ServerList::NAME,
-            Self::ClientList(_) => attributes::ClientList::NAME,
-            Self::PartsList(_) => attributes::PartsList::NAME,
-            Self::TagList(_) => attributes::TagList::NAME,
-            Self::EndpointUniqueId(_) => attributes::EndpointUniqueId::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        DescriptorCluster::NAME,
-        DescriptorCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: DescriptorCluster::NAME,
-            cluster_id: DescriptorCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::DeviceTypeList(inner) => Serialize::serialize(inner, serializer),
-            Self::ServerList(inner) => Serialize::serialize(inner, serializer),
-            Self::ClientList(inner) => Serialize::serialize(inner, serializer),
-            Self::PartsList(inner) => Serialize::serialize(inner, serializer),
-            Self::TagList(inner) => Serialize::serialize(inner, serializer),
-            Self::EndpointUniqueId(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((DescriptorCluster::NAME, DescriptorCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    DescriptorCluster,
+    [
+        DeviceTypeList,
+        ServerList,
+        ClientList,
+        PartsList,
+        TagList,
+        EndpointUniqueId,
+    ]
+);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -774,12 +707,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -799,14 +726,10 @@ pub mod attributes {
         DeviceTypeList,
         Vec<super::globals::DeviceTypeStruct>,
         super::DescriptorCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for DeviceTypeList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -833,12 +756,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -854,13 +771,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ServerList, Vec<ClusterId>, super::DescriptorCluster, owned);
-
-    impl fmt::Display for ServerList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(ServerList, Vec<ClusterId>, super::DescriptorCluster, owned, list, list);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -887,12 +798,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -908,13 +813,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ClientList, Vec<ClusterId>, super::DescriptorCluster, owned);
-
-    impl fmt::Display for ClientList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(ClientList, Vec<ClusterId>, super::DescriptorCluster, owned, list, list);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -941,12 +840,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -962,13 +855,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PartsList, Vec<EndpointId>, super::DescriptorCluster, owned);
-
-    impl fmt::Display for PartsList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(PartsList, Vec<EndpointId>, super::DescriptorCluster, owned, list, list);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -995,12 +882,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1023,14 +904,10 @@ pub mod attributes {
         TagList,
         Vec<super::globals::SemanticTagStruct>,
         super::DescriptorCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for TagList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1057,11 +934,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1074,11 +946,12 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(EndpointUniqueId, String, super::DescriptorCluster, owned);
-
-    impl fmt::Display for EndpointUniqueId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        EndpointUniqueId,
+        String,
+        super::DescriptorCluster,
+        owned,
+        scalar,
+        display
+    );
 }

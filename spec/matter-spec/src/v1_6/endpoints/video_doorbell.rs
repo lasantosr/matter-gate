@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
 };
 
 /// Video Doorbell (Class: Simple, Scope: Endpoint, Domain: cameras).
@@ -92,29 +92,4 @@ impl<'a> VideoDoorbellView<'a> {
     }
 }
 
-impl DeviceTypeSpec for VideoDoorbell {
-    type View<'a> = VideoDoorbellView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = true;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(VideoDoorbellView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, VideoDoorbell, true);
+crate::impl_device_type_spec!(VideoDoorbell, VideoDoorbellView, true);

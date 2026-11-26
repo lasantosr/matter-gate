@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
     error::EndpointError,
     model::{Cluster, ClusterId, DeviceTypeEntry, DeviceTypeId, Endpoint, EndpointId, Optional},
-    traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+    traits::{DeviceTypeSpec, update_descriptor_cluster},
     v1_4::clusters::{
         descriptor::DescriptorCluster, electrical_energy_measurement::ElectricalEnergyMeasurementCluster,
         electrical_power_measurement::ElectricalPowerMeasurementCluster, power_topology::PowerTopologyCluster,
@@ -216,29 +216,4 @@ impl<'a> ElectricalSensorView<'a> {
     }
 }
 
-impl DeviceTypeSpec for ElectricalSensor {
-    type View<'a> = ElectricalSensorView<'a>;
-
-    const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-    const IS_EMPTY: bool = false;
-    const NAME: &'static str = Self::NAME;
-    const REVISION: u16 = Self::REVISION;
-
-    #[inline]
-    fn into_endpoint(self, id: EndpointId) -> Endpoint {
-        Self::into_endpoint(self, id)
-    }
-
-    fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-        validate_device_view(
-            endpoint,
-            Self::DEVICE_TYPE_ID,
-            Self::DISALLOWED_CLUSTERS,
-            Self::MANDATORY_SERVER_CLUSTERS,
-            Self::MANDATORY_CLIENT_CLUSTERS,
-        )?;
-        Ok(ElectricalSensorView { endpoint })
-    }
-}
-
-crate::impl_matter_describe!(device, ElectricalSensor, false);
+crate::impl_device_type_spec!(ElectricalSensor, ElectricalSensorView, false);

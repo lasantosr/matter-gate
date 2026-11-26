@@ -91,6 +91,10 @@ mod tests {
         assert_eq!(SystimeUs::try_from(&av), Ok(t));
         assert_eq!(
             SystimeUs::try_from(&AttributeValue::U32(3_500)),
+            Ok(SystimeUs::from_raw(3_500))
+        );
+        assert_eq!(
+            SystimeUs::try_from(&AttributeValue::I64(3_500)),
             Err(MatterStatus::InvalidDataType)
         );
         assert_eq!(Duration::from(t), Duration::from_millis(3_500));

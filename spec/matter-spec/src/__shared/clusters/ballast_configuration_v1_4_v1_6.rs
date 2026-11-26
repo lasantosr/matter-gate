@@ -10,10 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1313,101 +1311,27 @@ crate::impl_cluster_member_variant!(
     attributes::LampBurnHoursTripPoint,
     LampBurnHoursTripPoint
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        BallastConfigurationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::PhysicalMinLevel(_) => attributes::PhysicalMinLevel::NAME,
-            Self::PhysicalMaxLevel(_) => attributes::PhysicalMaxLevel::NAME,
-            Self::BallastStatus(_) => attributes::BallastStatus::NAME,
-            Self::MinLevel(_) => attributes::MinLevel::NAME,
-            Self::MaxLevel(_) => attributes::MaxLevel::NAME,
-            Self::IntrinsicBallastFactor(_) => attributes::IntrinsicBallastFactor::NAME,
-            Self::BallastFactorAdjustment(_) => attributes::BallastFactorAdjustment::NAME,
-            Self::LampQuantity(_) => attributes::LampQuantity::NAME,
-            Self::LampType(_) => attributes::LampType::NAME,
-            Self::LampManufacturer(_) => attributes::LampManufacturer::NAME,
-            Self::LampRatedHours(_) => attributes::LampRatedHours::NAME,
-            Self::LampBurnHours(_) => attributes::LampBurnHours::NAME,
-            Self::LampAlarmMode(_) => attributes::LampAlarmMode::NAME,
-            Self::LampBurnHoursTripPoint(_) => attributes::LampBurnHoursTripPoint::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        BallastConfigurationCluster::NAME,
-        BallastConfigurationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: BallastConfigurationCluster::NAME,
-            cluster_id: BallastConfigurationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::PhysicalMinLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::PhysicalMaxLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::BallastStatus(inner) => Serialize::serialize(inner, serializer),
-            Self::MinLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxLevel(inner) => Serialize::serialize(inner, serializer),
-            Self::IntrinsicBallastFactor(inner) => Serialize::serialize(inner, serializer),
-            Self::BallastFactorAdjustment(inner) => Serialize::serialize(inner, serializer),
-            Self::LampQuantity(inner) => Serialize::serialize(inner, serializer),
-            Self::LampType(inner) => Serialize::serialize(inner, serializer),
-            Self::LampManufacturer(inner) => Serialize::serialize(inner, serializer),
-            Self::LampRatedHours(inner) => Serialize::serialize(inner, serializer),
-            Self::LampBurnHours(inner) => Serialize::serialize(inner, serializer),
-            Self::LampAlarmMode(inner) => Serialize::serialize(inner, serializer),
-            Self::LampBurnHoursTripPoint(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                BallastConfigurationCluster::NAME,
-                BallastConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    BallastConfigurationCluster,
+    [
+        PhysicalMinLevel,
+        PhysicalMaxLevel,
+        BallastStatus,
+        MinLevel,
+        MaxLevel,
+        IntrinsicBallastFactor,
+        BallastFactorAdjustment,
+        LampQuantity,
+        LampType,
+        LampManufacturer,
+        LampRatedHours,
+        LampBurnHours,
+        LampAlarmMode,
+        LampBurnHoursTripPoint,
+    ]
+);
 
 crate::define_matter_bitmap! {
     /// BallastStatusBitmap bitmap.
@@ -1436,8 +1360,6 @@ crate::define_matter_bitmap! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1479,16 +1401,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1499,13 +1416,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PhysicalMinLevel, u8, super::BallastConfigurationCluster, copy);
-
-    impl fmt::Display for PhysicalMinLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PhysicalMinLevel,
+        u8,
+        super::BallastConfigurationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1532,16 +1450,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1552,13 +1465,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PhysicalMaxLevel, u8, super::BallastConfigurationCluster, copy);
-
-    impl fmt::Display for PhysicalMaxLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PhysicalMaxLevel,
+        u8,
+        super::BallastConfigurationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1585,11 +1499,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1603,14 +1512,10 @@ pub mod attributes {
         BallastStatus,
         super::BallastStatusBitmap,
         super::BallastConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for BallastStatus {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1637,16 +1542,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1657,13 +1557,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinLevel, u8, super::BallastConfigurationCluster, copy);
-
-    impl fmt::Display for MinLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MinLevel, u8, super::BallastConfigurationCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1690,16 +1584,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1710,13 +1599,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxLevel, u8, super::BallastConfigurationCluster, copy);
-
-    impl fmt::Display for MaxLevel {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MaxLevel, u8, super::BallastConfigurationCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1767,51 +1650,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         IntrinsicBallastFactor,
-        Nullable<u8>,
+        u8,
         super::BallastConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u8> for IntrinsicBallastFactor {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for IntrinsicBallastFactor {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for IntrinsicBallastFactor {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1862,19 +1718,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1883,33 +1731,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         BallastFactorAdjustment,
-        Nullable<u8>,
+        u8,
         super::BallastConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u8> for BallastFactorAdjustment {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for BallastFactorAdjustment {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for BallastFactorAdjustment {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1936,27 +1765,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(LampQuantity, u8, super::BallastConfigurationCluster, copy);
-
-    impl fmt::Display for LampQuantity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LampQuantity,
+        u8,
+        super::BallastConfigurationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1983,11 +1808,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2000,13 +1820,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LampType, String, super::BallastConfigurationCluster, owned);
-
-    impl fmt::Display for LampType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LampType,
+        String,
+        super::BallastConfigurationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2033,11 +1854,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2050,13 +1866,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LampManufacturer, String, super::BallastConfigurationCluster, owned);
-
-    impl fmt::Display for LampManufacturer {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LampManufacturer,
+        String,
+        super::BallastConfigurationCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2107,46 +1924,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(LampRatedHours, Nullable<u32>, super::BallastConfigurationCluster, copy);
-    impl From<u32> for LampRatedHours {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for LampRatedHours {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LampRatedHours {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        LampRatedHours,
+        u32,
+        super::BallastConfigurationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2197,46 +1992,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(LampBurnHours, Nullable<u32>, super::BallastConfigurationCluster, copy);
-    impl From<u32> for LampBurnHours {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for LampBurnHours {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LampBurnHours {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        LampBurnHours,
+        u32,
+        super::BallastConfigurationCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2263,11 +2036,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2281,14 +2049,10 @@ pub mod attributes {
         LampAlarmMode,
         super::LampAlarmModeBitmap,
         super::BallastConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for LampAlarmMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2339,49 +2103,22 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         LampBurnHoursTripPoint,
-        Nullable<u32>,
+        u32,
         super::BallastConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u32> for LampBurnHoursTripPoint {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for LampBurnHoursTripPoint {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LampBurnHoursTripPoint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }

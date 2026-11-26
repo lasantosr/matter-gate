@@ -154,13 +154,6 @@ pub(super) fn emit_command_enum_tokens(
     }
 }
 
-fn emit_command_dispatch_impls(cmd_name: &str, cluster_struct: &str, is_empty: bool) -> Tokens {
-    let is_empty_str = if is_empty { "true" } else { "false" };
-    quote! {
-        crate::impl_matter_command!($cmd_name, super::$cluster_struct, $is_empty_str);
-    }
-}
-
 fn emit_unit_command_tokens(
     cmd_name: &str,
     description: &str,
@@ -170,6 +163,7 @@ fn emit_unit_command_tokens(
     response_type: &str,
     is_client: bool,
 ) -> Tokens {
+    let resp = if is_client { response_type } else { "()" };
     quote! {
         $(doc_comment(description))
         #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -177,61 +171,14 @@ fn emit_unit_command_tokens(
         #[cfg_attr(feature = $(quoted("schemars")), derive(schemars::JsonSchema))]
         pub struct $cmd_name;
 
-        impl crate::traits::CommandSpec for $cmd_name {
-            const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-            const CLUSTER_NAME: &'static str = super::$cluster_struct::NAME;
-            const COMMAND_ID: CommandId = Self::COMMAND_ID;
-            const COMMAND_NAME: &'static str = Self::NAME;
-            const DIRECTION: CommandDirection = Self::DIRECTION;
-            const IS_EMPTY: bool = true;
-            type Response = $(if is_client { $response_type } else { () });
-        }
-
         impl $cmd_name {
             pub const CLUSTER_ID: ClusterId = super::$cluster_struct::CLUSTER_ID;
             pub const COMMAND_ID: CommandId = CommandId::new($cmd_id_hex);
             pub const NAME: &'static str = $(quoted(cmd_name));
             pub const DIRECTION: CommandDirection = $direction;
-
-            #[inline]
-            #[must_use]
-            pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-                Vec::new()
-            }
-
-            #[inline]
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.into_fields())
-            }
-
-            #[inline]
-            pub(crate) fn decode_fields(
-                fields: Vec<(FieldId, AttributeValue)>,
-            ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-                if let Some((fid, _)) = fields.first() {
-                    Err((Some(*fid), MatterStatus::ConstraintError))
-                } else {
-                    Ok(Self)
-                }
-            }
-
-            #[inline]
-            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-                Self::decode_fields(fields).map_err(|(_, status)| status)
-            }
-
-            #[inline]
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                match val {
-                    AttributeValue::Null => Ok(Self),
-                    AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                    _ => Err(MatterStatus::InvalidDataType),
-                }
-            }
         }
 
-        $(emit_command_dispatch_impls(cmd_name, cluster_struct, true))
+        crate::impl_matter_command!($cmd_name, super::$cluster_struct, $resp, true);
     }
 }
 
@@ -241,7 +188,7 @@ fn emit_struct_command_tokens(
     cluster_struct: &str,
     cmd_id_hex: &str,
     direction: &Tokens,
-    _response_type: &str,
+    response_type: &str,
     ctx: &TypeContext<'_>,
 ) -> Result<Tokens> {
     let CommandDef {
@@ -249,7 +196,6 @@ fn emit_struct_command_tokens(
         args,
         description,
         source,
-        response,
         ..
     } = cmd;
 
@@ -288,31 +234,14 @@ fn emit_struct_command_tokens(
 
     let short_field_count = partition.short_field_count();
     let many_single_char_reason = "Specification command contains multiple CSA single-character argument names";
+    let resp_type = if source.eq_ignore_ascii_case("server") {
+        "()"
+    } else {
+        response_type
+    };
 
     Ok(quote! {
         $struct_def
-
-        impl crate::traits::CommandSpec for $cmd_name {
-            const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-            const CLUSTER_NAME: &'static str = super::$cluster_struct::NAME;
-            const COMMAND_ID: CommandId = Self::COMMAND_ID;
-            const COMMAND_NAME: &'static str = Self::NAME;
-            const DIRECTION: CommandDirection = Self::DIRECTION;
-            const IS_EMPTY: bool = false;
-            type Response = $(if !source.eq_ignore_ascii_case("server") {
-                $(if let Some(resp) = response {
-                    $(if resp.eq_ignore_ascii_case("Y") || resp.eq_ignore_ascii_case("DefaultResponse") {
-                        ()
-                    } else {
-                        $resp
-                    })
-                } else {
-                    ()
-                })
-            } else {
-                ()
-            });
-        }
 
         impl $cmd_name {
             pub const CLUSTER_ID: ClusterId = super::$cluster_struct::CLUSTER_ID;
@@ -325,11 +254,6 @@ fn emit_struct_command_tokens(
             #[must_use]
             pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
                 $encode_vec_body
-            }
-
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                AttributeValue::Struct(self.into_fields())
             }
 
             $(if short_field_count >= 5 =>
@@ -346,24 +270,11 @@ fn emit_struct_command_tokens(
                     $construct_fields
                 })
             }
-
-            #[inline]
-            pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-                Self::decode_fields(fields).map_err(|(_, status)| status)
-            }
-
-            #[inline]
-            pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-                let AttributeValue::Struct(fields) = val else {
-                    return Err(MatterStatus::InvalidDataType);
-                };
-                Self::try_from_fields(fields)
-            }
         }
 
         $single_mand_from
 
-        $(emit_command_dispatch_impls(cmd_name, cluster_struct, partition.is_empty()))
+        crate::impl_matter_command!($cmd_name, super::$cluster_struct, $resp_type, false);
     })
 }
 
@@ -550,36 +461,23 @@ fn emit_command_enum_wire_impls(
             )
         )
         $(if !has_multiple =>
-            $(for cmd in cmds join ($['\n']) =>
-                impl From<commands::$(&cmd.name)> for $enum_name {
-                    #[inline]
-                    fn from(
-                        $(if cmd.args.is_empty() => _)$(if !cmd.args.is_empty() => cmd): commands::$(&cmd.name),
-                    ) -> Self {
-                        $(if cmd.args.is_empty() =>
-                            Self::$(&cmd.name)
-                        )
-                        $(if !cmd.args.is_empty() =>
-                            Self::$(&cmd.name)(cmd)
-                        )
-                    }
-                }
-
-                impl TryFrom<$enum_name> for commands::$(&cmd.name) {
-                    type Error = CommandError;
-
-                    #[inline]
-                    fn try_from(cmd: $enum_name) -> Result<Self, Self::Error> {
-                        match cmd {
-                            $(if cmd.args.is_empty() =>
-                                $enum_name::$(&cmd.name) => Ok(Self),
-                            )
-                            $(if !cmd.args.is_empty() =>
-                                $enum_name::$(&cmd.name)(inner) => Ok(inner),
-                            )
-                        }
-                    }
-                }
+            $(for cmd in cmds join ($['\r']) =>
+                $(if cmd.args.is_empty() =>
+                    crate::impl_cluster_member_variant!(
+                        command_unit_single,
+                        $enum_name,
+                        commands::$(&cmd.name),
+                        $(&cmd.name)
+                    );
+                )
+                $(if !cmd.args.is_empty() =>
+                    crate::impl_cluster_member_variant!(
+                        command_single,
+                        $enum_name,
+                        commands::$(&cmd.name),
+                        $(&cmd.name)
+                    );
+                )
             )
         )
     }
@@ -593,116 +491,22 @@ fn emit_command_enum_dispatch_impls(
 ) -> Tokens {
     let empty_cmds: Vec<_> = cmds.iter().copied().filter(|c| c.args.is_empty()).collect();
     let non_empty_cmds: Vec<_> = cmds.iter().copied().filter(|c| !c.args.is_empty()).collect();
+    let kind = if is_client { "command" } else { "command_response" };
     quote! {
-        #[cfg(feature = $(quoted("dispatch")))]
-        impl CommandMeta for $enum_name {
-            #[inline]
-            fn cluster_id(&self) -> ClusterId {
-                Self::CLUSTER_ID
-            }
-
-            #[inline]
-            fn cluster_name(&self) -> &'static str {
-                $cluster_struct_name::NAME
-            }
-
-            #[inline]
-            fn command_id(&self) -> CommandId {
-                self.id()
-            }
-
-            #[inline]
-            fn command_name(&self) -> &'static str {
-                match self {
-                    $(for cmd in cmds join ($['\r']) =>
-                        $(if cmd.args.is_empty() =>
-                            Self::$(&cmd.name) => commands::$(&cmd.name)::NAME,
-                        )
-                        $(if !cmd.args.is_empty() =>
-                            Self::$(&cmd.name)(_) => commands::$(&cmd.name)::NAME,
-                        )
-                    )
-                }
-            }
-
-            #[inline]
-            fn direction(&self) -> CommandDirection {
-                self.direction()
-            }
-
-            #[inline]
-            fn is_empty_payload(&self) -> bool {
-                self.is_empty_payload()
-            }
-        }
-
-        #[cfg(feature = $(quoted("dispatch")))]
-        impl MatterDescribe for $enum_name {
-            const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-                EntityKind::Command,
-                $cluster_struct_name::NAME,
-                $cluster_struct_name::CLUSTER_ID.raw(),
-            );
-
-            #[inline]
-            fn descriptor(&self) -> EntityDescriptor {
-                EntityDescriptor::Command {
-                    cluster: $cluster_struct_name::NAME,
-                    cluster_id: $cluster_struct_name::CLUSTER_ID.raw(),
-                    command: self.command_name(),
-                    command_id: self.id().raw(),
-                }
-            }
-
-            #[inline]
-            fn is_empty_payload(&self) -> bool {
-                Self::is_empty_payload(self)
-            }
-
-            #[cfg(feature = $(quoted("serde")))]
-            fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-            where
-                S: serde::Serializer,
-            {
-                match self {
-                    $(if !empty_cmds.is_empty() =>
-                        $(for cmd in &empty_cmds join ( | ) => Self::$(&cmd.name)) => {
-                            Serialize::serialize(&(), serializer)
-                        }
-                    )
-                    $(for cmd in &non_empty_cmds join ($['\r']) =>
-                        Self::$(&cmd.name)(inner) => Serialize::serialize(inner, serializer),
-                    )
-                }
-            }
-
-            #[cfg(feature = $(quoted("serde")))]
-            fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-            where
-                D: serde::Deserializer<'de>,
-            {
-                deserialize_enum_described(
-                    deserializer,
-                    EntityKind::Command,
-                    Some(($cluster_struct_name::NAME, $cluster_struct_name::CLUSTER_ID.raw())),
-                    |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
+        crate::impl_cluster_enum_dispatch!(
+            $kind,
+            $enum_name,
+            $cluster_struct_name,
+            empty = [
+                $(for cmd in &empty_cmds join ($['\r']) =>
+                    $(&cmd.name),
                 )
-            }
-
-            $(if is_client =>
-                #[cfg(feature = $(quoted("serde")))]
-                fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-                where
-                    D: serde::Deserializer<'de>,
-                {
-                    deserialize_enum_invocation(
-                        deserializer,
-                        EntityKind::Command,
-                        Some(($cluster_struct_name::NAME, $cluster_struct_name::CLUSTER_ID.raw())),
-                        |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-                    )
-                }
-            )
-        }
+            ],
+            payload = [
+                $(for cmd in &non_empty_cmds join ($['\r']) =>
+                    $(&cmd.name),
+                )
+            ]
+        );
     }
 }

@@ -10,10 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -476,85 +474,16 @@ crate::impl_cluster_member_variant!(
     attributes::ScheduleProgrammingVisibility,
     ScheduleProgrammingVisibility
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThermostatUserInterfaceConfigurationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::TemperatureDisplayMode(_) => attributes::TemperatureDisplayMode::NAME,
-            Self::KeypadLockout(_) => attributes::KeypadLockout::NAME,
-            Self::ScheduleProgrammingVisibility(_) => attributes::ScheduleProgrammingVisibility::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ThermostatUserInterfaceConfigurationCluster::NAME,
-        ThermostatUserInterfaceConfigurationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ThermostatUserInterfaceConfigurationCluster::NAME,
-            cluster_id: ThermostatUserInterfaceConfigurationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::TemperatureDisplayMode(inner) => Serialize::serialize(inner, serializer),
-            Self::KeypadLockout(inner) => Serialize::serialize(inner, serializer),
-            Self::ScheduleProgrammingVisibility(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ThermostatUserInterfaceConfigurationCluster::NAME,
-                ThermostatUserInterfaceConfigurationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ThermostatUserInterfaceConfigurationCluster,
+    [TemperatureDisplayMode, KeypadLockout, ScheduleProgrammingVisibility,]
+);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -596,16 +525,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -617,14 +541,10 @@ pub mod attributes {
         TemperatureDisplayMode,
         u8,
         super::ThermostatUserInterfaceConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TemperatureDisplayMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     /// KeypadLockout.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -652,16 +572,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 5_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -673,14 +588,10 @@ pub mod attributes {
         KeypadLockout,
         u8,
         super::ThermostatUserInterfaceConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for KeypadLockout {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     /// ScheduleProgrammingVisibility.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -708,16 +619,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -729,12 +635,8 @@ pub mod attributes {
         ScheduleProgrammingVisibility,
         u8,
         super::ThermostatUserInterfaceConfigurationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ScheduleProgrammingVisibility {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }

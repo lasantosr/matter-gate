@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1206,101 +1202,27 @@ crate::impl_cluster_member_variant!(
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::NodeKeySetList, NodeKeySetList);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::NodeAclList, NodeAclList);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::NodeEndpointList, NodeEndpointList);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        JointFabricDatastoreCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::AnchorRootCa(_) => attributes::AnchorRootCa::NAME,
-            Self::AnchorNodeId(_) => attributes::AnchorNodeId::NAME,
-            Self::AnchorVendorId(_) => attributes::AnchorVendorId::NAME,
-            Self::FriendlyName(_) => attributes::FriendlyName::NAME,
-            Self::GroupKeySetList(_) => attributes::GroupKeySetList::NAME,
-            Self::GroupList(_) => attributes::GroupList::NAME,
-            Self::NodeList(_) => attributes::NodeList::NAME,
-            Self::AdminList(_) => attributes::AdminList::NAME,
-            Self::Status(_) => attributes::Status::NAME,
-            Self::EndpointGroupIdList(_) => attributes::EndpointGroupIdList::NAME,
-            Self::EndpointBindingList(_) => attributes::EndpointBindingList::NAME,
-            Self::NodeKeySetList(_) => attributes::NodeKeySetList::NAME,
-            Self::NodeAclList(_) => attributes::NodeAclList::NAME,
-            Self::NodeEndpointList(_) => attributes::NodeEndpointList::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        JointFabricDatastoreCluster::NAME,
-        JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: JointFabricDatastoreCluster::NAME,
-            cluster_id: JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AnchorRootCa(inner) => Serialize::serialize(inner, serializer),
-            Self::AnchorNodeId(inner) => Serialize::serialize(inner, serializer),
-            Self::AnchorVendorId(inner) => Serialize::serialize(inner, serializer),
-            Self::FriendlyName(inner) => Serialize::serialize(inner, serializer),
-            Self::GroupKeySetList(inner) => Serialize::serialize(inner, serializer),
-            Self::GroupList(inner) => Serialize::serialize(inner, serializer),
-            Self::NodeList(inner) => Serialize::serialize(inner, serializer),
-            Self::AdminList(inner) => Serialize::serialize(inner, serializer),
-            Self::Status(inner) => Serialize::serialize(inner, serializer),
-            Self::EndpointGroupIdList(inner) => Serialize::serialize(inner, serializer),
-            Self::EndpointBindingList(inner) => Serialize::serialize(inner, serializer),
-            Self::NodeKeySetList(inner) => Serialize::serialize(inner, serializer),
-            Self::NodeAclList(inner) => Serialize::serialize(inner, serializer),
-            Self::NodeEndpointList(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                JointFabricDatastoreCluster::NAME,
-                JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    JointFabricDatastoreCluster,
+    [
+        AnchorRootCa,
+        AnchorNodeId,
+        AnchorVendorId,
+        FriendlyName,
+        GroupKeySetList,
+        GroupList,
+        NodeList,
+        AdminList,
+        Status,
+        EndpointGroupIdList,
+        EndpointBindingList,
+        NodeKeySetList,
+        NodeAclList,
+        NodeEndpointList,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`JointFabricDatastoreCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1806,144 +1728,34 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(command, Command, commands::AddAclToNode, AddAclToNode);
 crate::impl_cluster_member_variant!(command, Command, commands::RemoveAclFromNode, RemoveAclFromNode);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        JointFabricDatastoreCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::AddKeySet(_) => commands::AddKeySet::NAME,
-            Self::UpdateKeySet(_) => commands::UpdateKeySet::NAME,
-            Self::RemoveKeySet(_) => commands::RemoveKeySet::NAME,
-            Self::AddGroup(_) => commands::AddGroup::NAME,
-            Self::UpdateGroup(_) => commands::UpdateGroup::NAME,
-            Self::RemoveGroup(_) => commands::RemoveGroup::NAME,
-            Self::AddAdmin(_) => commands::AddAdmin::NAME,
-            Self::UpdateAdmin(_) => commands::UpdateAdmin::NAME,
-            Self::RemoveAdmin(_) => commands::RemoveAdmin::NAME,
-            Self::AddPendingNode(_) => commands::AddPendingNode::NAME,
-            Self::RefreshNode(_) => commands::RefreshNode::NAME,
-            Self::UpdateNode(_) => commands::UpdateNode::NAME,
-            Self::RemoveNode(_) => commands::RemoveNode::NAME,
-            Self::UpdateEndpointForNode(_) => commands::UpdateEndpointForNode::NAME,
-            Self::AddGroupIdToEndpointForNode(_) => commands::AddGroupIdToEndpointForNode::NAME,
-            Self::RemoveGroupIdFromEndpointForNode(_) => commands::RemoveGroupIdFromEndpointForNode::NAME,
-            Self::AddBindingToEndpointForNode(_) => commands::AddBindingToEndpointForNode::NAME,
-            Self::RemoveBindingFromEndpointForNode(_) => commands::RemoveBindingFromEndpointForNode::NAME,
-            Self::AddAclToNode(_) => commands::AddAclToNode::NAME,
-            Self::RemoveAclFromNode(_) => commands::RemoveAclFromNode::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        JointFabricDatastoreCluster::NAME,
-        JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: JointFabricDatastoreCluster::NAME,
-            cluster_id: JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::AddKeySet(inner) => Serialize::serialize(inner, serializer),
-            Self::UpdateKeySet(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveKeySet(inner) => Serialize::serialize(inner, serializer),
-            Self::AddGroup(inner) => Serialize::serialize(inner, serializer),
-            Self::UpdateGroup(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveGroup(inner) => Serialize::serialize(inner, serializer),
-            Self::AddAdmin(inner) => Serialize::serialize(inner, serializer),
-            Self::UpdateAdmin(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveAdmin(inner) => Serialize::serialize(inner, serializer),
-            Self::AddPendingNode(inner) => Serialize::serialize(inner, serializer),
-            Self::RefreshNode(inner) => Serialize::serialize(inner, serializer),
-            Self::UpdateNode(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveNode(inner) => Serialize::serialize(inner, serializer),
-            Self::UpdateEndpointForNode(inner) => Serialize::serialize(inner, serializer),
-            Self::AddGroupIdToEndpointForNode(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveGroupIdFromEndpointForNode(inner) => Serialize::serialize(inner, serializer),
-            Self::AddBindingToEndpointForNode(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveBindingFromEndpointForNode(inner) => Serialize::serialize(inner, serializer),
-            Self::AddAclToNode(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoveAclFromNode(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                JointFabricDatastoreCluster::NAME,
-                JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                JointFabricDatastoreCluster::NAME,
-                JointFabricDatastoreCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    JointFabricDatastoreCluster,
+    empty = [],
+    payload = [
+        AddKeySet,
+        UpdateKeySet,
+        RemoveKeySet,
+        AddGroup,
+        UpdateGroup,
+        RemoveGroup,
+        AddAdmin,
+        UpdateAdmin,
+        RemoveAdmin,
+        AddPendingNode,
+        RefreshNode,
+        UpdateNode,
+        RemoveNode,
+        UpdateEndpointForNode,
+        AddGroupIdToEndpointForNode,
+        RemoveGroupIdFromEndpointForNode,
+        AddBindingToEndpointForNode,
+        RemoveBindingFromEndpointForNode,
+        AddAclToNode,
+        RemoveAclFromNode,
+    ]
+);
 
 crate::define_matter_enum! {
     /// DatastoreAccessControlEntryAuthModeEnum exhaustive specification enum.
@@ -2054,45 +1866,45 @@ impl DatastoreAclEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if list_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         list_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if acl_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreAccessControlEntryStruct>::try_from(fval)?;
                         acl_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2115,24 +1927,7 @@ impl DatastoreAclEntryStruct {
     }
 }
 
-impl From<DatastoreAclEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreAclEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreAclEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreAclEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2183,46 +1978,47 @@ impl DatastoreAccessControlEntryStruct {
                     if privilege.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreAccessControlEntryPrivilegeEnum>::try_from(fval)?;
                         privilege = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if auth_mode.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreAccessControlEntryAuthModeEnum>::try_from(fval)?;
                         auth_mode = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if subjects.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable_list(fval, <u64>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable_list(fval, |v| crate::traits::decode_scalar::<u64>(&v))?;
                         subjects = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if targets.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded =
                             crate::traits::decode_nullable_list(fval, <DatastoreAccessControlTargetStruct>::try_from)?;
                         targets = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2257,24 +2053,7 @@ impl DatastoreAccessControlEntryStruct {
     }
 }
 
-impl From<DatastoreAccessControlEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreAccessControlEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreAccessControlEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreAccessControlEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2320,34 +2099,34 @@ impl DatastoreAccessControlTargetStruct {
                     if cluster.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <ClusterId>::try_from)?;
                         cluster = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if endpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <EndpointId>::try_from)?;
                         endpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if device_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <DeviceTypeId>::try_from)?;
                         device_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2386,24 +2165,7 @@ impl DatastoreAccessControlTargetStruct {
     }
 }
 
-impl From<DatastoreAccessControlTargetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreAccessControlTargetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreAccessControlTargetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreAccessControlTargetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2455,51 +2217,51 @@ impl DatastoreAdministratorInformationEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if friendly_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         friendly_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if vendor_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VendorId>::try_from(fval)?;
                         vendor_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if icac.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 400)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         icac = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2522,24 +2284,7 @@ impl DatastoreAdministratorInformationEntryStruct {
     }
 }
 
-impl From<DatastoreAdministratorInformationEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreAdministratorInformationEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreAdministratorInformationEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreAdministratorInformationEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2618,45 +2363,45 @@ impl DatastoreBindingTargetStruct {
                     if node.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if group.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroupId>::try_from(fval)?;
                         group = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if endpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if cluster.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ClusterId>::try_from(fval)?;
                         cluster = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2687,24 +2432,7 @@ impl DatastoreBindingTargetStruct {
     }
 }
 
-impl From<DatastoreBindingTargetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreBindingTargetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreBindingTargetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreBindingTargetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2760,56 +2488,56 @@ impl DatastoreEndpointBindingEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if endpoint_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if list_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         list_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if binding.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreBindingTargetStruct>::try_from(fval)?;
                         binding = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2834,24 +2562,7 @@ impl DatastoreEndpointBindingEntryStruct {
     }
 }
 
-impl From<DatastoreEndpointBindingEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreEndpointBindingEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreEndpointBindingEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreEndpointBindingEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2902,48 +2613,48 @@ impl DatastoreEndpointEntryStruct {
                     if endpoint_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if friendly_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         friendly_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2966,24 +2677,7 @@ impl DatastoreEndpointEntryStruct {
     }
 }
 
-impl From<DatastoreEndpointEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreEndpointEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreEndpointEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreEndpointEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3034,45 +2728,45 @@ impl DatastoreEndpointGroupIdEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if endpoint_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         endpoint_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if group_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroupId>::try_from(fval)?;
                         group_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3095,24 +2789,7 @@ impl DatastoreEndpointGroupIdEntryStruct {
     }
 }
 
-impl From<DatastoreEndpointGroupIdEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreEndpointGroupIdEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreEndpointGroupIdEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreEndpointGroupIdEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3173,33 +2850,34 @@ impl DatastoreGroupInformationEntryStruct {
                     if group_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         group_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if friendly_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         friendly_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if group_key_set_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -3208,26 +2886,28 @@ impl DatastoreGroupInformationEntryStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if group_cat.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         group_cat = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if group_cat_version.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
@@ -3236,19 +2916,19 @@ impl DatastoreGroupInformationEntryStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         group_cat_version = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if group_permission.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreAccessControlEntryPrivilegeEnum>::try_from(fval)?;
                         group_permission = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3296,24 +2976,7 @@ impl DatastoreGroupInformationEntryStruct {
     }
 }
 
-impl From<DatastoreGroupInformationEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreGroupInformationEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreGroupInformationEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreGroupInformationEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3392,109 +3055,109 @@ impl DatastoreGroupKeySetStruct {
                     if group_key_set_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if group_key_security_policy.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreGroupKeySecurityPolicyEnum>::try_from(fval)?;
                         group_key_security_policy = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if epoch_key0.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key0 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if epoch_start_time0.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time0 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if epoch_key1.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key1 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if epoch_start_time1.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time1 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if epoch_key2.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key2 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if epoch_start_time2.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time2 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if group_key_multicast_policy.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreGroupKeyMulticastPolicyEnum>::try_from(fval)?;
                         group_key_multicast_policy = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3574,24 +3237,7 @@ impl DatastoreGroupKeySetStruct {
     }
 }
 
-impl From<DatastoreGroupKeySetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreGroupKeySetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreGroupKeySetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreGroupKeySetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3637,37 +3283,37 @@ impl DatastoreNodeInformationEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if friendly_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         friendly_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if commissioning_status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         commissioning_status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3692,24 +3338,7 @@ impl DatastoreNodeInformationEntryStruct {
     }
 }
 
-impl From<DatastoreNodeInformationEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreNodeInformationEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreNodeInformationEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreNodeInformationEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3755,34 +3384,34 @@ impl DatastoreNodeKeySetEntryStruct {
                     if node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if group_key_set_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if status_entry.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStatusEntryStruct>::try_from(fval)?;
                         status_entry = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3806,24 +3435,7 @@ impl DatastoreNodeKeySetEntryStruct {
     }
 }
 
-impl From<DatastoreNodeKeySetEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreNodeKeySetEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreNodeKeySetEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreNodeKeySetEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3869,34 +3481,34 @@ impl DatastoreStatusEntryStruct {
                     if state.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DatastoreStateEnum>::try_from(fval)?;
                         state = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if update_timestamp.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         update_timestamp = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if failure_code.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         failure_code = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3920,30 +3532,11 @@ impl DatastoreStatusEntryStruct {
     }
 }
 
-impl From<DatastoreStatusEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DatastoreStatusEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DatastoreStatusEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DatastoreStatusEntryStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3985,11 +3578,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3999,13 +3587,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(AnchorRootCa, crate::Bytes, super::JointFabricDatastoreCluster, owned);
-
-    impl fmt::Display for AnchorRootCa {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<{} bytes>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        AnchorRootCa,
+        crate::Bytes,
+        super::JointFabricDatastoreCluster,
+        owned,
+        scalar,
+        bytes
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4032,11 +3621,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4046,13 +3630,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(AnchorNodeId, NodeId, super::JointFabricDatastoreCluster, copy);
-
-    impl fmt::Display for AnchorNodeId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        AnchorNodeId,
+        NodeId,
+        super::JointFabricDatastoreCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4079,11 +3664,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4097,14 +3677,10 @@ pub mod attributes {
         AnchorVendorId,
         model::VendorId,
         super::JointFabricDatastoreCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AnchorVendorId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4131,11 +3707,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4148,13 +3719,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(FriendlyName, String, super::JointFabricDatastoreCluster, owned);
-
-    impl fmt::Display for FriendlyName {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        FriendlyName,
+        String,
+        super::JointFabricDatastoreCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4181,12 +3753,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4206,14 +3772,10 @@ pub mod attributes {
         GroupKeySetList,
         Vec<super::DatastoreGroupKeySetStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for GroupKeySetList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4240,12 +3802,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4265,14 +3821,10 @@ pub mod attributes {
         GroupList,
         Vec<super::DatastoreGroupInformationEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for GroupList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4299,12 +3851,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4324,14 +3870,10 @@ pub mod attributes {
         NodeList,
         Vec<super::DatastoreNodeInformationEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for NodeList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4358,12 +3900,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4383,14 +3919,10 @@ pub mod attributes {
         AdminList,
         Vec<super::DatastoreAdministratorInformationEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for AdminList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4417,11 +3949,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4435,14 +3962,10 @@ pub mod attributes {
         Status,
         super::DatastoreStatusEntryStruct,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for Status {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4469,12 +3992,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4494,14 +4011,10 @@ pub mod attributes {
         EndpointGroupIdList,
         Vec<super::DatastoreEndpointGroupIdEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for EndpointGroupIdList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4528,12 +4041,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4553,14 +4060,10 @@ pub mod attributes {
         EndpointBindingList,
         Vec<super::DatastoreEndpointBindingEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for EndpointBindingList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4587,12 +4090,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4612,14 +4109,10 @@ pub mod attributes {
         NodeKeySetList,
         Vec<super::DatastoreNodeKeySetEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for NodeKeySetList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4646,12 +4139,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4671,14 +4158,10 @@ pub mod attributes {
         NodeAclList,
         Vec<super::DatastoreAclEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for NodeAclList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4705,12 +4188,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4730,14 +4207,10 @@ pub mod attributes {
         NodeEndpointList,
         Vec<super::DatastoreEndpointEntryStruct>,
         super::JointFabricDatastoreCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for NodeEndpointList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 }
 
 pub mod commands {
@@ -4771,17 +4244,6 @@ pub mod commands {
         pub group_key_set: super::DatastoreGroupKeySetStruct,
     }
 
-    impl crate::traits::CommandSpec for AddKeySet {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl AddKeySet {
         pub const CLUSTER_ID: ClusterId = super::JointFabricDatastoreCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -4799,11 +4261,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_KEY_SET, AttributeValue::from(self.group_key_set)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -4829,19 +4286,6 @@ pub mod commands {
                 group_key_set: group_key_set.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::DatastoreGroupKeySetStruct> for AddKeySet {
@@ -4851,7 +4295,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(AddKeySet, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(AddKeySet, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to update a KeySet in the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4864,17 +4308,6 @@ pub mod commands {
     )]
     pub struct UpdateKeySet {
         pub group_key_set: super::DatastoreGroupKeySetStruct,
-    }
-
-    impl crate::traits::CommandSpec for UpdateKeySet {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UpdateKeySet {
@@ -4896,11 +4329,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_GROUP_KEY_SET, AttributeValue::from(self.group_key_set)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4924,19 +4352,6 @@ pub mod commands {
                 group_key_set: group_key_set.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::DatastoreGroupKeySetStruct> for UpdateKeySet {
@@ -4946,7 +4361,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(UpdateKeySet, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(UpdateKeySet, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to remove a KeySet from the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -4959,17 +4374,6 @@ pub mod commands {
     )]
     pub struct RemoveKeySet {
         pub group_key_set_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for RemoveKeySet {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveKeySet {
@@ -4994,11 +4398,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5009,7 +4408,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
                     })()
@@ -5022,19 +4421,6 @@ pub mod commands {
                 group_key_set_id: group_key_set_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for RemoveKeySet {
@@ -5044,7 +4430,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveKeySet, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RemoveKeySet, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to add a group to the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5062,17 +4448,6 @@ pub mod commands {
         pub group_cat: Nullable<u16>,
         pub group_cat_version: Nullable<u16>,
         pub group_permission: super::DatastoreAccessControlEntryPrivilegeEnum,
-    }
-
-    impl crate::traits::CommandSpec for AddGroup {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddGroup {
@@ -5139,11 +4514,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5159,33 +4529,34 @@ pub mod commands {
                         if group_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <GroupId>::try_from(fval)?;
                             group_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if group_key_set_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
@@ -5194,26 +4565,28 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             group_key_set_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if group_cat.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             group_cat = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if group_cat_version.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
@@ -5222,19 +4595,19 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             group_cat_version = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if group_permission.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::DatastoreAccessControlEntryPrivilegeEnum>::try_from(fval)?;
                             group_permission = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5248,22 +4621,9 @@ pub mod commands {
                 group_permission: group_permission.ok_or((Some(FieldId::new(5)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddGroup, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(AddGroup, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to update a group in the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5281,17 +4641,6 @@ pub mod commands {
         pub group_cat: Nullable<u16>,
         pub group_cat_version: Nullable<u16>,
         pub group_permission: super::DatastoreAccessControlEntryPrivilegeEnum,
-    }
-
-    impl crate::traits::CommandSpec for UpdateGroup {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UpdateGroup {
@@ -5364,11 +4713,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5384,33 +4728,34 @@ pub mod commands {
                         if group_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <GroupId>::try_from(fval)?;
                             group_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                             (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 32))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if group_key_set_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
@@ -5419,26 +4764,28 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             group_key_set_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if group_cat.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             group_cat = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if group_cat_version.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             (!matches!(&decoded, Nullable::NonNull(v) if *v < 1_u16))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
@@ -5447,19 +4794,19 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             group_cat_version = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if group_permission.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::DatastoreAccessControlEntryPrivilegeEnum>::try_from(fval)?;
                             group_permission = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5473,22 +4820,9 @@ pub mod commands {
                 group_permission: group_permission.ok_or((Some(FieldId::new(5)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(UpdateGroup, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(UpdateGroup, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to remove a group from the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5501,17 +4835,6 @@ pub mod commands {
     )]
     pub struct RemoveGroup {
         pub group_id: GroupId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveGroup {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveGroup {
@@ -5531,11 +4854,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_ID, AttributeValue::from(self.group_id)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -5561,19 +4879,6 @@ pub mod commands {
                 group_id: group_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<GroupId> for RemoveGroup {
@@ -5583,7 +4888,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveGroup, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RemoveGroup, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to add an admin to the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5600,17 +4905,6 @@ pub mod commands {
         pub vendor_id: VendorId,
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub icac: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for AddAdmin {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddAdmin {
@@ -5648,11 +4942,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5666,51 +4955,51 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if vendor_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <VendorId>::try_from(fval)?;
                             vendor_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if icac.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <crate::Bytes>::try_from(fval)?;
                             (decoded.len() <= 400)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             icac = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5722,22 +5011,9 @@ pub mod commands {
                 icac: icac.ok_or((Some(FieldId::new(4)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddAdmin, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(AddAdmin, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to update an admin in the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5753,17 +5029,6 @@ pub mod commands {
         pub friendly_name: Nullable<String>,
         #[cfg_attr(feature = "schemars", schemars(with = "Option<Vec<u8>>"))]
         pub icac: Nullable<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for UpdateAdmin {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UpdateAdmin {
@@ -5815,11 +5080,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5832,40 +5092,40 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <NodeId>::try_from)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                             (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 32))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if icac.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                             (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 400))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             icac = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5876,22 +5136,9 @@ pub mod commands {
                 icac: icac.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(UpdateAdmin, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(UpdateAdmin, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to remove an admin from the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5904,17 +5151,6 @@ pub mod commands {
     )]
     pub struct RemoveAdmin {
         pub node_id: NodeId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveAdmin {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveAdmin {
@@ -5934,11 +5170,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_NODE_ID, AttributeValue::from(self.node_id)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -5964,19 +5195,6 @@ pub mod commands {
                 node_id: node_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<NodeId> for RemoveAdmin {
@@ -5986,7 +5204,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveAdmin, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RemoveAdmin, super::JointFabricDatastoreCluster, (), false);
 
     /// The command SHALL be used to add a node to the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -6000,17 +5218,6 @@ pub mod commands {
     pub struct AddPendingNode {
         pub node_id: NodeId,
         pub friendly_name: String,
-    }
-
-    impl crate::traits::CommandSpec for AddPendingNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddPendingNode {
@@ -6037,11 +5244,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6053,26 +5255,26 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6082,22 +5284,9 @@ pub mod commands {
                 friendly_name: friendly_name.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddPendingNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(AddPendingNode, super::JointFabricDatastoreCluster, (), false);
 
     /// The command SHALL be used to request that Datastore information relating to a Node of the accessing fabric is
     /// refreshed.
@@ -6111,17 +5300,6 @@ pub mod commands {
     )]
     pub struct RefreshNode {
         pub node_id: NodeId,
-    }
-
-    impl crate::traits::CommandSpec for RefreshNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RefreshNode {
@@ -6141,11 +5319,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_NODE_ID, AttributeValue::from(self.node_id)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -6171,19 +5344,6 @@ pub mod commands {
                 node_id: node_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<NodeId> for RefreshNode {
@@ -6193,7 +5353,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RefreshNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RefreshNode, super::JointFabricDatastoreCluster, (), false);
 
     /// The command SHALL be used to update the friendly name for a node in the Joint Fabric Datastore Cluster of the
     /// accessing fabric.
@@ -6208,17 +5368,6 @@ pub mod commands {
     pub struct UpdateNode {
         pub node_id: NodeId,
         pub friendly_name: String,
-    }
-
-    impl crate::traits::CommandSpec for UpdateNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UpdateNode {
@@ -6245,11 +5394,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6261,26 +5405,26 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6290,22 +5434,9 @@ pub mod commands {
                 friendly_name: friendly_name.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(UpdateNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(UpdateNode, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to remove a node from the Joint Fabric Datastore Cluster of the accessing fabric.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -6318,17 +5449,6 @@ pub mod commands {
     )]
     pub struct RemoveNode {
         pub node_id: NodeId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveNode {
@@ -6348,11 +5468,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_NODE_ID, AttributeValue::from(self.node_id)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -6378,19 +5493,6 @@ pub mod commands {
                 node_id: node_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<NodeId> for RemoveNode {
@@ -6400,7 +5502,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(RemoveNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RemoveNode, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to update the state of an endpoint for a node in the Joint Fabric Datastore Cluster
     /// of the accessing fabric.
@@ -6416,17 +5518,6 @@ pub mod commands {
         pub endpoint_id: EndpointId,
         pub node_id: NodeId,
         pub friendly_name: String,
-    }
-
-    impl crate::traits::CommandSpec for UpdateEndpointForNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl UpdateEndpointForNode {
@@ -6460,11 +5551,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6477,37 +5563,37 @@ pub mod commands {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <EndpointId>::try_from(fval)?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if friendly_name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             friendly_name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6518,22 +5604,9 @@ pub mod commands {
                 friendly_name: friendly_name.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(UpdateEndpointForNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(UpdateEndpointForNode, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to add a Group ID to an endpoint for a node in the Joint Fabric Datastore Cluster of
     /// the accessing fabric.
@@ -6549,17 +5622,6 @@ pub mod commands {
         pub node_id: NodeId,
         pub endpoint_id: EndpointId,
         pub group_id: GroupId,
-    }
-
-    impl crate::traits::CommandSpec for AddGroupIdToEndpointForNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddGroupIdToEndpointForNode {
@@ -6593,11 +5655,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6610,34 +5667,34 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <EndpointId>::try_from(fval)?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if group_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <GroupId>::try_from(fval)?;
                             group_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6648,22 +5705,14 @@ pub mod commands {
                 group_id: group_id.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddGroupIdToEndpointForNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(
+        AddGroupIdToEndpointForNode,
+        super::JointFabricDatastoreCluster,
+        (),
+        false
+    );
 
     /// This command SHALL be used to remove a Group ID from an endpoint for a node in the Joint Fabric Datastore
     /// Cluster of the accessing fabric.
@@ -6679,17 +5728,6 @@ pub mod commands {
         pub node_id: NodeId,
         pub endpoint_id: EndpointId,
         pub group_id: GroupId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveGroupIdFromEndpointForNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveGroupIdFromEndpointForNode {
@@ -6723,11 +5761,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6740,34 +5773,34 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <EndpointId>::try_from(fval)?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if group_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <GroupId>::try_from(fval)?;
                             group_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6778,24 +5811,12 @@ pub mod commands {
                 group_id: group_id.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         RemoveGroupIdFromEndpointForNode,
         super::JointFabricDatastoreCluster,
+        (),
         false
     );
 
@@ -6813,17 +5834,6 @@ pub mod commands {
         pub node_id: NodeId,
         pub endpoint_id: EndpointId,
         pub binding: super::DatastoreBindingTargetStruct,
-    }
-
-    impl crate::traits::CommandSpec for AddBindingToEndpointForNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddBindingToEndpointForNode {
@@ -6857,11 +5867,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6874,34 +5879,34 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <EndpointId>::try_from(fval)?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if binding.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::DatastoreBindingTargetStruct>::try_from(fval)?;
                             binding = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -6912,22 +5917,14 @@ pub mod commands {
                 binding: binding.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddBindingToEndpointForNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(
+        AddBindingToEndpointForNode,
+        super::JointFabricDatastoreCluster,
+        (),
+        false
+    );
 
     /// This command SHALL be used to remove a binding from an endpoint for a node in the Joint Fabric Datastore Cluster
     /// of the accessing fabric.
@@ -6943,17 +5940,6 @@ pub mod commands {
         pub list_id: u16,
         pub endpoint_id: EndpointId,
         pub node_id: NodeId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveBindingFromEndpointForNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveBindingFromEndpointForNode {
@@ -6983,11 +5969,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -7000,34 +5981,34 @@ pub mod commands {
                         if list_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             list_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if endpoint_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <EndpointId>::try_from(fval)?;
                             endpoint_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -7038,24 +6019,12 @@ pub mod commands {
                 node_id: node_id.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         RemoveBindingFromEndpointForNode,
         super::JointFabricDatastoreCluster,
+        (),
         false
     );
 
@@ -7072,17 +6041,6 @@ pub mod commands {
     pub struct AddAclToNode {
         pub node_id: NodeId,
         pub acl_entry: super::DatastoreAccessControlEntryStruct,
-    }
-
-    impl crate::traits::CommandSpec for AddAclToNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddAclToNode {
@@ -7109,11 +6067,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -7125,23 +6078,23 @@ pub mod commands {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if acl_entry.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::DatastoreAccessControlEntryStruct>::try_from(fval)?;
                             acl_entry = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -7151,22 +6104,9 @@ pub mod commands {
                 acl_entry: acl_entry.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddAclToNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(AddAclToNode, super::JointFabricDatastoreCluster, (), false);
 
     /// This command SHALL be used to remove an ACL from a node in the Joint Fabric Datastore Cluster of the accessing
     /// fabric.
@@ -7181,17 +6121,6 @@ pub mod commands {
     pub struct RemoveAclFromNode {
         pub list_id: u16,
         pub node_id: NodeId,
-    }
-
-    impl crate::traits::CommandSpec for RemoveAclFromNode {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::JointFabricDatastoreCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl RemoveAclFromNode {
@@ -7218,11 +6147,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -7234,23 +6158,23 @@ pub mod commands {
                         if list_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             list_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if node_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <NodeId>::try_from(fval)?;
                             node_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -7260,20 +6184,7 @@ pub mod commands {
                 node_id: node_id.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(RemoveAclFromNode, super::JointFabricDatastoreCluster, false);
+    crate::impl_matter_command!(RemoveAclFromNode, super::JointFabricDatastoreCluster, (), false);
 }

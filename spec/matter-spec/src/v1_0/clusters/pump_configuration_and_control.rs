@@ -10,10 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -2076,119 +2074,36 @@ crate::impl_cluster_member_variant!(
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::OperationMode, OperationMode);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ControlMode, ControlMode);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        PumpConfigurationAndControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MaxPressure(_) => attributes::MaxPressure::NAME,
-            Self::MaxSpeed(_) => attributes::MaxSpeed::NAME,
-            Self::MaxFlow(_) => attributes::MaxFlow::NAME,
-            Self::MinConstPressure(_) => attributes::MinConstPressure::NAME,
-            Self::MaxConstPressure(_) => attributes::MaxConstPressure::NAME,
-            Self::MinCompPressure(_) => attributes::MinCompPressure::NAME,
-            Self::MaxCompPressure(_) => attributes::MaxCompPressure::NAME,
-            Self::MinConstSpeed(_) => attributes::MinConstSpeed::NAME,
-            Self::MaxConstSpeed(_) => attributes::MaxConstSpeed::NAME,
-            Self::MinConstFlow(_) => attributes::MinConstFlow::NAME,
-            Self::MaxConstFlow(_) => attributes::MaxConstFlow::NAME,
-            Self::MinConstTemp(_) => attributes::MinConstTemp::NAME,
-            Self::MaxConstTemp(_) => attributes::MaxConstTemp::NAME,
-            Self::PumpStatus(_) => attributes::PumpStatus::NAME,
-            Self::EffectiveOperationMode(_) => attributes::EffectiveOperationMode::NAME,
-            Self::EffectiveControlMode(_) => attributes::EffectiveControlMode::NAME,
-            Self::Capacity(_) => attributes::Capacity::NAME,
-            Self::Speed(_) => attributes::Speed::NAME,
-            Self::LifetimeRunningHours(_) => attributes::LifetimeRunningHours::NAME,
-            Self::Power(_) => attributes::Power::NAME,
-            Self::LifetimeEnergyConsumed(_) => attributes::LifetimeEnergyConsumed::NAME,
-            Self::OperationMode(_) => attributes::OperationMode::NAME,
-            Self::ControlMode(_) => attributes::ControlMode::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        PumpConfigurationAndControlCluster::NAME,
-        PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: PumpConfigurationAndControlCluster::NAME,
-            cluster_id: PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MaxPressure(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxSpeed(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxFlow(inner) => Serialize::serialize(inner, serializer),
-            Self::MinConstPressure(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxConstPressure(inner) => Serialize::serialize(inner, serializer),
-            Self::MinCompPressure(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxCompPressure(inner) => Serialize::serialize(inner, serializer),
-            Self::MinConstSpeed(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxConstSpeed(inner) => Serialize::serialize(inner, serializer),
-            Self::MinConstFlow(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxConstFlow(inner) => Serialize::serialize(inner, serializer),
-            Self::MinConstTemp(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxConstTemp(inner) => Serialize::serialize(inner, serializer),
-            Self::PumpStatus(inner) => Serialize::serialize(inner, serializer),
-            Self::EffectiveOperationMode(inner) => Serialize::serialize(inner, serializer),
-            Self::EffectiveControlMode(inner) => Serialize::serialize(inner, serializer),
-            Self::Capacity(inner) => Serialize::serialize(inner, serializer),
-            Self::Speed(inner) => Serialize::serialize(inner, serializer),
-            Self::LifetimeRunningHours(inner) => Serialize::serialize(inner, serializer),
-            Self::Power(inner) => Serialize::serialize(inner, serializer),
-            Self::LifetimeEnergyConsumed(inner) => Serialize::serialize(inner, serializer),
-            Self::OperationMode(inner) => Serialize::serialize(inner, serializer),
-            Self::ControlMode(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                PumpConfigurationAndControlCluster::NAME,
-                PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    PumpConfigurationAndControlCluster,
+    [
+        MaxPressure,
+        MaxSpeed,
+        MaxFlow,
+        MinConstPressure,
+        MaxConstPressure,
+        MinCompPressure,
+        MaxCompPressure,
+        MinConstSpeed,
+        MaxConstSpeed,
+        MinConstFlow,
+        MaxConstFlow,
+        MinConstTemp,
+        MaxConstTemp,
+        PumpStatus,
+        EffectiveOperationMode,
+        EffectiveControlMode,
+        Capacity,
+        Speed,
+        LifetimeRunningHours,
+        Power,
+        LifetimeEnergyConsumed,
+        OperationMode,
+        ControlMode,
+    ]
+);
 /// Dynamic event variant matching for [`PumpConfigurationAndControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2754,122 +2669,31 @@ crate::impl_cluster_member_variant!(event_unit, Event, events::GeneralFault, Gen
 crate::impl_cluster_member_variant!(event_unit, Event, events::Leakage, Leakage);
 crate::impl_cluster_member_variant!(event_unit, Event, events::AirDetection, AirDetection);
 crate::impl_cluster_member_variant!(event_unit, Event, events::TurbineOperation, TurbineOperation);
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        PumpConfigurationAndControlCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::SupplyVoltageLow => events::SupplyVoltageLow::NAME,
-            Self::SupplyVoltageHigh => events::SupplyVoltageHigh::NAME,
-            Self::PowerMissingPhase => events::PowerMissingPhase::NAME,
-            Self::SystemPressureLow => events::SystemPressureLow::NAME,
-            Self::SystemPressureHigh => events::SystemPressureHigh::NAME,
-            Self::DryRunning => events::DryRunning::NAME,
-            Self::MotorTemperatureHigh => events::MotorTemperatureHigh::NAME,
-            Self::PumpMotorFatalFailure => events::PumpMotorFatalFailure::NAME,
-            Self::ElectronicTemperatureHigh => events::ElectronicTemperatureHigh::NAME,
-            Self::PumpBlocked => events::PumpBlocked::NAME,
-            Self::SensorFailure => events::SensorFailure::NAME,
-            Self::ElectronicNonFatalFailure => events::ElectronicNonFatalFailure::NAME,
-            Self::ElectronicFatalFailure => events::ElectronicFatalFailure::NAME,
-            Self::GeneralFault => events::GeneralFault::NAME,
-            Self::Leakage => events::Leakage::NAME,
-            Self::AirDetection => events::AirDetection::NAME,
-            Self::TurbineOperation => events::TurbineOperation::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        PumpConfigurationAndControlCluster::NAME,
-        PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: PumpConfigurationAndControlCluster::NAME,
-            cluster_id: PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::SupplyVoltageLow
-            | Self::SupplyVoltageHigh
-            | Self::PowerMissingPhase
-            | Self::SystemPressureLow
-            | Self::SystemPressureHigh
-            | Self::DryRunning
-            | Self::MotorTemperatureHigh
-            | Self::PumpMotorFatalFailure
-            | Self::ElectronicTemperatureHigh
-            | Self::PumpBlocked
-            | Self::SensorFailure
-            | Self::ElectronicNonFatalFailure
-            | Self::ElectronicFatalFailure
-            | Self::GeneralFault
-            | Self::Leakage
-            | Self::AirDetection
-            | Self::TurbineOperation => Serialize::serialize(&(), serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                PumpConfigurationAndControlCluster::NAME,
-                PumpConfigurationAndControlCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    PumpConfigurationAndControlCluster,
+    empty = [
+        SupplyVoltageLow,
+        SupplyVoltageHigh,
+        PowerMissingPhase,
+        SystemPressureLow,
+        SystemPressureHigh,
+        DryRunning,
+        MotorTemperatureHigh,
+        PumpMotorFatalFailure,
+        ElectronicTemperatureHigh,
+        PumpBlocked,
+        SensorFailure,
+        ElectronicNonFatalFailure,
+        ElectronicFatalFailure,
+        GeneralFault,
+        Leakage,
+        AirDetection,
+        TurbineOperation,
+    ],
+    payload = []
+);
 
 crate::define_matter_bitmap! {
     /// PumpStatus bitmap.
@@ -2929,8 +2753,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -2996,19 +2818,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -0x7FFF_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3017,33 +2831,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxPressure,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MaxPressure {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MaxPressure {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxPressure {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3094,19 +2889,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3114,29 +2901,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxSpeed, Nullable<u16>, super::PumpConfigurationAndControlCluster, copy);
-    impl From<u16> for MaxSpeed {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MaxSpeed {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxSpeed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        MaxSpeed,
+        u16,
+        super::PumpConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3187,19 +2960,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3207,29 +2972,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxFlow, Nullable<u16>, super::PumpConfigurationAndControlCluster, copy);
-    impl From<u16> for MaxFlow {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MaxFlow {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxFlow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        MaxFlow,
+        u16,
+        super::PumpConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3280,19 +3031,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -0x7FFF_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3301,33 +3044,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinConstPressure,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MinConstPressure {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MinConstPressure {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinConstPressure {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3378,19 +3102,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -0x7FFF_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3399,33 +3115,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxConstPressure,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MaxConstPressure {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MaxConstPressure {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxConstPressure {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3476,19 +3173,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -0x7FFF_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3497,33 +3186,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinCompPressure,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MinCompPressure {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MinCompPressure {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinCompPressure {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3574,19 +3244,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -0x7FFF_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3595,33 +3257,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxCompPressure,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MaxCompPressure {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MaxCompPressure {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxCompPressure {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3672,19 +3315,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3693,33 +3328,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinConstSpeed,
-        Nullable<u16>,
+        u16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for MinConstSpeed {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MinConstSpeed {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinConstSpeed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3770,19 +3386,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3791,33 +3399,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxConstSpeed,
-        Nullable<u16>,
+        u16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for MaxConstSpeed {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MaxConstSpeed {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxConstSpeed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3868,19 +3457,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3889,33 +3470,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinConstFlow,
-        Nullable<u16>,
+        u16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for MinConstFlow {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MinConstFlow {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinConstFlow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3966,19 +3528,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -3987,33 +3541,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxConstFlow,
-        Nullable<u16>,
+        u16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for MaxConstFlow {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for MaxConstFlow {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxConstFlow {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4064,19 +3599,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -27_315_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4085,33 +3612,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinConstTemp,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MinConstTemp {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MinConstTemp {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinConstTemp {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4162,19 +3670,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -27_315_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4183,33 +3683,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxConstTemp,
-        Nullable<i16>,
+        i16,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MaxConstTemp {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MaxConstTemp {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxConstTemp {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4236,11 +3717,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4254,14 +3730,10 @@ pub mod attributes {
         PumpStatus,
         super::PumpStatus,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for PumpStatus {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4288,11 +3760,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4306,14 +3773,10 @@ pub mod attributes {
         EffectiveOperationMode,
         super::PumpOperationMode,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for EffectiveOperationMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4340,11 +3803,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4358,14 +3816,10 @@ pub mod attributes {
         EffectiveControlMode,
         super::PumpControlMode,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for EffectiveControlMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4416,19 +3870,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < 0_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4436,29 +3882,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Capacity, Nullable<i16>, super::PumpConfigurationAndControlCluster, copy);
-    impl From<i16> for Capacity {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for Capacity {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Capacity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        Capacity,
+        i16,
+        super::PumpConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4509,19 +3941,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0xFFFE_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -4529,29 +3953,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Speed, Nullable<u16>, super::PumpConfigurationAndControlCluster, copy);
-    impl From<u16> for Speed {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for Speed {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Speed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        Speed,
+        u16,
+        super::PumpConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     /// LifetimeRunningHours.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4603,51 +4013,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         LifetimeRunningHours,
-        Nullable<u32>,
+        u32,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u32> for LifetimeRunningHours {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for LifetimeRunningHours {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LifetimeRunningHours {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4698,46 +4081,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(Power, Nullable<u32>, super::PumpConfigurationAndControlCluster, copy);
-    impl From<u32> for Power {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for Power {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for Power {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        Power,
+        u32,
+        super::PumpConfigurationAndControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     /// LifetimeEnergyConsumed.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4789,51 +4150,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         LifetimeEnergyConsumed,
-        Nullable<u32>,
+        u32,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u32> for LifetimeEnergyConsumed {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for LifetimeEnergyConsumed {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LifetimeEnergyConsumed {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     /// OperationMode.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4861,11 +4195,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4879,14 +4208,10 @@ pub mod attributes {
         OperationMode,
         super::PumpOperationMode,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OperationMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     /// ControlMode.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -4914,11 +4239,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -4932,14 +4252,10 @@ pub mod attributes {
         ControlMode,
         super::PumpControlMode,
         super::PumpConfigurationAndControlCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ControlMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod events {
@@ -4971,43 +4287,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x00);
         pub const NAME: &'static str = "SupplyVoltageLow";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(SupplyVoltageLow, super::PumpConfigurationAndControlCluster, true);
@@ -5023,43 +4302,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x01);
         pub const NAME: &'static str = "SupplyVoltageHigh";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(SupplyVoltageHigh, super::PumpConfigurationAndControlCluster, true);
@@ -5075,43 +4317,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x02);
         pub const NAME: &'static str = "PowerMissingPhase";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(PowerMissingPhase, super::PumpConfigurationAndControlCluster, true);
@@ -5127,43 +4332,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x03);
         pub const NAME: &'static str = "SystemPressureLow";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(SystemPressureLow, super::PumpConfigurationAndControlCluster, true);
@@ -5179,43 +4347,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x04);
         pub const NAME: &'static str = "SystemPressureHigh";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(SystemPressureHigh, super::PumpConfigurationAndControlCluster, true);
@@ -5231,43 +4362,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x05);
         pub const NAME: &'static str = "DryRunning";
         pub const PRIORITY: EventPriority = EventPriority::Critical;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(DryRunning, super::PumpConfigurationAndControlCluster, true);
@@ -5283,43 +4377,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x06);
         pub const NAME: &'static str = "MotorTemperatureHigh";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(MotorTemperatureHigh, super::PumpConfigurationAndControlCluster, true);
@@ -5335,43 +4392,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x07);
         pub const NAME: &'static str = "PumpMotorFatalFailure";
         pub const PRIORITY: EventPriority = EventPriority::Critical;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(PumpMotorFatalFailure, super::PumpConfigurationAndControlCluster, true);
@@ -5387,43 +4407,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x08);
         pub const NAME: &'static str = "ElectronicTemperatureHigh";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(
@@ -5443,43 +4426,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x09);
         pub const NAME: &'static str = "PumpBlocked";
         pub const PRIORITY: EventPriority = EventPriority::Critical;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(PumpBlocked, super::PumpConfigurationAndControlCluster, true);
@@ -5495,43 +4441,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0A);
         pub const NAME: &'static str = "SensorFailure";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(SensorFailure, super::PumpConfigurationAndControlCluster, true);
@@ -5547,43 +4456,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0B);
         pub const NAME: &'static str = "ElectronicNonFatalFailure";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(
@@ -5603,43 +4475,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0C);
         pub const NAME: &'static str = "ElectronicFatalFailure";
         pub const PRIORITY: EventPriority = EventPriority::Critical;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(ElectronicFatalFailure, super::PumpConfigurationAndControlCluster, true);
@@ -5655,43 +4490,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0D);
         pub const NAME: &'static str = "GeneralFault";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(GeneralFault, super::PumpConfigurationAndControlCluster, true);
@@ -5707,43 +4505,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0E);
         pub const NAME: &'static str = "Leakage";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(Leakage, super::PumpConfigurationAndControlCluster, true);
@@ -5759,43 +4520,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x0F);
         pub const NAME: &'static str = "AirDetection";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(AirDetection, super::PumpConfigurationAndControlCluster, true);
@@ -5811,43 +4535,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x10);
         pub const NAME: &'static str = "TurbineOperation";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(TurbineOperation, super::PumpConfigurationAndControlCluster, true);

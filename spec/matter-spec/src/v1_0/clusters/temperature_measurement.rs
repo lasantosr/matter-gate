@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -543,87 +541,16 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MeasuredVa
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MinMeasuredValue, MinMeasuredValue);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MaxMeasuredValue, MaxMeasuredValue);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::Tolerance, Tolerance);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        TemperatureMeasurementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MeasuredValue(_) => attributes::MeasuredValue::NAME,
-            Self::MinMeasuredValue(_) => attributes::MinMeasuredValue::NAME,
-            Self::MaxMeasuredValue(_) => attributes::MaxMeasuredValue::NAME,
-            Self::Tolerance(_) => attributes::Tolerance::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        TemperatureMeasurementCluster::NAME,
-        TemperatureMeasurementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: TemperatureMeasurementCluster::NAME,
-            cluster_id: TemperatureMeasurementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::MinMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxMeasuredValue(inner) => Serialize::serialize(inner, serializer),
-            Self::Tolerance(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                TemperatureMeasurementCluster::NAME,
-                TemperatureMeasurementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    TemperatureMeasurementCluster,
+    [MeasuredValue, MinMeasuredValue, MaxMeasuredValue, Tolerance,]
+);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -689,19 +616,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -27_315_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -709,29 +628,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MeasuredValue, Nullable<i16>, super::TemperatureMeasurementCluster, copy);
-    impl From<i16> for MeasuredValue {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MeasuredValue {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        MeasuredValue,
+        i16,
+        super::TemperatureMeasurementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -782,19 +687,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -27_315_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -806,33 +703,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MinMeasuredValue,
-        Nullable<i16>,
+        i16,
         super::TemperatureMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MinMeasuredValue {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MinMeasuredValue {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MinMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -883,19 +761,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -27_314_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -904,33 +774,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MaxMeasuredValue,
-        Nullable<i16>,
+        i16,
         super::TemperatureMeasurementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for MaxMeasuredValue {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for MaxMeasuredValue {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MaxMeasuredValue {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -957,16 +808,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 0x8000_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -974,11 +820,12 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Tolerance, u16, super::TemperatureMeasurementCluster, copy);
-
-    impl fmt::Display for Tolerance {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Tolerance,
+        u16,
+        super::TemperatureMeasurementCluster,
+        copy,
+        scalar,
+        display
+    );
 }

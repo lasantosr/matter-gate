@@ -11,7 +11,7 @@
     clippy::too_many_lines,
     clippy::unnecessary_wraps,
     clippy::unreadable_literal,
-    reason = "Upstream CSA Matter XML spec documentation contains raw technical identifiers without code styling"
+    reason = "Auto-generated CSA Matter specification version modules"
 )]
 
 //! Specification domain models for Matter `v1.2.0.1` (commit [`181b0cb`](https://github.com/project-chip/connectedhomeip/tree/181b0cb14ff007ec912f2ba6627e05dfb066c008/src/app/zap-templates/zcl/data-model/chip)).

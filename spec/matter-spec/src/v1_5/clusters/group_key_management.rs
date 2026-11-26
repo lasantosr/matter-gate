@@ -10,12 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -534,81 +530,12 @@ crate::impl_cluster_member_variant!(
     attributes::MaxGroupKeysPerFabric,
     MaxGroupKeysPerFabric
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GroupKeyManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::GroupKeyMap(_) => attributes::GroupKeyMap::NAME,
-            Self::GroupTable(_) => attributes::GroupTable::NAME,
-            Self::MaxGroupsPerFabric(_) => attributes::MaxGroupsPerFabric::NAME,
-            Self::MaxGroupKeysPerFabric(_) => attributes::MaxGroupKeysPerFabric::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        GroupKeyManagementCluster::NAME,
-        GroupKeyManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: GroupKeyManagementCluster::NAME,
-            cluster_id: GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::GroupKeyMap(inner) => Serialize::serialize(inner, serializer),
-            Self::GroupTable(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxGroupsPerFabric(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxGroupKeysPerFabric(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                GroupKeyManagementCluster::NAME,
-                GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    GroupKeyManagementCluster,
+    [GroupKeyMap, GroupTable, MaxGroupsPerFabric, MaxGroupKeysPerFabric,]
+);
 /// Dynamic client-to-server command variant matching for [`GroupKeyManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -765,112 +692,13 @@ crate::impl_cluster_member_variant!(
     commands::KeySetReadAllIndices,
     KeySetReadAllIndices
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GroupKeyManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::KeySetWrite(_) => commands::KeySetWrite::NAME,
-            Self::KeySetRead(_) => commands::KeySetRead::NAME,
-            Self::KeySetRemove(_) => commands::KeySetRemove::NAME,
-            Self::KeySetReadAllIndices => commands::KeySetReadAllIndices::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        GroupKeyManagementCluster::NAME,
-        GroupKeyManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: GroupKeyManagementCluster::NAME,
-            cluster_id: GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::KeySetReadAllIndices => Serialize::serialize(&(), serializer),
-            Self::KeySetWrite(inner) => Serialize::serialize(inner, serializer),
-            Self::KeySetRead(inner) => Serialize::serialize(inner, serializer),
-            Self::KeySetRemove(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GroupKeyManagementCluster::NAME,
-                GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GroupKeyManagementCluster::NAME,
-                GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    GroupKeyManagementCluster,
+    empty = [KeySetReadAllIndices,],
+    payload = [KeySetWrite, KeySetRead, KeySetRemove,]
+);
 /// Dynamic server-to-client command response variant matching for [`GroupKeyManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -998,92 +826,13 @@ crate::impl_cluster_member_variant!(
     commands::KeySetReadAllIndicesResponse,
     KeySetReadAllIndicesResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GroupKeyManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::KeySetReadResponse(_) => commands::KeySetReadResponse::NAME,
-            Self::KeySetReadAllIndicesResponse(_) => commands::KeySetReadAllIndicesResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        GroupKeyManagementCluster::NAME,
-        GroupKeyManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: GroupKeyManagementCluster::NAME,
-            cluster_id: GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::KeySetReadResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::KeySetReadAllIndicesResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GroupKeyManagementCluster::NAME,
-                GroupKeyManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    GroupKeyManagementCluster,
+    empty = [],
+    payload = [KeySetReadResponse, KeySetReadAllIndicesResponse,]
+);
 
 crate::define_matter_enum! {
     /// GroupKeySecurityPolicyEnum exhaustive specification enum.
@@ -1133,23 +882,23 @@ impl GroupKeyMapStruct {
                     if group_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroupId>::try_from(fval)?;
                         group_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if group_key_set_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1171,24 +920,7 @@ impl GroupKeyMapStruct {
     }
 }
 
-impl From<GroupKeyMapStruct> for AttributeValue {
-    #[inline]
-    fn from(val: GroupKeyMapStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for GroupKeyMapStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(GroupKeyMapStruct);
 
 /// Fabric-scoped data structure.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1239,37 +971,37 @@ impl GroupInfoMapStruct {
                     if group_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroupId>::try_from(fval)?;
                         group_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if endpoints.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <EndpointId>::try_from)?;
                         endpoints = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if group_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         group_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1295,24 +1027,7 @@ impl GroupInfoMapStruct {
     }
 }
 
-impl From<GroupInfoMapStruct> for AttributeValue {
-    #[inline]
-    fn from(val: GroupInfoMapStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for GroupInfoMapStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(GroupInfoMapStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1386,98 +1101,98 @@ impl GroupKeySetStruct {
                     if group_key_set_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if group_key_security_policy.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroupKeySecurityPolicyEnum>::try_from(fval)?;
                         group_key_security_policy = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if epoch_key0.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key0 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if epoch_start_time0.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time0 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if epoch_key1.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key1 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if epoch_start_time1.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time1 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if epoch_key2.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         epoch_key2 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if epoch_start_time2.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochUs>::try_from)?;
                         epoch_start_time2 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1551,30 +1266,11 @@ impl GroupKeySetStruct {
     }
 }
 
-impl From<GroupKeySetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: GroupKeySetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for GroupKeySetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(GroupKeySetStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1616,12 +1312,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1644,14 +1334,10 @@ pub mod attributes {
         GroupKeyMap,
         Vec<super::GroupKeyMapStruct>,
         super::GroupKeyManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for GroupKeyMap {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1678,12 +1364,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1706,14 +1386,10 @@ pub mod attributes {
         GroupTable,
         Vec<super::GroupInfoMapStruct>,
         super::GroupKeyManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for GroupTable {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1740,27 +1416,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxGroupsPerFabric, u16, super::GroupKeyManagementCluster, copy);
-
-    impl fmt::Display for MaxGroupsPerFabric {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxGroupsPerFabric,
+        u16,
+        super::GroupKeyManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1787,27 +1459,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxGroupKeysPerFabric, u16, super::GroupKeyManagementCluster, copy);
-
-    impl fmt::Display for MaxGroupKeysPerFabric {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxGroupKeysPerFabric,
+        u16,
+        super::GroupKeyManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -1841,17 +1509,6 @@ pub mod commands {
         pub group_key_set: super::GroupKeySetStruct,
     }
 
-    impl crate::traits::CommandSpec for KeySetWrite {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl KeySetWrite {
         pub const CLUSTER_ID: ClusterId = super::GroupKeyManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -1869,11 +1526,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_KEY_SET, AttributeValue::from(self.group_key_set)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -1899,19 +1551,6 @@ pub mod commands {
                 group_key_set: group_key_set.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::GroupKeySetStruct> for KeySetWrite {
@@ -1921,7 +1560,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(KeySetWrite, super::GroupKeyManagementCluster, false);
+    crate::impl_matter_command!(KeySetWrite, super::GroupKeyManagementCluster, (), false);
 
     /// Read the keys for a given key set id.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1934,17 +1573,6 @@ pub mod commands {
     )]
     pub struct KeySetRead {
         pub group_key_set_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for KeySetRead {
-        type Response = KeySetReadResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl KeySetRead {
@@ -1969,11 +1597,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -1984,7 +1607,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
                     })()
@@ -1997,19 +1620,6 @@ pub mod commands {
                 group_key_set_id: group_key_set_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for KeySetRead {
@@ -2019,7 +1629,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(KeySetRead, super::GroupKeyManagementCluster, false);
+    crate::impl_matter_command!(KeySetRead, super::GroupKeyManagementCluster, KeySetReadResponse, false);
 
     /// Response to KeySetRead.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2032,17 +1642,6 @@ pub mod commands {
     )]
     pub struct KeySetReadResponse {
         pub group_key_set: super::GroupKeySetStruct,
-    }
-
-    impl crate::traits::CommandSpec for KeySetReadResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl KeySetReadResponse {
@@ -2062,11 +1661,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_GROUP_KEY_SET, AttributeValue::from(self.group_key_set)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2092,19 +1686,6 @@ pub mod commands {
                 group_key_set: group_key_set.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::GroupKeySetStruct> for KeySetReadResponse {
@@ -2114,7 +1695,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(KeySetReadResponse, super::GroupKeyManagementCluster, false);
+    crate::impl_matter_command!(KeySetReadResponse, super::GroupKeyManagementCluster, (), false);
 
     /// Revoke a Root Key from a Group.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2127,17 +1708,6 @@ pub mod commands {
     )]
     pub struct KeySetRemove {
         pub group_key_set_id: u16,
-    }
-
-    impl crate::traits::CommandSpec for KeySetRemove {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl KeySetRemove {
@@ -2162,11 +1732,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2177,7 +1742,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         group_key_set_id = Some(decoded);
                         Ok(())
                     })()
@@ -2190,19 +1755,6 @@ pub mod commands {
                 group_key_set_id: group_key_set_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u16> for KeySetRemove {
@@ -2212,7 +1764,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(KeySetRemove, super::GroupKeyManagementCluster, false);
+    crate::impl_matter_command!(KeySetRemove, super::GroupKeyManagementCluster, (), false);
 
     /// Return the list of Group Key Sets associated with the accessing fabric.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -2220,62 +1772,19 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct KeySetReadAllIndices;
 
-    impl crate::traits::CommandSpec for KeySetReadAllIndices {
-        type Response = KeySetReadAllIndicesResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl KeySetReadAllIndices {
         pub const CLUSTER_ID: ClusterId = super::GroupKeyManagementCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x04);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "KeySetReadAllIndices";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(KeySetReadAllIndices, super::GroupKeyManagementCluster, true);
+    crate::impl_matter_command!(
+        KeySetReadAllIndices,
+        super::GroupKeyManagementCluster,
+        KeySetReadAllIndicesResponse,
+        true
+    );
 
     /// Reseponse to KeySetReadAllIndices.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2288,17 +1797,6 @@ pub mod commands {
     )]
     pub struct KeySetReadAllIndicesResponse {
         pub group_key_set_i_ds: Vec<u16>,
-    }
-
-    impl crate::traits::CommandSpec for KeySetReadAllIndicesResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GroupKeyManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl KeySetReadAllIndicesResponse {
@@ -2323,11 +1821,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2338,7 +1831,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u16>::try_from)?;
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         group_key_set_i_ds = Some(decoded);
                         Ok(())
                     })()
@@ -2351,19 +1844,6 @@ pub mod commands {
                 group_key_set_i_ds: group_key_set_i_ds.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<u16>> for KeySetReadAllIndicesResponse {
@@ -2373,5 +1853,10 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(KeySetReadAllIndicesResponse, super::GroupKeyManagementCluster, false);
+    crate::impl_matter_command!(
+        KeySetReadAllIndicesResponse,
+        super::GroupKeyManagementCluster,
+        (),
+        false
+    );
 }

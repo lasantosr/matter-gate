@@ -5,7 +5,7 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 ## 0. Invariants (CRITICAL)
 
 1. **Pure in-memory library.** Zero filesystem, network, git, CLI, or `anyhow` dependencies.
-2. **Fail fast on unknown schema elements.** Unmapped scalar types, invalid boolean semantics, unknown command sources, unmapped event priorities, and unknown categories must return typed `thiserror` variants; never fall back silently.
+2. **Fail fast on unknown schema elements.** Unmapped scalar types, invalid boolean semantics, unknown command sources, unmapped event priorities, unresolved device-type `require*` includes, and unknown categories must return typed `thiserror` variants; never fall back silently. Only allowlist an unresolved device-type include for a specific Matter version when verified to be genuinely absent (or a known typo) in that release's upstream `matter-devices.xml`—fix or alias in the resolver whenever the member exists in the cluster XML.
 3. **One-directional layering.** `xml` → `model` → `render` / `items` → `build`. Lower modules must never import higher modules; parse XML once.
 4. **Layout agnostic.** Never write files, choose directory structures, emit `mod.rs` trees, or edit `Cargo.toml` manifests.
 5. **Deterministic output.** Identical inputs must produce byte-identical `genco` token streams and rendered strings.
@@ -18,6 +18,7 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 ## 2. Design & Constraints
 
 - **Flat layout & direction-split commands:** Emit flat cluster structs (with spec-optional fields as `Optional<T>` and `.with_*` builders), sparse patch structs, single-attribute enums, and direction-split `Command` (`ClientToServer`) vs. `CommandResponse` (`ServerToClient`) using non-generic owned decode/encode kernels.
+- **Explicit types, macro-delegated boilerplate:** Emit primary public types (`pub struct`, `pub enum`, `View<'a>`), typed accessors, constructors, and spec constants directly for Ctrl+Click ergonomics and readability. Delegate only repetitive trait/wire `impl` boilerplate to declarative macros when doing so materially reduces generated line count.
 - **Content-addressed `__shared` deduplication:** Hash canonical ASTs, referenced globals, and conformance/access/layout metadata transitively so items shared across 2+ versions are emitted once into `__shared`.
 - **Static `SpecRegistry` & dispatch metadata:** Emit sorted static `SpecRegistry` tables and `> 64B` `TypeLayout` boxing metadata for `dispatch`.
 - **Fixture tests:** Add or update XML fixture tests in `tests/` for every parser, model, or renderer change.

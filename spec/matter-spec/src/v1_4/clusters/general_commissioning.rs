@@ -10,12 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1142,97 +1138,25 @@ crate::impl_cluster_member_variant!(
     attributes::NetworkRecoveryReason,
     NetworkRecoveryReason
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GeneralCommissioningCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Breadcrumb(_) => attributes::Breadcrumb::NAME,
-            Self::BasicCommissioningInfo(_) => attributes::BasicCommissioningInfo::NAME,
-            Self::RegulatoryConfig(_) => attributes::RegulatoryConfig::NAME,
-            Self::LocationCapability(_) => attributes::LocationCapability::NAME,
-            Self::SupportsConcurrentConnection(_) => attributes::SupportsConcurrentConnection::NAME,
-            Self::TcAcceptedVersion(_) => attributes::TcAcceptedVersion::NAME,
-            Self::TcMinRequiredVersion(_) => attributes::TcMinRequiredVersion::NAME,
-            Self::TcAcknowledgements(_) => attributes::TcAcknowledgements::NAME,
-            Self::TcAcknowledgementsRequired(_) => attributes::TcAcknowledgementsRequired::NAME,
-            Self::TcUpdateDeadline(_) => attributes::TcUpdateDeadline::NAME,
-            Self::RecoveryIdentifier(_) => attributes::RecoveryIdentifier::NAME,
-            Self::NetworkRecoveryReason(_) => attributes::NetworkRecoveryReason::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        GeneralCommissioningCluster::NAME,
-        GeneralCommissioningCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: GeneralCommissioningCluster::NAME,
-            cluster_id: GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Breadcrumb(inner) => Serialize::serialize(inner, serializer),
-            Self::BasicCommissioningInfo(inner) => Serialize::serialize(inner, serializer),
-            Self::RegulatoryConfig(inner) => Serialize::serialize(inner, serializer),
-            Self::LocationCapability(inner) => Serialize::serialize(inner, serializer),
-            Self::SupportsConcurrentConnection(inner) => Serialize::serialize(inner, serializer),
-            Self::TcAcceptedVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::TcMinRequiredVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::TcAcknowledgements(inner) => Serialize::serialize(inner, serializer),
-            Self::TcAcknowledgementsRequired(inner) => Serialize::serialize(inner, serializer),
-            Self::TcUpdateDeadline(inner) => Serialize::serialize(inner, serializer),
-            Self::RecoveryIdentifier(inner) => Serialize::serialize(inner, serializer),
-            Self::NetworkRecoveryReason(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                GeneralCommissioningCluster::NAME,
-                GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    GeneralCommissioningCluster,
+    [
+        Breadcrumb,
+        BasicCommissioningInfo,
+        RegulatoryConfig,
+        LocationCapability,
+        SupportsConcurrentConnection,
+        TcAcceptedVersion,
+        TcMinRequiredVersion,
+        TcAcknowledgements,
+        TcAcknowledgementsRequired,
+        TcUpdateDeadline,
+        RecoveryIdentifier,
+        NetworkRecoveryReason,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`GeneralCommissioningCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1396,112 +1320,13 @@ crate::impl_cluster_member_variant!(
     CommissioningComplete
 );
 crate::impl_cluster_member_variant!(command, Command, commands::SetTcAcknowledgements, SetTcAcknowledgements);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GeneralCommissioningCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ArmFailSafe(_) => commands::ArmFailSafe::NAME,
-            Self::SetRegulatoryConfig(_) => commands::SetRegulatoryConfig::NAME,
-            Self::CommissioningComplete => commands::CommissioningComplete::NAME,
-            Self::SetTcAcknowledgements(_) => commands::SetTcAcknowledgements::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        GeneralCommissioningCluster::NAME,
-        GeneralCommissioningCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: GeneralCommissioningCluster::NAME,
-            cluster_id: GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::CommissioningComplete => Serialize::serialize(&(), serializer),
-            Self::ArmFailSafe(inner) => Serialize::serialize(inner, serializer),
-            Self::SetRegulatoryConfig(inner) => Serialize::serialize(inner, serializer),
-            Self::SetTcAcknowledgements(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GeneralCommissioningCluster::NAME,
-                GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GeneralCommissioningCluster::NAME,
-                GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    GeneralCommissioningCluster,
+    empty = [CommissioningComplete,],
+    payload = [ArmFailSafe, SetRegulatoryConfig, SetTcAcknowledgements,]
+);
 /// Dynamic server-to-client command response variant matching for [`GeneralCommissioningCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1688,96 +1513,18 @@ crate::impl_cluster_member_variant!(
     commands::SetTcAcknowledgementsResponse,
     SetTcAcknowledgementsResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        GeneralCommissioningCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ArmFailSafeResponse(_) => commands::ArmFailSafeResponse::NAME,
-            Self::SetRegulatoryConfigResponse(_) => commands::SetRegulatoryConfigResponse::NAME,
-            Self::CommissioningCompleteResponse(_) => commands::CommissioningCompleteResponse::NAME,
-            Self::SetTcAcknowledgementsResponse(_) => commands::SetTcAcknowledgementsResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        GeneralCommissioningCluster::NAME,
-        GeneralCommissioningCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: GeneralCommissioningCluster::NAME,
-            cluster_id: GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ArmFailSafeResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::SetRegulatoryConfigResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::CommissioningCompleteResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::SetTcAcknowledgementsResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                GeneralCommissioningCluster::NAME,
-                GeneralCommissioningCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    GeneralCommissioningCluster,
+    empty = [],
+    payload = [
+        ArmFailSafeResponse,
+        SetRegulatoryConfigResponse,
+        CommissioningCompleteResponse,
+        SetTcAcknowledgementsResponse,
+    ]
+);
 
 crate::define_matter_enum! {
     /// CommissioningErrorEnum exhaustive specification enum.
@@ -1875,23 +1622,23 @@ impl BasicCommissioningInfo {
                     if fail_safe_expiry_length_seconds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         fail_safe_expiry_length_seconds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if max_cumulative_failsafe_seconds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         max_cumulative_failsafe_seconds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1918,30 +1665,11 @@ impl BasicCommissioningInfo {
     }
 }
 
-impl From<BasicCommissioningInfo> for AttributeValue {
-    #[inline]
-    fn from(val: BasicCommissioningInfo) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for BasicCommissioningInfo {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(BasicCommissioningInfo);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1983,27 +1711,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Breadcrumb, u64, super::GeneralCommissioningCluster, copy);
-
-    impl fmt::Display for Breadcrumb {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Breadcrumb,
+        u64,
+        super::GeneralCommissioningCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2030,11 +1754,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2048,14 +1767,10 @@ pub mod attributes {
         BasicCommissioningInfo,
         super::BasicCommissioningInfo,
         super::GeneralCommissioningCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for BasicCommissioningInfo {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2082,11 +1797,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2100,14 +1810,10 @@ pub mod attributes {
         RegulatoryConfig,
         super::RegulatoryLocationTypeEnum,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for RegulatoryConfig {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2134,11 +1840,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2152,14 +1853,10 @@ pub mod attributes {
         LocationCapability,
         super::RegulatoryLocationTypeEnum,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for LocationCapability {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2190,11 +1887,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2208,19 +1900,14 @@ pub mod attributes {
         SupportsConcurrentConnection,
         super::SupportsConcurrentConnection,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for SupportsConcurrentConnection {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::SupportsConcurrentConnection::from(val))
-        }
-    }
-
-    impl fmt::Display for SupportsConcurrentConnection {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2249,27 +1936,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TcAcceptedVersion, u16, super::GeneralCommissioningCluster, copy);
-
-    impl fmt::Display for TcAcceptedVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TcAcceptedVersion,
+        u16,
+        super::GeneralCommissioningCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2296,27 +1979,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TcMinRequiredVersion, u16, super::GeneralCommissioningCluster, copy);
-
-    impl fmt::Display for TcMinRequiredVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TcMinRequiredVersion,
+        u16,
+        super::GeneralCommissioningCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2343,27 +2022,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TcAcknowledgements, u16, super::GeneralCommissioningCluster, copy);
-
-    impl fmt::Display for TcAcknowledgements {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TcAcknowledgements,
+        u16,
+        super::GeneralCommissioningCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2394,11 +2069,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2412,19 +2082,14 @@ pub mod attributes {
         TcAcknowledgementsRequired,
         super::TcAcknowledgementsRequired,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
     impl From<bool> for TcAcknowledgementsRequired {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::TcAcknowledgementsRequired::from(val))
-        }
-    }
-
-    impl fmt::Display for TcAcknowledgementsRequired {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -2477,51 +2142,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TcUpdateDeadline,
-        Nullable<u32>,
+        u32,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u32> for TcUpdateDeadline {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for TcUpdateDeadline {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TcUpdateDeadline {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2548,11 +2186,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2569,14 +2202,10 @@ pub mod attributes {
         RecoveryIdentifier,
         crate::Bytes,
         super::GeneralCommissioningCluster,
-        owned
+        owned,
+        scalar,
+        bytes
     );
-
-    impl fmt::Display for RecoveryIdentifier {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<{} bytes>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2627,14 +2256,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -2645,33 +2266,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NetworkRecoveryReason,
-        Nullable<super::NetworkRecoveryReasonEnum>,
+        super::NetworkRecoveryReasonEnum,
         super::GeneralCommissioningCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::NetworkRecoveryReasonEnum> for NetworkRecoveryReason {
-        #[inline]
-        fn from(val: super::NetworkRecoveryReasonEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::NetworkRecoveryReasonEnum>> for NetworkRecoveryReason {
-        #[inline]
-        fn from(val: Option<super::NetworkRecoveryReasonEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NetworkRecoveryReason {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod commands {
@@ -2706,17 +2308,6 @@ pub mod commands {
         pub breadcrumb: u64,
     }
 
-    impl crate::traits::CommandSpec for ArmFailSafe {
-        type Response = ArmFailSafeResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl ArmFailSafe {
         pub const CLUSTER_ID: ClusterId = super::GeneralCommissioningCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -2744,11 +2335,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2760,23 +2346,23 @@ pub mod commands {
                         if expiry_length_seconds.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             expiry_length_seconds = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if breadcrumb.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                             breadcrumb = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2787,22 +2373,14 @@ pub mod commands {
                 breadcrumb: breadcrumb.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(ArmFailSafe, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        ArmFailSafe,
+        super::GeneralCommissioningCluster,
+        ArmFailSafeResponse,
+        false
+    );
 
     /// This command is used to report the result of the ArmFailSafe command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2816,17 +2394,6 @@ pub mod commands {
     pub struct ArmFailSafeResponse {
         pub error_code: super::CommissioningErrorEnum,
         pub debug_text: String,
-    }
-
-    impl crate::traits::CommandSpec for ArmFailSafeResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ArmFailSafeResponse {
@@ -2853,11 +2420,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2869,26 +2431,26 @@ pub mod commands {
                         if error_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::CommissioningErrorEnum>::try_from(fval)?;
                             error_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if debug_text.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 128)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             debug_text = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2898,22 +2460,9 @@ pub mod commands {
                 debug_text: debug_text.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(ArmFailSafeResponse, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(ArmFailSafeResponse, super::GeneralCommissioningCluster, (), false);
 
     /// This command is used to set the regulatory configuration for the device.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2928,17 +2477,6 @@ pub mod commands {
         pub new_regulatory_config: super::RegulatoryLocationTypeEnum,
         pub country_code: String,
         pub breadcrumb: u64,
-    }
-
-    impl crate::traits::CommandSpec for SetRegulatoryConfig {
-        type Response = SetRegulatoryConfigResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetRegulatoryConfig {
@@ -2975,11 +2513,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2992,37 +2525,37 @@ pub mod commands {
                         if new_regulatory_config.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::RegulatoryLocationTypeEnum>::try_from(fval)?;
                             new_regulatory_config = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if country_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 2)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             country_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if breadcrumb.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                             breadcrumb = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3034,22 +2567,14 @@ pub mod commands {
                 breadcrumb: breadcrumb.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetRegulatoryConfig, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        SetRegulatoryConfig,
+        super::GeneralCommissioningCluster,
+        SetRegulatoryConfigResponse,
+        false
+    );
 
     /// This command is used to report the result of the SetRegulatoryConfig command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3063,17 +2588,6 @@ pub mod commands {
     pub struct SetRegulatoryConfigResponse {
         pub error_code: super::CommissioningErrorEnum,
         pub debug_text: String,
-    }
-
-    impl crate::traits::CommandSpec for SetRegulatoryConfigResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetRegulatoryConfigResponse {
@@ -3100,11 +2614,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3116,23 +2625,23 @@ pub mod commands {
                         if error_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::CommissioningErrorEnum>::try_from(fval)?;
                             error_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if debug_text.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             debug_text = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3142,22 +2651,14 @@ pub mod commands {
                 debug_text: debug_text.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetRegulatoryConfigResponse, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        SetRegulatoryConfigResponse,
+        super::GeneralCommissioningCluster,
+        (),
+        false
+    );
 
     /// This command is used to indicate that the commissioning process is complete.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -3165,62 +2666,19 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct CommissioningComplete;
 
-    impl crate::traits::CommandSpec for CommissioningComplete {
-        type Response = CommissioningCompleteResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl CommissioningComplete {
         pub const CLUSTER_ID: ClusterId = super::GeneralCommissioningCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x04);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "CommissioningComplete";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(CommissioningComplete, super::GeneralCommissioningCluster, true);
+    crate::impl_matter_command!(
+        CommissioningComplete,
+        super::GeneralCommissioningCluster,
+        CommissioningCompleteResponse,
+        true
+    );
 
     /// This command is used to report the result of the CommissioningComplete command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3234,17 +2692,6 @@ pub mod commands {
     pub struct CommissioningCompleteResponse {
         pub error_code: super::CommissioningErrorEnum,
         pub debug_text: String,
-    }
-
-    impl crate::traits::CommandSpec for CommissioningCompleteResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl CommissioningCompleteResponse {
@@ -3271,11 +2718,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3287,23 +2729,23 @@ pub mod commands {
                         if error_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::CommissioningErrorEnum>::try_from(fval)?;
                             error_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if debug_text.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             debug_text = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3313,22 +2755,14 @@ pub mod commands {
                 debug_text: debug_text.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(CommissioningCompleteResponse, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        CommissioningCompleteResponse,
+        super::GeneralCommissioningCluster,
+        (),
+        false
+    );
 
     /// This command is used to set the user acknowledgements received in the Enhanced Setup Flow Terms & Conditions
     /// into the node.
@@ -3343,17 +2777,6 @@ pub mod commands {
     pub struct SetTcAcknowledgements {
         pub tc_version: u16,
         pub tc_user_response: u16,
-    }
-
-    impl crate::traits::CommandSpec for SetTcAcknowledgements {
-        type Response = SetTcAcknowledgementsResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTcAcknowledgements {
@@ -3383,11 +2806,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3399,23 +2817,23 @@ pub mod commands {
                         if tc_version.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             tc_version = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if tc_user_response.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             tc_user_response = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3425,22 +2843,14 @@ pub mod commands {
                 tc_user_response: tc_user_response.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetTcAcknowledgements, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        SetTcAcknowledgements,
+        super::GeneralCommissioningCluster,
+        SetTcAcknowledgementsResponse,
+        false
+    );
 
     /// This command is used to report the result of the SetTCAcknowledgements command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -3453,17 +2863,6 @@ pub mod commands {
     )]
     pub struct SetTcAcknowledgementsResponse {
         pub error_code: super::CommissioningErrorEnum,
-    }
-
-    impl crate::traits::CommandSpec for SetTcAcknowledgementsResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::GeneralCommissioningCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetTcAcknowledgementsResponse {
@@ -3483,11 +2882,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ERROR_CODE, AttributeValue::from(self.error_code)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -3513,19 +2907,6 @@ pub mod commands {
                 error_code: error_code.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::CommissioningErrorEnum> for SetTcAcknowledgementsResponse {
@@ -3535,5 +2916,10 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetTcAcknowledgementsResponse, super::GeneralCommissioningCluster, false);
+    crate::impl_matter_command!(
+        SetTcAcknowledgementsResponse,
+        super::GeneralCommissioningCluster,
+        (),
+        false
+    );
 }

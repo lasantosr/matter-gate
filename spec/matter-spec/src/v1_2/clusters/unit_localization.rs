@@ -13,10 +13,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -320,89 +318,13 @@ impl From<Attribute> for (AttributeId, AttributeValue) {
     }
 }
 
-impl From<attributes::TemperatureUnit> for Attribute {
-    #[inline]
-    fn from(attr: attributes::TemperatureUnit) -> Self {
-        Self::TemperatureUnit(attr)
-    }
-}
-
-impl TryFrom<Attribute> for attributes::TemperatureUnit {
-    type Error = AttributeError;
-
-    #[inline]
-    fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-        match attr {
-            Attribute::TemperatureUnit(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        UnitLocalizationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::TemperatureUnit(_) => attributes::TemperatureUnit::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        UnitLocalizationCluster::NAME,
-        UnitLocalizationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: UnitLocalizationCluster::NAME,
-            cluster_id: UnitLocalizationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::TemperatureUnit(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((UnitLocalizationCluster::NAME, UnitLocalizationCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    attribute_single,
+    Attribute,
+    attributes::TemperatureUnit,
+    TemperatureUnit
+);
+crate::impl_cluster_enum_dispatch!(attribute, Attribute, UnitLocalizationCluster, [TemperatureUnit,]);
 
 crate::define_matter_bitmap! {
     /// Feature bitmap.
@@ -430,8 +352,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -473,11 +393,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -491,12 +406,8 @@ pub mod attributes {
         TemperatureUnit,
         super::TempUnitEnum,
         super::UnitLocalizationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TemperatureUnit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }

@@ -2,7 +2,7 @@ use std::result::Result as StdResult;
 
 use genco::{quote, tokens::quoted};
 
-use super::context::{PushLine as _, Tokens, TypeContext, doc_comment, format_hex};
+use super::context::{PushLine as _, Tokens, TypeContext, doc_comment, format_hex, is_primitive_int};
 use crate::{
     error::Error,
     model::{
@@ -53,8 +53,6 @@ pub(super) fn emit_attributes(
         pub mod attributes {
             #[allow(unused_imports, reason = "Generated attribute imports")]
             use alloc::{string::String, vec::Vec};
-            #[allow(unused_imports, reason = "Generated attribute imports")]
-            use core::fmt;
 
             #[allow(unused_imports, reason = "Generated attribute imports")]
             use crate::{
@@ -124,9 +122,6 @@ pub(super) fn single_attribute_tokens(
     let can_derive_eq_hash = ctx.can_derive_eq_hash(&resolved);
 
     let attr_name = name;
-    let skip_base_80 = base_type.len().saturating_add(name.len()) > 80;
-    let skip_base_70 = base_type.len().saturating_add(name.len()) > 70;
-
     let struct_field = build_struct_field(base_type, inner_type, is_nullable);
     let is_semantic = matches!(&resolved, ResolvedType::SemanticType { .. });
     let raw_primitive = bound_primitive_type(&resolved, base_type);
@@ -134,8 +129,6 @@ pub(super) fn single_attribute_tokens(
     let bool_consts = build_semantic_bool_consts(name, is_bool_type, is_nullable, &resolved);
 
     let is_array = matches!(&resolved, ResolvedType::Array { .. });
-    let into_value_body = build_into_value_body(is_nullable, is_array);
-
     let decode_body = build_decode_body(
         is_array,
         is_nullable,
@@ -145,21 +138,30 @@ pub(super) fn single_attribute_tokens(
         max.as_deref(),
         length,
     );
-    let display_body = build_display_body(is_array, is_nullable, base_type, &resolved);
 
     let attr_id_hex = format_hex(u64::from(code), 4);
     let is_nullable_bool = is_nullable.to_string();
     let is_writable_bool = is_writable.to_string();
     let is_optional_bool = is_optional.to_string();
     let copy_mode = if is_copy { "copy" } else { "owned" };
-
-    let from_flags = FromDerefFlags {
-        is_nullable,
-        is_semantic_bool,
-        skip_base_80,
-        skip_base_70,
+    let val_mode = if is_array { "list" } else { "scalar" };
+    let disp_mode = if is_array {
+        "list"
+    } else if base_type == "crate::Bytes" {
+        "bytes"
+    } else if matches!(&resolved, ResolvedType::Struct { .. }) {
+        "debug"
+    } else {
+        "display"
     };
-    let extra_froms = build_extra_from_tokens(attr_name, base_type, from_flags);
+    let prefix = if is_nullable { "nullable, " } else { "" };
+    let impl_macro_line = format!(
+        "crate::impl_matter_attribute!({prefix}{attr_name}, {base_type}, super::{cluster_struct}, {copy_mode}, \
+         {val_mode}, {disp_mode});"
+    );
+    let wrap_macro_call = impl_macro_line.len() > 108;
+    let extra_froms = build_extra_from_tokens(attr_name, is_nullable, is_semantic_bool);
+
     let tokens: Tokens = quote! {
         $(doc_comment(description))
         #[derive(Debug, Clone $(if is_copy => , Copy), PartialEq $(if can_derive_eq_hash => , Eq, Hash))]
@@ -178,11 +180,6 @@ pub(super) fn single_attribute_tokens(
             $methods
             $(if let Some(consts) = &bool_consts => $consts)
 
-            #[must_use]
-            pub fn into_value(self) -> AttributeValue {
-                $into_value_body
-            }
-
             pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
                 $(if is_nullable =>
                     if matches!(val, AttributeValue::Null) {
@@ -198,14 +195,21 @@ pub(super) fn single_attribute_tokens(
             }
         }
 
-        crate::impl_matter_attribute!($attr_name, $inner_type, super::$cluster_struct, $copy_mode);
+        $(if wrap_macro_call =>
+            crate::impl_matter_attribute!(
+                $(if is_nullable => nullable,)
+                $attr_name,
+                $base_type,
+                super::$cluster_struct,
+                $copy_mode,
+                $val_mode,
+                $disp_mode
+            );
+        )
+        $(if !wrap_macro_call =>
+            $impl_macro_line
+        )
         $extra_froms
-
-        impl fmt::Display for $attr_name {
-            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-                $display_body
-            }
-        }
     };
 
     Ok(tokens)
@@ -399,13 +403,23 @@ fn build_decode_body(
             | ResolvedType::Bitmap { .. }
             | ResolvedType::Struct { .. } => base_type.to_owned(),
         };
+        let elem_ref = elem_path.as_str();
+        let elem_is_int = is_primitive_int(elem_ref);
         let len_str = length.map(|len| format_dec_with_underscores(i128::from(len)));
         quote! {
             let AttributeValue::List(items) = val else { return Err(MatterStatus::InvalidDataType); };
             $(if let Some(len) = &len_str =>
                 if items.len() > $len { return Err(MatterStatus::ConstraintError); }
             )
-            let list = items.into_iter().map(<$elem_path>::try_from).collect::<Result<Vec<_>, _>>()?;
+            $(if elem_is_int =>
+                let list = items
+                    .into_iter()
+                    .map(|item| crate::traits::decode_scalar::<$elem_ref>(&item))
+                    .collect::<Result<Vec<_>, _>>()?;
+            )
+            $(if !elem_is_int =>
+                let list = items.into_iter().map(<$elem_ref>::try_from).collect::<Result<Vec<_>, _>>()?;
+            )
             $(if is_nullable =>
                 Ok(Self(Nullable::NonNull(list)))
             )
@@ -450,7 +464,12 @@ fn build_decode_body(
             .flatten();
 
         quote! {
-            let raw = <$base_type>::try_from(val)?;
+            $(if is_primitive_int(base_type) =>
+                let raw = crate::traits::decode_scalar::<$base_type>(&val)?;
+            )
+            $(if !is_primitive_int(base_type) =>
+                let raw = <$base_type>::try_from(val)?;
+            )
             $(if let Some(min_val) = &min_s =>
                 if $cmp_target < $min_val { return Err(MatterStatus::ConstraintError); }
             )
@@ -470,141 +489,21 @@ fn build_decode_body(
     }
 }
 
-fn build_display_body(is_array: bool, is_nullable: bool, base_type: &str, resolved: &ResolvedType) -> Tokens {
-    if is_array {
-        if is_nullable {
-            quote! {
-                match &self.0 {
-                    Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                    Nullable::Null => write!(f, "null"),
-                }
-            }
-        } else {
-            quote! {
-                write!(f, "<list of {} items>", self.0.len())
-            }
-        }
-    } else if base_type == "crate::Bytes" {
-        if is_nullable {
-            quote! {
-                match &self.0 {
-                    Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
-                    Nullable::Null => write!(f, "null"),
-                }
-            }
-        } else {
-            quote! {
-                write!(f, "<{} bytes>", self.0.len())
-            }
-        }
-    } else if matches!(resolved, ResolvedType::Struct { .. }) {
-        if is_nullable {
-            quote! {
-                match &self.0 {
-                    Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                    Nullable::Null => write!(f, "null"),
-                }
-            }
-        } else {
-            quote! {
-                write!(f, "{:?}", self.0)
-            }
-        }
-    } else if is_nullable {
-        quote! {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    } else {
-        quote! {
-            write!(f, "{}", self.0)
-        }
+fn build_extra_from_tokens(attr_name: &str, is_nullable: bool, is_semantic_bool: bool) -> Tokens {
+    if !is_semantic_bool {
+        return Tokens::new();
     }
-}
-
-struct FromDerefFlags {
-    is_nullable: bool,
-    is_semantic_bool: bool,
-    skip_base_80: bool,
-    skip_base_70: bool,
-}
-
-fn build_extra_from_tokens(attr_name: &str, base_type: &str, flags: FromDerefFlags) -> Tokens {
-    let FromDerefFlags {
-        is_nullable,
-        is_semantic_bool,
-        skip_base_80,
-        skip_base_70,
-    } = flags;
     quote! {
-        $(if is_nullable =>
-            $(if skip_base_80 =>
-                #[rustfmt::skip]
-            )
-            impl From<$base_type> for $attr_name {
-                #[inline]
-                fn from(val: $base_type) -> Self {
-                    Self(Nullable::NonNull(val))
-                }
+        impl From<bool> for $attr_name {
+            #[inline]
+            fn from(val: bool) -> Self {
+                $(if is_nullable =>
+                    Self(Nullable::NonNull(super::$attr_name::from(val)))
+                )
+                $(if !is_nullable =>
+                    Self(super::$attr_name::from(val))
+                )
             }
-
-            $(if skip_base_70 =>
-                #[rustfmt::skip]
-            )
-            impl From<Option<$base_type>> for $attr_name {
-                #[inline]
-                fn from(val: Option<$base_type>) -> Self {
-                    Self(Nullable::from(val))
-                }
-            }
-        )
-
-        $(if is_semantic_bool =>
-            impl From<bool> for $attr_name {
-                #[inline]
-                fn from(val: bool) -> Self {
-                    $(if is_nullable =>
-                        Self(Nullable::NonNull(super::$attr_name::from(val)))
-                    )
-                    $(if !is_nullable =>
-                        Self(super::$attr_name::from(val))
-                    )
-                }
-            }
-        )
-    }
-}
-
-fn build_into_value_body(is_nullable: bool, is_array: bool) -> Tokens {
-    if is_nullable {
-        if is_array {
-            quote! {
-                match self.0 {
-                    Nullable::NonNull(list) => {
-                        let items = list.into_iter().map(AttributeValue::from).collect();
-                        AttributeValue::List(items)
-                    }
-                    Nullable::Null => AttributeValue::Null,
-                }
-            }
-        } else {
-            quote! {
-                match self.0 {
-                    Nullable::NonNull(val) => AttributeValue::from(val),
-                    Nullable::Null => AttributeValue::Null,
-                }
-            }
-        }
-    } else if is_array {
-        quote! {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-    } else {
-        quote! {
-            AttributeValue::from(self.0)
         }
     }
 }

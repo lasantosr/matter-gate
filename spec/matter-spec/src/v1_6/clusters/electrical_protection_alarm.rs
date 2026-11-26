@@ -12,14 +12,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1070,93 +1064,23 @@ crate::impl_cluster_member_variant!(
     ResidualCurrentRating
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ArcFaultRating, ArcFaultRating);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalProtectionAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Mask(_) => attributes::Mask::NAME,
-            Self::State(_) => attributes::State::NAME,
-            Self::Supported(_) => attributes::Supported::NAME,
-            Self::ArcCause(_) => attributes::ArcCause::NAME,
-            Self::OverLoadRating(_) => attributes::OverLoadRating::NAME,
-            Self::OverVoltageRating(_) => attributes::OverVoltageRating::NAME,
-            Self::SurgeProtectionRating(_) => attributes::SurgeProtectionRating::NAME,
-            Self::ShortCircuitRating(_) => attributes::ShortCircuitRating::NAME,
-            Self::ResidualCurrentRating(_) => attributes::ResidualCurrentRating::NAME,
-            Self::ArcFaultRating(_) => attributes::ArcFaultRating::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ElectricalProtectionAlarmCluster::NAME,
-        ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ElectricalProtectionAlarmCluster::NAME,
-            cluster_id: ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Mask(inner) => Serialize::serialize(inner, serializer),
-            Self::State(inner) => Serialize::serialize(inner, serializer),
-            Self::Supported(inner) => Serialize::serialize(inner, serializer),
-            Self::ArcCause(inner) => Serialize::serialize(inner, serializer),
-            Self::OverLoadRating(inner) => Serialize::serialize(inner, serializer),
-            Self::OverVoltageRating(inner) => Serialize::serialize(inner, serializer),
-            Self::SurgeProtectionRating(inner) => Serialize::serialize(inner, serializer),
-            Self::ShortCircuitRating(inner) => Serialize::serialize(inner, serializer),
-            Self::ResidualCurrentRating(inner) => Serialize::serialize(inner, serializer),
-            Self::ArcFaultRating(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                ElectricalProtectionAlarmCluster::NAME,
-                ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ElectricalProtectionAlarmCluster,
+    [
+        Mask,
+        State,
+        Supported,
+        ArcCause,
+        OverLoadRating,
+        OverVoltageRating,
+        SurgeProtectionRating,
+        ShortCircuitRating,
+        ResidualCurrentRating,
+        ArcFaultRating,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ElectricalProtectionAlarmCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1248,123 +1172,19 @@ impl TryFrom<model::Command> for Command {
     }
 }
 
-impl From<commands::ModifyEnabledAlarms> for Command {
-    #[inline]
-    fn from(cmd: commands::ModifyEnabledAlarms) -> Self {
-        Self::ModifyEnabledAlarms(cmd)
-    }
-}
-
-impl TryFrom<Command> for commands::ModifyEnabledAlarms {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: Command) -> Result<Self, Self::Error> {
-        match cmd {
-            Command::ModifyEnabledAlarms(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalProtectionAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ModifyEnabledAlarms(_) => commands::ModifyEnabledAlarms::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ElectricalProtectionAlarmCluster::NAME,
-        ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ElectricalProtectionAlarmCluster::NAME,
-            cluster_id: ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ModifyEnabledAlarms(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ElectricalProtectionAlarmCluster::NAME,
-                ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                ElectricalProtectionAlarmCluster::NAME,
-                ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    Command,
+    commands::ModifyEnabledAlarms,
+    ModifyEnabledAlarms
+);
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ElectricalProtectionAlarmCluster,
+    empty = [],
+    payload = [ModifyEnabledAlarms,]
+);
 /// Dynamic event variant matching for [`ElectricalProtectionAlarmCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1454,107 +1274,14 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::Notify> for Event {
-    #[inline]
-    fn from(ev: events::Notify) -> Self {
-        Self::Notify(ev)
-    }
-}
-
-impl TryFrom<Event> for events::Notify {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::Notify(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ElectricalProtectionAlarmCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::Notify(_) => events::Notify::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ElectricalProtectionAlarmCluster::NAME,
-        ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ElectricalProtectionAlarmCluster::NAME,
-            cluster_id: ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Notify(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((
-                ElectricalProtectionAlarmCluster::NAME,
-                ElectricalProtectionAlarmCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(event_single, Event, events::Notify, Notify);
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    ElectricalProtectionAlarmCluster,
+    empty = [],
+    payload = [Notify,]
+);
 
 crate::define_matter_bitmap! {
     /// AlarmBitmap bitmap.
@@ -1781,7 +1508,7 @@ impl ArcFaultRatingsStruct {
                     if series_arc_current_sensitivity.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -1789,14 +1516,14 @@ impl ArcFaultRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         series_arc_current_sensitivity = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if parallel_arc_current_sensitivity.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -1804,19 +1531,19 @@ impl ArcFaultRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         parallel_arc_current_sensitivity = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if supported_arc_causes.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ArcCauseBitmap>::try_from(fval)?;
                         supported_arc_causes = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1843,24 +1570,7 @@ impl ArcFaultRatingsStruct {
     }
 }
 
-impl From<ArcFaultRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ArcFaultRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ArcFaultRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ArcFaultRatingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1951,7 +1661,7 @@ impl OverLoadRatingsStruct {
                     if trip_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -1959,36 +1669,36 @@ impl OverLoadRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         trip_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if trip_curve.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentTripCurveEnum>::try_from(fval)?;
                         trip_curve = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if trip_mechanism.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentTripMechanismBitmap>::try_from(fval)?;
                         trip_mechanism = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if ultimate_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -1996,14 +1706,14 @@ impl OverLoadRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         ultimate_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if service_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2011,8 +1721,8 @@ impl OverLoadRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         service_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2047,24 +1757,7 @@ impl OverLoadRatingsStruct {
     }
 }
 
-impl From<OverLoadRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: OverLoadRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for OverLoadRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(OverLoadRatingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2146,18 +1839,18 @@ impl OverVoltageRatingsStruct {
                     if trip_mechanism.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VoltageTripMechanismBitmap>::try_from(fval)?;
                         trip_mechanism = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if trip_voltage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::VoltageMv>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2165,14 +1858,14 @@ impl OverVoltageRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         trip_voltage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if max_continuous_operating_voltage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::VoltageMv>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2180,20 +1873,20 @@ impl OverVoltageRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_continuous_operating_voltage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if response_time.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded >= 1_u64).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         response_time = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2224,24 +1917,7 @@ impl OverVoltageRatingsStruct {
     }
 }
 
-impl From<OverVoltageRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: OverVoltageRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for OverVoltageRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(OverVoltageRatingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2371,7 +2047,7 @@ impl ResidualCurrentFaultRatingsStruct {
                     if current_sensitivity.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2379,69 +2055,69 @@ impl ResidualCurrentFaultRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         current_sensitivity = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if trip_mechanism.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentTripMechanismBitmap>::try_from(fval)?;
                         trip_mechanism = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if voltage_dependent.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         voltage_dependent = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if ground_fault_class.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <GroundFaultClassEnum>::try_from(fval)?;
                         ground_fault_class = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if waveform.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentWaveformEnum>::try_from(fval)?;
                         waveform = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if tripping_characteristic.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <TrippingCharacteristicsBitmap>::try_from(fval)?;
                         tripping_characteristic = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if ultimate_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2449,14 +2125,14 @@ impl ResidualCurrentFaultRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         ultimate_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if service_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2464,8 +2140,8 @@ impl ResidualCurrentFaultRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         service_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2512,24 +2188,7 @@ impl ResidualCurrentFaultRatingsStruct {
     }
 }
 
-impl From<ResidualCurrentFaultRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ResidualCurrentFaultRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ResidualCurrentFaultRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ResidualCurrentFaultRatingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2632,7 +2291,7 @@ impl ShortCircuitRatingsStruct {
                     if trip_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2640,36 +2299,36 @@ impl ShortCircuitRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         trip_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if trip_mechanism.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentTripMechanismBitmap>::try_from(fval)?;
                         trip_mechanism = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if trip_curve.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <CurrentTripCurveEnum>::try_from(fval)?;
                         trip_curve = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if ultimate_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2677,14 +2336,14 @@ impl ShortCircuitRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         ultimate_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if service_max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2692,14 +2351,14 @@ impl ShortCircuitRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         service_max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if max_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2707,8 +2366,8 @@ impl ShortCircuitRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2747,24 +2406,7 @@ impl ShortCircuitRatingsStruct {
     }
 }
 
-impl From<ShortCircuitRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ShortCircuitRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ShortCircuitRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ShortCircuitRatingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2948,40 +2590,40 @@ impl SurgeProtectionRatingsStruct {
                     if trip_mechanism.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <VoltageTripMechanismBitmap>::try_from(fval)?;
                         trip_mechanism = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if protection_class.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SurgeProtectionClassBitmap>::try_from(fval)?;
                         protection_class = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if protection_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SurgeProtectionTypeBitmap>::try_from(fval)?;
                         protection_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if max_continuous_operating_voltage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::VoltageMv>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -2989,14 +2631,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_continuous_operating_voltage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if max_voltage_protection.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::VoltageMv>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3004,14 +2646,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_voltage_protection = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if max_temporary_voltage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::VoltageMv>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3019,14 +2661,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_temporary_voltage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if nominal_discharge_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3034,14 +2676,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         nominal_discharge_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if maximum_disharge_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3049,14 +2691,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         maximum_disharge_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if rated_short_circuit_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3064,14 +2706,14 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         rated_short_circuit_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 9 => {
                     if rated_short_time_withstand_current.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::AmperageMa>::try_from(fval)?;
                         (1_i64..=0x3FFF_FFFF_FFFF_FFFF_i64)
                             .contains(&decoded.raw())
@@ -3079,32 +2721,32 @@ impl SurgeProtectionRatingsStruct {
                             .ok_or(MatterStatus::ConstraintError)?;
                         rated_short_time_withstand_current = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 10 => {
                     if energy_absorption_capability.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded >= 1_u64).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         energy_absorption_capability = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 11 => {
                     if response_time.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         (decoded >= 1_u64).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         response_time = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3167,30 +2809,11 @@ impl SurgeProtectionRatingsStruct {
     }
 }
 
-impl From<SurgeProtectionRatingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: SurgeProtectionRatingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for SurgeProtectionRatingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(SurgeProtectionRatingsStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3232,11 +2855,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3246,13 +2864,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Mask, super::AlarmBitmap, super::ElectricalProtectionAlarmCluster, copy);
-
-    impl fmt::Display for Mask {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Mask,
+        super::AlarmBitmap,
+        super::ElectricalProtectionAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3279,11 +2898,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3293,13 +2907,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(State, super::AlarmBitmap, super::ElectricalProtectionAlarmCluster, copy);
-
-    impl fmt::Display for State {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        State,
+        super::AlarmBitmap,
+        super::ElectricalProtectionAlarmCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3326,11 +2941,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -3344,14 +2954,10 @@ pub mod attributes {
         Supported,
         super::AlarmBitmap,
         super::ElectricalProtectionAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for Supported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3402,14 +3008,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3420,33 +3018,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ArcCause,
-        Nullable<super::ArcCauseBitmap>,
+        super::ArcCauseBitmap,
         super::ElectricalProtectionAlarmCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::ArcCauseBitmap> for ArcCause {
-        #[inline]
-        fn from(val: super::ArcCauseBitmap) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ArcCauseBitmap>> for ArcCause {
-        #[inline]
-        fn from(val: Option<super::ArcCauseBitmap>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ArcCause {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3497,14 +3076,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3515,33 +3086,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OverLoadRating,
-        Nullable<super::OverLoadRatingsStruct>,
+        super::OverLoadRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::OverLoadRatingsStruct> for OverLoadRating {
-        #[inline]
-        fn from(val: super::OverLoadRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::OverLoadRatingsStruct>> for OverLoadRating {
-        #[inline]
-        fn from(val: Option<super::OverLoadRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OverLoadRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3592,14 +3144,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3610,33 +3154,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OverVoltageRating,
-        Nullable<super::OverVoltageRatingsStruct>,
+        super::OverVoltageRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::OverVoltageRatingsStruct> for OverVoltageRating {
-        #[inline]
-        fn from(val: super::OverVoltageRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::OverVoltageRatingsStruct>> for OverVoltageRating {
-        #[inline]
-        fn from(val: Option<super::OverVoltageRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OverVoltageRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3687,14 +3212,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3705,33 +3222,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SurgeProtectionRating,
-        Nullable<super::SurgeProtectionRatingsStruct>,
+        super::SurgeProtectionRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::SurgeProtectionRatingsStruct> for SurgeProtectionRating {
-        #[inline]
-        fn from(val: super::SurgeProtectionRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::SurgeProtectionRatingsStruct>> for SurgeProtectionRating {
-        #[inline]
-        fn from(val: Option<super::SurgeProtectionRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SurgeProtectionRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3782,14 +3280,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3800,33 +3290,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ShortCircuitRating,
-        Nullable<super::ShortCircuitRatingsStruct>,
+        super::ShortCircuitRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::ShortCircuitRatingsStruct> for ShortCircuitRating {
-        #[inline]
-        fn from(val: super::ShortCircuitRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ShortCircuitRatingsStruct>> for ShortCircuitRating {
-        #[inline]
-        fn from(val: Option<super::ShortCircuitRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ShortCircuitRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3877,14 +3348,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3895,33 +3358,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ResidualCurrentRating,
-        Nullable<super::ResidualCurrentFaultRatingsStruct>,
+        super::ResidualCurrentFaultRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::ResidualCurrentFaultRatingsStruct> for ResidualCurrentRating {
-        #[inline]
-        fn from(val: super::ResidualCurrentFaultRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ResidualCurrentFaultRatingsStruct>> for ResidualCurrentRating {
-        #[inline]
-        fn from(val: Option<super::ResidualCurrentFaultRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ResidualCurrentRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3972,14 +3416,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3990,33 +3426,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ArcFaultRating,
-        Nullable<super::ArcFaultRatingsStruct>,
+        super::ArcFaultRatingsStruct,
         super::ElectricalProtectionAlarmCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::ArcFaultRatingsStruct> for ArcFaultRating {
-        #[inline]
-        fn from(val: super::ArcFaultRatingsStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::ArcFaultRatingsStruct>> for ArcFaultRating {
-        #[inline]
-        fn from(val: Option<super::ArcFaultRatingsStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ArcFaultRating {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod commands {
@@ -4050,17 +3467,6 @@ pub mod commands {
         pub mask: super::AlarmBitmap,
     }
 
-    impl crate::traits::CommandSpec for ModifyEnabledAlarms {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ElectricalProtectionAlarmCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl ModifyEnabledAlarms {
         pub const CLUSTER_ID: ClusterId = super::ElectricalProtectionAlarmCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
@@ -4076,11 +3482,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_MASK, AttributeValue::from(self.mask)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -4106,19 +3507,6 @@ pub mod commands {
                 mask: mask.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::AlarmBitmap> for ModifyEnabledAlarms {
@@ -4128,7 +3516,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(ModifyEnabledAlarms, super::ElectricalProtectionAlarmCluster, false);
+    crate::impl_matter_command!(ModifyEnabledAlarms, super::ElectricalProtectionAlarmCluster, (), false);
 }
 
 pub mod events {
@@ -4200,11 +3588,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -4218,45 +3601,45 @@ pub mod events {
                         if active.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             active = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if inactive.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             inactive = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if state.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             state = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if mask.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::AlarmBitmap>::try_from(fval)?;
                             mask = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -4267,19 +3650,6 @@ pub mod events {
                 state: state.ok_or((Some(FieldId::new(2)), MatterStatus::ConstraintError))?,
                 mask: mask.ok_or((Some(FieldId::new(3)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

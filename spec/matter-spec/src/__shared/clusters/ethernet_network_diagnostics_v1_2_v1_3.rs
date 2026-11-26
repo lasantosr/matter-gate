@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -913,91 +909,22 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::CollisionC
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::OverrunCount, OverrunCount);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::CarrierDetect, CarrierDetect);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::TimeSinceReset, TimeSinceReset);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EthernetNetworkDiagnosticsCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::PhyRate(_) => attributes::PhyRate::NAME,
-            Self::FullDuplex(_) => attributes::FullDuplex::NAME,
-            Self::PacketRxCount(_) => attributes::PacketRxCount::NAME,
-            Self::PacketTxCount(_) => attributes::PacketTxCount::NAME,
-            Self::TxErrCount(_) => attributes::TxErrCount::NAME,
-            Self::CollisionCount(_) => attributes::CollisionCount::NAME,
-            Self::OverrunCount(_) => attributes::OverrunCount::NAME,
-            Self::CarrierDetect(_) => attributes::CarrierDetect::NAME,
-            Self::TimeSinceReset(_) => attributes::TimeSinceReset::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        EthernetNetworkDiagnosticsCluster::NAME,
-        EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: EthernetNetworkDiagnosticsCluster::NAME,
-            cluster_id: EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::PhyRate(inner) => Serialize::serialize(inner, serializer),
-            Self::FullDuplex(inner) => Serialize::serialize(inner, serializer),
-            Self::PacketRxCount(inner) => Serialize::serialize(inner, serializer),
-            Self::PacketTxCount(inner) => Serialize::serialize(inner, serializer),
-            Self::TxErrCount(inner) => Serialize::serialize(inner, serializer),
-            Self::CollisionCount(inner) => Serialize::serialize(inner, serializer),
-            Self::OverrunCount(inner) => Serialize::serialize(inner, serializer),
-            Self::CarrierDetect(inner) => Serialize::serialize(inner, serializer),
-            Self::TimeSinceReset(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                EthernetNetworkDiagnosticsCluster::NAME,
-                EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    EthernetNetworkDiagnosticsCluster,
+    [
+        PhyRate,
+        FullDuplex,
+        PacketRxCount,
+        PacketTxCount,
+        TxErrCount,
+        CollisionCount,
+        OverrunCount,
+        CarrierDetect,
+        TimeSinceReset,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`EthernetNetworkDiagnosticsCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1089,123 +1016,14 @@ impl TryFrom<model::Command> for Command {
     }
 }
 
-impl From<commands::ResetCounts> for Command {
-    #[inline]
-    fn from(_: commands::ResetCounts) -> Self {
-        Self::ResetCounts
-    }
-}
-
-impl TryFrom<Command> for commands::ResetCounts {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: Command) -> Result<Self, Self::Error> {
-        match cmd {
-            Command::ResetCounts => Ok(Self),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        EthernetNetworkDiagnosticsCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ResetCounts => commands::ResetCounts::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        EthernetNetworkDiagnosticsCluster::NAME,
-        EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: EthernetNetworkDiagnosticsCluster::NAME,
-            cluster_id: EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ResetCounts => Serialize::serialize(&(), serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                EthernetNetworkDiagnosticsCluster::NAME,
-                EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                EthernetNetworkDiagnosticsCluster::NAME,
-                EthernetNetworkDiagnosticsCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(command_unit_single, Command, commands::ResetCounts, ResetCounts);
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    EthernetNetworkDiagnosticsCluster,
+    empty = [ResetCounts,],
+    payload = []
+);
 
 crate::define_matter_bitmap! {
     /// Feature bitmap.
@@ -1258,8 +1076,6 @@ crate::define_matter_semantic_bool! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1325,14 +1141,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1343,33 +1151,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PhyRate,
-        Nullable<super::PhyRateEnum>,
+        super::PhyRateEnum,
         super::EthernetNetworkDiagnosticsCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::PhyRateEnum> for PhyRate {
-        #[inline]
-        fn from(val: super::PhyRateEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::PhyRateEnum>> for PhyRate {
-        #[inline]
-        fn from(val: Option<super::PhyRateEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PhyRate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1420,14 +1209,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1438,38 +1219,18 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         FullDuplex,
-        Nullable<super::FullDuplex>,
+        super::FullDuplex,
         super::EthernetNetworkDiagnosticsCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::FullDuplex> for FullDuplex {
-        #[inline]
-        fn from(val: super::FullDuplex) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::FullDuplex>> for FullDuplex {
-        #[inline]
-        fn from(val: Option<super::FullDuplex>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
     impl From<bool> for FullDuplex {
         #[inline]
         fn from(val: bool) -> Self {
             Self(Nullable::NonNull(super::FullDuplex::from(val)))
-        }
-    }
-
-    impl fmt::Display for FullDuplex {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
         }
     }
 
@@ -1498,27 +1259,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PacketRxCount, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for PacketRxCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PacketRxCount,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1545,27 +1302,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(PacketTxCount, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for PacketTxCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PacketTxCount,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1592,27 +1345,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TxErrCount, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for TxErrCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TxErrCount,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1639,27 +1388,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(CollisionCount, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for CollisionCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        CollisionCount,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1686,27 +1431,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(OverrunCount, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for OverrunCount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        OverrunCount,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1757,14 +1498,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1775,38 +1508,18 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CarrierDetect,
-        Nullable<super::CarrierDetect>,
+        super::CarrierDetect,
         super::EthernetNetworkDiagnosticsCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::CarrierDetect> for CarrierDetect {
-        #[inline]
-        fn from(val: super::CarrierDetect) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::CarrierDetect>> for CarrierDetect {
-        #[inline]
-        fn from(val: Option<super::CarrierDetect>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
     impl From<bool> for CarrierDetect {
         #[inline]
         fn from(val: bool) -> Self {
             Self(Nullable::NonNull(super::CarrierDetect::from(val)))
-        }
-    }
-
-    impl fmt::Display for CarrierDetect {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
         }
     }
 
@@ -1835,27 +1548,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(TimeSinceReset, u64, super::EthernetNetworkDiagnosticsCluster, copy);
-
-    impl fmt::Display for TimeSinceReset {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TimeSinceReset,
+        u64,
+        super::EthernetNetworkDiagnosticsCluster,
+        copy,
+        scalar,
+        display
+    );
 }
 
 pub mod commands {
@@ -1883,60 +1592,12 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ResetCounts;
 
-    impl crate::traits::CommandSpec for ResetCounts {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::EthernetNetworkDiagnosticsCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ResetCounts {
         pub const CLUSTER_ID: ClusterId = super::EthernetNetworkDiagnosticsCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ResetCounts";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ResetCounts, super::EthernetNetworkDiagnosticsCluster, true);
+    crate::impl_matter_command!(ResetCounts, super::EthernetNetworkDiagnosticsCluster, (), true);
 }

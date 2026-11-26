@@ -11,12 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -916,93 +912,23 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::TiltMax, T
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PanMin, PanMin);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PanMax, PanMax);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MovementState, MovementState);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CameraAvSettingsUserLevelManagementCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MptzPosition(_) => attributes::MptzPosition::NAME,
-            Self::MaxPresets(_) => attributes::MaxPresets::NAME,
-            Self::MptzPresets(_) => attributes::MptzPresets::NAME,
-            Self::DptzStreams(_) => attributes::DptzStreams::NAME,
-            Self::ZoomMax(_) => attributes::ZoomMax::NAME,
-            Self::TiltMin(_) => attributes::TiltMin::NAME,
-            Self::TiltMax(_) => attributes::TiltMax::NAME,
-            Self::PanMin(_) => attributes::PanMin::NAME,
-            Self::PanMax(_) => attributes::PanMax::NAME,
-            Self::MovementState(_) => attributes::MovementState::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        CameraAvSettingsUserLevelManagementCluster::NAME,
-        CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: CameraAvSettingsUserLevelManagementCluster::NAME,
-            cluster_id: CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MptzPosition(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxPresets(inner) => Serialize::serialize(inner, serializer),
-            Self::MptzPresets(inner) => Serialize::serialize(inner, serializer),
-            Self::DptzStreams(inner) => Serialize::serialize(inner, serializer),
-            Self::ZoomMax(inner) => Serialize::serialize(inner, serializer),
-            Self::TiltMin(inner) => Serialize::serialize(inner, serializer),
-            Self::TiltMax(inner) => Serialize::serialize(inner, serializer),
-            Self::PanMin(inner) => Serialize::serialize(inner, serializer),
-            Self::PanMax(inner) => Serialize::serialize(inner, serializer),
-            Self::MovementState(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                CameraAvSettingsUserLevelManagementCluster::NAME,
-                CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    CameraAvSettingsUserLevelManagementCluster,
+    [
+        MptzPosition,
+        MaxPresets,
+        MptzPresets,
+        DptzStreams,
+        ZoomMax,
+        TiltMin,
+        TiltMax,
+        PanMin,
+        PanMax,
+        MovementState,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`CameraAvSettingsUserLevelManagementCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1229,118 +1155,21 @@ crate::impl_cluster_member_variant!(command, Command, commands::MptzSavePreset, 
 crate::impl_cluster_member_variant!(command, Command, commands::MptzRemovePreset, MptzRemovePreset);
 crate::impl_cluster_member_variant!(command, Command, commands::DptzSetViewport, DptzSetViewport);
 crate::impl_cluster_member_variant!(command, Command, commands::DptzRelativeMove, DptzRelativeMove);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CameraAvSettingsUserLevelManagementCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::MptzSetPosition(_) => commands::MptzSetPosition::NAME,
-            Self::MptzRelativeMove(_) => commands::MptzRelativeMove::NAME,
-            Self::MptzMoveToPreset(_) => commands::MptzMoveToPreset::NAME,
-            Self::MptzSavePreset(_) => commands::MptzSavePreset::NAME,
-            Self::MptzRemovePreset(_) => commands::MptzRemovePreset::NAME,
-            Self::DptzSetViewport(_) => commands::DptzSetViewport::NAME,
-            Self::DptzRelativeMove(_) => commands::DptzRelativeMove::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        CameraAvSettingsUserLevelManagementCluster::NAME,
-        CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: CameraAvSettingsUserLevelManagementCluster::NAME,
-            cluster_id: CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MptzSetPosition(inner) => Serialize::serialize(inner, serializer),
-            Self::MptzRelativeMove(inner) => Serialize::serialize(inner, serializer),
-            Self::MptzMoveToPreset(inner) => Serialize::serialize(inner, serializer),
-            Self::MptzSavePreset(inner) => Serialize::serialize(inner, serializer),
-            Self::MptzRemovePreset(inner) => Serialize::serialize(inner, serializer),
-            Self::DptzSetViewport(inner) => Serialize::serialize(inner, serializer),
-            Self::DptzRelativeMove(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                CameraAvSettingsUserLevelManagementCluster::NAME,
-                CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((
-                CameraAvSettingsUserLevelManagementCluster::NAME,
-                CameraAvSettingsUserLevelManagementCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    CameraAvSettingsUserLevelManagementCluster,
+    empty = [],
+    payload = [
+        MptzSetPosition,
+        MptzRelativeMove,
+        MptzMoveToPreset,
+        MptzSavePreset,
+        MptzRemovePreset,
+        DptzSetViewport,
+        DptzRelativeMove,
+    ]
+);
 
 crate::define_matter_enum! {
     /// PhysicalMovementEnum exhaustive specification enum.
@@ -1389,23 +1218,23 @@ impl DptzStruct {
                     if video_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         video_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if viewport.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::ViewportStruct>::try_from(fval)?;
                         viewport = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1424,24 +1253,7 @@ impl DptzStruct {
     }
 }
 
-impl From<DptzStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DptzStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DptzStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DptzStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1483,38 +1295,38 @@ impl MptzPresetStruct {
                     if preset_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         preset_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if settings.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <MptzStruct>::try_from(fval)?;
                         settings = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1535,24 +1347,7 @@ impl MptzPresetStruct {
     }
 }
 
-impl From<MptzPresetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MptzPresetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MptzPresetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MptzPresetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1619,46 +1414,46 @@ impl MptzStruct {
                     if pan.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                         (-180_i16..=180_i16)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         pan = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if tilt.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                         (-180_i16..=180_i16)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         tilt = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if zoom.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (1_u8..=100_u8)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         zoom = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1685,30 +1480,11 @@ impl MptzStruct {
     }
 }
 
-impl From<MptzStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MptzStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MptzStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MptzStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1750,11 +1526,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1768,14 +1539,10 @@ pub mod attributes {
         MptzPosition,
         super::MptzStruct,
         super::CameraAvSettingsUserLevelManagementCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for MptzPosition {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1802,27 +1569,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MaxPresets, u8, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for MaxPresets {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxPresets,
+        u8,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1849,12 +1612,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1877,14 +1634,10 @@ pub mod attributes {
         MptzPresets,
         Vec<super::MptzPresetStruct>,
         super::CameraAvSettingsUserLevelManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for MptzPresets {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1911,12 +1664,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1936,14 +1683,10 @@ pub mod attributes {
         DptzStreams,
         Vec<super::DptzStruct>,
         super::CameraAvSettingsUserLevelManagementCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for DptzStreams {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1970,16 +1713,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 2_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -1990,13 +1728,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ZoomMax, u8, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for ZoomMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ZoomMax,
+        u8,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2023,16 +1762,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -180_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2043,13 +1777,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(TiltMin, i16, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for TiltMin {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TiltMin,
+        i16,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2076,16 +1811,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < 1_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2096,13 +1826,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(TiltMax, i16, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for TiltMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TiltMax,
+        i16,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2129,16 +1860,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -180_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2149,13 +1875,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PanMin, i16, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for PanMin {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PanMin,
+        i16,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2182,16 +1909,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < 1_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -2202,13 +1924,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PanMax, i16, super::CameraAvSettingsUserLevelManagementCluster, copy);
-
-    impl fmt::Display for PanMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        PanMax,
+        i16,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2235,11 +1958,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2253,14 +1971,10 @@ pub mod attributes {
         MovementState,
         super::PhysicalMovementEnum,
         super::CameraAvSettingsUserLevelManagementCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for MovementState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -2300,17 +2014,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub zoom: Optional<u8>,
-    }
-
-    impl crate::traits::CommandSpec for MptzSetPosition {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MptzSetPosition {
@@ -2365,11 +2068,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2382,46 +2080,46 @@ pub mod commands {
                         if pan.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             (-180_i16..=180_i16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             pan = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if tilt.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             (-180_i16..=180_i16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             tilt = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if zoom.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             (1_u8..=100_u8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             zoom = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2432,24 +2130,12 @@ pub mod commands {
                 zoom: Optional::from(zoom),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         MptzSetPosition,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 
@@ -2472,17 +2158,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub zoom_delta: Optional<i8>,
-    }
-
-    impl crate::traits::CommandSpec for MptzRelativeMove {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MptzRelativeMove {
@@ -2537,11 +2212,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2554,46 +2224,46 @@ pub mod commands {
                         if pan_delta.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             (-360_i16..=360_i16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             pan_delta = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if tilt_delta.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             (-360_i16..=360_i16)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             tilt_delta = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if zoom_delta.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i8>(&fval)?;
                             (-99_i8..=99_i8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             zoom_delta = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2604,24 +2274,12 @@ pub mod commands {
                 zoom_delta: Optional::from(zoom_delta),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         MptzRelativeMove,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 
@@ -2636,17 +2294,6 @@ pub mod commands {
     )]
     pub struct MptzMoveToPreset {
         pub preset_id: u8,
-    }
-
-    impl crate::traits::CommandSpec for MptzMoveToPreset {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MptzMoveToPreset {
@@ -2668,11 +2315,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_PRESET_ID, AttributeValue::from(self.preset_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2683,7 +2325,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         preset_id = Some(decoded);
                         Ok(())
@@ -2697,19 +2339,6 @@ pub mod commands {
                 preset_id: preset_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for MptzMoveToPreset {
@@ -2722,6 +2351,7 @@ pub mod commands {
     crate::impl_matter_command!(
         MptzMoveToPreset,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 
@@ -2739,17 +2369,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub preset_id: Optional<u8>,
-    }
-
-    impl crate::traits::CommandSpec for MptzSavePreset {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MptzSavePreset {
@@ -2784,11 +2403,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2800,27 +2414,27 @@ pub mod commands {
                         if preset_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                             preset_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if name.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             (decoded.len() <= 32)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             name = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2829,19 +2443,6 @@ pub mod commands {
                 preset_id: Optional::from(preset_id),
                 name: name.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2859,7 +2460,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(MptzSavePreset, super::CameraAvSettingsUserLevelManagementCluster, false);
+    crate::impl_matter_command!(
+        MptzSavePreset,
+        super::CameraAvSettingsUserLevelManagementCluster,
+        (),
+        false
+    );
 
     /// This command SHALL remove a preset entry from the PresetMptzTable.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -2872,17 +2478,6 @@ pub mod commands {
     )]
     pub struct MptzRemovePreset {
         pub preset_id: u8,
-    }
-
-    impl crate::traits::CommandSpec for MptzRemovePreset {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl MptzRemovePreset {
@@ -2904,11 +2499,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_PRESET_ID, AttributeValue::from(self.preset_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2919,7 +2509,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         (decoded >= 1_u8).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         preset_id = Some(decoded);
                         Ok(())
@@ -2933,19 +2523,6 @@ pub mod commands {
                 preset_id: preset_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for MptzRemovePreset {
@@ -2958,6 +2535,7 @@ pub mod commands {
     crate::impl_matter_command!(
         MptzRemovePreset,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 
@@ -2973,17 +2551,6 @@ pub mod commands {
     pub struct DptzSetViewport {
         pub video_stream_id: u16,
         pub viewport: super::globals::ViewportStruct,
-    }
-
-    impl crate::traits::CommandSpec for DptzSetViewport {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl DptzSetViewport {
@@ -3010,11 +2577,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3026,23 +2588,23 @@ pub mod commands {
                         if video_stream_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             video_stream_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if viewport.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::ViewportStruct>::try_from(fval)?;
                             viewport = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3052,24 +2614,12 @@ pub mod commands {
                 viewport: viewport.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     crate::impl_matter_command!(
         DptzSetViewport,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 
@@ -3093,17 +2643,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub zoom_delta: Optional<i8>,
-    }
-
-    impl crate::traits::CommandSpec for DptzRelativeMove {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CameraAvSettingsUserLevelManagementCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl DptzRelativeMove {
@@ -3160,11 +2699,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3178,49 +2712,49 @@ pub mod commands {
                         if video_stream_id.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             video_stream_id = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if delta_x.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             delta_x = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if delta_y.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                             delta_y = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if zoom_delta.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i8>(&fval)?;
                             (-100_i8..=100_i8)
                                 .contains(&decoded)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             zoom_delta = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -3231,19 +2765,6 @@ pub mod commands {
                 delta_y: Optional::from(delta_y),
                 zoom_delta: Optional::from(zoom_delta),
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -3257,6 +2778,7 @@ pub mod commands {
     crate::impl_matter_command!(
         DptzRelativeMove,
         super::CameraAvSettingsUserLevelManagementCluster,
+        (),
         false
     );
 }

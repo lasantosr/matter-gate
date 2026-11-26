@@ -48,7 +48,7 @@ pub(crate) fn generate_single_device_type_tokens(
                 $(if has_optional => Optional,)
             },
             error::EndpointError,
-            traits::{DeviceTypeSpec, update_descriptor_cluster, validate_device_view},
+            traits::{DeviceTypeSpec, update_descriptor_cluster},
         };
         #[cfg(feature = $(quoted("serde")))]
         use serde::{Deserialize, Serialize};
@@ -679,31 +679,6 @@ fn emit_device_type_spec_and_dispatch(
             )
         }
 
-        impl DeviceTypeSpec for $struct_name {
-            type View<'a> = $view_name<'a>;
-
-            const DEVICE_TYPE_ID: DeviceTypeId = Self::DEVICE_TYPE_ID;
-            const REVISION: u16 = Self::REVISION;
-            const NAME: &'static str = Self::NAME;
-            const IS_EMPTY: bool = $is_empty_str;
-
-            #[inline]
-            fn into_endpoint(self, id: EndpointId) -> Endpoint {
-                Self::into_endpoint(self, id)
-            }
-
-            fn view(endpoint: &Endpoint) -> Result<Self::View<'_>, EndpointError> {
-                validate_device_view(
-                    endpoint,
-                    Self::DEVICE_TYPE_ID,
-                    Self::DISALLOWED_CLUSTERS,
-                    Self::MANDATORY_SERVER_CLUSTERS,
-                    Self::MANDATORY_CLIENT_CLUSTERS,
-                )?;
-                Ok($view_name { endpoint })
-            }
-        }
-
-        crate::impl_matter_describe!(device, $struct_name, $is_empty_str);
+        crate::impl_device_type_spec!($struct_name, $view_name, $is_empty_str);
     }
 }

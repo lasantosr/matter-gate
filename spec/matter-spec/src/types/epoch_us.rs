@@ -4,8 +4,8 @@ use core::time::Duration;
 #[cfg(feature = "std")]
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[cfg(feature = "chrono")]
-use chrono::{DateTime, Utc};
+#[cfg(feature = "jiff")]
+use jiff::Timestamp;
 #[cfg(feature = "time")]
 use time::OffsetDateTime;
 
@@ -117,21 +117,21 @@ impl EpochUs {
         Self::from_unix_micros(unix_us)
     }
 
-    /// Convert to a UTC [`chrono::DateTime<chrono::Utc>`], returning `None` on overflow.
-    #[cfg(feature = "chrono")]
+    /// Convert to a [`jiff::Timestamp`], returning `None` on overflow.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn to_chrono_utc(self) -> Option<DateTime<Utc>> {
+    pub fn to_jiff_timestamp(self) -> Option<Timestamp> {
         let unix_us = i64::try_from(self.to_unix_micros()?).ok()?;
-        DateTime::from_timestamp_micros(unix_us)
+        Timestamp::from_microsecond(unix_us).ok()
     }
 
-    /// Construct from a UTC [`chrono::DateTime<chrono::Utc>`], returning `None` if out of range.
-    #[cfg(feature = "chrono")]
+    /// Construct from a [`jiff::Timestamp`], returning `None` if out of range.
+    #[cfg(feature = "jiff")]
     #[inline]
     #[must_use]
-    pub fn from_chrono_utc(dt: DateTime<Utc>) -> Option<Self> {
-        let unix_us = u64::try_from(dt.timestamp_micros()).ok()?;
+    pub fn from_jiff_timestamp(ts: Timestamp) -> Option<Self> {
+        let unix_us = u64::try_from(ts.as_microsecond()).ok()?;
         Self::from_unix_micros(unix_us)
     }
 
@@ -187,8 +187,9 @@ mod tests {
         let av = AttributeValue::from(t);
         assert_eq!(EpochUs::try_from(&av), Ok(t));
         assert_eq!(EpochUs::try_from(av), Ok(t));
+        assert_eq!(EpochUs::try_from(&AttributeValue::U32(1)), Ok(EpochUs::from_raw(1)));
         assert_eq!(
-            EpochUs::try_from(&AttributeValue::U32(1)),
+            EpochUs::try_from(&AttributeValue::I64(1)),
             Err(MatterStatus::InvalidDataType)
         );
 
@@ -226,14 +227,14 @@ mod tests {
         assert_eq!(EpochUs::try_from(UNIX_EPOCH), Err(MatterStatus::ConstraintError));
     }
 
-    #[cfg(feature = "chrono")]
+    #[cfg(feature = "jiff")]
     #[test]
-    fn epoch_us_chrono_round_trip() {
+    fn epoch_us_jiff_round_trip() {
         let t = EpochUs::from_raw(2_500_000);
-        let dt = DateTime::<Utc>::try_from(t).expect("valid chrono DateTime");
-        assert_eq!(EpochUs::try_from(dt), Ok(t));
+        let ts = Timestamp::try_from(t).expect("valid jiff Timestamp");
+        assert_eq!(EpochUs::try_from(ts), Ok(t));
         assert_eq!(
-            EpochUs::try_from(DateTime::<Utc>::UNIX_EPOCH),
+            EpochUs::try_from(Timestamp::UNIX_EPOCH),
             Err(MatterStatus::ConstraintError)
         );
     }

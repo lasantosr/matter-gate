@@ -38,10 +38,14 @@ pub(crate) fn with_method_name(field_name: &str) -> String {
     format!("with_{}", field_name.strip_prefix("r#").unwrap_or(field_name))
 }
 
-/// Emits Serde and Schemars `deny_unknown_fields` attributes for record structs with named fields.
 /// Renders a token stream into Rust source text.
 pub(crate) fn render(tokens: Tokens) -> Result<String> {
     tokens.to_string().map_err(|err| Error::Render(err.to_string()))
+}
+
+/// Returns `true` if `ty` is one of Rust's fixed-width integer primitive names (`u8`..`i64`).
+pub(super) fn is_primitive_int(ty: &str) -> bool {
+    matches!(ty, "u8" | "u16" | "u32" | "u64" | "i8" | "i16" | "i32" | "i64")
 }
 
 pub(super) fn format_hex(val: u64, min_digits: usize) -> String {

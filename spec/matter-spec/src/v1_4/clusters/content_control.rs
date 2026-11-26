@@ -11,14 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -871,86 +865,21 @@ crate::impl_cluster_member_variant!(
     RemainingScreenTime
 );
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::BlockUnrated, BlockUnrated);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ContentControlCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Enabled(_) => attributes::Enabled::NAME,
-            Self::OnDemandRatings(_) => attributes::OnDemandRatings::NAME,
-            Self::OnDemandRatingThreshold(_) => attributes::OnDemandRatingThreshold::NAME,
-            Self::ScheduledContentRatings(_) => attributes::ScheduledContentRatings::NAME,
-            Self::ScheduledContentRatingThreshold(_) => attributes::ScheduledContentRatingThreshold::NAME,
-            Self::ScreenDailyTime(_) => attributes::ScreenDailyTime::NAME,
-            Self::RemainingScreenTime(_) => attributes::RemainingScreenTime::NAME,
-            Self::BlockUnrated(_) => attributes::BlockUnrated::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ContentControlCluster::NAME,
-        ContentControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ContentControlCluster::NAME,
-            cluster_id: ContentControlCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Enabled(inner) => Serialize::serialize(inner, serializer),
-            Self::OnDemandRatings(inner) => Serialize::serialize(inner, serializer),
-            Self::OnDemandRatingThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::ScheduledContentRatings(inner) => Serialize::serialize(inner, serializer),
-            Self::ScheduledContentRatingThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::ScreenDailyTime(inner) => Serialize::serialize(inner, serializer),
-            Self::RemainingScreenTime(inner) => Serialize::serialize(inner, serializer),
-            Self::BlockUnrated(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((ContentControlCluster::NAME, ContentControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ContentControlCluster,
+    [
+        Enabled,
+        OnDemandRatings,
+        OnDemandRatingThreshold,
+        ScheduledContentRatings,
+        ScheduledContentRatingThreshold,
+        ScreenDailyTime,
+        RemainingScreenTime,
+        BlockUnrated,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ContentControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1237,116 +1166,19 @@ crate::impl_cluster_member_variant!(
     commands::SetScheduledContentRatingThreshold,
     SetScheduledContentRatingThreshold
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ContentControlCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::UpdatePin(_) => commands::UpdatePin::NAME,
-            Self::ResetPin => commands::ResetPin::NAME,
-            Self::Enable => commands::Enable::NAME,
-            Self::Disable => commands::Disable::NAME,
-            Self::AddBonusTime(_) => commands::AddBonusTime::NAME,
-            Self::SetScreenDailyTime(_) => commands::SetScreenDailyTime::NAME,
-            Self::BlockUnratedContent => commands::BlockUnratedContent::NAME,
-            Self::UnblockUnratedContent => commands::UnblockUnratedContent::NAME,
-            Self::SetOnDemandRatingThreshold(_) => commands::SetOnDemandRatingThreshold::NAME,
-            Self::SetScheduledContentRatingThreshold(_) => commands::SetScheduledContentRatingThreshold::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ContentControlCluster::NAME,
-        ContentControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ContentControlCluster::NAME,
-            cluster_id: ContentControlCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ResetPin | Self::Enable | Self::Disable | Self::BlockUnratedContent | Self::UnblockUnratedContent => {
-                Serialize::serialize(&(), serializer)
-            }
-            Self::UpdatePin(inner) => Serialize::serialize(inner, serializer),
-            Self::AddBonusTime(inner) => Serialize::serialize(inner, serializer),
-            Self::SetScreenDailyTime(inner) => Serialize::serialize(inner, serializer),
-            Self::SetOnDemandRatingThreshold(inner) => Serialize::serialize(inner, serializer),
-            Self::SetScheduledContentRatingThreshold(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ContentControlCluster::NAME, ContentControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((ContentControlCluster::NAME, ContentControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ContentControlCluster,
+    empty = [ResetPin, Enable, Disable, BlockUnratedContent, UnblockUnratedContent,],
+    payload = [
+        UpdatePin,
+        AddBonusTime,
+        SetScreenDailyTime,
+        SetOnDemandRatingThreshold,
+        SetScheduledContentRatingThreshold,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`ContentControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1438,104 +1270,19 @@ impl TryFrom<model::Command> for CommandResponse {
     }
 }
 
-impl From<commands::ResetPinResponse> for CommandResponse {
-    #[inline]
-    fn from(cmd: commands::ResetPinResponse) -> Self {
-        Self::ResetPinResponse(cmd)
-    }
-}
-
-impl TryFrom<CommandResponse> for commands::ResetPinResponse {
-    type Error = CommandError;
-
-    #[inline]
-    fn try_from(cmd: CommandResponse) -> Result<Self, Self::Error> {
-        match cmd {
-            CommandResponse::ResetPinResponse(inner) => Ok(inner),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ContentControlCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::ResetPinResponse(_) => commands::ResetPinResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ContentControlCluster::NAME,
-        ContentControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ContentControlCluster::NAME,
-            cluster_id: ContentControlCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ResetPinResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ContentControlCluster::NAME, ContentControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    command_single,
+    CommandResponse,
+    commands::ResetPinResponse,
+    ResetPinResponse
+);
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    ContentControlCluster,
+    empty = [],
+    payload = [ResetPinResponse,]
+);
 /// Dynamic event variant matching for [`ContentControlCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1630,104 +1377,19 @@ impl TryFrom<model::Event> for Event {
     }
 }
 
-impl From<events::RemainingScreenTimeExpired> for Event {
-    #[inline]
-    fn from(_: events::RemainingScreenTimeExpired) -> Self {
-        Self::RemainingScreenTimeExpired
-    }
-}
-
-impl TryFrom<Event> for events::RemainingScreenTimeExpired {
-    type Error = EventError;
-
-    #[inline]
-    fn try_from(ev: Event) -> Result<Self, Self::Error> {
-        match ev {
-            Event::RemainingScreenTimeExpired => Ok(Self),
-        }
-    }
-}
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ContentControlCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::RemainingScreenTimeExpired => events::RemainingScreenTimeExpired::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        ContentControlCluster::NAME,
-        ContentControlCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: ContentControlCluster::NAME,
-            cluster_id: ContentControlCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::RemainingScreenTimeExpired => Serialize::serialize(&(), serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((ContentControlCluster::NAME, ContentControlCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_member_variant!(
+    event_unit_single,
+    Event,
+    events::RemainingScreenTimeExpired,
+    RemainingScreenTimeExpired
+);
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    ContentControlCluster,
+    empty = [RemainingScreenTimeExpired,],
+    payload = []
+);
 
 crate::define_matter_semantic_bool! {
     /// Specification 2-variant semantic boolean enum for [`Enabled`].
@@ -1789,23 +1451,23 @@ impl RatingNameStruct {
                     if rating_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         rating_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if rating_name_desc.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         rating_name_desc = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -1840,30 +1502,11 @@ impl From<&str> for RatingNameStruct {
     }
 }
 
-impl From<RatingNameStruct> for AttributeValue {
-    #[inline]
-    fn from(val: RatingNameStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for RatingNameStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(RatingNameStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -1909,11 +1552,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1923,18 +1561,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Enabled, super::Enabled, super::ContentControlCluster, copy);
-
+    crate::impl_matter_attribute!(
+        Enabled,
+        super::Enabled,
+        super::ContentControlCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for Enabled {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::Enabled::from(val))
-        }
-    }
-
-    impl fmt::Display for Enabled {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -1963,12 +1601,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -1988,14 +1620,10 @@ pub mod attributes {
         OnDemandRatings,
         Vec<super::RatingNameStruct>,
         super::ContentControlCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for OnDemandRatings {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2022,11 +1650,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2039,13 +1662,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OnDemandRatingThreshold, String, super::ContentControlCluster, owned);
-
-    impl fmt::Display for OnDemandRatingThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        OnDemandRatingThreshold,
+        String,
+        super::ContentControlCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2072,12 +1696,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2097,14 +1715,10 @@ pub mod attributes {
         ScheduledContentRatings,
         Vec<super::RatingNameStruct>,
         super::ContentControlCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ScheduledContentRatings {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2131,11 +1745,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2152,14 +1761,10 @@ pub mod attributes {
         ScheduledContentRatingThreshold,
         String,
         super::ContentControlCluster,
-        owned
+        owned,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ScheduledContentRatingThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2180,11 +1785,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2194,13 +1794,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ScreenDailyTime, types::ElapsedS, super::ContentControlCluster, copy);
-
-    impl fmt::Display for ScreenDailyTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ScreenDailyTime,
+        types::ElapsedS,
+        super::ContentControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2221,11 +1822,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2235,13 +1831,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(RemainingScreenTime, types::ElapsedS, super::ContentControlCluster, copy);
-
-    impl fmt::Display for RemainingScreenTime {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        RemainingScreenTime,
+        types::ElapsedS,
+        super::ContentControlCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -2272,11 +1869,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -2286,18 +1878,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(BlockUnrated, super::BlockUnrated, super::ContentControlCluster, copy);
-
+    crate::impl_matter_attribute!(
+        BlockUnrated,
+        super::BlockUnrated,
+        super::ContentControlCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for BlockUnrated {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::BlockUnrated::from(val))
-        }
-    }
-
-    impl fmt::Display for BlockUnrated {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 }
@@ -2345,17 +1937,6 @@ pub mod commands {
         pub old_pin: Optional<String>,
     }
 
-    impl crate::traits::CommandSpec for UpdatePin {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl UpdatePin {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -2388,11 +1969,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2404,23 +1980,23 @@ pub mod commands {
                         if old_pin.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             old_pin = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if new_pin.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             new_pin = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2429,19 +2005,6 @@ pub mod commands {
                 old_pin: Optional::from(old_pin),
                 new_pin: new_pin.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -2459,7 +2022,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(UpdatePin, super::ContentControlCluster, false);
+    crate::impl_matter_command!(UpdatePin, super::ContentControlCluster, (), false);
 
     /// The purpose of this command is to reset the PIN. If this command is executed successfully, a ResetPINResponse
     /// command with a new PIN SHALL be returned.
@@ -2468,62 +2031,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ResetPin;
 
-    impl crate::traits::CommandSpec for ResetPin {
-        type Response = ResetPinResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ResetPin {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ResetPin";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ResetPin, super::ContentControlCluster, true);
+    crate::impl_matter_command!(ResetPin, super::ContentControlCluster, ResetPinResponse, true);
 
     /// This command SHALL be generated in response to a ResetPIN command. The data for this command SHALL be as
     /// follows:
@@ -2537,17 +2052,6 @@ pub mod commands {
     )]
     pub struct ResetPinResponse {
         pub pin_code: String,
-    }
-
-    impl crate::traits::CommandSpec for ResetPinResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl ResetPinResponse {
@@ -2567,11 +2071,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_PIN_CODE, AttributeValue::from(self.pin_code)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2597,19 +2096,6 @@ pub mod commands {
                 pin_code: pin_code.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<String> for ResetPinResponse {
@@ -2626,7 +2112,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(ResetPinResponse, super::ContentControlCluster, false);
+    crate::impl_matter_command!(ResetPinResponse, super::ContentControlCluster, (), false);
 
     /// The purpose of this command is to turn on the Content Control feature on a media device. On receipt of the
     /// Enable command, the media device SHALL set the Enabled attribute to TRUE.
@@ -2635,62 +2121,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Enable;
 
-    impl crate::traits::CommandSpec for Enable {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Enable {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x03);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Enable";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Enable, super::ContentControlCluster, true);
+    crate::impl_matter_command!(Enable, super::ContentControlCluster, (), true);
 
     /// The purpose of this command is to turn off the Content Control feature on a media device. On receipt of the
     /// Disable command, the media device SHALL set the Enabled attribute to FALSE.
@@ -2699,62 +2137,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Disable;
 
-    impl crate::traits::CommandSpec for Disable {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Disable {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x04);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Disable";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Disable, super::ContentControlCluster, true);
+    crate::impl_matter_command!(Disable, super::ContentControlCluster, (), true);
 
     /// The purpose of this command is to add the extra screen time for the user. If a client with Operate privilege
     /// invokes this command, the media device SHALL check whether the PINCode passed in the command matches the current
@@ -2780,17 +2170,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub bonus_time: Optional<types::ElapsedS>,
-    }
-
-    impl crate::traits::CommandSpec for AddBonusTime {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AddBonusTime {
@@ -2834,11 +2213,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -2850,23 +2224,23 @@ pub mod commands {
                         if pin_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             pin_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if bonus_time.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <types::ElapsedS>::try_from(fval)?;
                             bonus_time = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -2876,22 +2250,9 @@ pub mod commands {
                 bonus_time: Optional::from(bonus_time),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AddBonusTime, super::ContentControlCluster, false);
+    crate::impl_matter_command!(AddBonusTime, super::ContentControlCluster, (), false);
 
     /// The purpose of this command is to set the ScreenDailyTime attribute. On receipt of the SetScreenDailyTime
     /// command, the media device SHALL set the ScreenDailyTime attribute to the ScreenTime value.
@@ -2905,17 +2266,6 @@ pub mod commands {
     )]
     pub struct SetScreenDailyTime {
         pub screen_time: types::ElapsedS,
-    }
-
-    impl crate::traits::CommandSpec for SetScreenDailyTime {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetScreenDailyTime {
@@ -2935,11 +2285,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_SCREEN_TIME, AttributeValue::from(self.screen_time)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -2965,19 +2310,6 @@ pub mod commands {
                 screen_time: screen_time.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<types::ElapsedS> for SetScreenDailyTime {
@@ -2987,7 +2319,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetScreenDailyTime, super::ContentControlCluster, false);
+    crate::impl_matter_command!(SetScreenDailyTime, super::ContentControlCluster, (), false);
 
     /// The purpose of this command is to specify whether programs with no Content rating must be blocked by this media
     /// device. On receipt of the BlockUnratedContent command, the media device SHALL set the BlockUnrated attribute to
@@ -2997,62 +2329,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct BlockUnratedContent;
 
-    impl crate::traits::CommandSpec for BlockUnratedContent {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl BlockUnratedContent {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x07);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "BlockUnratedContent";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(BlockUnratedContent, super::ContentControlCluster, true);
+    crate::impl_matter_command!(BlockUnratedContent, super::ContentControlCluster, (), true);
 
     /// The purpose of this command is to specify whether programs with no Content rating must be blocked by this media
     /// device. On receipt of the UnblockUnratedContent command, the media device SHALL set the BlockUnrated attribute
@@ -3062,62 +2346,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct UnblockUnratedContent;
 
-    impl crate::traits::CommandSpec for UnblockUnratedContent {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl UnblockUnratedContent {
         pub const CLUSTER_ID: ClusterId = super::ContentControlCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x08);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "UnblockUnratedContent";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(UnblockUnratedContent, super::ContentControlCluster, true);
+    crate::impl_matter_command!(UnblockUnratedContent, super::ContentControlCluster, (), true);
 
     /// The purpose of this command is to set the OnDemandRatingThreshold attribute. On receipt of the
     /// SetOnDemandRatingThreshold command, the media device SHALL check if the Rating field is one of values present in
@@ -3132,17 +2368,6 @@ pub mod commands {
     )]
     pub struct SetOnDemandRatingThreshold {
         pub rating: String,
-    }
-
-    impl crate::traits::CommandSpec for SetOnDemandRatingThreshold {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetOnDemandRatingThreshold {
@@ -3162,11 +2387,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_RATING, AttributeValue::from(self.rating)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3190,19 +2410,6 @@ pub mod commands {
                 rating: rating.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<String> for SetOnDemandRatingThreshold {
@@ -3219,7 +2426,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetOnDemandRatingThreshold, super::ContentControlCluster, false);
+    crate::impl_matter_command!(SetOnDemandRatingThreshold, super::ContentControlCluster, (), false);
 
     /// The purpose of this command is to set ScheduledContentRatingThreshold attribute. On receipt of the
     /// SetScheduledContentRatingThreshold command, the media device SHALL check if the Rating field is one of values
@@ -3235,17 +2442,6 @@ pub mod commands {
     )]
     pub struct SetScheduledContentRatingThreshold {
         pub rating: String,
-    }
-
-    impl crate::traits::CommandSpec for SetScheduledContentRatingThreshold {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ContentControlCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetScheduledContentRatingThreshold {
@@ -3265,11 +2461,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_RATING, AttributeValue::from(self.rating)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -3293,19 +2484,6 @@ pub mod commands {
                 rating: rating.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<String> for SetScheduledContentRatingThreshold {
@@ -3322,7 +2500,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetScheduledContentRatingThreshold, super::ContentControlCluster, false);
+    crate::impl_matter_command!(
+        SetScheduledContentRatingThreshold,
+        super::ContentControlCluster,
+        (),
+        false
+    );
 }
 
 pub mod events {
@@ -3354,43 +2537,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x00);
         pub const NAME: &'static str = "RemainingScreenTimeExpired";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(RemainingScreenTimeExpired, super::ContentControlCluster, true);

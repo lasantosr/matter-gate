@@ -13,12 +13,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -1755,108 +1751,32 @@ crate::impl_cluster_member_variant!(
     attributes::DefaultRandomizationType,
     DefaultRandomizationType
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CommodityTariffCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::TariffInfo(_) => attributes::TariffInfo::NAME,
-            Self::TariffUnit(_) => attributes::TariffUnit::NAME,
-            Self::StartDate(_) => attributes::StartDate::NAME,
-            Self::DayEntries(_) => attributes::DayEntries::NAME,
-            Self::DayPatterns(_) => attributes::DayPatterns::NAME,
-            Self::CalendarPeriods(_) => attributes::CalendarPeriods::NAME,
-            Self::IndividualDays(_) => attributes::IndividualDays::NAME,
-            Self::CurrentDay(_) => attributes::CurrentDay::NAME,
-            Self::NextDay(_) => attributes::NextDay::NAME,
-            Self::CurrentDayEntry(_) => attributes::CurrentDayEntry::NAME,
-            Self::CurrentDayEntryDate(_) => attributes::CurrentDayEntryDate::NAME,
-            Self::NextDayEntry(_) => attributes::NextDayEntry::NAME,
-            Self::NextDayEntryDate(_) => attributes::NextDayEntryDate::NAME,
-            Self::TariffComponents(_) => attributes::TariffComponents::NAME,
-            Self::TariffPeriods(_) => attributes::TariffPeriods::NAME,
-            Self::CurrentTariffComponents(_) => attributes::CurrentTariffComponents::NAME,
-            Self::NextTariffComponents(_) => attributes::NextTariffComponents::NAME,
-            Self::DefaultRandomizationOffset(_) => attributes::DefaultRandomizationOffset::NAME,
-            Self::DefaultRandomizationType(_) => attributes::DefaultRandomizationType::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        CommodityTariffCluster::NAME,
-        CommodityTariffCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: CommodityTariffCluster::NAME,
-            cluster_id: CommodityTariffCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::TariffInfo(inner) => Serialize::serialize(inner, serializer),
-            Self::TariffUnit(inner) => Serialize::serialize(inner, serializer),
-            Self::StartDate(inner) => Serialize::serialize(inner, serializer),
-            Self::DayEntries(inner) => Serialize::serialize(inner, serializer),
-            Self::DayPatterns(inner) => Serialize::serialize(inner, serializer),
-            Self::CalendarPeriods(inner) => Serialize::serialize(inner, serializer),
-            Self::IndividualDays(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentDay(inner) => Serialize::serialize(inner, serializer),
-            Self::NextDay(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentDayEntry(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentDayEntryDate(inner) => Serialize::serialize(inner, serializer),
-            Self::NextDayEntry(inner) => Serialize::serialize(inner, serializer),
-            Self::NextDayEntryDate(inner) => Serialize::serialize(inner, serializer),
-            Self::TariffComponents(inner) => Serialize::serialize(inner, serializer),
-            Self::TariffPeriods(inner) => Serialize::serialize(inner, serializer),
-            Self::CurrentTariffComponents(inner) => Serialize::serialize(inner, serializer),
-            Self::NextTariffComponents(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultRandomizationOffset(inner) => Serialize::serialize(inner, serializer),
-            Self::DefaultRandomizationType(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((CommodityTariffCluster::NAME, CommodityTariffCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    CommodityTariffCluster,
+    [
+        TariffInfo,
+        TariffUnit,
+        StartDate,
+        DayEntries,
+        DayPatterns,
+        CalendarPeriods,
+        IndividualDays,
+        CurrentDay,
+        NextDay,
+        CurrentDayEntry,
+        CurrentDayEntryDate,
+        NextDayEntry,
+        NextDayEntryDate,
+        TariffComponents,
+        TariffPeriods,
+        CurrentTariffComponents,
+        NextTariffComponents,
+        DefaultRandomizationOffset,
+        DefaultRandomizationType,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`CommodityTariffCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -1972,102 +1892,13 @@ impl TryFrom<model::Command> for Command {
 
 crate::impl_cluster_member_variant!(command, Command, commands::GetTariffComponent, GetTariffComponent);
 crate::impl_cluster_member_variant!(command, Command, commands::GetDayEntry, GetDayEntry);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CommodityTariffCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::GetTariffComponent(_) => commands::GetTariffComponent::NAME,
-            Self::GetDayEntry(_) => commands::GetDayEntry::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        CommodityTariffCluster::NAME,
-        CommodityTariffCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: CommodityTariffCluster::NAME,
-            cluster_id: CommodityTariffCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::GetTariffComponent(inner) => Serialize::serialize(inner, serializer),
-            Self::GetDayEntry(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((CommodityTariffCluster::NAME, CommodityTariffCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((CommodityTariffCluster::NAME, CommodityTariffCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    CommodityTariffCluster,
+    empty = [],
+    payload = [GetTariffComponent, GetDayEntry,]
+);
 /// Dynamic server-to-client command response variant matching for [`CommodityTariffCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2195,89 +2026,13 @@ crate::impl_cluster_member_variant!(
     commands::GetDayEntryResponse,
     GetDayEntryResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        CommodityTariffCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::GetTariffComponentResponse(_) => commands::GetTariffComponentResponse::NAME,
-            Self::GetDayEntryResponse(_) => commands::GetDayEntryResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        CommodityTariffCluster::NAME,
-        CommodityTariffCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: CommodityTariffCluster::NAME,
-            cluster_id: CommodityTariffCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::GetTariffComponentResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::GetDayEntryResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((CommodityTariffCluster::NAME, CommodityTariffCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    CommodityTariffCluster,
+    empty = [],
+    payload = [GetTariffComponentResponse, GetDayEntryResponse,]
+);
 
 crate::define_matter_bitmap! {
     /// DayPatternDayOfWeekBitmap bitmap.
@@ -2402,23 +2157,23 @@ impl AuxiliaryLoadSwitchSettingsStruct {
                     if number.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         number = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if required_state.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <AuxiliaryLoadSettingEnum>::try_from(fval)?;
                         required_state = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2437,24 +2192,7 @@ impl AuxiliaryLoadSwitchSettingsStruct {
     }
 }
 
-impl From<AuxiliaryLoadSwitchSettingsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: AuxiliaryLoadSwitchSettingsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for AuxiliaryLoadSwitchSettingsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(AuxiliaryLoadSwitchSettingsStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2492,29 +2230,29 @@ impl CalendarPeriodStruct {
                     if start_date.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::EpochS>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.raw() > 0xFFFF_FFFE_u32))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         start_date = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if day_pattern_i_ds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         (decoded.len() <= 7)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         day_pattern_i_ds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2542,24 +2280,7 @@ impl CalendarPeriodStruct {
     }
 }
 
-impl From<CalendarPeriodStruct> for AttributeValue {
-    #[inline]
-    fn from(val: CalendarPeriodStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for CalendarPeriodStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(CalendarPeriodStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2633,60 +2354,60 @@ impl DayEntryStruct {
                     if day_entry_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         day_entry_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if start_time.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 1499_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         start_time = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if duration.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         duration = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if randomization_offset.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                         randomization_offset = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if randomization_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DayEntryRandomizationTypeEnum>::try_from(fval)?;
                         randomization_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2717,24 +2438,7 @@ impl DayEntryStruct {
     }
 }
 
-impl From<DayEntryStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DayEntryStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DayEntryStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DayEntryStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2780,37 +2484,37 @@ impl DayPatternStruct {
                     if day_pattern_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         day_pattern_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if days_of_week.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DayPatternDayOfWeekBitmap>::try_from(fval)?;
                         days_of_week = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if day_entry_i_ds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         (decoded.len() <= 96)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         day_entry_i_ds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2834,24 +2538,7 @@ impl DayPatternStruct {
     }
 }
 
-impl From<DayPatternStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DayPatternStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DayPatternStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DayPatternStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -2897,37 +2584,37 @@ impl DayStruct {
                     if date.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::EpochS>::try_from(fval)?;
                         date = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if day_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <DayTypeEnum>::try_from(fval)?;
                         day_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if day_entry_i_ds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         (decoded.len() <= 96)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         day_entry_i_ds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -2951,24 +2638,7 @@ impl DayStruct {
     }
 }
 
-impl From<DayStruct> for AttributeValue {
-    #[inline]
-    fn from(val: DayStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DayStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DayStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3006,24 +2676,24 @@ impl PeakPeriodStruct {
                     if severity.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <PeakPeriodSeverityEnum>::try_from(fval)?;
                         severity = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if peak_period.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded >= 1_u16).then_some(()).ok_or(MatterStatus::ConstraintError)?;
                         peak_period = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3042,24 +2712,7 @@ impl PeakPeriodStruct {
     }
 }
 
-impl From<PeakPeriodStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PeakPeriodStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PeakPeriodStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PeakPeriodStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3195,103 +2848,104 @@ impl TariffComponentStruct {
                     if tariff_component_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         tariff_component_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if price.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <TariffPriceStruct>::try_from)?;
                         price = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if friendly_credit.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         friendly_credit = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if auxiliary_load.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <AuxiliaryLoadSwitchSettingsStruct>::try_from(fval)?;
                         auxiliary_load = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if peak_period.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <PeakPeriodStruct>::try_from(fval)?;
                         peak_period = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if power_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::PowerThresholdStruct>::try_from(fval)?;
                         power_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if label.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 128))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         label = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if predicted.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         predicted = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3362,24 +3016,7 @@ impl TariffComponentStruct {
     }
 }
 
-impl From<TariffComponentStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TariffComponentStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TariffComponentStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TariffComponentStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3444,51 +3081,51 @@ impl TariffInformationStruct {
                     if tariff_label.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 128))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         tariff_label = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if provider_name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 128))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         provider_name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if currency.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <globals::CurrencyStruct>::try_from)?;
                         currency = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if block_mode.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <BlockModeEnum>::try_from)?;
                         block_mode = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3541,24 +3178,7 @@ impl TariffInformationStruct {
     }
 }
 
-impl From<TariffInformationStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TariffInformationStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TariffInformationStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TariffInformationStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3604,43 +3224,43 @@ impl TariffPeriodStruct {
                     if label.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 128))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         label = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if day_entry_i_ds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         (decoded.len() <= 20)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         day_entry_i_ds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if tariff_component_i_ds.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         (decoded.len() <= 20)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         tariff_component_i_ds = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3679,24 +3299,7 @@ impl TariffPeriodStruct {
     }
 }
 
-impl From<TariffPeriodStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TariffPeriodStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TariffPeriodStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TariffPeriodStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -3754,34 +3357,34 @@ impl TariffPriceStruct {
                     if price_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::TariffPriceTypeEnum>::try_from(fval)?;
                         price_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if price.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         price = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if price_level.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i16>(&fval)?;
                         price_level = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -3813,30 +3416,11 @@ impl From<globals::TariffPriceTypeEnum> for TariffPriceStruct {
     }
 }
 
-impl From<TariffPriceStruct> for AttributeValue {
-    #[inline]
-    fn from(val: TariffPriceStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TariffPriceStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TariffPriceStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -3902,14 +3486,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -3920,33 +3496,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TariffInfo,
-        Nullable<super::TariffInformationStruct>,
+        super::TariffInformationStruct,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::TariffInformationStruct> for TariffInfo {
-        #[inline]
-        fn from(val: super::TariffInformationStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::TariffInformationStruct>> for TariffInfo {
-        #[inline]
-        fn from(val: Option<super::TariffInformationStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TariffInfo {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -3997,14 +3554,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4015,33 +3564,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TariffUnit,
-        Nullable<super::globals::TariffUnitEnum>,
+        super::globals::TariffUnitEnum,
         super::CommodityTariffCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::globals::TariffUnitEnum> for TariffUnit {
-        #[inline]
-        fn from(val: super::globals::TariffUnitEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::globals::TariffUnitEnum>> for TariffUnit {
-        #[inline]
-        fn from(val: Option<super::globals::TariffUnitEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TariffUnit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4095,14 +3625,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4112,29 +3634,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StartDate, Nullable<types::EpochS>, super::CommodityTariffCluster, copy);
-    impl From<types::EpochS> for StartDate {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for StartDate {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for StartDate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        StartDate,
+        types::EpochS,
+        super::CommodityTariffCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4185,17 +3693,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4212,33 +3709,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DayEntries,
-        Nullable<Vec<super::DayEntryStruct>>,
+        Vec<super::DayEntryStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::DayEntryStruct>> for DayEntries {
-        #[inline]
-        fn from(val: Vec<super::DayEntryStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::DayEntryStruct>>> for DayEntries {
-        #[inline]
-        fn from(val: Option<Vec<super::DayEntryStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DayEntries {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4289,17 +3767,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4316,33 +3783,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DayPatterns,
-        Nullable<Vec<super::DayPatternStruct>>,
+        Vec<super::DayPatternStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::DayPatternStruct>> for DayPatterns {
-        #[inline]
-        fn from(val: Vec<super::DayPatternStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::DayPatternStruct>>> for DayPatterns {
-        #[inline]
-        fn from(val: Option<Vec<super::DayPatternStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DayPatterns {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4393,17 +3841,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4423,33 +3860,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CalendarPeriods,
-        Nullable<Vec<super::CalendarPeriodStruct>>,
+        Vec<super::CalendarPeriodStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::CalendarPeriodStruct>> for CalendarPeriods {
-        #[inline]
-        fn from(val: Vec<super::CalendarPeriodStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::CalendarPeriodStruct>>> for CalendarPeriods {
-        #[inline]
-        fn from(val: Option<Vec<super::CalendarPeriodStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CalendarPeriods {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4500,17 +3918,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4530,33 +3937,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         IndividualDays,
-        Nullable<Vec<super::DayStruct>>,
+        Vec<super::DayStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::DayStruct>> for IndividualDays {
-        #[inline]
-        fn from(val: Vec<super::DayStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::DayStruct>>> for IndividualDays {
-        #[inline]
-        fn from(val: Option<Vec<super::DayStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for IndividualDays {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4607,14 +3995,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4625,33 +4005,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentDay,
-        Nullable<super::DayStruct>,
+        super::DayStruct,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::DayStruct> for CurrentDay {
-        #[inline]
-        fn from(val: super::DayStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::DayStruct>> for CurrentDay {
-        #[inline]
-        fn from(val: Option<super::DayStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentDay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4702,14 +4063,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4720,33 +4073,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextDay,
-        Nullable<super::DayStruct>,
+        super::DayStruct,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::DayStruct> for NextDay {
-        #[inline]
-        fn from(val: super::DayStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::DayStruct>> for NextDay {
-        #[inline]
-        fn from(val: Option<super::DayStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextDay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4797,14 +4131,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4815,33 +4141,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentDayEntry,
-        Nullable<super::DayEntryStruct>,
+        super::DayEntryStruct,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::DayEntryStruct> for CurrentDayEntry {
-        #[inline]
-        fn from(val: super::DayEntryStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::DayEntryStruct>> for CurrentDayEntry {
-        #[inline]
-        fn from(val: Option<super::DayEntryStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentDayEntry {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4895,14 +4202,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -4913,33 +4212,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentDayEntryDate,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::CommodityTariffCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for CurrentDayEntryDate {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for CurrentDayEntryDate {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentDayEntryDate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -4990,14 +4270,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5008,33 +4280,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextDayEntry,
-        Nullable<super::DayEntryStruct>,
+        super::DayEntryStruct,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::DayEntryStruct> for NextDayEntry {
-        #[inline]
-        fn from(val: super::DayEntryStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::DayEntryStruct>> for NextDayEntry {
-        #[inline]
-        fn from(val: Option<super::DayEntryStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextDayEntry {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5088,14 +4341,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5106,33 +4351,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextDayEntryDate,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::CommodityTariffCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for NextDayEntryDate {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for NextDayEntryDate {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextDayEntryDate {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5183,17 +4409,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5210,33 +4425,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TariffComponents,
-        Nullable<Vec<super::TariffComponentStruct>>,
+        Vec<super::TariffComponentStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::TariffComponentStruct>> for TariffComponents {
-        #[inline]
-        fn from(val: Vec<super::TariffComponentStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::TariffComponentStruct>>> for TariffComponents {
-        #[inline]
-        fn from(val: Option<Vec<super::TariffComponentStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TariffComponents {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5287,17 +4483,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5314,33 +4499,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TariffPeriods,
-        Nullable<Vec<super::TariffPeriodStruct>>,
+        Vec<super::TariffPeriodStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::TariffPeriodStruct>> for TariffPeriods {
-        #[inline]
-        fn from(val: Vec<super::TariffPeriodStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::TariffPeriodStruct>>> for TariffPeriods {
-        #[inline]
-        fn from(val: Option<Vec<super::TariffPeriodStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TariffPeriods {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5391,17 +4557,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5418,33 +4573,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         CurrentTariffComponents,
-        Nullable<Vec<super::TariffComponentStruct>>,
+        Vec<super::TariffComponentStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::TariffComponentStruct>> for CurrentTariffComponents {
-        #[inline]
-        fn from(val: Vec<super::TariffComponentStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::TariffComponentStruct>>> for CurrentTariffComponents {
-        #[inline]
-        fn from(val: Option<Vec<super::TariffComponentStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for CurrentTariffComponents {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5495,17 +4631,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(list) => {
-                    let items = list.into_iter().map(AttributeValue::from).collect();
-                    AttributeValue::List(items)
-                }
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5522,33 +4647,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NextTariffComponents,
-        Nullable<Vec<super::TariffComponentStruct>>,
+        Vec<super::TariffComponentStruct>,
         super::CommodityTariffCluster,
-        owned
+        owned,
+        list,
+        list
     );
-    impl From<Vec<super::TariffComponentStruct>> for NextTariffComponents {
-        #[inline]
-        fn from(val: Vec<super::TariffComponentStruct>) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<Vec<super::TariffComponentStruct>>> for NextTariffComponents {
-        #[inline]
-        fn from(val: Option<Vec<super::TariffComponentStruct>>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NextTariffComponents {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(list) => write!(f, "<list of {} items>", list.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5599,51 +4705,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DefaultRandomizationOffset,
-        Nullable<i16>,
+        i16,
         super::CommodityTariffCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for DefaultRandomizationOffset {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for DefaultRandomizationOffset {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DefaultRandomizationOffset {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -5694,14 +4773,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -5712,33 +4783,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         DefaultRandomizationType,
-        Nullable<super::DayEntryRandomizationTypeEnum>,
+        super::DayEntryRandomizationTypeEnum,
         super::CommodityTariffCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::DayEntryRandomizationTypeEnum> for DefaultRandomizationType {
-        #[inline]
-        fn from(val: super::DayEntryRandomizationTypeEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::DayEntryRandomizationTypeEnum>> for DefaultRandomizationType {
-        #[inline]
-        fn from(val: Option<super::DayEntryRandomizationTypeEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for DefaultRandomizationType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod commands {
@@ -5773,17 +4825,6 @@ pub mod commands {
         pub tariff_component_id: u32,
     }
 
-    impl crate::traits::CommandSpec for GetTariffComponent {
-        type Response = GetTariffComponentResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CommodityTariffCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl GetTariffComponent {
         pub const CLUSTER_ID: ClusterId = super::CommodityTariffCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -5806,11 +4847,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5821,7 +4857,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         tariff_component_id = Some(decoded);
                         Ok(())
                     })()
@@ -5835,19 +4871,6 @@ pub mod commands {
                     .ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u32> for GetTariffComponent {
@@ -5857,7 +4880,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GetTariffComponent, super::CommodityTariffCluster, false);
+    crate::impl_matter_command!(
+        GetTariffComponent,
+        super::CommodityTariffCluster,
+        GetTariffComponentResponse,
+        false
+    );
 
     /// The GetTariffComponentResponse command is sent in response to a GetTariffComponent command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -5872,17 +4900,6 @@ pub mod commands {
         pub label: Nullable<String>,
         pub day_entry_i_ds: Vec<u32>,
         pub tariff_component: super::TariffComponentStruct,
-    }
-
-    impl crate::traits::CommandSpec for GetTariffComponentResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CommodityTariffCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetTariffComponentResponse {
@@ -5928,11 +4945,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -5945,37 +4957,38 @@ pub mod commands {
                         if label.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                             (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 128))
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             label = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if day_entry_i_ds.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                             day_entry_i_ds = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if tariff_component.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::TariffComponentStruct>::try_from(fval)?;
                             tariff_component = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -5986,22 +4999,9 @@ pub mod commands {
                 tariff_component: tariff_component.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GetTariffComponentResponse, super::CommodityTariffCluster, false);
+    crate::impl_matter_command!(GetTariffComponentResponse, super::CommodityTariffCluster, (), false);
 
     /// The GetDayEntry command allows a client to request information for a calendar day entry identifier that may no
     /// longer be available in the CalendarPeriods or IndividualDays attributes.
@@ -6015,17 +5015,6 @@ pub mod commands {
     )]
     pub struct GetDayEntry {
         pub day_entry_id: u32,
-    }
-
-    impl crate::traits::CommandSpec for GetDayEntry {
-        type Response = GetDayEntryResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CommodityTariffCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetDayEntry {
@@ -6047,11 +5036,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_DAY_ENTRY_ID, AttributeValue::from(self.day_entry_id)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -6062,7 +5046,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u32>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u32>(&fval)?;
                         day_entry_id = Some(decoded);
                         Ok(())
                     })()
@@ -6075,19 +5059,6 @@ pub mod commands {
                 day_entry_id: day_entry_id.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u32> for GetDayEntry {
@@ -6097,7 +5068,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GetDayEntry, super::CommodityTariffCluster, false);
+    crate::impl_matter_command!(GetDayEntry, super::CommodityTariffCluster, GetDayEntryResponse, false);
 
     /// The GetDayEntryResponse command is sent in response to a GetDayEntry command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -6110,17 +5081,6 @@ pub mod commands {
     )]
     pub struct GetDayEntryResponse {
         pub day_entry: super::DayEntryStruct,
-    }
-
-    impl crate::traits::CommandSpec for GetDayEntryResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::CommodityTariffCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetDayEntryResponse {
@@ -6140,11 +5100,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_DAY_ENTRY, AttributeValue::from(self.day_entry)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -6170,19 +5125,6 @@ pub mod commands {
                 day_entry: day_entry.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::DayEntryStruct> for GetDayEntryResponse {
@@ -6192,5 +5134,5 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(GetDayEntryResponse, super::CommodityTariffCluster, false);
+    crate::impl_matter_command!(GetDayEntryResponse, super::CommodityTariffCluster, (), false);
 }

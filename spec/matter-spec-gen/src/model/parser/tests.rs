@@ -219,6 +219,14 @@ fn device_type_include_resolution_and_legacy_ignores() {
         resolve_include_target("DEVICE_TYPE_LIST", &candidates, to_shouty_snake_case),
         Some("DeviceTypeList")
     );
-    assert!(is_legacy_device_include_ignored("Scenes"));
-    assert!(!is_legacy_device_include_ignored("UnknownAttr"));
+    assert!(is_legacy_device_include_ignored("1.0", "Scenes"));
+    assert!(is_legacy_device_include_ignored(
+        "1.6",
+        "COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN"
+    ));
+    assert!(!is_legacy_device_include_ignored(
+        "1.5",
+        "COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN"
+    ));
+    assert!(!is_legacy_device_include_ignored("1.6", "UnknownAttr"));
 }

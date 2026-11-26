@@ -12,12 +12,8 @@ use serde::{Deserialize, Serialize};
 
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use super::super::globals;
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -5009,190 +5005,73 @@ crate::impl_cluster_member_variant!(
     attributes::SetpointHoldExpiryTimestamp,
     SetpointHoldExpiryTimestamp
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThermostatCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::LocalTemperature(_) => attributes::LocalTemperature::NAME,
-            Self::OutdoorTemperature(_) => attributes::OutdoorTemperature::NAME,
-            Self::Occupancy(_) => attributes::Occupancy::NAME,
-            Self::AbsMinHeatSetpointLimit(_) => attributes::AbsMinHeatSetpointLimit::NAME,
-            Self::AbsMaxHeatSetpointLimit(_) => attributes::AbsMaxHeatSetpointLimit::NAME,
-            Self::AbsMinCoolSetpointLimit(_) => attributes::AbsMinCoolSetpointLimit::NAME,
-            Self::AbsMaxCoolSetpointLimit(_) => attributes::AbsMaxCoolSetpointLimit::NAME,
-            Self::PiCoolingDemand(_) => attributes::PiCoolingDemand::NAME,
-            Self::PiHeatingDemand(_) => attributes::PiHeatingDemand::NAME,
-            Self::HvacSystemTypeConfiguration(_) => attributes::HvacSystemTypeConfiguration::NAME,
-            Self::LocalTemperatureCalibration(_) => attributes::LocalTemperatureCalibration::NAME,
-            Self::OccupiedCoolingSetpoint(_) => attributes::OccupiedCoolingSetpoint::NAME,
-            Self::OccupiedHeatingSetpoint(_) => attributes::OccupiedHeatingSetpoint::NAME,
-            Self::UnoccupiedCoolingSetpoint(_) => attributes::UnoccupiedCoolingSetpoint::NAME,
-            Self::UnoccupiedHeatingSetpoint(_) => attributes::UnoccupiedHeatingSetpoint::NAME,
-            Self::MinHeatSetpointLimit(_) => attributes::MinHeatSetpointLimit::NAME,
-            Self::MaxHeatSetpointLimit(_) => attributes::MaxHeatSetpointLimit::NAME,
-            Self::MinCoolSetpointLimit(_) => attributes::MinCoolSetpointLimit::NAME,
-            Self::MaxCoolSetpointLimit(_) => attributes::MaxCoolSetpointLimit::NAME,
-            Self::MinSetpointDeadBand(_) => attributes::MinSetpointDeadBand::NAME,
-            Self::RemoteSensing(_) => attributes::RemoteSensing::NAME,
-            Self::ControlSequenceOfOperation(_) => attributes::ControlSequenceOfOperation::NAME,
-            Self::SystemMode(_) => attributes::SystemMode::NAME,
-            Self::ThermostatRunningMode(_) => attributes::ThermostatRunningMode::NAME,
-            Self::StartOfWeek(_) => attributes::StartOfWeek::NAME,
-            Self::NumberOfWeeklyTransitions(_) => attributes::NumberOfWeeklyTransitions::NAME,
-            Self::NumberOfDailyTransitions(_) => attributes::NumberOfDailyTransitions::NAME,
-            Self::TemperatureSetpointHold(_) => attributes::TemperatureSetpointHold::NAME,
-            Self::TemperatureSetpointHoldDuration(_) => attributes::TemperatureSetpointHoldDuration::NAME,
-            Self::ThermostatProgrammingOperationMode(_) => attributes::ThermostatProgrammingOperationMode::NAME,
-            Self::ThermostatRunningState(_) => attributes::ThermostatRunningState::NAME,
-            Self::SetpointChangeSource(_) => attributes::SetpointChangeSource::NAME,
-            Self::SetpointChangeAmount(_) => attributes::SetpointChangeAmount::NAME,
-            Self::SetpointChangeSourceTimestamp(_) => attributes::SetpointChangeSourceTimestamp::NAME,
-            Self::OccupiedSetback(_) => attributes::OccupiedSetback::NAME,
-            Self::OccupiedSetbackMin(_) => attributes::OccupiedSetbackMin::NAME,
-            Self::OccupiedSetbackMax(_) => attributes::OccupiedSetbackMax::NAME,
-            Self::UnoccupiedSetback(_) => attributes::UnoccupiedSetback::NAME,
-            Self::UnoccupiedSetbackMin(_) => attributes::UnoccupiedSetbackMin::NAME,
-            Self::UnoccupiedSetbackMax(_) => attributes::UnoccupiedSetbackMax::NAME,
-            Self::EmergencyHeatDelta(_) => attributes::EmergencyHeatDelta::NAME,
-            Self::AcType(_) => attributes::AcType::NAME,
-            Self::AcCapacity(_) => attributes::AcCapacity::NAME,
-            Self::AcRefrigerantType(_) => attributes::AcRefrigerantType::NAME,
-            Self::AcCompressorType(_) => attributes::AcCompressorType::NAME,
-            Self::AcErrorCode(_) => attributes::AcErrorCode::NAME,
-            Self::AcLouverPosition(_) => attributes::AcLouverPosition::NAME,
-            Self::AcCoilTemperature(_) => attributes::AcCoilTemperature::NAME,
-            Self::AcCapacityformat(_) => attributes::AcCapacityformat::NAME,
-            Self::PresetTypes(_) => attributes::PresetTypes::NAME,
-            Self::ScheduleTypes(_) => attributes::ScheduleTypes::NAME,
-            Self::NumberOfPresets(_) => attributes::NumberOfPresets::NAME,
-            Self::NumberOfSchedules(_) => attributes::NumberOfSchedules::NAME,
-            Self::NumberOfScheduleTransitions(_) => attributes::NumberOfScheduleTransitions::NAME,
-            Self::NumberOfScheduleTransitionPerDay(_) => attributes::NumberOfScheduleTransitionPerDay::NAME,
-            Self::ActivePresetHandle(_) => attributes::ActivePresetHandle::NAME,
-            Self::ActiveScheduleHandle(_) => attributes::ActiveScheduleHandle::NAME,
-            Self::Presets(_) => attributes::Presets::NAME,
-            Self::Schedules(_) => attributes::Schedules::NAME,
-            Self::SetpointHoldExpiryTimestamp(_) => attributes::SetpointHoldExpiryTimestamp::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        ThermostatCluster::NAME,
-        ThermostatCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: ThermostatCluster::NAME,
-            cluster_id: ThermostatCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::LocalTemperature(inner) => Serialize::serialize(inner, serializer),
-            Self::OutdoorTemperature(inner) => Serialize::serialize(inner, serializer),
-            Self::Occupancy(inner) => Serialize::serialize(inner, serializer),
-            Self::AbsMinHeatSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::AbsMaxHeatSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::AbsMinCoolSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::AbsMaxCoolSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::PiCoolingDemand(inner) => Serialize::serialize(inner, serializer),
-            Self::PiHeatingDemand(inner) => Serialize::serialize(inner, serializer),
-            Self::HvacSystemTypeConfiguration(inner) => Serialize::serialize(inner, serializer),
-            Self::LocalTemperatureCalibration(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupiedCoolingSetpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupiedHeatingSetpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::UnoccupiedCoolingSetpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::UnoccupiedHeatingSetpoint(inner) => Serialize::serialize(inner, serializer),
-            Self::MinHeatSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxHeatSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::MinCoolSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::MaxCoolSetpointLimit(inner) => Serialize::serialize(inner, serializer),
-            Self::MinSetpointDeadBand(inner) => Serialize::serialize(inner, serializer),
-            Self::RemoteSensing(inner) => Serialize::serialize(inner, serializer),
-            Self::ControlSequenceOfOperation(inner) => Serialize::serialize(inner, serializer),
-            Self::SystemMode(inner) => Serialize::serialize(inner, serializer),
-            Self::ThermostatRunningMode(inner) => Serialize::serialize(inner, serializer),
-            Self::StartOfWeek(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfWeeklyTransitions(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfDailyTransitions(inner) => Serialize::serialize(inner, serializer),
-            Self::TemperatureSetpointHold(inner) => Serialize::serialize(inner, serializer),
-            Self::TemperatureSetpointHoldDuration(inner) => Serialize::serialize(inner, serializer),
-            Self::ThermostatProgrammingOperationMode(inner) => Serialize::serialize(inner, serializer),
-            Self::ThermostatRunningState(inner) => Serialize::serialize(inner, serializer),
-            Self::SetpointChangeSource(inner) => Serialize::serialize(inner, serializer),
-            Self::SetpointChangeAmount(inner) => Serialize::serialize(inner, serializer),
-            Self::SetpointChangeSourceTimestamp(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupiedSetback(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupiedSetbackMin(inner) => Serialize::serialize(inner, serializer),
-            Self::OccupiedSetbackMax(inner) => Serialize::serialize(inner, serializer),
-            Self::UnoccupiedSetback(inner) => Serialize::serialize(inner, serializer),
-            Self::UnoccupiedSetbackMin(inner) => Serialize::serialize(inner, serializer),
-            Self::UnoccupiedSetbackMax(inner) => Serialize::serialize(inner, serializer),
-            Self::EmergencyHeatDelta(inner) => Serialize::serialize(inner, serializer),
-            Self::AcType(inner) => Serialize::serialize(inner, serializer),
-            Self::AcCapacity(inner) => Serialize::serialize(inner, serializer),
-            Self::AcRefrigerantType(inner) => Serialize::serialize(inner, serializer),
-            Self::AcCompressorType(inner) => Serialize::serialize(inner, serializer),
-            Self::AcErrorCode(inner) => Serialize::serialize(inner, serializer),
-            Self::AcLouverPosition(inner) => Serialize::serialize(inner, serializer),
-            Self::AcCoilTemperature(inner) => Serialize::serialize(inner, serializer),
-            Self::AcCapacityformat(inner) => Serialize::serialize(inner, serializer),
-            Self::PresetTypes(inner) => Serialize::serialize(inner, serializer),
-            Self::ScheduleTypes(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfPresets(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfSchedules(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfScheduleTransitions(inner) => Serialize::serialize(inner, serializer),
-            Self::NumberOfScheduleTransitionPerDay(inner) => Serialize::serialize(inner, serializer),
-            Self::ActivePresetHandle(inner) => Serialize::serialize(inner, serializer),
-            Self::ActiveScheduleHandle(inner) => Serialize::serialize(inner, serializer),
-            Self::Presets(inner) => Serialize::serialize(inner, serializer),
-            Self::Schedules(inner) => Serialize::serialize(inner, serializer),
-            Self::SetpointHoldExpiryTimestamp(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((ThermostatCluster::NAME, ThermostatCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    ThermostatCluster,
+    [
+        LocalTemperature,
+        OutdoorTemperature,
+        Occupancy,
+        AbsMinHeatSetpointLimit,
+        AbsMaxHeatSetpointLimit,
+        AbsMinCoolSetpointLimit,
+        AbsMaxCoolSetpointLimit,
+        PiCoolingDemand,
+        PiHeatingDemand,
+        HvacSystemTypeConfiguration,
+        LocalTemperatureCalibration,
+        OccupiedCoolingSetpoint,
+        OccupiedHeatingSetpoint,
+        UnoccupiedCoolingSetpoint,
+        UnoccupiedHeatingSetpoint,
+        MinHeatSetpointLimit,
+        MaxHeatSetpointLimit,
+        MinCoolSetpointLimit,
+        MaxCoolSetpointLimit,
+        MinSetpointDeadBand,
+        RemoteSensing,
+        ControlSequenceOfOperation,
+        SystemMode,
+        ThermostatRunningMode,
+        StartOfWeek,
+        NumberOfWeeklyTransitions,
+        NumberOfDailyTransitions,
+        TemperatureSetpointHold,
+        TemperatureSetpointHoldDuration,
+        ThermostatProgrammingOperationMode,
+        ThermostatRunningState,
+        SetpointChangeSource,
+        SetpointChangeAmount,
+        SetpointChangeSourceTimestamp,
+        OccupiedSetback,
+        OccupiedSetbackMin,
+        OccupiedSetbackMax,
+        UnoccupiedSetback,
+        UnoccupiedSetbackMin,
+        UnoccupiedSetbackMax,
+        EmergencyHeatDelta,
+        AcType,
+        AcCapacity,
+        AcRefrigerantType,
+        AcCompressorType,
+        AcErrorCode,
+        AcLouverPosition,
+        AcCoilTemperature,
+        AcCapacityformat,
+        PresetTypes,
+        ScheduleTypes,
+        NumberOfPresets,
+        NumberOfSchedules,
+        NumberOfScheduleTransitions,
+        NumberOfScheduleTransitionPerDay,
+        ActivePresetHandle,
+        ActiveScheduleHandle,
+        Presets,
+        Schedules,
+        SetpointHoldExpiryTimestamp,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`ThermostatCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5438,112 +5317,20 @@ crate::impl_cluster_member_variant!(
     SetActivePresetRequest
 );
 crate::impl_cluster_member_variant!(command, Command, commands::AtomicRequest, AtomicRequest);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThermostatCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::SetpointRaiseLower(_) => commands::SetpointRaiseLower::NAME,
-            Self::SetWeeklySchedule(_) => commands::SetWeeklySchedule::NAME,
-            Self::GetWeeklySchedule(_) => commands::GetWeeklySchedule::NAME,
-            Self::ClearWeeklySchedule => commands::ClearWeeklySchedule::NAME,
-            Self::SetActiveScheduleRequest(_) => commands::SetActiveScheduleRequest::NAME,
-            Self::SetActivePresetRequest(_) => commands::SetActivePresetRequest::NAME,
-            Self::AtomicRequest(_) => commands::AtomicRequest::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ThermostatCluster::NAME,
-        ThermostatCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ThermostatCluster::NAME,
-            cluster_id: ThermostatCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::ClearWeeklySchedule => Serialize::serialize(&(), serializer),
-            Self::SetpointRaiseLower(inner) => Serialize::serialize(inner, serializer),
-            Self::SetWeeklySchedule(inner) => Serialize::serialize(inner, serializer),
-            Self::GetWeeklySchedule(inner) => Serialize::serialize(inner, serializer),
-            Self::SetActiveScheduleRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::SetActivePresetRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::AtomicRequest(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ThermostatCluster::NAME, ThermostatCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((ThermostatCluster::NAME, ThermostatCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    ThermostatCluster,
+    empty = [ClearWeeklySchedule,],
+    payload = [
+        SetpointRaiseLower,
+        SetWeeklySchedule,
+        GetWeeklySchedule,
+        SetActiveScheduleRequest,
+        SetActivePresetRequest,
+        AtomicRequest,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`ThermostatCluster`].
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -5666,89 +5453,13 @@ crate::impl_cluster_member_variant!(
     GetWeeklyScheduleResponse
 );
 crate::impl_cluster_member_variant!(command, CommandResponse, commands::AtomicResponse, AtomicResponse);
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        ThermostatCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::GetWeeklyScheduleResponse(_) => commands::GetWeeklyScheduleResponse::NAME,
-            Self::AtomicResponse(_) => commands::AtomicResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        ThermostatCluster::NAME,
-        ThermostatCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: ThermostatCluster::NAME,
-            cluster_id: ThermostatCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::GetWeeklyScheduleResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::AtomicResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((ThermostatCluster::NAME, ThermostatCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    ThermostatCluster,
+    empty = [],
+    payload = [GetWeeklyScheduleResponse, AtomicResponse,]
+);
 
 crate::define_matter_bitmap! {
     /// AcErrorCodeBitmap bitmap.
@@ -6127,37 +5838,37 @@ impl WeeklyScheduleTransitionStruct {
                     if transition_time.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 1439_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         transition_time = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if heat_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::Temperature>::try_from)?;
                         heat_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if cool_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <types::Temperature>::try_from)?;
                         cool_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -6190,24 +5901,7 @@ impl WeeklyScheduleTransitionStruct {
     }
 }
 
-impl From<WeeklyScheduleTransitionStruct> for AttributeValue {
-    #[inline]
-    fn from(val: WeeklyScheduleTransitionStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for WeeklyScheduleTransitionStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(WeeklyScheduleTransitionStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -6253,34 +5947,34 @@ impl ScheduleTypeStruct {
                     if system_mode.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SystemModeEnum>::try_from(fval)?;
                         system_mode = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if number_of_schedules.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         number_of_schedules = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if schedule_type_features.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ScheduleTypeFeaturesBitmap>::try_from(fval)?;
                         schedule_type_features = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -6308,24 +6002,7 @@ impl ScheduleTypeStruct {
     }
 }
 
-impl From<ScheduleTypeStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ScheduleTypeStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ScheduleTypeStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ScheduleTypeStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -6415,73 +6092,73 @@ impl PresetStruct {
                     if preset_handle.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         preset_handle = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if preset_scenario.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <PresetScenarioEnum>::try_from(fval)?;
                         preset_scenario = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 64))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if cooling_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Temperature>::try_from(fval)?;
                         cooling_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if heating_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Temperature>::try_from(fval)?;
                         heating_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if built_in.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <bool>::try_from)?;
                         built_in = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -6535,24 +6212,7 @@ impl PresetStruct {
     }
 }
 
-impl From<PresetStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PresetStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PresetStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PresetStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -6598,34 +6258,34 @@ impl PresetTypeStruct {
                     if preset_scenario.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <PresetScenarioEnum>::try_from(fval)?;
                         preset_scenario = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if number_of_presets.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         number_of_presets = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if preset_type_features.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <PresetTypeFeaturesBitmap>::try_from(fval)?;
                         preset_type_features = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -6652,24 +6312,7 @@ impl PresetTypeStruct {
     }
 }
 
-impl From<PresetTypeStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PresetTypeStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PresetTypeStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PresetTypeStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -6746,76 +6389,76 @@ impl ScheduleStruct {
                     if schedule_handle.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <crate::Bytes>::try_from)?;
                         (!matches!(&decoded, Nullable::NonNull(v) if v.len() > 16))
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         schedule_handle = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if system_mode.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SystemModeEnum>::try_from(fval)?;
                         system_mode = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if name.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 64)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         name = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if preset_handle.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         preset_handle = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if transitions.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <ScheduleTransitionStruct>::try_from)?;
                         transitions = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if built_in.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <bool>::try_from)?;
                         built_in = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -6863,24 +6506,7 @@ impl ScheduleStruct {
     }
 }
 
-impl From<ScheduleStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ScheduleStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ScheduleStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ScheduleStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -6967,73 +6593,73 @@ impl ScheduleTransitionStruct {
                     if day_of_week.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <ScheduleDayOfWeekBitmap>::try_from(fval)?;
                         day_of_week = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if transition_time.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         (decoded <= 1439_u16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         transition_time = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if preset_handle.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 16)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         preset_handle = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if system_mode.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SystemModeEnum>::try_from(fval)?;
                         system_mode = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if cooling_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Temperature>::try_from(fval)?;
                         cooling_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if heating_setpoint.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::Temperature>::try_from(fval)?;
                         heating_setpoint = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -7068,30 +6694,11 @@ impl ScheduleTransitionStruct {
     }
 }
 
-impl From<ScheduleTransitionStruct> for AttributeValue {
-    #[inline]
-    fn from(val: ScheduleTransitionStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for ScheduleTransitionStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(ScheduleTransitionStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -7160,14 +6767,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -7178,33 +6777,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         LocalTemperature,
-        Nullable<types::Temperature>,
+        types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Temperature> for LocalTemperature {
-        #[inline]
-        fn from(val: types::Temperature) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Temperature>> for LocalTemperature {
-        #[inline]
-        fn from(val: Option<types::Temperature>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for LocalTemperature {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7258,14 +6838,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -7276,33 +6848,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         OutdoorTemperature,
-        Nullable<types::Temperature>,
+        types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Temperature> for OutdoorTemperature {
-        #[inline]
-        fn from(val: types::Temperature) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Temperature>> for OutdoorTemperature {
-        #[inline]
-        fn from(val: Option<types::Temperature>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OutdoorTemperature {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7329,11 +6882,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7347,14 +6895,10 @@ pub mod attributes {
         Occupancy,
         super::globals::OccupancyBitmap,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for Occupancy {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7375,11 +6919,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7393,14 +6932,10 @@ pub mod attributes {
         AbsMinHeatSetpointLimit,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AbsMinHeatSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7421,11 +6956,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7439,14 +6969,10 @@ pub mod attributes {
         AbsMaxHeatSetpointLimit,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AbsMaxHeatSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7467,11 +6993,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7485,14 +7006,10 @@ pub mod attributes {
         AbsMinCoolSetpointLimit,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AbsMinCoolSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7513,11 +7030,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7531,14 +7043,10 @@ pub mod attributes {
         AbsMaxCoolSetpointLimit,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AbsMaxCoolSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7565,16 +7073,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7582,13 +7085,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PiCoolingDemand, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for PiCoolingDemand {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(PiCoolingDemand, u8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7615,16 +7112,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 100_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7632,13 +7124,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(PiHeatingDemand, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for PiHeatingDemand {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(PiHeatingDemand, u8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7665,11 +7151,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7683,14 +7164,10 @@ pub mod attributes {
         HvacSystemTypeConfiguration,
         super::HvacSystemTypeBitmap,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for HvacSystemTypeConfiguration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7717,16 +7194,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             if raw < -127_i8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -7734,13 +7206,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LocalTemperatureCalibration, i8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for LocalTemperatureCalibration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LocalTemperatureCalibration,
+        i8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7761,11 +7234,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7782,14 +7250,10 @@ pub mod attributes {
         OccupiedCoolingSetpoint,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OccupiedCoolingSetpoint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7810,11 +7274,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7831,14 +7290,10 @@ pub mod attributes {
         OccupiedHeatingSetpoint,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for OccupiedHeatingSetpoint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7859,11 +7314,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7880,14 +7330,10 @@ pub mod attributes {
         UnoccupiedCoolingSetpoint,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UnoccupiedCoolingSetpoint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7908,11 +7354,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7929,14 +7370,10 @@ pub mod attributes {
         UnoccupiedHeatingSetpoint,
         types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UnoccupiedHeatingSetpoint {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -7957,11 +7394,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -7974,13 +7406,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinHeatSetpointLimit, types::Temperature, super::ThermostatCluster, copy);
-
-    impl fmt::Display for MinHeatSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MinHeatSetpointLimit,
+        types::Temperature,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8001,11 +7434,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8018,13 +7446,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxHeatSetpointLimit, types::Temperature, super::ThermostatCluster, copy);
-
-    impl fmt::Display for MaxHeatSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxHeatSetpointLimit,
+        types::Temperature,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8045,11 +7474,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8062,13 +7486,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinCoolSetpointLimit, types::Temperature, super::ThermostatCluster, copy);
-
-    impl fmt::Display for MinCoolSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MinCoolSetpointLimit,
+        types::Temperature,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8089,11 +7514,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8106,13 +7526,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MaxCoolSetpointLimit, types::Temperature, super::ThermostatCluster, copy);
-
-    impl fmt::Display for MaxCoolSetpointLimit {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        MaxCoolSetpointLimit,
+        types::Temperature,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8139,16 +7560,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             if raw < 0_i8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -8156,13 +7572,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(MinSetpointDeadBand, i8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for MinSetpointDeadBand {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MinSetpointDeadBand, i8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8189,11 +7599,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8207,14 +7612,10 @@ pub mod attributes {
         RemoteSensing,
         super::RemoteSensingBitmap,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for RemoteSensing {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8241,11 +7642,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8259,14 +7655,10 @@ pub mod attributes {
         ControlSequenceOfOperation,
         super::ControlSequenceOfOperationEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ControlSequenceOfOperation {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8293,11 +7685,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8307,13 +7694,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(SystemMode, super::SystemModeEnum, super::ThermostatCluster, copy);
-
-    impl fmt::Display for SystemMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        SystemMode,
+        super::SystemModeEnum,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8340,11 +7728,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8358,14 +7741,10 @@ pub mod attributes {
         ThermostatRunningMode,
         super::ThermostatRunningModeEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ThermostatRunningMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8392,11 +7771,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8406,13 +7780,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StartOfWeek, super::StartOfWeekEnum, super::ThermostatCluster, copy);
-
-    impl fmt::Display for StartOfWeek {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        StartOfWeek,
+        super::StartOfWeekEnum,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8439,27 +7814,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfWeeklyTransitions, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for NumberOfWeeklyTransitions {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NumberOfWeeklyTransitions,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8486,27 +7857,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfDailyTransitions, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for NumberOfDailyTransitions {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NumberOfDailyTransitions,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8533,11 +7900,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8551,14 +7913,10 @@ pub mod attributes {
         TemperatureSetpointHold,
         super::TemperatureSetpointHoldEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for TemperatureSetpointHold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8609,19 +7967,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw > 1440_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -8630,33 +7980,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         TemperatureSetpointHoldDuration,
-        Nullable<u16>,
+        u16,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for TemperatureSetpointHoldDuration {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for TemperatureSetpointHoldDuration {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for TemperatureSetpointHoldDuration {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8683,11 +8014,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8701,14 +8027,10 @@ pub mod attributes {
         ThermostatProgrammingOperationMode,
         super::ProgrammingOperationModeBitmap,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ThermostatProgrammingOperationMode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8735,11 +8057,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8753,14 +8070,10 @@ pub mod attributes {
         ThermostatRunningState,
         super::RelayStateBitmap,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for ThermostatRunningState {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8787,11 +8100,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8805,14 +8113,10 @@ pub mod attributes {
         SetpointChangeSource,
         super::SetpointChangeSourceEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SetpointChangeSource {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8863,46 +8167,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(SetpointChangeAmount, Nullable<i16>, super::ThermostatCluster, copy);
-    impl From<i16> for SetpointChangeAmount {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for SetpointChangeAmount {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SetpointChangeAmount {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        SetpointChangeAmount,
+        i16,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8923,11 +8205,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -8941,14 +8218,10 @@ pub mod attributes {
         SetpointChangeSourceTimestamp,
         types::EpochS,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for SetpointChangeSourceTimestamp {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -8999,19 +8272,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9019,29 +8284,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OccupiedSetback, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for OccupiedSetback {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for OccupiedSetback {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OccupiedSetback {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        OccupiedSetback,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9092,19 +8343,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9112,29 +8355,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OccupiedSetbackMin, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for OccupiedSetbackMin {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for OccupiedSetbackMin {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OccupiedSetbackMin {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        OccupiedSetbackMin,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9185,19 +8414,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9205,29 +8426,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OccupiedSetbackMax, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for OccupiedSetbackMax {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for OccupiedSetbackMax {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for OccupiedSetbackMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        OccupiedSetbackMax,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9278,19 +8485,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9298,29 +8497,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UnoccupiedSetback, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for UnoccupiedSetback {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for UnoccupiedSetback {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for UnoccupiedSetback {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        UnoccupiedSetback,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9371,19 +8556,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9391,29 +8568,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UnoccupiedSetbackMin, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for UnoccupiedSetbackMin {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for UnoccupiedSetbackMin {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for UnoccupiedSetbackMin {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        UnoccupiedSetbackMin,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9464,19 +8627,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw > 254_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -9484,29 +8639,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(UnoccupiedSetbackMax, Nullable<u8>, super::ThermostatCluster, copy);
-    impl From<u8> for UnoccupiedSetbackMax {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for UnoccupiedSetbackMax {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for UnoccupiedSetbackMax {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        UnoccupiedSetbackMax,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9533,27 +8674,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(EmergencyHeatDelta, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for EmergencyHeatDelta {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(EmergencyHeatDelta, u8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9580,11 +8710,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9594,13 +8719,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(AcType, super::AcTypeEnum, super::ThermostatCluster, copy);
-
-    impl fmt::Display for AcType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        AcType,
+        super::AcTypeEnum,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9627,27 +8753,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(AcCapacity, u16, super::ThermostatCluster, copy);
-
-    impl fmt::Display for AcCapacity {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(AcCapacity, u16, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9674,11 +8789,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9692,14 +8802,10 @@ pub mod attributes {
         AcRefrigerantType,
         super::AcRefrigerantTypeEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AcRefrigerantType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9726,11 +8832,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9744,14 +8845,10 @@ pub mod attributes {
         AcCompressorType,
         super::AcCompressorTypeEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AcCompressorType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9778,11 +8875,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9792,13 +8884,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(AcErrorCode, super::AcErrorCodeBitmap, super::ThermostatCluster, copy);
-
-    impl fmt::Display for AcErrorCode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        AcErrorCode,
+        super::AcErrorCodeBitmap,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9825,11 +8918,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9843,14 +8931,10 @@ pub mod attributes {
         AcLouverPosition,
         super::AcLouverPositionEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AcLouverPosition {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9904,14 +8988,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -9922,33 +8998,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         AcCoilTemperature,
-        Nullable<types::Temperature>,
+        types::Temperature,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::Temperature> for AcCoilTemperature {
-        #[inline]
-        fn from(val: types::Temperature) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::Temperature>> for AcCoilTemperature {
-        #[inline]
-        fn from(val: Option<types::Temperature>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for AcCoilTemperature {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -9975,11 +9032,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -9993,14 +9045,10 @@ pub mod attributes {
         AcCapacityformat,
         super::AcCapacityFormatEnum,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for AcCapacityformat {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10027,12 +9075,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10052,14 +9094,10 @@ pub mod attributes {
         PresetTypes,
         Vec<super::PresetTypeStruct>,
         super::ThermostatCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for PresetTypes {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10086,12 +9124,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10111,14 +9143,10 @@ pub mod attributes {
         ScheduleTypes,
         Vec<super::ScheduleTypeStruct>,
         super::ThermostatCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ScheduleTypes {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10145,27 +9173,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfPresets, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for NumberOfPresets {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(NumberOfPresets, u8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10192,27 +9209,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfSchedules, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for NumberOfSchedules {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(NumberOfSchedules, u8, super::ThermostatCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10239,27 +9245,23 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(NumberOfScheduleTransitions, u8, super::ThermostatCluster, copy);
-
-    impl fmt::Display for NumberOfScheduleTransitions {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        NumberOfScheduleTransitions,
+        u8,
+        super::ThermostatCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10310,51 +9312,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NumberOfScheduleTransitionPerDay,
-        Nullable<u8>,
+        u8,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u8> for NumberOfScheduleTransitionPerDay {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for NumberOfScheduleTransitionPerDay {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NumberOfScheduleTransitionPerDay {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10407,14 +9382,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -10428,33 +9395,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ActivePresetHandle,
-        Nullable<crate::Bytes>,
+        crate::Bytes,
         super::ThermostatCluster,
-        owned
+        owned,
+        scalar,
+        bytes
     );
-    impl From<crate::Bytes> for ActivePresetHandle {
-        #[inline]
-        fn from(val: crate::Bytes) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<crate::Bytes>> for ActivePresetHandle {
-        #[inline]
-        fn from(val: Option<crate::Bytes>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ActivePresetHandle {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10507,14 +9455,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -10528,33 +9468,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ActiveScheduleHandle,
-        Nullable<crate::Bytes>,
+        crate::Bytes,
         super::ThermostatCluster,
-        owned
+        owned,
+        scalar,
+        bytes
     );
-    impl From<crate::Bytes> for ActiveScheduleHandle {
-        #[inline]
-        fn from(val: crate::Bytes) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<crate::Bytes>> for ActiveScheduleHandle {
-        #[inline]
-        fn from(val: Option<crate::Bytes>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ActiveScheduleHandle {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10581,12 +9502,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10602,13 +9517,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Presets, Vec<super::PresetStruct>, super::ThermostatCluster, owned);
-
-    impl fmt::Display for Presets {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        Presets,
+        Vec<super::PresetStruct>,
+        super::ThermostatCluster,
+        owned,
+        list,
+        list
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10635,12 +9551,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10656,13 +9566,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Schedules, Vec<super::ScheduleStruct>, super::ThermostatCluster, owned);
-
-    impl fmt::Display for Schedules {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        Schedules,
+        Vec<super::ScheduleStruct>,
+        super::ThermostatCluster,
+        owned,
+        list,
+        list
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10716,14 +9627,6 @@ pub mod attributes {
             }
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -10734,33 +9637,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         SetpointHoldExpiryTimestamp,
-        Nullable<types::EpochS>,
+        types::EpochS,
         super::ThermostatCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<types::EpochS> for SetpointHoldExpiryTimestamp {
-        #[inline]
-        fn from(val: types::EpochS) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<types::EpochS>> for SetpointHoldExpiryTimestamp {
-        #[inline]
-        fn from(val: Option<types::EpochS>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for SetpointHoldExpiryTimestamp {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }
 
 pub mod commands {
@@ -10796,17 +9680,6 @@ pub mod commands {
         pub amount: i8,
     }
 
-    impl crate::traits::CommandSpec for SetpointRaiseLower {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
-    }
-
     impl SetpointRaiseLower {
         pub const CLUSTER_ID: ClusterId = super::ThermostatCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
@@ -10831,11 +9704,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -10847,23 +9715,23 @@ pub mod commands {
                         if mode.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SetpointRaiseLowerModeEnum>::try_from(fval)?;
                             mode = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if amount.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <i8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<i8>(&fval)?;
                             amount = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -10873,22 +9741,9 @@ pub mod commands {
                 amount: amount.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetpointRaiseLower, super::ThermostatCluster, false);
+    crate::impl_matter_command!(SetpointRaiseLower, super::ThermostatCluster, (), false);
 
     /// This command is used to update the thermostat weekly setpoint schedule from a management system.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -10904,17 +9759,6 @@ pub mod commands {
         pub day_of_week_for_sequence: super::ScheduleDayOfWeekBitmap,
         pub mode_for_sequence: super::ScheduleModeBitmap,
         pub transitions: Vec<super::WeeklyScheduleTransitionStruct>,
-    }
-
-    impl crate::traits::CommandSpec for SetWeeklySchedule {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetWeeklySchedule {
@@ -10964,11 +9808,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -10982,40 +9821,40 @@ pub mod commands {
                         if number_of_transitions_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             number_of_transitions_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if day_of_week_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleDayOfWeekBitmap>::try_from(fval)?;
                             day_of_week_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if mode_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleModeBitmap>::try_from(fval)?;
                             mode_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if transitions.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded =
                                 crate::traits::decode_list(fval, <super::WeeklyScheduleTransitionStruct>::try_from)?;
                             (decoded.len() <= 10)
@@ -11023,8 +9862,8 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             transitions = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -11038,22 +9877,9 @@ pub mod commands {
                 transitions: transitions.ok_or((Some(FieldId::new(3)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(SetWeeklySchedule, super::ThermostatCluster, false);
+    crate::impl_matter_command!(SetWeeklySchedule, super::ThermostatCluster, (), false);
 
     /// The Current Weekly Schedule Command is sent from the server in response to the Get Weekly Schedule Command.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -11067,17 +9893,6 @@ pub mod commands {
     pub struct GetWeeklySchedule {
         pub days_to_return: super::ScheduleDayOfWeekBitmap,
         pub mode_to_return: super::ScheduleModeBitmap,
-    }
-
-    impl crate::traits::CommandSpec for GetWeeklySchedule {
-        type Response = GetWeeklyScheduleResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetWeeklySchedule {
@@ -11107,11 +9922,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -11123,23 +9933,23 @@ pub mod commands {
                         if days_to_return.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleDayOfWeekBitmap>::try_from(fval)?;
                             days_to_return = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if mode_to_return.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleModeBitmap>::try_from(fval)?;
                             mode_to_return = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -11149,22 +9959,14 @@ pub mod commands {
                 mode_to_return: mode_to_return.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GetWeeklySchedule, super::ThermostatCluster, false);
+    crate::impl_matter_command!(
+        GetWeeklySchedule,
+        super::ThermostatCluster,
+        GetWeeklyScheduleResponse,
+        false
+    );
 
     /// This command is used to clear the weekly schedule.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -11172,62 +9974,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct ClearWeeklySchedule;
 
-    impl crate::traits::CommandSpec for ClearWeeklySchedule {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl ClearWeeklySchedule {
         pub const CLUSTER_ID: ClusterId = super::ThermostatCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x03);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "ClearWeeklySchedule";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(ClearWeeklySchedule, super::ThermostatCluster, true);
+    crate::impl_matter_command!(ClearWeeklySchedule, super::ThermostatCluster, (), true);
 
     /// Upon receipt, if the Schedules attribute contains a ScheduleStruct whose ScheduleHandle field matches the value
     /// of the ScheduleHandle field, the server SHALL set the thermostat's ActiveScheduleHandle attribute to the value
@@ -11243,17 +9997,6 @@ pub mod commands {
     pub struct SetActiveScheduleRequest {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub schedule_handle: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for SetActiveScheduleRequest {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetActiveScheduleRequest {
@@ -11273,11 +10016,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_SCHEDULE_HANDLE, AttributeValue::from(self.schedule_handle)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -11306,19 +10044,6 @@ pub mod commands {
                 schedule_handle: schedule_handle.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for SetActiveScheduleRequest {
@@ -11328,7 +10053,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetActiveScheduleRequest, super::ThermostatCluster, false);
+    crate::impl_matter_command!(SetActiveScheduleRequest, super::ThermostatCluster, (), false);
 
     /// ID.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -11342,17 +10067,6 @@ pub mod commands {
     pub struct SetActivePresetRequest {
         #[cfg_attr(feature = "schemars", schemars(with = "Option<Vec<u8>>"))]
         pub preset_handle: Nullable<crate::Bytes>,
-    }
-
-    impl crate::traits::CommandSpec for SetActivePresetRequest {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SetActivePresetRequest {
@@ -11378,11 +10092,6 @@ pub mod commands {
                     Nullable::Null => AttributeValue::Null,
                 }
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -11411,19 +10120,6 @@ pub mod commands {
                 preset_handle: preset_handle.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Nullable<crate::Bytes>> for SetActivePresetRequest {
@@ -11447,7 +10143,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SetActivePresetRequest, super::ThermostatCluster, false);
+    crate::impl_matter_command!(SetActivePresetRequest, super::ThermostatCluster, (), false);
 
     /// This command has the same payload format as the Set Weekly Schedule.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -11463,17 +10159,6 @@ pub mod commands {
         pub day_of_week_for_sequence: super::ScheduleDayOfWeekBitmap,
         pub mode_for_sequence: super::ScheduleModeBitmap,
         pub transitions: Vec<super::WeeklyScheduleTransitionStruct>,
-    }
-
-    impl crate::traits::CommandSpec for GetWeeklyScheduleResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GetWeeklyScheduleResponse {
@@ -11523,11 +10208,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -11541,40 +10221,40 @@ pub mod commands {
                         if number_of_transitions_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             number_of_transitions_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if day_of_week_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleDayOfWeekBitmap>::try_from(fval)?;
                             day_of_week_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if mode_for_sequence.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::ScheduleModeBitmap>::try_from(fval)?;
                             mode_for_sequence = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if transitions.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded =
                                 crate::traits::decode_list(fval, <super::WeeklyScheduleTransitionStruct>::try_from)?;
                             (decoded.len() <= 10)
@@ -11582,8 +10262,8 @@ pub mod commands {
                                 .ok_or(MatterStatus::ConstraintError)?;
                             transitions = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -11597,22 +10277,9 @@ pub mod commands {
                 transitions: transitions.ok_or((Some(FieldId::new(3)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GetWeeklyScheduleResponse, super::ThermostatCluster, false);
+    crate::impl_matter_command!(GetWeeklyScheduleResponse, super::ThermostatCluster, (), false);
 
     /// Returns the status of an atomic write.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -11629,17 +10296,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub timeout: Optional<u16>,
-    }
-
-    impl crate::traits::CommandSpec for AtomicResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AtomicResponse {
@@ -11683,11 +10339,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -11700,37 +10351,37 @@ pub mod commands {
                         if status_code.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             status_code = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if attribute_status.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(
                                 fval,
                                 <super::globals::AtomicAttributeStatusStruct>::try_from,
                             )?;
                             attribute_status = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if timeout.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             timeout = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -11741,22 +10392,9 @@ pub mod commands {
                 timeout: Optional::from(timeout),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AtomicResponse, super::ThermostatCluster, false);
+    crate::impl_matter_command!(AtomicResponse, super::ThermostatCluster, (), false);
 
     /// Begins, Commits or Cancels an atomic write.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -11773,17 +10411,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub timeout: Optional<u16>,
-    }
-
-    impl crate::traits::CommandSpec for AtomicRequest {
-        type Response = AtomicResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::ThermostatCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl AtomicRequest {
@@ -11827,11 +10454,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -11844,34 +10466,34 @@ pub mod commands {
                         if request_type.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::AtomicRequestTypeEnum>::try_from(fval)?;
                             request_type = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if attribute_requests.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <AttributeId>::try_from)?;
                             attribute_requests = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if timeout.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             timeout = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -11882,20 +10504,7 @@ pub mod commands {
                 timeout: Optional::from(timeout),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(AtomicRequest, super::ThermostatCluster, false);
+    crate::impl_matter_command!(AtomicRequest, super::ThermostatCluster, AtomicResponse, false);
 }

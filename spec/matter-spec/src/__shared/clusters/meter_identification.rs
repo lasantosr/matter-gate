@@ -11,10 +11,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{AttributeMeta, EntityDescriptor, EntityKind, MatterDescribe, StaticEntitySchema};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{DescribedVariant, deserialize_enum_described};
+use crate::dispatch::DescribedVariant;
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -659,83 +657,18 @@ crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PointOfDel
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::MeterSerialNumber, MeterSerialNumber);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::ProtocolVersion, ProtocolVersion);
 crate::impl_cluster_member_variant!(attribute, Attribute, attributes::PowerThreshold, PowerThreshold);
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        MeterIdentificationCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::MeterType(_) => attributes::MeterType::NAME,
-            Self::PointOfDelivery(_) => attributes::PointOfDelivery::NAME,
-            Self::MeterSerialNumber(_) => attributes::MeterSerialNumber::NAME,
-            Self::ProtocolVersion(_) => attributes::ProtocolVersion::NAME,
-            Self::PowerThreshold(_) => attributes::PowerThreshold::NAME,
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        MeterIdentificationCluster::NAME,
-        MeterIdentificationCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: MeterIdentificationCluster::NAME,
-            cluster_id: MeterIdentificationCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::MeterType(inner) => Serialize::serialize(inner, serializer),
-            Self::PointOfDelivery(inner) => Serialize::serialize(inner, serializer),
-            Self::MeterSerialNumber(inner) => Serialize::serialize(inner, serializer),
-            Self::ProtocolVersion(inner) => Serialize::serialize(inner, serializer),
-            Self::PowerThreshold(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((
-                MeterIdentificationCluster::NAME,
-                MeterIdentificationCluster::CLUSTER_ID.raw(),
-            )),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    MeterIdentificationCluster,
+    [
+        MeterType,
+        PointOfDelivery,
+        MeterSerialNumber,
+        ProtocolVersion,
+        PowerThreshold,
+    ]
+);
 
 crate::define_matter_enum! {
     /// MeterTypeEnum exhaustive specification enum.
@@ -752,8 +685,6 @@ crate::define_matter_enum! {
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -819,14 +750,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -837,33 +760,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MeterType,
-        Nullable<super::MeterTypeEnum>,
+        super::MeterTypeEnum,
         super::MeterIdentificationCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::MeterTypeEnum> for MeterType {
-        #[inline]
-        fn from(val: super::MeterTypeEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::MeterTypeEnum>> for MeterType {
-        #[inline]
-        fn from(val: Option<super::MeterTypeEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MeterType {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -914,14 +818,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -935,33 +831,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PointOfDelivery,
-        Nullable<String>,
+        String,
         super::MeterIdentificationCluster,
-        owned
+        owned,
+        scalar,
+        display
     );
-    impl From<String> for PointOfDelivery {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for PointOfDelivery {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PointOfDelivery {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1012,14 +889,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1033,33 +902,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         MeterSerialNumber,
-        Nullable<String>,
+        String,
         super::MeterIdentificationCluster,
-        owned
+        owned,
+        scalar,
+        display
     );
-    impl From<String> for MeterSerialNumber {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for MeterSerialNumber {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for MeterSerialNumber {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1110,14 +960,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1131,33 +973,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         ProtocolVersion,
-        Nullable<String>,
+        String,
         super::MeterIdentificationCluster,
-        owned
+        owned,
+        scalar,
+        display
     );
-    impl From<String> for ProtocolVersion {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for ProtocolVersion {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for ProtocolVersion {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -1208,14 +1031,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -1226,31 +1041,12 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         PowerThreshold,
-        Nullable<super::globals::PowerThresholdStruct>,
+        super::globals::PowerThresholdStruct,
         super::MeterIdentificationCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::globals::PowerThresholdStruct> for PowerThreshold {
-        #[inline]
-        fn from(val: super::globals::PowerThresholdStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::globals::PowerThresholdStruct>> for PowerThreshold {
-        #[inline]
-        fn from(val: Option<super::globals::PowerThresholdStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for PowerThreshold {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 }

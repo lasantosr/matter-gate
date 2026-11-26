@@ -10,14 +10,8 @@ use core::{fmt, ops};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "dispatch")]
-use crate::dispatch::{
-    AttributeMeta, CommandMeta, EntityDescriptor, EntityKind, EventMeta, MatterDescribe, StaticEntitySchema,
-};
 #[cfg(all(feature = "dispatch", feature = "serde"))]
-use crate::dispatch::{
-    DescribedCommandVariant, DescribedVariant, deserialize_enum_described, deserialize_enum_invocation,
-};
+use crate::dispatch::{DescribedCommandVariant, DescribedVariant};
 #[allow(unused_imports, reason = "Generated cluster imports")]
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EventError},
@@ -6499,252 +6493,103 @@ crate::impl_cluster_member_variant!(
     attributes::UnsupportedAttributeRequiringAdminPrivilege,
     UnsupportedAttributeRequiringAdminPrivilege
 );
-#[cfg(feature = "dispatch")]
-impl AttributeMeta for Attribute {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        UnitTestingCluster::NAME
-    }
-
-    #[inline]
-    fn attribute_id(&self) -> AttributeId {
-        self.id()
-    }
-
-    #[inline]
-    fn attribute_name(&self) -> &'static str {
-        match self {
-            Self::Boolean(_) => attributes::Boolean::NAME,
-            Self::Bitmap8(_) => attributes::Bitmap8::NAME,
-            Self::Bitmap16(_) => attributes::Bitmap16::NAME,
-            Self::Bitmap32(_) => attributes::Bitmap32::NAME,
-            Self::Bitmap64(_) => attributes::Bitmap64::NAME,
-            Self::Int8u(_) => attributes::Int8u::NAME,
-            Self::Int16u(_) => attributes::Int16u::NAME,
-            Self::Int24u(_) => attributes::Int24u::NAME,
-            Self::Int32u(_) => attributes::Int32u::NAME,
-            Self::Int40u(_) => attributes::Int40u::NAME,
-            Self::Int48u(_) => attributes::Int48u::NAME,
-            Self::Int56u(_) => attributes::Int56u::NAME,
-            Self::Int64u(_) => attributes::Int64u::NAME,
-            Self::Int8s(_) => attributes::Int8s::NAME,
-            Self::Int16s(_) => attributes::Int16s::NAME,
-            Self::Int24s(_) => attributes::Int24s::NAME,
-            Self::Int32s(_) => attributes::Int32s::NAME,
-            Self::Int40s(_) => attributes::Int40s::NAME,
-            Self::Int48s(_) => attributes::Int48s::NAME,
-            Self::Int56s(_) => attributes::Int56s::NAME,
-            Self::Int64s(_) => attributes::Int64s::NAME,
-            Self::Enum8(_) => attributes::Enum8::NAME,
-            Self::Enum16(_) => attributes::Enum16::NAME,
-            Self::FloatSingle(_) => attributes::FloatSingle::NAME,
-            Self::FloatDouble(_) => attributes::FloatDouble::NAME,
-            Self::OctetString(_) => attributes::OctetString::NAME,
-            Self::ListInt8u(_) => attributes::ListInt8u::NAME,
-            Self::ListOctetString(_) => attributes::ListOctetString::NAME,
-            Self::ListStructOctetString(_) => attributes::ListStructOctetString::NAME,
-            Self::LongOctetString(_) => attributes::LongOctetString::NAME,
-            Self::CharString(_) => attributes::CharString::NAME,
-            Self::LongCharString(_) => attributes::LongCharString::NAME,
-            Self::EpochUs(_) => attributes::EpochUs::NAME,
-            Self::EpochS(_) => attributes::EpochS::NAME,
-            Self::VendorId(_) => attributes::VendorId::NAME,
-            Self::ListNullablesAndOptionalsStruct(_) => attributes::ListNullablesAndOptionalsStruct::NAME,
-            Self::EnumAttr(_) => attributes::EnumAttr::NAME,
-            Self::StructAttr(_) => attributes::StructAttr::NAME,
-            Self::RangeRestrictedInt8u(_) => attributes::RangeRestrictedInt8u::NAME,
-            Self::RangeRestrictedInt8s(_) => attributes::RangeRestrictedInt8s::NAME,
-            Self::RangeRestrictedInt16u(_) => attributes::RangeRestrictedInt16u::NAME,
-            Self::RangeRestrictedInt16s(_) => attributes::RangeRestrictedInt16s::NAME,
-            Self::ListLongOctetString(_) => attributes::ListLongOctetString::NAME,
-            Self::ListFabricScoped(_) => attributes::ListFabricScoped::NAME,
-            Self::TimedWriteBoolean(_) => attributes::TimedWriteBoolean::NAME,
-            Self::GeneralErrorBoolean(_) => attributes::GeneralErrorBoolean::NAME,
-            Self::ClusterErrorBoolean(_) => attributes::ClusterErrorBoolean::NAME,
-            Self::GlobalEnum(_) => attributes::GlobalEnum::NAME,
-            Self::GlobalStruct(_) => attributes::GlobalStruct::NAME,
-            Self::ReadFailureCode(_) => attributes::ReadFailureCode::NAME,
-            Self::FailureInt32U(_) => attributes::FailureInt32U::NAME,
-            Self::NullableBoolean(_) => attributes::NullableBoolean::NAME,
-            Self::NullableBitmap8(_) => attributes::NullableBitmap8::NAME,
-            Self::NullableBitmap16(_) => attributes::NullableBitmap16::NAME,
-            Self::NullableBitmap32(_) => attributes::NullableBitmap32::NAME,
-            Self::NullableBitmap64(_) => attributes::NullableBitmap64::NAME,
-            Self::NullableInt8u(_) => attributes::NullableInt8u::NAME,
-            Self::NullableInt16u(_) => attributes::NullableInt16u::NAME,
-            Self::NullableInt24u(_) => attributes::NullableInt24u::NAME,
-            Self::NullableInt32u(_) => attributes::NullableInt32u::NAME,
-            Self::NullableInt40u(_) => attributes::NullableInt40u::NAME,
-            Self::NullableInt48u(_) => attributes::NullableInt48u::NAME,
-            Self::NullableInt56u(_) => attributes::NullableInt56u::NAME,
-            Self::NullableInt64u(_) => attributes::NullableInt64u::NAME,
-            Self::NullableInt8s(_) => attributes::NullableInt8s::NAME,
-            Self::NullableInt16s(_) => attributes::NullableInt16s::NAME,
-            Self::NullableInt24s(_) => attributes::NullableInt24s::NAME,
-            Self::NullableInt32s(_) => attributes::NullableInt32s::NAME,
-            Self::NullableInt40s(_) => attributes::NullableInt40s::NAME,
-            Self::NullableInt48s(_) => attributes::NullableInt48s::NAME,
-            Self::NullableInt56s(_) => attributes::NullableInt56s::NAME,
-            Self::NullableInt64s(_) => attributes::NullableInt64s::NAME,
-            Self::NullableEnum8(_) => attributes::NullableEnum8::NAME,
-            Self::NullableEnum16(_) => attributes::NullableEnum16::NAME,
-            Self::NullableFloatSingle(_) => attributes::NullableFloatSingle::NAME,
-            Self::NullableFloatDouble(_) => attributes::NullableFloatDouble::NAME,
-            Self::NullableOctetString(_) => attributes::NullableOctetString::NAME,
-            Self::NullableCharString(_) => attributes::NullableCharString::NAME,
-            Self::NullableEnumAttr(_) => attributes::NullableEnumAttr::NAME,
-            Self::NullableStruct(_) => attributes::NullableStruct::NAME,
-            Self::NullableRangeRestrictedInt8u(_) => attributes::NullableRangeRestrictedInt8u::NAME,
-            Self::NullableRangeRestrictedInt8s(_) => attributes::NullableRangeRestrictedInt8s::NAME,
-            Self::NullableRangeRestrictedInt16u(_) => attributes::NullableRangeRestrictedInt16u::NAME,
-            Self::NullableRangeRestrictedInt16s(_) => attributes::NullableRangeRestrictedInt16s::NAME,
-            Self::WriteOnlyInt8u(_) => attributes::WriteOnlyInt8u::NAME,
-            Self::NullableGlobalEnum(_) => attributes::NullableGlobalEnum::NAME,
-            Self::NullableGlobalStruct(_) => attributes::NullableGlobalStruct::NAME,
-            Self::MeiInt8u(_) => attributes::MeiInt8u::NAME,
-            Self::Unsupported(_) => attributes::Unsupported::NAME,
-            Self::UnsupportedAttributeRequiringAdminPrivilege(_) => {
-                attributes::UnsupportedAttributeRequiringAdminPrivilege::NAME
-            }
-        }
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Attribute {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Attribute,
-        UnitTestingCluster::NAME,
-        UnitTestingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Attribute {
-            cluster: UnitTestingCluster::NAME,
-            cluster_id: UnitTestingCluster::CLUSTER_ID.raw(),
-            attribute: self.attribute_name(),
-            attribute_id: self.id().raw(),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Boolean(inner) => Serialize::serialize(inner, serializer),
-            Self::Bitmap8(inner) => Serialize::serialize(inner, serializer),
-            Self::Bitmap16(inner) => Serialize::serialize(inner, serializer),
-            Self::Bitmap32(inner) => Serialize::serialize(inner, serializer),
-            Self::Bitmap64(inner) => Serialize::serialize(inner, serializer),
-            Self::Int8u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int16u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int24u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int32u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int40u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int48u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int56u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int64u(inner) => Serialize::serialize(inner, serializer),
-            Self::Int8s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int16s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int24s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int32s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int40s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int48s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int56s(inner) => Serialize::serialize(inner, serializer),
-            Self::Int64s(inner) => Serialize::serialize(inner, serializer),
-            Self::Enum8(inner) => Serialize::serialize(inner, serializer),
-            Self::Enum16(inner) => Serialize::serialize(inner, serializer),
-            Self::FloatSingle(inner) => Serialize::serialize(inner, serializer),
-            Self::FloatDouble(inner) => Serialize::serialize(inner, serializer),
-            Self::OctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::ListInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::ListOctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::ListStructOctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::LongOctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::CharString(inner) => Serialize::serialize(inner, serializer),
-            Self::LongCharString(inner) => Serialize::serialize(inner, serializer),
-            Self::EpochUs(inner) => Serialize::serialize(inner, serializer),
-            Self::EpochS(inner) => Serialize::serialize(inner, serializer),
-            Self::VendorId(inner) => Serialize::serialize(inner, serializer),
-            Self::ListNullablesAndOptionalsStruct(inner) => Serialize::serialize(inner, serializer),
-            Self::EnumAttr(inner) => Serialize::serialize(inner, serializer),
-            Self::StructAttr(inner) => Serialize::serialize(inner, serializer),
-            Self::RangeRestrictedInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::RangeRestrictedInt8s(inner) => Serialize::serialize(inner, serializer),
-            Self::RangeRestrictedInt16u(inner) => Serialize::serialize(inner, serializer),
-            Self::RangeRestrictedInt16s(inner) => Serialize::serialize(inner, serializer),
-            Self::ListLongOctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::ListFabricScoped(inner) => Serialize::serialize(inner, serializer),
-            Self::TimedWriteBoolean(inner) => Serialize::serialize(inner, serializer),
-            Self::GeneralErrorBoolean(inner) => Serialize::serialize(inner, serializer),
-            Self::ClusterErrorBoolean(inner) => Serialize::serialize(inner, serializer),
-            Self::GlobalEnum(inner) => Serialize::serialize(inner, serializer),
-            Self::GlobalStruct(inner) => Serialize::serialize(inner, serializer),
-            Self::ReadFailureCode(inner) => Serialize::serialize(inner, serializer),
-            Self::FailureInt32U(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableBoolean(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableBitmap8(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableBitmap16(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableBitmap32(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableBitmap64(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt16u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt24u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt32u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt40u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt48u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt56u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt64u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt8s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt16s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt24s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt32s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt40s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt48s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt56s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableInt64s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableEnum8(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableEnum16(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableFloatSingle(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableFloatDouble(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableOctetString(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableCharString(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableEnumAttr(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableStruct(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableRangeRestrictedInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableRangeRestrictedInt8s(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableRangeRestrictedInt16u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableRangeRestrictedInt16s(inner) => Serialize::serialize(inner, serializer),
-            Self::WriteOnlyInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableGlobalEnum(inner) => Serialize::serialize(inner, serializer),
-            Self::NullableGlobalStruct(inner) => Serialize::serialize(inner, serializer),
-            Self::MeiInt8u(inner) => Serialize::serialize(inner, serializer),
-            Self::Unsupported(inner) => Serialize::serialize(inner, serializer),
-            Self::UnsupportedAttributeRequiringAdminPrivilege(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Attribute,
-            Some((UnitTestingCluster::NAME, UnitTestingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    attribute,
+    Attribute,
+    UnitTestingCluster,
+    [
+        Boolean,
+        Bitmap8,
+        Bitmap16,
+        Bitmap32,
+        Bitmap64,
+        Int8u,
+        Int16u,
+        Int24u,
+        Int32u,
+        Int40u,
+        Int48u,
+        Int56u,
+        Int64u,
+        Int8s,
+        Int16s,
+        Int24s,
+        Int32s,
+        Int40s,
+        Int48s,
+        Int56s,
+        Int64s,
+        Enum8,
+        Enum16,
+        FloatSingle,
+        FloatDouble,
+        OctetString,
+        ListInt8u,
+        ListOctetString,
+        ListStructOctetString,
+        LongOctetString,
+        CharString,
+        LongCharString,
+        EpochUs,
+        EpochS,
+        VendorId,
+        ListNullablesAndOptionalsStruct,
+        EnumAttr,
+        StructAttr,
+        RangeRestrictedInt8u,
+        RangeRestrictedInt8s,
+        RangeRestrictedInt16u,
+        RangeRestrictedInt16s,
+        ListLongOctetString,
+        ListFabricScoped,
+        TimedWriteBoolean,
+        GeneralErrorBoolean,
+        ClusterErrorBoolean,
+        GlobalEnum,
+        GlobalStruct,
+        ReadFailureCode,
+        FailureInt32U,
+        NullableBoolean,
+        NullableBitmap8,
+        NullableBitmap16,
+        NullableBitmap32,
+        NullableBitmap64,
+        NullableInt8u,
+        NullableInt16u,
+        NullableInt24u,
+        NullableInt32u,
+        NullableInt40u,
+        NullableInt48u,
+        NullableInt56u,
+        NullableInt64u,
+        NullableInt8s,
+        NullableInt16s,
+        NullableInt24s,
+        NullableInt32s,
+        NullableInt40s,
+        NullableInt48s,
+        NullableInt56s,
+        NullableInt64s,
+        NullableEnum8,
+        NullableEnum16,
+        NullableFloatSingle,
+        NullableFloatDouble,
+        NullableOctetString,
+        NullableCharString,
+        NullableEnumAttr,
+        NullableStruct,
+        NullableRangeRestrictedInt8u,
+        NullableRangeRestrictedInt8s,
+        NullableRangeRestrictedInt16u,
+        NullableRangeRestrictedInt16s,
+        WriteOnlyInt8u,
+        NullableGlobalEnum,
+        NullableGlobalStruct,
+        MeiInt8u,
+        Unsupported,
+        UnsupportedAttributeRequiringAdminPrivilege,
+    ]
+);
 /// Dynamic client-to-server command variant matching for [`UnitTestingCluster`].
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -7561,154 +7406,43 @@ crate::impl_cluster_member_variant!(
     commands::TestDifferentVendorMeiRequest,
     TestDifferentVendorMeiRequest
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for Command {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        UnitTestingCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::Test => commands::Test::NAME,
-            Self::TestNotHandled => commands::TestNotHandled::NAME,
-            Self::TestSpecific => commands::TestSpecific::NAME,
-            Self::TestUnknownCommand => commands::TestUnknownCommand::NAME,
-            Self::TestAddArguments(_) => commands::TestAddArguments::NAME,
-            Self::TestSimpleArgumentRequest(_) => commands::TestSimpleArgumentRequest::NAME,
-            Self::TestStructArrayArgumentRequest(_) => commands::TestStructArrayArgumentRequest::NAME,
-            Self::TestStructArgumentRequest(_) => commands::TestStructArgumentRequest::NAME,
-            Self::TestNestedStructArgumentRequest(_) => commands::TestNestedStructArgumentRequest::NAME,
-            Self::TestListStructArgumentRequest(_) => commands::TestListStructArgumentRequest::NAME,
-            Self::TestListInt8UArgumentRequest(_) => commands::TestListInt8UArgumentRequest::NAME,
-            Self::TestNestedStructListArgumentRequest(_) => commands::TestNestedStructListArgumentRequest::NAME,
-            Self::TestListNestedStructListArgumentRequest(_) => commands::TestListNestedStructListArgumentRequest::NAME,
-            Self::TestListInt8UReverseRequest(_) => commands::TestListInt8UReverseRequest::NAME,
-            Self::TestEnumsRequest(_) => commands::TestEnumsRequest::NAME,
-            Self::TestNullableOptionalRequest(_) => commands::TestNullableOptionalRequest::NAME,
-            Self::TestComplexNullableOptionalRequest(_) => commands::TestComplexNullableOptionalRequest::NAME,
-            Self::SimpleStructEchoRequest(_) => commands::SimpleStructEchoRequest::NAME,
-            Self::TimedInvokeRequest => commands::TimedInvokeRequest::NAME,
-            Self::TestSimpleOptionalArgumentRequest(_) => commands::TestSimpleOptionalArgumentRequest::NAME,
-            Self::TestEmitTestEventRequest(_) => commands::TestEmitTestEventRequest::NAME,
-            Self::TestEmitTestFabricScopedEventRequest(_) => commands::TestEmitTestFabricScopedEventRequest::NAME,
-            Self::TestBatchHelperRequest(_) => commands::TestBatchHelperRequest::NAME,
-            Self::TestSecondBatchHelperRequest(_) => commands::TestSecondBatchHelperRequest::NAME,
-            Self::StringEchoRequest(_) => commands::StringEchoRequest::NAME,
-            Self::GlobalEchoRequest(_) => commands::GlobalEchoRequest::NAME,
-            Self::TestCheckCommandFlags => commands::TestCheckCommandFlags::NAME,
-            Self::TestDifferentVendorMeiRequest(_) => commands::TestDifferentVendorMeiRequest::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Command {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        UnitTestingCluster::NAME,
-        UnitTestingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: UnitTestingCluster::NAME,
-            cluster_id: UnitTestingCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::Test
-            | Self::TestNotHandled
-            | Self::TestSpecific
-            | Self::TestUnknownCommand
-            | Self::TimedInvokeRequest
-            | Self::TestCheckCommandFlags => Serialize::serialize(&(), serializer),
-            Self::TestAddArguments(inner) => Serialize::serialize(inner, serializer),
-            Self::TestSimpleArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestStructArrayArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestStructArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestNestedStructArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestListStructArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestListInt8UArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestNestedStructListArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestListNestedStructListArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestListInt8UReverseRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEnumsRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestNullableOptionalRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestComplexNullableOptionalRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::SimpleStructEchoRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestSimpleOptionalArgumentRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEmitTestEventRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEmitTestFabricScopedEventRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestBatchHelperRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestSecondBatchHelperRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::StringEchoRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::GlobalEchoRequest(inner) => Serialize::serialize(inner, serializer),
-            Self::TestDifferentVendorMeiRequest(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((UnitTestingCluster::NAME, UnitTestingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_invocation<'de, D>(deserializer: D) -> Result<(EndpointId, Self), D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_invocation(
-            deserializer,
-            EntityKind::Command,
-            Some((UnitTestingCluster::NAME, UnitTestingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command,
+    Command,
+    UnitTestingCluster,
+    empty = [
+        Test,
+        TestNotHandled,
+        TestSpecific,
+        TestUnknownCommand,
+        TimedInvokeRequest,
+        TestCheckCommandFlags,
+    ],
+    payload = [
+        TestAddArguments,
+        TestSimpleArgumentRequest,
+        TestStructArrayArgumentRequest,
+        TestStructArgumentRequest,
+        TestNestedStructArgumentRequest,
+        TestListStructArgumentRequest,
+        TestListInt8UArgumentRequest,
+        TestNestedStructListArgumentRequest,
+        TestListNestedStructListArgumentRequest,
+        TestListInt8UReverseRequest,
+        TestEnumsRequest,
+        TestNullableOptionalRequest,
+        TestComplexNullableOptionalRequest,
+        SimpleStructEchoRequest,
+        TestSimpleOptionalArgumentRequest,
+        TestEmitTestEventRequest,
+        TestEmitTestFabricScopedEventRequest,
+        TestBatchHelperRequest,
+        TestSecondBatchHelperRequest,
+        StringEchoRequest,
+        GlobalEchoRequest,
+        TestDifferentVendorMeiRequest,
+    ]
+);
 /// Dynamic server-to-client command response variant matching for [`UnitTestingCluster`].
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -8225,117 +7959,30 @@ crate::impl_cluster_member_variant!(
     commands::TestDifferentVendorMeiResponse,
     TestDifferentVendorMeiResponse
 );
-#[cfg(feature = "dispatch")]
-impl CommandMeta for CommandResponse {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        UnitTestingCluster::NAME
-    }
-
-    #[inline]
-    fn command_id(&self) -> CommandId {
-        self.id()
-    }
-
-    #[inline]
-    fn command_name(&self) -> &'static str {
-        match self {
-            Self::TestSpecificResponse(_) => commands::TestSpecificResponse::NAME,
-            Self::TestAddArgumentsResponse(_) => commands::TestAddArgumentsResponse::NAME,
-            Self::TestSimpleArgumentResponse(_) => commands::TestSimpleArgumentResponse::NAME,
-            Self::TestStructArrayArgumentResponse(_) => commands::TestStructArrayArgumentResponse::NAME,
-            Self::TestListInt8UReverseResponse(_) => commands::TestListInt8UReverseResponse::NAME,
-            Self::TestEnumsResponse(_) => commands::TestEnumsResponse::NAME,
-            Self::TestNullableOptionalResponse(_) => commands::TestNullableOptionalResponse::NAME,
-            Self::TestComplexNullableOptionalResponse(_) => commands::TestComplexNullableOptionalResponse::NAME,
-            Self::BooleanResponse(_) => commands::BooleanResponse::NAME,
-            Self::SimpleStructResponse(_) => commands::SimpleStructResponse::NAME,
-            Self::TestEmitTestEventResponse(_) => commands::TestEmitTestEventResponse::NAME,
-            Self::TestEmitTestFabricScopedEventResponse(_) => commands::TestEmitTestFabricScopedEventResponse::NAME,
-            Self::TestBatchHelperResponse(_) => commands::TestBatchHelperResponse::NAME,
-            Self::StringEchoResponse(_) => commands::StringEchoResponse::NAME,
-            Self::GlobalEchoResponse(_) => commands::GlobalEchoResponse::NAME,
-            Self::TestDifferentVendorMeiResponse(_) => commands::TestDifferentVendorMeiResponse::NAME,
-        }
-    }
-
-    #[inline]
-    fn direction(&self) -> CommandDirection {
-        self.direction()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for CommandResponse {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Command,
-        UnitTestingCluster::NAME,
-        UnitTestingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Command {
-            cluster: UnitTestingCluster::NAME,
-            cluster_id: UnitTestingCluster::CLUSTER_ID.raw(),
-            command: self.command_name(),
-            command_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::TestSpecificResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestAddArgumentsResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestSimpleArgumentResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestStructArrayArgumentResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestListInt8UReverseResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEnumsResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestNullableOptionalResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestComplexNullableOptionalResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::BooleanResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::SimpleStructResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEmitTestEventResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestEmitTestFabricScopedEventResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestBatchHelperResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::StringEchoResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::GlobalEchoResponse(inner) => Serialize::serialize(inner, serializer),
-            Self::TestDifferentVendorMeiResponse(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Command,
-            Some((UnitTestingCluster::NAME, UnitTestingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    command_response,
+    CommandResponse,
+    UnitTestingCluster,
+    empty = [],
+    payload = [
+        TestSpecificResponse,
+        TestAddArgumentsResponse,
+        TestSimpleArgumentResponse,
+        TestStructArrayArgumentResponse,
+        TestListInt8UReverseResponse,
+        TestEnumsResponse,
+        TestNullableOptionalResponse,
+        TestComplexNullableOptionalResponse,
+        BooleanResponse,
+        SimpleStructResponse,
+        TestEmitTestEventResponse,
+        TestEmitTestFabricScopedEventResponse,
+        TestBatchHelperResponse,
+        StringEchoResponse,
+        GlobalEchoResponse,
+        TestDifferentVendorMeiResponse,
+    ]
+);
 /// Dynamic event variant matching for [`UnitTestingCluster`].
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -8491,91 +8138,13 @@ crate::impl_cluster_member_variant!(
     events::TestDifferentVendorMeiEvent,
     TestDifferentVendorMeiEvent
 );
-#[cfg(feature = "dispatch")]
-impl EventMeta for Event {
-    #[inline]
-    fn cluster_id(&self) -> ClusterId {
-        Self::CLUSTER_ID
-    }
-
-    #[inline]
-    fn cluster_name(&self) -> &'static str {
-        UnitTestingCluster::NAME
-    }
-
-    #[inline]
-    fn event_id(&self) -> EventId {
-        self.id()
-    }
-
-    #[inline]
-    fn event_name(&self) -> &'static str {
-        match self {
-            Self::TestEvent(_) => events::TestEvent::NAME,
-            Self::TestFabricScopedEvent => events::TestFabricScopedEvent::NAME,
-            Self::TestDifferentVendorMeiEvent(_) => events::TestDifferentVendorMeiEvent::NAME,
-        }
-    }
-
-    #[inline]
-    fn priority(&self) -> EventPriority {
-        self.priority()
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        self.is_empty_payload()
-    }
-}
-
-#[cfg(feature = "dispatch")]
-impl MatterDescribe for Event {
-    const STATIC_SCHEMA: StaticEntitySchema = StaticEntitySchema::cluster_enum(
-        EntityKind::Event,
-        UnitTestingCluster::NAME,
-        UnitTestingCluster::CLUSTER_ID.raw(),
-    );
-
-    #[inline]
-    fn descriptor(&self) -> EntityDescriptor {
-        EntityDescriptor::Event {
-            cluster: UnitTestingCluster::NAME,
-            cluster_id: UnitTestingCluster::CLUSTER_ID.raw(),
-            event: self.event_name(),
-            event_id: self.id().raw(),
-        }
-    }
-
-    #[inline]
-    fn is_empty_payload(&self) -> bool {
-        Self::is_empty_payload(self)
-    }
-
-    #[cfg(feature = "serde")]
-    fn serialize_payload<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        match self {
-            Self::TestFabricScopedEvent => Serialize::serialize(&(), serializer),
-            Self::TestEvent(inner) => Serialize::serialize(inner, serializer),
-            Self::TestDifferentVendorMeiEvent(inner) => Serialize::serialize(inner, serializer),
-        }
-    }
-
-    #[cfg(feature = "serde")]
-    fn deserialize_described<'de, D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        deserialize_enum_described(
-            deserializer,
-            EntityKind::Event,
-            Some((UnitTestingCluster::NAME, UnitTestingCluster::CLUSTER_ID.raw())),
-            |_, _, item_name, item_id, payload| Self::select_described(item_name, item_id, payload),
-        )
-    }
-}
+crate::impl_cluster_enum_dispatch!(
+    event,
+    Event,
+    UnitTestingCluster,
+    empty = [TestFabricScopedEvent,],
+    payload = [TestEvent, TestDifferentVendorMeiEvent,]
+);
 
 crate::define_matter_bitmap! {
     /// SimpleBitmap bitmap.
@@ -8718,26 +8287,26 @@ impl TestListStructOctet {
                     if member1.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         member1 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if member2.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         (decoded.len() <= 32)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         member2 = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -8756,24 +8325,7 @@ impl TestListStructOctet {
     }
 }
 
-impl From<TestListStructOctet> for AttributeValue {
-    #[inline]
-    fn from(val: TestListStructOctet) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TestListStructOctet {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TestListStructOctet);
 
 /// Fabric-scoped data structure.
 #[derive(Debug, Clone, PartialEq, Default)]
@@ -8865,78 +8417,78 @@ impl TestFabricScoped {
                     if fabric_sensitive_int8u.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         fabric_sensitive_int8u = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if optional_fabric_sensitive_int8u.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         optional_fabric_sensitive_int8u = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if nullable_fabric_sensitive_int8u.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u8>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         nullable_fabric_sensitive_int8u = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if nullable_optional_fabric_sensitive_int8u.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u8>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         nullable_optional_fabric_sensitive_int8u = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if fabric_sensitive_char_string.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         fabric_sensitive_char_string = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if fabric_sensitive_struct.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleStruct>::try_from(fval)?;
                         fabric_sensitive_struct = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if fabric_sensitive_int8u_list.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         fabric_sensitive_int8u_list = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -9011,24 +8563,7 @@ impl TestFabricScoped {
     }
 }
 
-impl From<TestFabricScoped> for AttributeValue {
-    #[inline]
-    fn from(val: TestFabricScoped) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for TestFabricScoped {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(TestFabricScoped);
 
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -9120,100 +8655,100 @@ impl SimpleStruct {
                     if a.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         a = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if b.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         b = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if c.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleEnum>::try_from(fval)?;
                         c = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if d.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <crate::Bytes>::try_from(fval)?;
                         d = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if e.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         e = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if f.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleBitmap>::try_from(fval)?;
                         f = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if g.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <f32>::try_from(fval)?;
                         g = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if h.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <f64>::try_from(fval)?;
                         h = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if i.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::TestGlobalEnum>::try_from(fval)?;
                         i = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -9248,24 +8783,7 @@ impl SimpleStruct {
     }
 }
 
-impl From<SimpleStruct> for AttributeValue {
-    #[inline]
-    fn from(val: SimpleStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for SimpleStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(SimpleStruct);
 
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -9319,45 +8837,45 @@ impl NestedStruct {
                     if a.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         a = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if b.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         b = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if c.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleStruct>::try_from(fval)?;
                         c = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if d.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <globals::TestGlobalStruct>::try_from(fval)?;
                         d = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -9382,24 +8900,7 @@ impl NestedStruct {
     }
 }
 
-impl From<NestedStruct> for AttributeValue {
-    #[inline]
-    fn from(val: NestedStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for NestedStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(NestedStruct);
 
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -9474,78 +8975,78 @@ impl NestedStructList {
                     if a.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         a = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if b.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         b = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if c.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleStruct>::try_from(fval)?;
                         c = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if d.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <SimpleStruct>::try_from)?;
                         d = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if e.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u32>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u32>(&v))?;
                         e = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if f.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <crate::Bytes>::try_from)?;
                         f = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if g.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         g = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -9586,24 +9087,7 @@ impl NestedStructList {
     }
 }
 
-impl From<NestedStructList> for AttributeValue {
-    #[inline]
-    fn from(val: NestedStructList) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for NestedStructList {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(NestedStructList);
 
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -9664,24 +9148,7 @@ impl From<Vec<NestedStructList>> for DoubleNestedStructList {
     }
 }
 
-impl From<DoubleNestedStructList> for AttributeValue {
-    #[inline]
-    fn from(val: DoubleNestedStructList) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for DoubleNestedStructList {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(DoubleNestedStructList);
 
 #[derive(Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -9859,133 +9326,135 @@ impl NullablesAndOptionalsStruct {
                     if nullable_int.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         nullable_int = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if optional_int.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         optional_int = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if nullable_optional_int.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         nullable_optional_int = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if nullable_string.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         nullable_string = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if optional_string.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         optional_string = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if nullable_optional_string.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                         nullable_optional_string = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if nullable_struct.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <SimpleStruct>::try_from)?;
                         nullable_struct = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 7 => {
                     if optional_struct.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <SimpleStruct>::try_from(fval)?;
                         optional_struct = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 8 => {
                     if nullable_optional_struct.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <SimpleStruct>::try_from)?;
                         nullable_optional_struct = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 9 => {
                     if nullable_list.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable_list(fval, <SimpleEnum>::try_from)?;
                         nullable_list = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 10 => {
                     if optional_list.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <SimpleEnum>::try_from)?;
                         optional_list = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 11 => {
                     if nullable_optional_list.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable_list(fval, <SimpleEnum>::try_from)?;
                         nullable_optional_list = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -10105,30 +9574,11 @@ impl NullablesAndOptionalsStruct {
     }
 }
 
-impl From<NullablesAndOptionalsStruct> for AttributeValue {
-    #[inline]
-    fn from(val: NullablesAndOptionalsStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for NullablesAndOptionalsStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(NullablesAndOptionalsStruct);
 
 pub mod attributes {
     #[allow(unused_imports, reason = "Generated attribute imports")]
     use alloc::{string::String, vec::Vec};
-    #[allow(unused_imports, reason = "Generated attribute imports")]
-    use core::fmt;
 
     #[cfg(feature = "serde")]
     #[allow(unused_imports, reason = "Generated attribute imports")]
@@ -10174,11 +9624,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10188,13 +9633,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Boolean, bool, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Boolean {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Boolean, bool, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10221,11 +9660,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10235,13 +9669,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Bitmap8, super::Bitmap8MaskMap, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Bitmap8 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Bitmap8,
+        super::Bitmap8MaskMap,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10268,11 +9703,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10282,13 +9712,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Bitmap16, super::Bitmap16MaskMap, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Bitmap16 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Bitmap16,
+        super::Bitmap16MaskMap,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10315,11 +9746,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10329,13 +9755,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Bitmap32, super::Bitmap32MaskMap, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Bitmap32 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Bitmap32,
+        super::Bitmap32MaskMap,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10362,11 +9789,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -10376,13 +9798,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Bitmap64, super::Bitmap64MaskMap, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Bitmap64 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        Bitmap64,
+        super::Bitmap64MaskMap,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10409,27 +9832,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int8u, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int8u, u8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10456,27 +9868,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int16u, u16, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int16u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int16u, u16, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10503,27 +9904,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int24u, u32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int24u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int24u, u32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10550,27 +9940,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int32u, u32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int32u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int32u, u32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10597,27 +9976,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int40u, u64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int40u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int40u, u64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10644,27 +10012,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int48u, u64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int48u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int48u, u64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10691,27 +10048,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int56u, u64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int56u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int56u, u64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10738,27 +10084,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int64u, u64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int64u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int64u, u64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10785,27 +10120,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int8s, i8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int8s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int8s, i8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10832,27 +10156,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int16s, i16, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int16s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int16s, i16, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10879,27 +10192,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int24s, i32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int24s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int24s, i32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10926,27 +10228,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int32s, i32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int32s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int32s, i32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -10973,27 +10264,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int40s, i64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int40s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int40s, i64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11020,27 +10300,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int48s, i64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int48s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int48s, i64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11067,27 +10336,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int56s, i64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int56s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int56s, i64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11114,27 +10372,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Int64s, i64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Int64s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Int64s, i64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11161,27 +10408,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Enum8, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Enum8 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Enum8, u8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11208,27 +10444,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(Enum16, u16, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for Enum16 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(Enum16, u16, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11255,11 +10480,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11269,13 +10489,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(FloatSingle, f32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for FloatSingle {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(FloatSingle, f32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11302,11 +10516,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11316,13 +10525,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(FloatDouble, f64, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for FloatDouble {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(FloatDouble, f64, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11349,11 +10552,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11366,13 +10564,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(OctetString, crate::Bytes, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for OctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<{} bytes>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        OctetString,
+        crate::Bytes,
+        super::UnitTestingCluster,
+        owned,
+        scalar,
+        bytes
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11399,12 +10598,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11415,18 +10608,15 @@ pub mod attributes {
             if items.len() > 10 {
                 return Err(MatterStatus::ConstraintError);
             }
-            let list = items.into_iter().map(<u8>::try_from).collect::<Result<Vec<_>, _>>()?;
+            let list = items
+                .into_iter()
+                .map(|item| crate::traits::decode_scalar::<u8>(&item))
+                .collect::<Result<Vec<_>, _>>()?;
             Ok(Self(list))
         }
     }
 
-    crate::impl_matter_attribute!(ListInt8u, Vec<u8>, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for ListInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(ListInt8u, Vec<u8>, super::UnitTestingCluster, owned, list, list);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11453,12 +10643,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11477,13 +10661,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ListOctetString, Vec<crate::Bytes>, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for ListOctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        ListOctetString,
+        Vec<crate::Bytes>,
+        super::UnitTestingCluster,
+        owned,
+        list,
+        list
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11510,12 +10695,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11538,14 +10717,10 @@ pub mod attributes {
         ListStructOctetString,
         Vec<super::TestListStructOctet>,
         super::UnitTestingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ListStructOctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11572,11 +10747,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11589,13 +10759,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LongOctetString, crate::Bytes, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for LongOctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<{} bytes>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        LongOctetString,
+        crate::Bytes,
+        super::UnitTestingCluster,
+        owned,
+        scalar,
+        bytes
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11622,11 +10793,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11639,13 +10805,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(CharString, String, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for CharString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(CharString, String, super::UnitTestingCluster, owned, scalar, display);
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11672,11 +10832,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11689,13 +10844,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(LongCharString, String, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for LongCharString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        LongCharString,
+        String,
+        super::UnitTestingCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11716,11 +10872,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11730,13 +10881,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(EpochUs, types::EpochUs, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for EpochUs {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        EpochUs,
+        types::EpochUs,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11757,11 +10909,6 @@ pub mod attributes {
             Self(val.into())
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11771,13 +10918,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(EpochS, types::EpochS, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for EpochS {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(EpochS, types::EpochS, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11804,11 +10945,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11818,13 +10954,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(VendorId, model::VendorId, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for VendorId {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        VendorId,
+        model::VendorId,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11851,12 +10988,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11876,14 +11007,10 @@ pub mod attributes {
         ListNullablesAndOptionalsStruct,
         Vec<super::NullablesAndOptionalsStruct>,
         super::UnitTestingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ListNullablesAndOptionalsStruct {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11910,11 +11037,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11924,13 +11046,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(EnumAttr, super::SimpleEnum, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for EnumAttr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        EnumAttr,
+        super::SimpleEnum,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -11957,11 +11080,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -11971,13 +11089,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(StructAttr, super::SimpleStruct, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for StructAttr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        StructAttr,
+        super::SimpleStruct,
+        super::UnitTestingCluster,
+        owned,
+        scalar,
+        debug
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12004,16 +11123,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 20_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -12024,13 +11138,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(RangeRestrictedInt8u, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for RangeRestrictedInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        RangeRestrictedInt8u,
+        u8,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12057,16 +11172,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             if raw < -40_i8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -12077,13 +11187,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(RangeRestrictedInt8s, i8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for RangeRestrictedInt8s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        RangeRestrictedInt8s,
+        i8,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12110,16 +11221,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 100_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -12130,13 +11236,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(RangeRestrictedInt16u, u16, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for RangeRestrictedInt16u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        RangeRestrictedInt16u,
+        u16,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12163,16 +11270,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -150_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -12183,13 +11285,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(RangeRestrictedInt16s, i16, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for RangeRestrictedInt16s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        RangeRestrictedInt16s,
+        i16,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12218,12 +11321,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12242,13 +11339,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ListLongOctetString, Vec<crate::Bytes>, super::UnitTestingCluster, owned);
-
-    impl fmt::Display for ListLongOctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_attribute!(
+        ListLongOctetString,
+        Vec<crate::Bytes>,
+        super::UnitTestingCluster,
+        owned,
+        list,
+        list
+    );
 
     #[derive(Debug, Clone, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12275,12 +11373,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12303,14 +11395,10 @@ pub mod attributes {
         ListFabricScoped,
         Vec<super::TestFabricScoped>,
         super::UnitTestingCluster,
-        owned
+        owned,
+        list,
+        list
     );
-
-    impl fmt::Display for ListFabricScoped {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12341,11 +11429,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12355,13 +11438,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(TimedWriteBoolean, bool, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for TimedWriteBoolean {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        TimedWriteBoolean,
+        bool,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12392,11 +11476,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12406,13 +11485,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(GeneralErrorBoolean, bool, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for GeneralErrorBoolean {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        GeneralErrorBoolean,
+        bool,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12443,11 +11523,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12457,13 +11532,14 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ClusterErrorBoolean, bool, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for ClusterErrorBoolean {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(
+        ClusterErrorBoolean,
+        bool,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12490,11 +11566,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12508,14 +11579,10 @@ pub mod attributes {
         GlobalEnum,
         super::globals::TestGlobalEnum,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for GlobalEnum {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12542,11 +11609,6 @@ pub mod attributes {
             &self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -12560,14 +11622,10 @@ pub mod attributes {
         GlobalStruct,
         super::globals::TestGlobalStruct,
         super::UnitTestingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-
-    impl fmt::Display for GlobalStruct {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:?}", self.0)
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12594,16 +11652,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 1_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -12614,13 +11667,7 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(ReadFailureCode, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for ReadFailureCode {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(ReadFailureCode, u8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12647,27 +11694,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(FailureInt32U, u32, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for FailureInt32U {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(FailureInt32U, u32, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12718,14 +11754,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -12735,29 +11763,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NullableBoolean, Nullable<bool>, super::UnitTestingCluster, copy);
-    impl From<bool> for NullableBoolean {
-        #[inline]
-        fn from(val: bool) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<bool>> for NullableBoolean {
-        #[inline]
-        fn from(val: Option<bool>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableBoolean {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableBoolean,
+        bool,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12808,14 +11822,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -12826,33 +11832,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableBitmap8,
-        Nullable<super::Bitmap8MaskMap>,
+        super::Bitmap8MaskMap,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::Bitmap8MaskMap> for NullableBitmap8 {
-        #[inline]
-        fn from(val: super::Bitmap8MaskMap) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::Bitmap8MaskMap>> for NullableBitmap8 {
-        #[inline]
-        fn from(val: Option<super::Bitmap8MaskMap>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableBitmap8 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12903,14 +11890,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -12921,33 +11900,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableBitmap16,
-        Nullable<super::Bitmap16MaskMap>,
+        super::Bitmap16MaskMap,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::Bitmap16MaskMap> for NullableBitmap16 {
-        #[inline]
-        fn from(val: super::Bitmap16MaskMap) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::Bitmap16MaskMap>> for NullableBitmap16 {
-        #[inline]
-        fn from(val: Option<super::Bitmap16MaskMap>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableBitmap16 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -12998,14 +11958,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -13016,33 +11968,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableBitmap32,
-        Nullable<super::Bitmap32MaskMap>,
+        super::Bitmap32MaskMap,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::Bitmap32MaskMap> for NullableBitmap32 {
-        #[inline]
-        fn from(val: super::Bitmap32MaskMap) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::Bitmap32MaskMap>> for NullableBitmap32 {
-        #[inline]
-        fn from(val: Option<super::Bitmap32MaskMap>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableBitmap32 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13093,14 +12026,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -13111,33 +12036,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableBitmap64,
-        Nullable<super::Bitmap64MaskMap>,
+        super::Bitmap64MaskMap,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::Bitmap64MaskMap> for NullableBitmap64 {
-        #[inline]
-        fn from(val: super::Bitmap64MaskMap) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::Bitmap64MaskMap>> for NullableBitmap64 {
-        #[inline]
-        fn from(val: Option<super::Bitmap64MaskMap>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableBitmap64 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13188,46 +12094,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt8u, Nullable<u8>, super::UnitTestingCluster, copy);
-    impl From<u8> for NullableInt8u {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for NullableInt8u {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt8u,
+        u8,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13278,46 +12162,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt16u, Nullable<u16>, super::UnitTestingCluster, copy);
-    impl From<u16> for NullableInt16u {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for NullableInt16u {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt16u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt16u,
+        u16,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13368,46 +12230,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt24u, Nullable<u32>, super::UnitTestingCluster, copy);
-    impl From<u32> for NullableInt24u {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for NullableInt24u {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt24u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt24u,
+        u32,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13458,46 +12298,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt32u, Nullable<u32>, super::UnitTestingCluster, copy);
-    impl From<u32> for NullableInt32u {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u32>> for NullableInt32u {
-        #[inline]
-        fn from(val: Option<u32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt32u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt32u,
+        u32,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13548,46 +12366,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt40u, Nullable<u64>, super::UnitTestingCluster, copy);
-    impl From<u64> for NullableInt40u {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for NullableInt40u {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt40u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt40u,
+        u64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13638,46 +12434,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt48u, Nullable<u64>, super::UnitTestingCluster, copy);
-    impl From<u64> for NullableInt48u {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for NullableInt48u {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt48u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt48u,
+        u64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13728,46 +12502,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt56u, Nullable<u64>, super::UnitTestingCluster, copy);
-    impl From<u64> for NullableInt56u {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for NullableInt56u {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt56u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt56u,
+        u64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13818,46 +12570,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt64u, Nullable<u64>, super::UnitTestingCluster, copy);
-    impl From<u64> for NullableInt64u {
-        #[inline]
-        fn from(val: u64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u64>> for NullableInt64u {
-        #[inline]
-        fn from(val: Option<u64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt64u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt64u,
+        u64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13908,46 +12638,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt8s, Nullable<i8>, super::UnitTestingCluster, copy);
-    impl From<i8> for NullableInt8s {
-        #[inline]
-        fn from(val: i8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i8>> for NullableInt8s {
-        #[inline]
-        fn from(val: Option<i8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt8s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt8s,
+        i8,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -13998,46 +12706,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt16s, Nullable<i16>, super::UnitTestingCluster, copy);
-    impl From<i16> for NullableInt16s {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for NullableInt16s {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt16s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt16s,
+        i16,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14088,46 +12774,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt24s, Nullable<i32>, super::UnitTestingCluster, copy);
-    impl From<i32> for NullableInt24s {
-        #[inline]
-        fn from(val: i32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i32>> for NullableInt24s {
-        #[inline]
-        fn from(val: Option<i32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt24s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt24s,
+        i32,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14178,46 +12842,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i32>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i32>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt32s, Nullable<i32>, super::UnitTestingCluster, copy);
-    impl From<i32> for NullableInt32s {
-        #[inline]
-        fn from(val: i32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i32>> for NullableInt32s {
-        #[inline]
-        fn from(val: Option<i32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt32s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt32s,
+        i32,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14268,46 +12910,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt40s, Nullable<i64>, super::UnitTestingCluster, copy);
-    impl From<i64> for NullableInt40s {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for NullableInt40s {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt40s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt40s,
+        i64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14358,46 +12978,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt48s, Nullable<i64>, super::UnitTestingCluster, copy);
-    impl From<i64> for NullableInt48s {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for NullableInt48s {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt48s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt48s,
+        i64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14448,46 +13046,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt56s, Nullable<i64>, super::UnitTestingCluster, copy);
-    impl From<i64> for NullableInt56s {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for NullableInt56s {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt56s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt56s,
+        i64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14538,46 +13114,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i64>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i64>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableInt64s, Nullable<i64>, super::UnitTestingCluster, copy);
-    impl From<i64> for NullableInt64s {
-        #[inline]
-        fn from(val: i64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i64>> for NullableInt64s {
-        #[inline]
-        fn from(val: Option<i64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableInt64s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableInt64s,
+        i64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14628,46 +13182,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableEnum8, Nullable<u8>, super::UnitTestingCluster, copy);
-    impl From<u8> for NullableEnum8 {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for NullableEnum8 {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableEnum8 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableEnum8,
+        u8,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14718,46 +13250,24 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             Ok(Self(Nullable::NonNull(raw)))
         }
     }
 
-    crate::impl_matter_attribute!(NullableEnum16, Nullable<u16>, super::UnitTestingCluster, copy);
-    impl From<u16> for NullableEnum16 {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for NullableEnum16 {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableEnum16 {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableEnum16,
+        u16,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14808,14 +13318,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -14825,29 +13327,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NullableFloatSingle, Nullable<f32>, super::UnitTestingCluster, copy);
-    impl From<f32> for NullableFloatSingle {
-        #[inline]
-        fn from(val: f32) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f32>> for NullableFloatSingle {
-        #[inline]
-        fn from(val: Option<f32>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableFloatSingle {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableFloatSingle,
+        f32,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14898,14 +13386,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -14915,29 +13395,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NullableFloatDouble, Nullable<f64>, super::UnitTestingCluster, copy);
-    impl From<f64> for NullableFloatDouble {
-        #[inline]
-        fn from(val: f64) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<f64>> for NullableFloatDouble {
-        #[inline]
-        fn from(val: Option<f64>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableFloatDouble {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableFloatDouble,
+        f64,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -14990,14 +13456,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15011,33 +13469,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableOctetString,
-        Nullable<crate::Bytes>,
+        crate::Bytes,
         super::UnitTestingCluster,
-        owned
+        owned,
+        scalar,
+        bytes
     );
-    impl From<crate::Bytes> for NullableOctetString {
-        #[inline]
-        fn from(val: crate::Bytes) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<crate::Bytes>> for NullableOctetString {
-        #[inline]
-        fn from(val: Option<crate::Bytes>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableOctetString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(bytes_val) => write!(f, "<{} bytes>", bytes_val.len()),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15088,14 +13527,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15108,29 +13539,15 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(NullableCharString, Nullable<String>, super::UnitTestingCluster, owned);
-    impl From<String> for NullableCharString {
-        #[inline]
-        fn from(val: String) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<String>> for NullableCharString {
-        #[inline]
-        fn from(val: Option<String>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableCharString {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
+    crate::impl_matter_attribute!(
+        nullable,
+        NullableCharString,
+        String,
+        super::UnitTestingCluster,
+        owned,
+        scalar,
+        display
+    );
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15181,14 +13598,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15199,33 +13608,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableEnumAttr,
-        Nullable<super::SimpleEnum>,
+        super::SimpleEnum,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::SimpleEnum> for NullableEnumAttr {
-        #[inline]
-        fn from(val: super::SimpleEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::SimpleEnum>> for NullableEnumAttr {
-        #[inline]
-        fn from(val: Option<super::SimpleEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableEnumAttr {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15276,14 +13666,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15294,33 +13676,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableStruct,
-        Nullable<super::SimpleStruct>,
+        super::SimpleStruct,
         super::UnitTestingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::SimpleStruct> for NullableStruct {
-        #[inline]
-        fn from(val: super::SimpleStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::SimpleStruct>> for NullableStruct {
-        #[inline]
-        fn from(val: Option<super::SimpleStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableStruct {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15371,19 +13734,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             if raw < 20_u8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -15395,33 +13750,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableRangeRestrictedInt8u,
-        Nullable<u8>,
+        u8,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u8> for NullableRangeRestrictedInt8u {
-        #[inline]
-        fn from(val: u8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u8>> for NullableRangeRestrictedInt8u {
-        #[inline]
-        fn from(val: Option<u8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableRangeRestrictedInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15472,19 +13808,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i8>(&val)?;
             if raw < -40_i8 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -15496,33 +13824,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableRangeRestrictedInt8s,
-        Nullable<i8>,
+        i8,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i8> for NullableRangeRestrictedInt8s {
-        #[inline]
-        fn from(val: i8) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i8>> for NullableRangeRestrictedInt8s {
-        #[inline]
-        fn from(val: Option<i8>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableRangeRestrictedInt8s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15573,19 +13882,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <u16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u16>(&val)?;
             if raw < 100_u16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -15597,33 +13898,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableRangeRestrictedInt16u,
-        Nullable<u16>,
+        u16,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<u16> for NullableRangeRestrictedInt16u {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<u16>> for NullableRangeRestrictedInt16u {
-        #[inline]
-        fn from(val: Option<u16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableRangeRestrictedInt16u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15674,19 +13956,11 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
             }
-            let raw = <i16>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<i16>(&val)?;
             if raw < -150_i16 {
                 return Err(MatterStatus::ConstraintError);
             }
@@ -15698,33 +13972,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableRangeRestrictedInt16s,
-        Nullable<i16>,
+        i16,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<i16> for NullableRangeRestrictedInt16s {
-        #[inline]
-        fn from(val: i16) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<i16>> for NullableRangeRestrictedInt16s {
-        #[inline]
-        fn from(val: Option<i16>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableRangeRestrictedInt16s {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15751,27 +14006,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(WriteOnlyInt8u, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for WriteOnlyInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(WriteOnlyInt8u, u8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15822,14 +14066,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15840,33 +14076,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableGlobalEnum,
-        Nullable<super::globals::TestGlobalEnum>,
+        super::globals::TestGlobalEnum,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-    impl From<super::globals::TestGlobalEnum> for NullableGlobalEnum {
-        #[inline]
-        fn from(val: super::globals::TestGlobalEnum) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::globals::TestGlobalEnum>> for NullableGlobalEnum {
-        #[inline]
-        fn from(val: Option<super::globals::TestGlobalEnum>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableGlobalEnum {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(val) => write!(f, "{val}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15917,14 +14134,6 @@ pub mod attributes {
             self.0.as_ref()
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            match self.0 {
-                Nullable::NonNull(val) => AttributeValue::from(val),
-                Nullable::Null => AttributeValue::Null,
-            }
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Ok(Self(Nullable::Null));
@@ -15935,33 +14144,14 @@ pub mod attributes {
     }
 
     crate::impl_matter_attribute!(
+        nullable,
         NullableGlobalStruct,
-        Nullable<super::globals::TestGlobalStruct>,
+        super::globals::TestGlobalStruct,
         super::UnitTestingCluster,
-        owned
+        owned,
+        scalar,
+        debug
     );
-    impl From<super::globals::TestGlobalStruct> for NullableGlobalStruct {
-        #[inline]
-        fn from(val: super::globals::TestGlobalStruct) -> Self {
-            Self(Nullable::NonNull(val))
-        }
-    }
-
-    impl From<Option<super::globals::TestGlobalStruct>> for NullableGlobalStruct {
-        #[inline]
-        fn from(val: Option<super::globals::TestGlobalStruct>) -> Self {
-            Self(Nullable::from(val))
-        }
-    }
-
-    impl fmt::Display for NullableGlobalStruct {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match &self.0 {
-                Nullable::NonNull(struct_val) => write!(f, "{struct_val:?}"),
-                Nullable::Null => write!(f, "null"),
-            }
-        }
-    }
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -15988,27 +14178,16 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
             }
-            let raw = <u8>::try_from(val)?;
+            let raw = crate::traits::decode_scalar::<u8>(&val)?;
             Ok(Self(raw))
         }
     }
 
-    crate::impl_matter_attribute!(MeiInt8u, u8, super::UnitTestingCluster, copy);
-
-    impl fmt::Display for MeiInt8u {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
+    crate::impl_matter_attribute!(MeiInt8u, u8, super::UnitTestingCluster, copy, scalar, display);
 
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -16039,11 +14218,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -16053,18 +14227,18 @@ pub mod attributes {
         }
     }
 
-    crate::impl_matter_attribute!(Unsupported, super::Unsupported, super::UnitTestingCluster, copy);
-
+    crate::impl_matter_attribute!(
+        Unsupported,
+        super::Unsupported,
+        super::UnitTestingCluster,
+        copy,
+        scalar,
+        display
+    );
     impl From<bool> for Unsupported {
         #[inline]
         fn from(val: bool) -> Self {
             Self(super::Unsupported::from(val))
-        }
-    }
-
-    impl fmt::Display for Unsupported {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
         }
     }
 
@@ -16097,11 +14271,6 @@ pub mod attributes {
             self.0
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::from(self.0)
-        }
-
         pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
             if matches!(val, AttributeValue::Null) {
                 return Err(MatterStatus::InvalidDataType);
@@ -16115,14 +14284,10 @@ pub mod attributes {
         UnsupportedAttributeRequiringAdminPrivilege,
         bool,
         super::UnitTestingCluster,
-        copy
+        copy,
+        scalar,
+        display
     );
-
-    impl fmt::Display for UnsupportedAttributeRequiringAdminPrivilege {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
 }
 
 pub mod commands {
@@ -16150,62 +14315,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct Test;
 
-    impl crate::traits::CommandSpec for Test {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl Test {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x00);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "Test";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(Test, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(Test, super::UnitTestingCluster, (), true);
 
     /// Simple command without any parameters and without a specific response not handled by the server.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -16213,62 +14330,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct TestNotHandled;
 
-    impl crate::traits::CommandSpec for TestNotHandled {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl TestNotHandled {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x01);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "TestNotHandled";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(TestNotHandled, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(TestNotHandled, super::UnitTestingCluster, (), true);
 
     /// Simple command without any parameters and with a specific response.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -16276,62 +14345,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct TestSpecific;
 
-    impl crate::traits::CommandSpec for TestSpecific {
-        type Response = TestSpecificResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl TestSpecific {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x02);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "TestSpecific";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(TestSpecific, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(TestSpecific, super::UnitTestingCluster, TestSpecificResponse, true);
 
     /// Simple command that should not be added to the server.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -16339,62 +14360,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct TestUnknownCommand;
 
-    impl crate::traits::CommandSpec for TestUnknownCommand {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl TestUnknownCommand {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x03);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "TestUnknownCommand";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(TestUnknownCommand, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(TestUnknownCommand, super::UnitTestingCluster, (), true);
 
     /// Command that takes two arguments and returns their sum.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -16408,17 +14381,6 @@ pub mod commands {
     pub struct TestAddArguments {
         pub arg1: u8,
         pub arg2: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestAddArguments {
-        type Response = TestAddArgumentsResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestAddArguments {
@@ -16445,11 +14407,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -16461,23 +14418,23 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -16487,22 +14444,14 @@ pub mod commands {
                 arg2: arg2.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestAddArguments, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestAddArguments,
+        super::UnitTestingCluster,
+        TestAddArgumentsResponse,
+        false
+    );
 
     /// Command that takes an argument which is bool.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -16515,17 +14464,6 @@ pub mod commands {
     )]
     pub struct TestSimpleArgumentRequest {
         pub arg1: bool,
-    }
-
-    impl crate::traits::CommandSpec for TestSimpleArgumentRequest {
-        type Response = TestSimpleArgumentResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestSimpleArgumentRequest {
@@ -16543,11 +14481,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -16573,19 +14506,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<bool> for TestSimpleArgumentRequest {
@@ -16595,7 +14515,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestSimpleArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestSimpleArgumentRequest,
+        super::UnitTestingCluster,
+        TestSimpleArgumentResponse,
+        false
+    );
 
     /// Command that takes various arguments that are arrays, including an array of structs which have a list member.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -16613,17 +14538,6 @@ pub mod commands {
         pub arg4: Vec<bool>,
         pub arg5: super::SimpleEnum,
         pub arg6: bool,
-    }
-
-    impl crate::traits::CommandSpec for TestStructArrayArgumentRequest {
-        type Response = TestStructArrayArgumentResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestStructArrayArgumentRequest {
@@ -16681,11 +14595,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -16701,67 +14610,67 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::NestedStructList>::try_from)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleStruct>::try_from)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if arg3.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             arg3 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if arg4.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <bool>::try_from)?;
                             arg4 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if arg5.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg5 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if arg6.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             arg6 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -16775,22 +14684,14 @@ pub mod commands {
                 arg6: arg6.ok_or((Some(FieldId::new(5)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestStructArrayArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestStructArrayArgumentRequest,
+        super::UnitTestingCluster,
+        TestStructArrayArgumentResponse,
+        false
+    );
 
     /// Command that takes an argument which is struct.  The response echoes the         'b' field of the single arg.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -16803,17 +14704,6 @@ pub mod commands {
     )]
     pub struct TestStructArgumentRequest {
         pub arg1: super::SimpleStruct,
-    }
-
-    impl crate::traits::CommandSpec for TestStructArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestStructArgumentRequest {
@@ -16831,11 +14721,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -16861,19 +14746,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::SimpleStruct> for TestStructArgumentRequest {
@@ -16883,7 +14755,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestStructArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestStructArgumentRequest,
+        super::UnitTestingCluster,
+        BooleanResponse,
+        false
+    );
 
     /// Command that takes an argument which is nested struct.  The response         echoes the 'b' field of ar1.c.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -16896,17 +14773,6 @@ pub mod commands {
     )]
     pub struct TestNestedStructArgumentRequest {
         pub arg1: super::NestedStruct,
-    }
-
-    impl crate::traits::CommandSpec for TestNestedStructArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestNestedStructArgumentRequest {
@@ -16924,11 +14790,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -16954,19 +14815,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::NestedStruct> for TestNestedStructArgumentRequest {
@@ -16976,7 +14824,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestNestedStructArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestNestedStructArgumentRequest,
+        super::UnitTestingCluster,
+        BooleanResponse,
+        false
+    );
 
     /// Command that takes an argument which is a list of structs.  The response         returns false if there is some
     /// struct in the list whose 'b' field is         false, and true otherwise (including if the list is empty).
@@ -16990,17 +14843,6 @@ pub mod commands {
     )]
     pub struct TestListStructArgumentRequest {
         pub arg1: Vec<super::SimpleStruct>,
-    }
-
-    impl crate::traits::CommandSpec for TestListStructArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestListStructArgumentRequest {
@@ -17021,11 +14863,6 @@ pub mod commands {
                 Self::FIELD_ARG1,
                 AttributeValue::List(self.arg1.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -17051,19 +14888,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::SimpleStruct>> for TestListStructArgumentRequest {
@@ -17073,7 +14897,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestListStructArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestListStructArgumentRequest,
+        super::UnitTestingCluster,
+        BooleanResponse,
+        false
+    );
 
     /// Command that takes an argument which is a list of INT8U.  The response         returns false if the list
     /// contains a 0 in it, true otherwise (including         if the list is empty).
@@ -17087,17 +14916,6 @@ pub mod commands {
     )]
     pub struct TestListInt8UArgumentRequest {
         pub arg1: Vec<u8>,
-    }
-
-    impl crate::traits::CommandSpec for TestListInt8UArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestListInt8UArgumentRequest {
@@ -17120,11 +14938,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -17135,7 +14948,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -17148,19 +14961,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<u8>> for TestListInt8UArgumentRequest {
@@ -17170,7 +14970,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestListInt8UArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestListInt8UArgumentRequest,
+        super::UnitTestingCluster,
+        BooleanResponse,
+        false
+    );
 
     /// Command that takes an argument which is a Nested Struct List.  The         response returns false if there is
     /// some struct in arg1 (either directly         in arg1.c or in the arg1.d list) whose 'b' field is false, and true
@@ -17185,17 +14990,6 @@ pub mod commands {
     )]
     pub struct TestNestedStructListArgumentRequest {
         pub arg1: super::NestedStructList,
-    }
-
-    impl crate::traits::CommandSpec for TestNestedStructListArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestNestedStructListArgumentRequest {
@@ -17213,11 +15007,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -17243,19 +15032,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::NestedStructList> for TestNestedStructListArgumentRequest {
@@ -17265,7 +15041,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestNestedStructListArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestNestedStructListArgumentRequest,
+        super::UnitTestingCluster,
+        BooleanResponse,
+        false
+    );
 
     /// Command that takes an argument which is a list of Nested Struct List.         The response returns false if
     /// there is some struct in arg1 (either         directly in as the 'c' field of an entry 'd' list of an entry)
@@ -17280,17 +15061,6 @@ pub mod commands {
     )]
     pub struct TestListNestedStructListArgumentRequest {
         pub arg1: Vec<super::NestedStructList>,
-    }
-
-    impl crate::traits::CommandSpec for TestListNestedStructListArgumentRequest {
-        type Response = BooleanResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestListNestedStructListArgumentRequest {
@@ -17311,11 +15081,6 @@ pub mod commands {
                 Self::FIELD_ARG1,
                 AttributeValue::List(self.arg1.into_iter().map(AttributeValue::from).collect())
             ),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -17341,19 +15106,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<super::NestedStructList>> for TestListNestedStructListArgumentRequest {
@@ -17366,6 +15118,7 @@ pub mod commands {
     crate::impl_matter_command!(
         TestListNestedStructListArgumentRequest,
         super::UnitTestingCluster,
+        BooleanResponse,
         false
     );
 
@@ -17380,17 +15133,6 @@ pub mod commands {
     )]
     pub struct TestListInt8UReverseRequest {
         pub arg1: Vec<u8>,
-    }
-
-    impl crate::traits::CommandSpec for TestListInt8UReverseRequest {
-        type Response = TestListInt8UReverseResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestListInt8UReverseRequest {
@@ -17413,11 +15155,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -17428,7 +15165,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -17441,19 +15178,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<u8>> for TestListInt8UReverseRequest {
@@ -17463,7 +15187,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestListInt8UReverseRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestListInt8UReverseRequest,
+        super::UnitTestingCluster,
+        TestListInt8UReverseResponse,
+        false
+    );
 
     /// Command that sends a vendor id and an enum.  The server is expected to         echo them back.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -17477,17 +15206,6 @@ pub mod commands {
     pub struct TestEnumsRequest {
         pub arg1: VendorId,
         pub arg2: super::SimpleEnum,
-    }
-
-    impl crate::traits::CommandSpec for TestEnumsRequest {
-        type Response = TestEnumsResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEnumsRequest {
@@ -17514,11 +15232,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -17530,23 +15243,23 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <VendorId>::try_from(fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -17556,22 +15269,9 @@ pub mod commands {
                 arg2: arg2.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestEnumsRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestEnumsRequest, super::UnitTestingCluster, TestEnumsResponse, false);
 
     /// Command that takes an argument which is nullable and optional.  The         response returns a boolean
     /// indicating whether the argument was present,         if that's true a boolean indicating whether the argument
@@ -17595,17 +15295,6 @@ pub mod commands {
         )]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub arg1: Optional<Nullable<u8>>,
-    }
-
-    impl crate::traits::CommandSpec for TestNullableOptionalRequest {
-        type Response = TestNullableOptionalResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestNullableOptionalRequest {
@@ -17645,11 +15334,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -17660,7 +15344,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u8>::try_from)?;
+                        let decoded = crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -17673,22 +15357,14 @@ pub mod commands {
                 arg1: Optional::from(arg1),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestNullableOptionalRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestNullableOptionalRequest,
+        super::UnitTestingCluster,
+        TestNullableOptionalResponse,
+        false
+    );
 
     /// Command that takes various arguments which can be nullable and/or optional.  The         response returns
     /// information about which things were received and what         their state was.
@@ -17757,17 +15433,6 @@ pub mod commands {
         )]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub nullable_optional_list: Optional<Nullable<Vec<super::SimpleEnum>>>,
-    }
-
-    impl crate::traits::CommandSpec for TestComplexNullableOptionalRequest {
-        type Response = TestComplexNullableOptionalResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestComplexNullableOptionalRequest {
@@ -17964,11 +15629,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -17990,133 +15650,135 @@ pub mod commands {
                         if nullable_int.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             nullable_int = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if optional_int.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             optional_int = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if nullable_optional_int.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                             nullable_optional_int = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if nullable_string.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                             nullable_string = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if optional_string.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             optional_string = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if nullable_optional_string.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <String>::try_from)?;
                             nullable_optional_string = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if nullable_struct.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <super::SimpleStruct>::try_from)?;
                             nullable_struct = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     7 => {
                         if optional_struct.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleStruct>::try_from(fval)?;
                             optional_struct = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     8 => {
                         if nullable_optional_struct.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable(fval, <super::SimpleStruct>::try_from)?;
                             nullable_optional_struct = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     9 => {
                         if nullable_list.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable_list(fval, <super::SimpleEnum>::try_from)?;
                             nullable_list = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     10 => {
                         if optional_list.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             optional_list = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     11 => {
                         if nullable_optional_list.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_nullable_list(fval, <super::SimpleEnum>::try_from)?;
                             nullable_optional_list = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -18136,22 +15798,14 @@ pub mod commands {
                 nullable_optional_list: Optional::from(nullable_optional_list),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestComplexNullableOptionalRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestComplexNullableOptionalRequest,
+        super::UnitTestingCluster,
+        TestComplexNullableOptionalResponse,
+        false
+    );
 
     /// Command that takes an argument which is a struct.  The response echoes         the struct back.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -18164,17 +15818,6 @@ pub mod commands {
     )]
     pub struct SimpleStructEchoRequest {
         pub arg1: super::SimpleStruct,
-    }
-
-    impl crate::traits::CommandSpec for SimpleStructEchoRequest {
-        type Response = SimpleStructResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SimpleStructEchoRequest {
@@ -18192,11 +15835,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -18222,19 +15860,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::SimpleStruct> for SimpleStructEchoRequest {
@@ -18244,7 +15869,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SimpleStructEchoRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        SimpleStructEchoRequest,
+        super::UnitTestingCluster,
+        SimpleStructResponse,
+        false
+    );
 
     /// Command that just responds with a success status if the timed invoke         conditions are met.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -18252,62 +15882,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct TimedInvokeRequest;
 
-    impl crate::traits::CommandSpec for TimedInvokeRequest {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl TimedInvokeRequest {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x12);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "TimedInvokeRequest";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(TimedInvokeRequest, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(TimedInvokeRequest, super::UnitTestingCluster, (), true);
 
     /// Command that takes an optional argument which is bool. It responds with a success value if the optional is set
     /// to any value.
@@ -18323,17 +15905,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub arg1: Optional<bool>,
-    }
-
-    impl crate::traits::CommandSpec for TestSimpleOptionalArgumentRequest {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestSimpleOptionalArgumentRequest {
@@ -18366,11 +15937,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -18394,22 +15960,9 @@ pub mod commands {
                 arg1: Optional::from(arg1),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestSimpleOptionalArgumentRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestSimpleOptionalArgumentRequest, super::UnitTestingCluster, (), false);
 
     /// Command that takes identical arguments to the fields of the TestEvent and logs the TestEvent to the buffer.
     /// Command returns an event ID as the response.
@@ -18425,17 +15978,6 @@ pub mod commands {
         pub arg1: u8,
         pub arg2: super::SimpleEnum,
         pub arg3: bool,
-    }
-
-    impl crate::traits::CommandSpec for TestEmitTestEventRequest {
-        type Response = TestEmitTestEventResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEmitTestEventRequest {
@@ -18465,11 +16007,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -18482,34 +16019,34 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if arg3.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             arg3 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -18520,22 +16057,14 @@ pub mod commands {
                 arg3: arg3.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestEmitTestEventRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestEmitTestEventRequest,
+        super::UnitTestingCluster,
+        TestEmitTestEventResponse,
+        false
+    );
 
     /// Command that takes identical arguments to the fields of the TestFabricScopedEvent and logs the
     /// TestFabricScopedEvent to the buffer.  Command returns an event ID as the response.
@@ -18549,17 +16078,6 @@ pub mod commands {
     )]
     pub struct TestEmitTestFabricScopedEventRequest {
         pub arg1: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestEmitTestFabricScopedEventRequest {
-        type Response = TestEmitTestFabricScopedEventResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEmitTestFabricScopedEventRequest {
@@ -18579,11 +16097,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -18594,7 +16107,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -18607,19 +16120,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for TestEmitTestFabricScopedEventRequest {
@@ -18629,7 +16129,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestEmitTestFabricScopedEventRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestEmitTestFabricScopedEventRequest,
+        super::UnitTestingCluster,
+        TestEmitTestFabricScopedEventResponse,
+        false
+    );
 
     /// Command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with
     /// fillCharacter.
@@ -18645,17 +16150,6 @@ pub mod commands {
         pub sleep_before_response_time_ms: u16,
         pub size_of_response_buffer: u16,
         pub fill_character: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestBatchHelperRequest {
-        type Response = TestBatchHelperResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestBatchHelperRequest {
@@ -18695,11 +16189,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -18712,37 +16201,37 @@ pub mod commands {
                         if sleep_before_response_time_ms.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             sleep_before_response_time_ms = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if size_of_response_buffer.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded <= 800_u16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             size_of_response_buffer = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if fill_character.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             fill_character = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -18755,22 +16244,14 @@ pub mod commands {
                 fill_character: fill_character.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestBatchHelperRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestBatchHelperRequest,
+        super::UnitTestingCluster,
+        TestBatchHelperResponse,
+        false
+    );
 
     /// Second command that responds after sleepBeforeResponseTimeMs with an octet_string the size requested with
     /// fillCharacter.
@@ -18786,17 +16267,6 @@ pub mod commands {
         pub sleep_before_response_time_ms: u16,
         pub size_of_response_buffer: u16,
         pub fill_character: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestSecondBatchHelperRequest {
-        type Response = TestBatchHelperResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestSecondBatchHelperRequest {
@@ -18836,11 +16306,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -18853,37 +16318,37 @@ pub mod commands {
                         if sleep_before_response_time_ms.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             sleep_before_response_time_ms = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if size_of_response_buffer.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             (decoded <= 800_u16)
                                 .then_some(())
                                 .ok_or(MatterStatus::ConstraintError)?;
                             size_of_response_buffer = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if fill_character.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             fill_character = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -18896,22 +16361,14 @@ pub mod commands {
                 fill_character: fill_character.ok_or((Some(FieldId::new(2)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestSecondBatchHelperRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestSecondBatchHelperRequest,
+        super::UnitTestingCluster,
+        TestBatchHelperResponse,
+        false
+    );
 
     /// Command that takes an argument which is an octet string.  The response echoes         the string back. If the
     /// string is large then it would require a session that         supports large payloads.
@@ -18926,17 +16383,6 @@ pub mod commands {
     pub struct StringEchoRequest {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub payload: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for StringEchoRequest {
-        type Response = StringEchoResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl StringEchoRequest {
@@ -18956,11 +16402,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_PAYLOAD, AttributeValue::from(self.payload)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -18986,19 +16427,6 @@ pub mod commands {
                 payload: payload.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for StringEchoRequest {
@@ -19008,7 +16436,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(StringEchoRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(StringEchoRequest, super::UnitTestingCluster, StringEchoResponse, false);
 
     /// Command that takes arguments that are global structs/enums and the         response just echoes them back.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19022,17 +16450,6 @@ pub mod commands {
     pub struct GlobalEchoRequest {
         pub field1: super::globals::TestGlobalStruct,
         pub field2: super::globals::TestGlobalEnum,
-    }
-
-    impl crate::traits::CommandSpec for GlobalEchoRequest {
-        type Response = GlobalEchoResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GlobalEchoRequest {
@@ -19062,11 +16479,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19078,23 +16490,23 @@ pub mod commands {
                         if field1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::TestGlobalStruct>::try_from(fval)?;
                             field1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if field2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::TestGlobalEnum>::try_from(fval)?;
                             field2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -19104,22 +16516,9 @@ pub mod commands {
                 field2: field2.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GlobalEchoRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(GlobalEchoRequest, super::UnitTestingCluster, GlobalEchoResponse, false);
 
     /// Command that returns Success if the CommandFlags pass all checks at the IM layer.         Otherwise, return
     /// appropriate StatusCode back.
@@ -19128,62 +16527,14 @@ pub mod commands {
     #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
     pub struct TestCheckCommandFlags;
 
-    impl crate::traits::CommandSpec for TestCheckCommandFlags {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = true;
-    }
-
     impl TestCheckCommandFlags {
         pub const CLUSTER_ID: ClusterId = super::UnitTestingCluster::CLUSTER_ID;
         pub const COMMAND_ID: CommandId = CommandId::new(0x1A);
         pub const DIRECTION: CommandDirection = CommandDirection::ClientToServer;
         pub const NAME: &'static str = "TestCheckCommandFlags";
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
-    crate::impl_matter_command!(TestCheckCommandFlags, super::UnitTestingCluster, true);
+    crate::impl_matter_command!(TestCheckCommandFlags, super::UnitTestingCluster, (), true);
 
     /// Command having a different MEI vendor ID than the cluster. Also emits TestDifferentVendorMeiEvent.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19196,17 +16547,6 @@ pub mod commands {
     )]
     pub struct TestDifferentVendorMeiRequest {
         pub arg1: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestDifferentVendorMeiRequest {
-        type Response = TestDifferentVendorMeiResponse;
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestDifferentVendorMeiRequest {
@@ -19226,11 +16566,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19241,7 +16576,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -19254,19 +16589,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for TestDifferentVendorMeiRequest {
@@ -19276,7 +16598,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestDifferentVendorMeiRequest, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestDifferentVendorMeiRequest,
+        super::UnitTestingCluster,
+        TestDifferentVendorMeiResponse,
+        false
+    );
 
     /// Simple response for TestWithResponse with a simple return value.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19289,17 +16616,6 @@ pub mod commands {
     )]
     pub struct TestSpecificResponse {
         pub return_value: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestSpecificResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestSpecificResponse {
@@ -19321,11 +16637,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_RETURN_VALUE, AttributeValue::from(self.return_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19336,7 +16647,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         return_value = Some(decoded);
                         Ok(())
                     })()
@@ -19349,19 +16660,6 @@ pub mod commands {
                 return_value: return_value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for TestSpecificResponse {
@@ -19371,7 +16669,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestSpecificResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestSpecificResponse, super::UnitTestingCluster, (), false);
 
     /// Response for TestAddArguments that returns the sum.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19384,17 +16682,6 @@ pub mod commands {
     )]
     pub struct TestAddArgumentsResponse {
         pub return_value: u8,
-    }
-
-    impl crate::traits::CommandSpec for TestAddArgumentsResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestAddArgumentsResponse {
@@ -19416,11 +16703,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_RETURN_VALUE, AttributeValue::from(self.return_value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19431,7 +16713,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         return_value = Some(decoded);
                         Ok(())
                     })()
@@ -19444,19 +16726,6 @@ pub mod commands {
                 return_value: return_value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u8> for TestAddArgumentsResponse {
@@ -19466,7 +16735,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestAddArgumentsResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestAddArgumentsResponse, super::UnitTestingCluster, (), false);
 
     /// Simple response for TestSimpleArgumentRequest with a simple return value.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19479,17 +16748,6 @@ pub mod commands {
     )]
     pub struct TestSimpleArgumentResponse {
         pub return_value: bool,
-    }
-
-    impl crate::traits::CommandSpec for TestSimpleArgumentResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestSimpleArgumentResponse {
@@ -19509,11 +16767,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_RETURN_VALUE, AttributeValue::from(self.return_value)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -19539,19 +16792,6 @@ pub mod commands {
                 return_value: return_value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<bool> for TestSimpleArgumentResponse {
@@ -19561,7 +16801,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestSimpleArgumentResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestSimpleArgumentResponse, super::UnitTestingCluster, (), false);
 
     /// Response for TestStructArrayArgumentRequest with complicated return arguments.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -19579,17 +16819,6 @@ pub mod commands {
         pub arg4: Vec<bool>,
         pub arg5: super::SimpleEnum,
         pub arg6: bool,
-    }
-
-    impl crate::traits::CommandSpec for TestStructArrayArgumentResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestStructArrayArgumentResponse {
@@ -19647,11 +16876,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19667,67 +16891,67 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::NestedStructList>::try_from)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleStruct>::try_from)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if arg3.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             arg3 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if arg4.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <bool>::try_from)?;
                             arg4 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if arg5.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg5 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if arg6.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             arg6 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -19741,22 +16965,9 @@ pub mod commands {
                 arg6: arg6.ok_or((Some(FieldId::new(5)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestStructArrayArgumentResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestStructArrayArgumentResponse, super::UnitTestingCluster, (), false);
 
     /// Response that delivers the reversed list of uint8.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19769,17 +16980,6 @@ pub mod commands {
     )]
     pub struct TestListInt8UReverseResponse {
         pub arg1: Vec<u8>,
-    }
-
-    impl crate::traits::CommandSpec for TestListInt8UReverseResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestListInt8UReverseResponse {
@@ -19802,11 +17002,6 @@ pub mod commands {
             ),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19817,7 +17012,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_list(fval, <u8>::try_from)?;
+                        let decoded = crate::traits::decode_list(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -19830,19 +17025,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<Vec<u8>> for TestListInt8UReverseResponse {
@@ -19852,7 +17034,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestListInt8UReverseResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestListInt8UReverseResponse, super::UnitTestingCluster, (), false);
 
     /// Response that delivers a vendor id and an enum..
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -19866,17 +17048,6 @@ pub mod commands {
     pub struct TestEnumsResponse {
         pub arg1: VendorId,
         pub arg2: super::SimpleEnum,
-    }
-
-    impl crate::traits::CommandSpec for TestEnumsResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEnumsResponse {
@@ -19903,11 +17074,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -19919,23 +17085,23 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <VendorId>::try_from(fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -19945,22 +17111,9 @@ pub mod commands {
                 arg2: arg2.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestEnumsResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestEnumsResponse, super::UnitTestingCluster, (), false);
 
     /// Delivers information about the argument TestNullableOptionalRequest had,         and the original value if there
     /// was one.
@@ -19990,17 +17143,6 @@ pub mod commands {
         )]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub original_value: Optional<Nullable<u8>>,
-    }
-
-    impl crate::traits::CommandSpec for TestNullableOptionalResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestNullableOptionalResponse {
@@ -20064,11 +17206,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -20082,45 +17219,46 @@ pub mod commands {
                         if was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if original_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = crate::traits::decode_nullable(fval, <u8>::try_from)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded =
+                                crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u8>(&v))?;
                             original_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -20132,19 +17270,6 @@ pub mod commands {
                 original_value: Optional::from(original_value),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<bool> for TestNullableOptionalResponse {
@@ -20154,7 +17279,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestNullableOptionalResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestNullableOptionalResponse, super::UnitTestingCluster, (), false);
 
     /// Delivers information about the arguments TestComplexNullableOptionalRequest had.
     #[derive(Debug, Clone, PartialEq, Default)]
@@ -20226,17 +17351,6 @@ pub mod commands {
         #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
         #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
         pub nullable_optional_list_value: Optional<Vec<super::SimpleEnum>>,
-    }
-
-    impl crate::traits::CommandSpec for TestComplexNullableOptionalResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestComplexNullableOptionalResponse {
@@ -20545,11 +17659,6 @@ pub mod commands {
             fields
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -20587,309 +17696,309 @@ pub mod commands {
                         if nullable_int_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_int_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if nullable_int_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             nullable_int_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if optional_int_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             optional_int_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if optional_int_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             optional_int_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if nullable_optional_int_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_int_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if nullable_optional_int_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_int_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if nullable_optional_int_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u16>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                             nullable_optional_int_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     7 => {
                         if nullable_string_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_string_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     8 => {
                         if nullable_string_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             nullable_string_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     9 => {
                         if optional_string_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             optional_string_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     10 => {
                         if optional_string_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             optional_string_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     11 => {
                         if nullable_optional_string_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_string_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     12 => {
                         if nullable_optional_string_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_string_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     13 => {
                         if nullable_optional_string_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <String>::try_from(fval)?;
                             nullable_optional_string_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     14 => {
                         if nullable_struct_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_struct_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     15 => {
                         if nullable_struct_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleStruct>::try_from(fval)?;
                             nullable_struct_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     16 => {
                         if optional_struct_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             optional_struct_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     17 => {
                         if optional_struct_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleStruct>::try_from(fval)?;
                             optional_struct_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     18 => {
                         if nullable_optional_struct_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_struct_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     19 => {
                         if nullable_optional_struct_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_struct_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     20 => {
                         if nullable_optional_struct_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleStruct>::try_from(fval)?;
                             nullable_optional_struct_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     21 => {
                         if nullable_list_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_list_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     22 => {
                         if nullable_list_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             nullable_list_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     23 => {
                         if optional_list_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             optional_list_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     24 => {
                         if optional_list_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             optional_list_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     25 => {
                         if nullable_optional_list_was_present.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_list_was_present = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     26 => {
                         if nullable_optional_list_was_null.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             nullable_optional_list_was_null = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     27 => {
                         if nullable_optional_list_value.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             nullable_optional_list_value = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -20937,22 +18046,14 @@ pub mod commands {
                 nullable_optional_list_value: Optional::from(nullable_optional_list_value),
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestComplexNullableOptionalResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestComplexNullableOptionalResponse,
+        super::UnitTestingCluster,
+        (),
+        false
+    );
 
     /// Delivers a single boolean argument. What the argument means depends on         what we're responding to.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -20965,17 +18066,6 @@ pub mod commands {
     )]
     pub struct BooleanResponse {
         pub value: bool,
-    }
-
-    impl crate::traits::CommandSpec for BooleanResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl BooleanResponse {
@@ -20993,11 +18083,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_VALUE, AttributeValue::from(self.value)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -21023,19 +18108,6 @@ pub mod commands {
                 value: value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<bool> for BooleanResponse {
@@ -21045,7 +18117,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(BooleanResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(BooleanResponse, super::UnitTestingCluster, (), false);
 
     /// Command that returns a single argument which is a struct.  The contents         of the struct depend on what we
     /// are responding to.
@@ -21059,17 +18131,6 @@ pub mod commands {
     )]
     pub struct SimpleStructResponse {
         pub arg1: super::SimpleStruct,
-    }
-
-    impl crate::traits::CommandSpec for SimpleStructResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl SimpleStructResponse {
@@ -21087,11 +18148,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -21117,19 +18173,6 @@ pub mod commands {
                 arg1: arg1.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<super::SimpleStruct> for SimpleStructResponse {
@@ -21139,7 +18182,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(SimpleStructResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(SimpleStructResponse, super::UnitTestingCluster, (), false);
 
     /// Delivers the ID of an event in response to test command emitting fabric scoped events.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -21152,17 +18195,6 @@ pub mod commands {
     )]
     pub struct TestEmitTestEventResponse {
         pub value: u64,
-    }
-
-    impl crate::traits::CommandSpec for TestEmitTestEventResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEmitTestEventResponse {
@@ -21182,11 +18214,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_VALUE, AttributeValue::from(self.value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -21197,7 +18224,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         value = Some(decoded);
                         Ok(())
                     })()
@@ -21210,19 +18237,6 @@ pub mod commands {
                 value: value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u64> for TestEmitTestEventResponse {
@@ -21232,7 +18246,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestEmitTestEventResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestEmitTestEventResponse, super::UnitTestingCluster, (), false);
 
     /// Delivers the ID of an event in response to test command emitting fabric scope events.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -21245,17 +18259,6 @@ pub mod commands {
     )]
     pub struct TestEmitTestFabricScopedEventResponse {
         pub value: u64,
-    }
-
-    impl crate::traits::CommandSpec for TestEmitTestFabricScopedEventResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestEmitTestFabricScopedEventResponse {
@@ -21275,11 +18278,6 @@ pub mod commands {
             alloc::vec![(Self::FIELD_VALUE, AttributeValue::from(self.value)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -21290,7 +18288,7 @@ pub mod commands {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u64>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                         value = Some(decoded);
                         Ok(())
                     })()
@@ -21303,19 +18301,6 @@ pub mod commands {
                 value: value.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<u64> for TestEmitTestFabricScopedEventResponse {
@@ -21325,7 +18310,12 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestEmitTestFabricScopedEventResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(
+        TestEmitTestFabricScopedEventResponse,
+        super::UnitTestingCluster,
+        (),
+        false
+    );
 
     /// Response to TestBatchHelperRequest or TestSecondBatchHelperRequest. Buffer in response is filled as directed in
     /// the Request.
@@ -21340,17 +18330,6 @@ pub mod commands {
     pub struct TestBatchHelperResponse {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub buffer: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for TestBatchHelperResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestBatchHelperResponse {
@@ -21368,11 +18347,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_BUFFER, AttributeValue::from(self.buffer)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -21401,19 +18375,6 @@ pub mod commands {
                 buffer: buffer.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for TestBatchHelperResponse {
@@ -21423,7 +18384,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(TestBatchHelperResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestBatchHelperResponse, super::UnitTestingCluster, (), false);
 
     /// Response to StringEchoRequest. Buffer in response is filled by the payload in the Request.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -21437,17 +18398,6 @@ pub mod commands {
     pub struct StringEchoResponse {
         #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
         pub payload: crate::Bytes,
-    }
-
-    impl crate::traits::CommandSpec for StringEchoResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl StringEchoResponse {
@@ -21467,11 +18417,6 @@ pub mod commands {
         #[must_use]
         pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
             alloc::vec![(Self::FIELD_PAYLOAD, AttributeValue::from(self.payload)),]
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
         }
 
         pub(crate) fn decode_fields(
@@ -21497,19 +18442,6 @@ pub mod commands {
                 payload: payload.ok_or((Some(FieldId::new(0)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
     impl From<crate::Bytes> for StringEchoResponse {
@@ -21519,7 +18451,7 @@ pub mod commands {
         }
     }
 
-    crate::impl_matter_command!(StringEchoResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(StringEchoResponse, super::UnitTestingCluster, (), false);
 
     /// Response to GlobalEchoRequest.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -21533,17 +18465,6 @@ pub mod commands {
     pub struct GlobalEchoResponse {
         pub field1: super::globals::TestGlobalStruct,
         pub field2: super::globals::TestGlobalEnum,
-    }
-
-    impl crate::traits::CommandSpec for GlobalEchoResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl GlobalEchoResponse {
@@ -21573,11 +18494,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -21589,23 +18505,23 @@ pub mod commands {
                         if field1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::TestGlobalStruct>::try_from(fval)?;
                             field1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if field2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::globals::TestGlobalEnum>::try_from(fval)?;
                             field2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -21615,22 +18531,9 @@ pub mod commands {
                 field2: field2.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(GlobalEchoResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(GlobalEchoResponse, super::UnitTestingCluster, (), false);
 
     /// Response to TestDifferentVendorMeiRequest, which is a command having a different MEI vendor ID than the cluster.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -21644,17 +18547,6 @@ pub mod commands {
     pub struct TestDifferentVendorMeiResponse {
         pub arg1: u8,
         pub event_number: u64,
-    }
-
-    impl crate::traits::CommandSpec for TestDifferentVendorMeiResponse {
-        type Response = ();
-
-        const CLUSTER_ID: ClusterId = Self::CLUSTER_ID;
-        const CLUSTER_NAME: &'static str = super::UnitTestingCluster::NAME;
-        const COMMAND_ID: CommandId = Self::COMMAND_ID;
-        const COMMAND_NAME: &'static str = Self::NAME;
-        const DIRECTION: CommandDirection = Self::DIRECTION;
-        const IS_EMPTY: bool = false;
     }
 
     impl TestDifferentVendorMeiResponse {
@@ -21681,11 +18573,6 @@ pub mod commands {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -21697,23 +18584,23 @@ pub mod commands {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     1 => {
                         if event_number.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u64>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u64>(&fval)?;
                             event_number = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -21723,22 +18610,9 @@ pub mod commands {
                 event_number: event_number.ok_or((Some(FieldId::new(1)), MatterStatus::InvalidCommand))?,
             })
         }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
-        }
     }
 
-    crate::impl_matter_command!(TestDifferentVendorMeiResponse, super::UnitTestingCluster, false);
+    crate::impl_matter_command!(TestDifferentVendorMeiResponse, super::UnitTestingCluster, (), false);
 }
 
 pub mod events {
@@ -21826,11 +18700,6 @@ pub mod events {
             ]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -21846,67 +18715,67 @@ pub mod events {
                         if arg1.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
-                            let decoded = <u8>::try_from(fval)?;
+                        (|| -> Result<(), MatterStatus> {
+                            let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                             arg1 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     2 => {
                         if arg2.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleEnum>::try_from(fval)?;
                             arg2 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     3 => {
                         if arg3.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <bool>::try_from(fval)?;
                             arg3 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     4 => {
                         if arg4.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = <super::SimpleStruct>::try_from(fval)?;
                             arg4 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     5 => {
                         if arg5.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleStruct>::try_from)?;
                             arg5 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     6 => {
                         if arg6.is_some() {
                             return Err((Some(fid), MatterStatus::ConstraintError));
                         }
-                        let decode_one = || -> Result<(), MatterStatus> {
+                        (|| -> Result<(), MatterStatus> {
                             let decoded = crate::traits::decode_list(fval, <super::SimpleEnum>::try_from)?;
                             arg6 = Some(decoded);
                             Ok(())
-                        };
-                        decode_one().map_err(|st| (Some(fid), st))?;
+                        })()
+                        .map_err(|st| (Some(fid), st))?;
                     }
                     _ => return Err((Some(fid), MatterStatus::ConstraintError)),
                 }
@@ -21919,19 +18788,6 @@ pub mod events {
                 arg5: arg5.ok_or((Some(FieldId::new(5)), MatterStatus::ConstraintError))?,
                 arg6: arg6.ok_or((Some(FieldId::new(6)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 
@@ -21948,43 +18804,6 @@ pub mod events {
         pub const EVENT_ID: EventId = EventId::new(0x02);
         pub const NAME: &'static str = "TestFabricScopedEvent";
         pub const PRIORITY: EventPriority = EventPriority::Info;
-
-        #[inline]
-        #[must_use]
-        pub fn into_fields(self) -> Vec<(FieldId, AttributeValue)> {
-            Vec::new()
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
-        #[inline]
-        pub(crate) fn decode_fields(
-            fields: Vec<(FieldId, AttributeValue)>,
-        ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
-            if let Some((fid, _)) = fields.first() {
-                Err((Some(*fid), MatterStatus::ConstraintError))
-            } else {
-                Ok(Self)
-            }
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            match val {
-                AttributeValue::Null => Ok(Self),
-                AttributeValue::Struct(fields) => Self::try_from_fields(fields),
-                _ => Err(MatterStatus::InvalidDataType),
-            }
-        }
     }
 
     crate::impl_matter_event!(TestFabricScopedEvent, super::UnitTestingCluster, true);
@@ -22019,11 +18838,6 @@ pub mod events {
             alloc::vec![(Self::FIELD_ARG1, AttributeValue::from(self.arg1)),]
         }
 
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::Struct(self.into_fields())
-        }
-
         pub(crate) fn decode_fields(
             fields: Vec<(FieldId, AttributeValue)>,
         ) -> Result<Self, (Option<FieldId>, MatterStatus)> {
@@ -22034,7 +18848,7 @@ pub mod events {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
                     (|| -> Result<(), MatterStatus> {
-                        let decoded = <u8>::try_from(fval)?;
+                        let decoded = crate::traits::decode_scalar::<u8>(&fval)?;
                         arg1 = Some(decoded);
                         Ok(())
                     })()
@@ -22046,19 +18860,6 @@ pub mod events {
             Ok(Self {
                 arg1: arg1.ok_or((Some(FieldId::new(1)), MatterStatus::ConstraintError))?,
             })
-        }
-
-        #[inline]
-        pub fn try_from_fields(fields: Vec<(FieldId, AttributeValue)>) -> Result<Self, MatterStatus> {
-            Self::decode_fields(fields).map_err(|(_, status)| status)
-        }
-
-        #[inline]
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::Struct(fields) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Self::try_from_fields(fields)
         }
     }
 

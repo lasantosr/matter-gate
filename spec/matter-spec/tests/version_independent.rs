@@ -265,6 +265,9 @@ mod tests {
     fn exhaustive_endpoint_error_matching() {
         let err = EndpointError::EmptyDeviceTypes;
         match err {
+            EndpointError::InvalidEndpointId(id) => {
+                assert_eq!(id, EndpointId::WILDCARD);
+            }
             EndpointError::EmptyDeviceTypes => {}
             EndpointError::UnsupportedDeviceType(id) => {
                 assert_eq!(id, DeviceTypeId::new(1));

@@ -171,64 +171,64 @@ impl MeasurementAccuracyStruct {
                     if measurement_type.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <MeasurementTypeEnum>::try_from(fval)?;
                         measurement_type = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if measured.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         measured = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if min_measured_value.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         min_measured_value = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if max_measured_value.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <i64>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<i64>(&fval)?;
                         (-0x4000_0000_0000_0000_i64..=0x4000_0000_0000_0000_i64)
                             .contains(&decoded)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         max_measured_value = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if accuracy_ranges.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <MeasurementAccuracyRangeStruct>::try_from)?;
                         accuracy_ranges = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -265,24 +265,7 @@ impl MeasurementAccuracyStruct {
     }
 }
 
-impl From<MeasurementAccuracyStruct> for AttributeValue {
-    #[inline]
-    fn from(val: MeasurementAccuracyStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for MeasurementAccuracyStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(MeasurementAccuracyStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -340,34 +323,34 @@ impl PowerThresholdStruct {
                     if power_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::PowerMw>::try_from(fval)?;
                         power_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if apparent_power_threshold.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <types::PowerMva>::try_from(fval)?;
                         apparent_power_threshold = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if power_threshold_source.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_nullable(fval, <PowerThresholdSourceEnum>::try_from)?;
                         power_threshold_source = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -421,24 +404,7 @@ impl From<Option<PowerThresholdSourceEnum>> for PowerThresholdStruct {
     }
 }
 
-impl From<PowerThresholdStruct> for AttributeValue {
-    #[inline]
-    fn from(val: PowerThresholdStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for PowerThresholdStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(PowerThresholdStruct);
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
@@ -508,54 +474,54 @@ impl IceServerStruct {
                     if ur_ls.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = crate::traits::decode_list(fval, <String>::try_from)?;
                         (decoded.len() <= 10)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         ur_ls = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if username.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 508)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         username = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if credential.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <String>::try_from(fval)?;
                         (decoded.len() <= 512)
                             .then_some(())
                             .ok_or(MatterStatus::ConstraintError)?;
                         credential = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if caid.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         caid = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -594,24 +560,7 @@ impl From<Vec<String>> for IceServerStruct {
     }
 }
 
-impl From<IceServerStruct> for AttributeValue {
-    #[inline]
-    fn from(val: IceServerStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for IceServerStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(IceServerStruct);
 
 /// Fabric-scoped data structure.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -685,78 +634,80 @@ impl WebRtcSessionStruct {
                     if id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = <u16>::try_from(fval)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded = crate::traits::decode_scalar::<u16>(&fval)?;
                         id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 1 => {
                     if peer_node_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <NodeId>::try_from(fval)?;
                         peer_node_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 2 => {
                     if peer_endpoint_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <EndpointId>::try_from(fval)?;
                         peer_endpoint_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 3 => {
                     if stream_usage.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <StreamUsageEnum>::try_from(fval)?;
                         stream_usage = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 4 => {
                     if video_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         video_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 5 => {
                     if audio_stream_id.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
-                        let decoded = crate::traits::decode_nullable(fval, <u16>::try_from)?;
+                    (|| -> Result<(), MatterStatus> {
+                        let decoded =
+                            crate::traits::decode_nullable(fval, |v| crate::traits::decode_scalar::<u16>(&v))?;
                         audio_stream_id = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 6 => {
                     if metadata_enabled.is_some() {
                         return Err((Some(fid), MatterStatus::ConstraintError));
                     }
-                    let decode_one = || -> Result<(), MatterStatus> {
+                    (|| -> Result<(), MatterStatus> {
                         let decoded = <bool>::try_from(fval)?;
                         metadata_enabled = Some(decoded);
                         Ok(())
-                    };
-                    decode_one().map_err(|st| (Some(fid), st))?;
+                    })()
+                    .map_err(|st| (Some(fid), st))?;
                 }
                 _ => return Err((Some(fid), MatterStatus::ConstraintError)),
             }
@@ -804,36 +755,15 @@ impl WebRtcSessionStruct {
     }
 }
 
-impl From<WebRtcSessionStruct> for AttributeValue {
-    #[inline]
-    fn from(val: WebRtcSessionStruct) -> Self {
-        AttributeValue::Struct(val.encode_fields_inner())
-    }
-}
-
-impl TryFrom<AttributeValue> for WebRtcSessionStruct {
-    type Error = MatterStatus;
-
-    #[inline]
-    fn try_from(val: AttributeValue) -> Result<Self, MatterStatus> {
-        let AttributeValue::Struct(fields) = val else {
-            return Err(MatterStatus::InvalidDataType);
-        };
-        Self::decode_fields_inner(fields).map_err(|(_, status)| status)
-    }
-}
+crate::impl_matter_struct_wire!(WebRtcSessionStruct);
 
 pub mod attributes {
     use alloc::vec::Vec;
-    use core::{fmt, ops};
 
     #[cfg(feature = "serde")]
     use serde::{Deserialize, Serialize};
 
-    use crate::{
-        error::AttributeError,
-        model::{Attribute, AttributeId, AttributeValue, ClusterId, CommandId, MatterStatus},
-    };
+    use crate::model::{AttributeId, ClusterId, CommandId};
 
     /// ClusterRevision global attribute.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
@@ -848,108 +778,10 @@ pub mod attributes {
         pub const IS_OPTIONAL: bool = false;
         pub const IS_WRITABLE: bool = false;
         pub const NAME: &'static str = "ClusterRevision";
-
-        #[inline]
-        #[must_use]
-        pub const fn new(val: u16) -> Self {
-            Self(val)
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn raw(self) -> u16 {
-            self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn as_inner(&self) -> &u16 {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn into_inner(self) -> u16 {
-            self.0
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::U16(self.0)
-        }
-
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::U16(v) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Ok(Self(v))
-        }
-
-        pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-            Self::try_from(attr).map(Into::into)
-        }
     }
 
-    impl From<ClusterRevision> for Attribute {
-        #[inline]
-        fn from(attr: ClusterRevision) -> Self {
-            Self::new(ClusterRevision::ATTRIBUTE_ID, attr.into_value())
-        }
-    }
+    crate::impl_matter_global_scalar_attr!(ClusterRevision, u16, U16, "{}");
 
-    impl TryFrom<Attribute> for ClusterRevision {
-        type Error = AttributeError;
-
-        fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-            if attr.id != Self::ATTRIBUTE_ID {
-                return Err(AttributeError::AttributeIdMismatch {
-                    expected: Self::ATTRIBUTE_ID,
-                    actual: attr.id,
-                });
-            }
-            Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                id: Self::ATTRIBUTE_ID,
-                field_id: None,
-                status,
-            })
-        }
-    }
-
-    impl From<u16> for ClusterRevision {
-        #[inline]
-        fn from(val: u16) -> Self {
-            Self(val)
-        }
-    }
-
-    impl From<ClusterRevision> for u16 {
-        #[inline]
-        fn from(attr: ClusterRevision) -> Self {
-            attr.0
-        }
-    }
-
-    impl ops::Deref for ClusterRevision {
-        type Target = u16;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl AsRef<u16> for ClusterRevision {
-        #[inline]
-        fn as_ref(&self) -> &u16 {
-            &self.0
-        }
-    }
-
-    impl fmt::Display for ClusterRevision {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{}", self.0)
-        }
-    }
     /// FeatureMap global attribute.
     #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default)]
     #[cfg_attr(feature = "serde", derive(Serialize, Deserialize), serde(transparent))]
@@ -963,108 +795,9 @@ pub mod attributes {
         pub const IS_OPTIONAL: bool = false;
         pub const IS_WRITABLE: bool = false;
         pub const NAME: &'static str = "FeatureMap";
-
-        #[inline]
-        #[must_use]
-        pub const fn new(val: u32) -> Self {
-            Self(val)
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn raw(self) -> u32 {
-            self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn as_inner(&self) -> &u32 {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn into_inner(self) -> u32 {
-            self.0
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            AttributeValue::U32(self.0)
-        }
-
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::U32(v) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            Ok(Self(v))
-        }
-
-        pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-            Self::try_from(attr).map(Into::into)
-        }
     }
 
-    impl From<FeatureMap> for Attribute {
-        #[inline]
-        fn from(attr: FeatureMap) -> Self {
-            Self::new(FeatureMap::ATTRIBUTE_ID, attr.into_value())
-        }
-    }
-
-    impl TryFrom<Attribute> for FeatureMap {
-        type Error = AttributeError;
-
-        fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-            if attr.id != Self::ATTRIBUTE_ID {
-                return Err(AttributeError::AttributeIdMismatch {
-                    expected: Self::ATTRIBUTE_ID,
-                    actual: attr.id,
-                });
-            }
-            Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                id: Self::ATTRIBUTE_ID,
-                field_id: None,
-                status,
-            })
-        }
-    }
-
-    impl From<u32> for FeatureMap {
-        #[inline]
-        fn from(val: u32) -> Self {
-            Self(val)
-        }
-    }
-
-    impl From<FeatureMap> for u32 {
-        #[inline]
-        fn from(attr: FeatureMap) -> Self {
-            attr.0
-        }
-    }
-
-    impl ops::Deref for FeatureMap {
-        type Target = u32;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl AsRef<u32> for FeatureMap {
-        #[inline]
-        fn as_ref(&self) -> &u32 {
-            &self.0
-        }
-    }
-
-    impl fmt::Display for FeatureMap {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "{:#010x}", self.0)
-        }
-    }
+    crate::impl_matter_global_scalar_attr!(FeatureMap, u32, U32, "{:#010x}");
 
     /// AttributeList global attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1079,120 +812,9 @@ pub mod attributes {
         pub const IS_OPTIONAL: bool = false;
         pub const IS_WRITABLE: bool = false;
         pub const NAME: &'static str = "AttributeList";
-
-        #[inline]
-        #[must_use]
-        pub fn new(val: Vec<AttributeId>) -> Self {
-            Self(val)
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn raw(&self) -> &[AttributeId] {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn as_inner(&self) -> &Vec<AttributeId> {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_inner(self) -> Vec<AttributeId> {
-            self.0
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::List(items) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            let res = items
-                .into_iter()
-                .map(AttributeId::try_from)
-                .collect::<Result<Vec<_>, _>>()?;
-            Ok(Self(res))
-        }
-
-        pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-            Self::try_from(attr).map(Into::into)
-        }
     }
 
-    impl From<AttributeList> for Attribute {
-        #[inline]
-        fn from(attr: AttributeList) -> Self {
-            Self::new(AttributeList::ATTRIBUTE_ID, attr.into_value())
-        }
-    }
-
-    impl TryFrom<Attribute> for AttributeList {
-        type Error = AttributeError;
-
-        fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-            if attr.id != Self::ATTRIBUTE_ID {
-                return Err(AttributeError::AttributeIdMismatch {
-                    expected: Self::ATTRIBUTE_ID,
-                    actual: attr.id,
-                });
-            }
-            Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                id: Self::ATTRIBUTE_ID,
-                field_id: None,
-                status,
-            })
-        }
-    }
-
-    impl From<Vec<AttributeId>> for AttributeList {
-        #[inline]
-        fn from(val: Vec<AttributeId>) -> Self {
-            Self(val)
-        }
-    }
-
-    impl From<AttributeList> for Vec<AttributeId> {
-        #[inline]
-        fn from(attr: AttributeList) -> Self {
-            attr.0
-        }
-    }
-
-    impl ops::Deref for AttributeList {
-        type Target = Vec<AttributeId>;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl AsRef<Vec<AttributeId>> for AttributeList {
-        #[inline]
-        fn as_ref(&self) -> &Vec<AttributeId> {
-            &self.0
-        }
-    }
-
-    impl AsRef<[AttributeId]> for AttributeList {
-        #[inline]
-        fn as_ref(&self) -> &[AttributeId] {
-            &self.0
-        }
-    }
-
-    impl fmt::Display for AttributeList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_global_id_list_attr!(AttributeList, AttributeId);
 
     /// AcceptedCommandList global attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1207,120 +829,9 @@ pub mod attributes {
         pub const IS_OPTIONAL: bool = false;
         pub const IS_WRITABLE: bool = false;
         pub const NAME: &'static str = "AcceptedCommandList";
-
-        #[inline]
-        #[must_use]
-        pub fn new(val: Vec<CommandId>) -> Self {
-            Self(val)
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn raw(&self) -> &[CommandId] {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn as_inner(&self) -> &Vec<CommandId> {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_inner(self) -> Vec<CommandId> {
-            self.0
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::List(items) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            let res = items
-                .into_iter()
-                .map(CommandId::try_from)
-                .collect::<Result<Vec<_>, _>>()?;
-            Ok(Self(res))
-        }
-
-        pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-            Self::try_from(attr).map(Into::into)
-        }
     }
 
-    impl From<AcceptedCommandList> for Attribute {
-        #[inline]
-        fn from(attr: AcceptedCommandList) -> Self {
-            Self::new(AcceptedCommandList::ATTRIBUTE_ID, attr.into_value())
-        }
-    }
-
-    impl TryFrom<Attribute> for AcceptedCommandList {
-        type Error = AttributeError;
-
-        fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-            if attr.id != Self::ATTRIBUTE_ID {
-                return Err(AttributeError::AttributeIdMismatch {
-                    expected: Self::ATTRIBUTE_ID,
-                    actual: attr.id,
-                });
-            }
-            Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                id: Self::ATTRIBUTE_ID,
-                field_id: None,
-                status,
-            })
-        }
-    }
-
-    impl From<Vec<CommandId>> for AcceptedCommandList {
-        #[inline]
-        fn from(val: Vec<CommandId>) -> Self {
-            Self(val)
-        }
-    }
-
-    impl From<AcceptedCommandList> for Vec<CommandId> {
-        #[inline]
-        fn from(attr: AcceptedCommandList) -> Self {
-            attr.0
-        }
-    }
-
-    impl ops::Deref for AcceptedCommandList {
-        type Target = Vec<CommandId>;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl AsRef<Vec<CommandId>> for AcceptedCommandList {
-        #[inline]
-        fn as_ref(&self) -> &Vec<CommandId> {
-            &self.0
-        }
-    }
-
-    impl AsRef<[CommandId]> for AcceptedCommandList {
-        #[inline]
-        fn as_ref(&self) -> &[CommandId] {
-            &self.0
-        }
-    }
-
-    impl fmt::Display for AcceptedCommandList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_global_id_list_attr!(AcceptedCommandList, CommandId);
 
     /// GeneratedCommandList global attribute.
     #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
@@ -1335,118 +846,7 @@ pub mod attributes {
         pub const IS_OPTIONAL: bool = false;
         pub const IS_WRITABLE: bool = false;
         pub const NAME: &'static str = "GeneratedCommandList";
-
-        #[inline]
-        #[must_use]
-        pub fn new(val: Vec<CommandId>) -> Self {
-            Self(val)
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn raw(&self) -> &[CommandId] {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub const fn as_inner(&self) -> &Vec<CommandId> {
-            &self.0
-        }
-
-        #[inline]
-        #[must_use]
-        pub fn into_inner(self) -> Vec<CommandId> {
-            self.0
-        }
-
-        #[must_use]
-        pub fn into_value(self) -> AttributeValue {
-            let items = self.0.into_iter().map(AttributeValue::from).collect();
-            AttributeValue::List(items)
-        }
-
-        pub fn try_from_value(val: AttributeValue) -> Result<Self, MatterStatus> {
-            let AttributeValue::List(items) = val else {
-                return Err(MatterStatus::InvalidDataType);
-            };
-            let res = items
-                .into_iter()
-                .map(CommandId::try_from)
-                .collect::<Result<Vec<_>, _>>()?;
-            Ok(Self(res))
-        }
-
-        pub fn validate(attr: Attribute) -> Result<Attribute, AttributeError> {
-            Self::try_from(attr).map(Into::into)
-        }
     }
 
-    impl From<GeneratedCommandList> for Attribute {
-        #[inline]
-        fn from(attr: GeneratedCommandList) -> Self {
-            Self::new(GeneratedCommandList::ATTRIBUTE_ID, attr.into_value())
-        }
-    }
-
-    impl TryFrom<Attribute> for GeneratedCommandList {
-        type Error = AttributeError;
-
-        fn try_from(attr: Attribute) -> Result<Self, Self::Error> {
-            if attr.id != Self::ATTRIBUTE_ID {
-                return Err(AttributeError::AttributeIdMismatch {
-                    expected: Self::ATTRIBUTE_ID,
-                    actual: attr.id,
-                });
-            }
-            Self::try_from_value(attr.value).map_err(|status| AttributeError::InvalidValue {
-                id: Self::ATTRIBUTE_ID,
-                field_id: None,
-                status,
-            })
-        }
-    }
-
-    impl From<Vec<CommandId>> for GeneratedCommandList {
-        #[inline]
-        fn from(val: Vec<CommandId>) -> Self {
-            Self(val)
-        }
-    }
-
-    impl From<GeneratedCommandList> for Vec<CommandId> {
-        #[inline]
-        fn from(attr: GeneratedCommandList) -> Self {
-            attr.0
-        }
-    }
-
-    impl ops::Deref for GeneratedCommandList {
-        type Target = Vec<CommandId>;
-
-        #[inline]
-        fn deref(&self) -> &Self::Target {
-            &self.0
-        }
-    }
-
-    impl AsRef<Vec<CommandId>> for GeneratedCommandList {
-        #[inline]
-        fn as_ref(&self) -> &Vec<CommandId> {
-            &self.0
-        }
-    }
-
-    impl AsRef<[CommandId]> for GeneratedCommandList {
-        #[inline]
-        fn as_ref(&self) -> &[CommandId] {
-            &self.0
-        }
-    }
-
-    impl fmt::Display for GeneratedCommandList {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            write!(f, "<list of {} items>", self.0.len())
-        }
-    }
+    crate::impl_matter_global_id_list_attr!(GeneratedCommandList, CommandId);
 }

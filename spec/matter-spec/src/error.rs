@@ -253,6 +253,9 @@ impl From<ClusterError> for MatterStatus {
     schemars(deny_unknown_fields)
 )]
 pub enum EndpointError {
+    /// Endpoint carries an invalid [`EndpointId`] (for example, wildcard `0xFFFF`).
+    #[error("Invalid endpoint ID {0}")]
+    InvalidEndpointId(EndpointId),
     /// Endpoint has an empty `device_types` list.
     #[error("Endpoint contains no device types")]
     EmptyDeviceTypes,
@@ -293,9 +296,25 @@ pub enum EndpointError {
     },
 }
 
+impl EndpointError {
+    /// Builds an [`EndpointError::InvalidCluster`] for a Descriptor (`0x001D`) attribute failure.
+    #[must_use]
+    pub(crate) const fn descriptor_attr_status(attr_id: u32, status: MatterStatus) -> Self {
+        Self::InvalidCluster {
+            id: ClusterId::DESCRIPTOR,
+            source: ClusterError::InvalidAttribute(AttributeError::InvalidValue {
+                id: AttributeId::new(attr_id),
+                field_id: None,
+                status,
+            }),
+        }
+    }
+}
+
 impl From<EndpointError> for MatterStatus {
     fn from(err: EndpointError) -> Self {
         match err {
+            EndpointError::InvalidEndpointId(_) => Self::UnsupportedEndpoint,
             EndpointError::EmptyDeviceTypes
             | EndpointError::UnsupportedDeviceType(_)
             | EndpointError::DeviceTypeMismatch { .. }
@@ -431,6 +450,9 @@ mod tests {
 
         let ep_err = EndpointError::EmptyDeviceTypes;
         match ep_err {
+            EndpointError::InvalidEndpointId(id) => {
+                assert_eq!(id, EndpointId::WILDCARD);
+            }
             EndpointError::EmptyDeviceTypes => {}
             EndpointError::UnsupportedDeviceType(id) => {
                 assert_eq!(id, DeviceTypeId::new(0));
@@ -507,6 +529,10 @@ mod tests {
         let cl_err = ClusterError::MissingMandatoryAttribute(AttributeId::new(5));
         assert_eq!(MatterStatus::from(cl_err.clone()), MatterStatus::ConstraintError);
         assert_eq!(format!("{cl_err}"), "Missing mandatory attribute 0x0005");
+
+        let ep_id_err = EndpointError::InvalidEndpointId(EndpointId::WILDCARD);
+        assert_eq!(MatterStatus::from(ep_id_err.clone()), MatterStatus::UnsupportedEndpoint);
+        assert_eq!(format!("{ep_id_err}"), "Invalid endpoint ID 65535");
 
         let ep_err = EndpointError::EmptyDeviceTypes;
         assert_eq!(MatterStatus::from(ep_err.clone()), MatterStatus::UnsupportedCluster);
