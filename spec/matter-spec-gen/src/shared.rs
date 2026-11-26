@@ -453,6 +453,10 @@ fn hash_conformance(h: &mut DeterministicHasher, ops: &[ConformanceOp]) {
                 h.write_u32(9);
                 h.write_str(s);
             }
+            ConformanceOp::Command(s) => {
+                h.write_u32(15);
+                h.write_str(s);
+            }
             ConformanceOp::Literal(s) => {
                 h.write_u32(10);
                 h.write_str(s);

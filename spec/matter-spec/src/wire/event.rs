@@ -29,11 +29,11 @@ pub struct WireEvent<T> {
     /// Wire event priority.
     pub priority: EventPriority,
     /// Optional wire `EventNumber`.
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub event_number: Optional<EventNumber>,
     /// Optional wire `EventTimestamp`.
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub timestamp: Optional<EventTimestamp>,
     /// Typed event payload.
@@ -59,7 +59,7 @@ impl<T> WireEvent<T> {
         event: T,
     ) -> Result<Self, MatterStatus> {
         if wire_priority != expected_priority {
-            return Err(MatterStatus::InvalidDataType);
+            return Err(MatterStatus::ConstraintError);
         }
         Ok(Self::new(wire_priority, event))
     }

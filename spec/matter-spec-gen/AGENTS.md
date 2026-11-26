@@ -5,7 +5,7 @@ Additive to root [`AGENTS.md`](../../AGENTS.md).
 ## 0. Invariants (CRITICAL)
 
 1. **Pure in-memory library.** Zero filesystem, network, git, CLI, or `anyhow` dependencies.
-2. **Fail fast on unknown schema elements.** Unmapped scalar types, invalid boolean semantics, unknown command sources, unmapped event priorities, and unknown categories must return typed `thiserror` variants; never fall back silently.
+2. **Fail fast on unknown schema elements.** Unmapped scalar types, invalid boolean semantics, unknown command sources, unmapped event priorities, unresolved device-type `require*` includes, and unknown categories must return typed `thiserror` variants; never fall back silently. Only allowlist an unresolved device-type include for a specific Matter version when verified to be genuinely absent (or a known typo) in that release's upstream `matter-devices.xml`—fix or alias in the resolver whenever the member exists in the cluster XML.
 3. **One-directional layering.** `xml` → `model` → `render` / `items` → `build`. Lower modules must never import higher modules; parse XML once.
 4. **Layout agnostic.** Never write files, choose directory structures, emit `mod.rs` trees, or edit `Cargo.toml` manifests.
 5. **Deterministic output.** Identical inputs must produce byte-identical `genco` token streams and rendered strings.

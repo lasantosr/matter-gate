@@ -94,6 +94,9 @@ impl PosixMs {
     #[inline]
     #[must_use]
     pub fn from_jiff_timestamp(ts: Timestamp) -> Option<Self> {
+        if ts < Timestamp::UNIX_EPOCH {
+            return None;
+        }
         u64::try_from(ts.as_millisecond()).ok().map(Self)
     }
 
@@ -186,6 +189,9 @@ mod tests {
         let t = PosixMs::from_raw(2_500);
         let ts = Timestamp::try_from(t).expect("valid jiff Timestamp");
         assert_eq!(PosixMs::try_from(ts), Ok(t));
+
+        let just_before_epoch = Timestamp::new(-1, 999_999_999).expect("valid jiff Timestamp");
+        assert_eq!(PosixMs::from_jiff_timestamp(just_before_epoch), None);
     }
 
     #[cfg(feature = "time")]

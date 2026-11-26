@@ -40,7 +40,7 @@ use crate::{
 )]
 pub struct WireCluster<T, F = u32> {
     /// Instance-level `DataVersion`.
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub data_version: Optional<DataVersion>,
     /// Global attributes (`0xFFF8..=0xFFFD`).

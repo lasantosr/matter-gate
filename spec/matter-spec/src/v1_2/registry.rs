@@ -4892,7 +4892,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                     FieldDescriptor {
                         id: FieldId::new(0x03),
                         name: "time_since_boot",
-                        constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                        constraint: ValueConstraint { value_type: ValueType::U64, bounds: ValueBounds::None, nullable: false },
                         conformance: &[ConformanceOp::Optional],
                     },
                 ],
@@ -9276,7 +9276,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "TemperatureSetpoint",
                 field_name: "temperature_setpoint",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I64, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::None, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9284,7 +9284,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinTemperature",
                 field_name: "min_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I64, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::None, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9292,7 +9292,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxTemperature",
                 field_name: "max_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I64, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::None, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9300,7 +9300,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "Step",
                 field_name: "step",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I64, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::None, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9338,7 +9338,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                     FieldDescriptor {
                         id: FieldId::new(0x00),
                         name: "target_temperature",
-                        constraint: ValueConstraint { value_type: ValueType::I64, bounds: ValueBounds::None, nullable: false },
+                        constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::None, nullable: false },
                         conformance: &[ConformanceOp::Optional],
                     },
                     FieldDescriptor {
@@ -10097,7 +10097,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CountdownTime",
                 field_name: "countdown_time",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 259200 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -10356,7 +10356,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CountdownTime",
                 field_name: "countdown_time",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 259200 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -10587,7 +10587,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "Condition",
                 field_name: "condition",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -10692,7 +10692,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "Condition",
                 field_name: "condition",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12369,7 +12369,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionLiftPercentage",
                 field_name: "current_position_lift_percentage",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12377,7 +12377,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionTiltPercentage",
                 field_name: "current_position_tilt_percentage",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12397,7 +12397,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "TargetPositionLiftPercent100ths",
                 field_name: "target_position_lift_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12405,7 +12405,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "TargetPositionTiltPercent100ths",
                 field_name: "target_position_tilt_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12425,7 +12425,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionLiftPercent100ths",
                 field_name: "current_position_lift_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12433,7 +12433,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionTiltPercent100ths",
                 field_name: "current_position_tilt_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12592,7 +12592,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxPressure",
                 field_name: "max_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -12616,7 +12616,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinConstPressure",
                 field_name: "min_const_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12624,7 +12624,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxConstPressure",
                 field_name: "max_const_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12632,7 +12632,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinCompPressure",
                 field_name: "min_comp_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12640,7 +12640,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxCompPressure",
                 field_name: "max_comp_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12680,7 +12680,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinConstTemp",
                 field_name: "min_const_temp",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12688,7 +12688,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxConstTemp",
                 field_name: "max_const_temp",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12943,7 +12943,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "LocalTemperature",
                 field_name: "local_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -12951,7 +12951,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "OutdoorTemperature",
                 field_name: "outdoor_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12967,7 +12967,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMinHeatSetpointLimit",
                 field_name: "abs_min_heat_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12975,7 +12975,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMaxHeatSetpointLimit",
                 field_name: "abs_max_heat_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12983,7 +12983,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMinCoolSetpointLimit",
                 field_name: "abs_min_cool_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -12991,7 +12991,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMaxCoolSetpointLimit",
                 field_name: "abs_max_cool_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -13023,7 +13023,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "LocalTemperatureCalibration",
                 field_name: "local_temperature_calibration",
                 access: AccessFlags(3),
-                constraint: ValueConstraint { value_type: ValueType::I8, bounds: ValueBounds::Signed { min: 231, max: 25 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I8, bounds: ValueBounds::Signed { min: -25, max: 25 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -13550,7 +13550,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PercentSetting",
                 field_name: "percent_setting",
                 access: AccessFlags(3),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -13558,7 +13558,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PercentCurrent",
                 field_name: "percent_current",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: false },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -15106,7 +15106,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MeasuredValue",
                 field_name: "measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -15114,7 +15114,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinMeasuredValue",
                 field_name: "min_measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32766 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32766 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -15122,7 +15122,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxMeasuredValue",
                 field_name: "max_measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38222, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27314, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -15464,7 +15464,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15480,7 +15480,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15574,7 +15574,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15590,7 +15590,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15684,7 +15684,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15700,7 +15700,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15794,7 +15794,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15810,7 +15810,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15904,7 +15904,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -15920,7 +15920,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16014,7 +16014,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16030,7 +16030,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16124,7 +16124,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16140,7 +16140,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16234,7 +16234,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16250,7 +16250,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16344,7 +16344,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16360,7 +16360,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16454,7 +16454,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "PeakMeasuredValueWindow",
                 field_name: "peak_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -16470,7 +16470,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AverageMeasuredValueWindow",
                 field_name: "average_measured_value_window",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::None, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::U32, bounds: ValueBounds::Unsigned { min: 0, max: 604800 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -23528,7 +23528,7 @@ static DEVICE_TYPES: &[DeviceTypeDescriptor] = &[
             cluster_id: ClusterId::new(0x0300),
             is_server: true,
             required_attributes: &[AttributeId::new(0x0002), AttributeId::new(0x0007), AttributeId::new(0x0008), AttributeId::new(0x000F), AttributeId::new(0x4001), AttributeId::new(0x0010), AttributeId::new(0x400A), AttributeId::new(0x400B), AttributeId::new(0x400C), AttributeId::new(0x400D), AttributeId::new(0x4010)],
-            required_commands: &[CommandId::new(0x0A), CommandId::new(0x47), CommandId::new(0x4C)],
+            required_commands: &[CommandId::new(0x0A), CommandId::new(0x47), CommandId::new(0x4B), CommandId::new(0x4C)],
             required_events: &[],
         },],
     },
@@ -23588,7 +23588,7 @@ static DEVICE_TYPES: &[DeviceTypeDescriptor] = &[
             cluster_id: ClusterId::new(0x0300),
             is_server: true,
             required_attributes: &[AttributeId::new(0x0002), AttributeId::new(0x0003), AttributeId::new(0x0004), AttributeId::new(0x0007), AttributeId::new(0x0008), AttributeId::new(0x000F), AttributeId::new(0x0010), AttributeId::new(0x4001), AttributeId::new(0x400A), AttributeId::new(0x400B), AttributeId::new(0x400C), AttributeId::new(0x400D), AttributeId::new(0x4010)],
-            required_commands: &[CommandId::new(0x07), CommandId::new(0x08), CommandId::new(0x09), CommandId::new(0x0A), CommandId::new(0x47), CommandId::new(0x4C)],
+            required_commands: &[CommandId::new(0x07), CommandId::new(0x08), CommandId::new(0x09), CommandId::new(0x0A), CommandId::new(0x47), CommandId::new(0x4B), CommandId::new(0x4C)],
             required_events: &[],
         },],
     },
@@ -24032,7 +24032,7 @@ static DEVICE_TYPES: &[DeviceTypeDescriptor] = &[
             cluster_id: ClusterId::new(0x0300),
             is_server: true,
             required_attributes: &[AttributeId::new(0x0000), AttributeId::new(0x0001), AttributeId::new(0x0002), AttributeId::new(0x0003), AttributeId::new(0x0004), AttributeId::new(0x0005), AttributeId::new(0x0006), AttributeId::new(0x0007), AttributeId::new(0x0008), AttributeId::new(0x000F), AttributeId::new(0x0010), AttributeId::new(0x0011), AttributeId::new(0x0012), AttributeId::new(0x0013), AttributeId::new(0x0015), AttributeId::new(0x0016), AttributeId::new(0x0017), AttributeId::new(0x0019), AttributeId::new(0x001A), AttributeId::new(0x001B), AttributeId::new(0x0020), AttributeId::new(0x0021), AttributeId::new(0x0022), AttributeId::new(0x0024), AttributeId::new(0x0025), AttributeId::new(0x0026), AttributeId::new(0x0028), AttributeId::new(0x0029), AttributeId::new(0x002A), AttributeId::new(0x0030), AttributeId::new(0x0031), AttributeId::new(0x0032), AttributeId::new(0x0033), AttributeId::new(0x0034), AttributeId::new(0x0036), AttributeId::new(0x0037), AttributeId::new(0x0038), AttributeId::new(0x003A), AttributeId::new(0x003B), AttributeId::new(0x003C), AttributeId::new(0x400D), AttributeId::new(0x4010), AttributeId::new(0x4000), AttributeId::new(0x4001), AttributeId::new(0x4002), AttributeId::new(0x4003), AttributeId::new(0x4004), AttributeId::new(0x400A), AttributeId::new(0x400B), AttributeId::new(0x400C)],
-            required_commands: &[CommandId::new(0x00), CommandId::new(0x01), CommandId::new(0x02), CommandId::new(0x03), CommandId::new(0x04), CommandId::new(0x05), CommandId::new(0x06), CommandId::new(0x07), CommandId::new(0x08), CommandId::new(0x09), CommandId::new(0x0A), CommandId::new(0x4C), CommandId::new(0x47)],
+            required_commands: &[CommandId::new(0x00), CommandId::new(0x01), CommandId::new(0x02), CommandId::new(0x03), CommandId::new(0x04), CommandId::new(0x05), CommandId::new(0x06), CommandId::new(0x07), CommandId::new(0x08), CommandId::new(0x09), CommandId::new(0x0A), CommandId::new(0x4B), CommandId::new(0x4C), CommandId::new(0x47)],
             required_events: &[],
         },
         DeviceTypeIncludeItem {

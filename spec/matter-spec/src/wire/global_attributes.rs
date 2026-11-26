@@ -21,27 +21,27 @@ use crate::{
 )]
 pub struct GlobalAttributes<F = u32> {
     /// `GeneratedCommandList` (`0xFFF8`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub generated_command_list: Optional<Vec<CommandId>>,
     /// `AcceptedCommandList` (`0xFFF9`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub accepted_command_list: Optional<Vec<CommandId>>,
     /// `EventList` (`0xFFFA`, present in Matter `v1.1`–`v1.3`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub event_list: Optional<Vec<EventId>>,
     /// `AttributeList` (`0xFFFB`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub attribute_list: Optional<Vec<AttributeId>>,
     /// `FeatureMap` (`0xFFFC`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub feature_map: Optional<F>,
     /// `ClusterRevision` (`0xFFFD`).
-    #[cfg_attr(feature = "serde", serde(default))]
+    #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub cluster_revision: Optional<u16>,
 }

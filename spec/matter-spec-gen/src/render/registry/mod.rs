@@ -12,9 +12,8 @@ use super::context::{Tokens, TypeContext, format_hex, render, to_rust_field_name
 use crate::{
     error::Error,
     model::{
-        AccessFlags, BitmapDef, ClusterDef, CommandDef, CommandDirection, EnumDef, GlobalDefs, ParsedDeviceType,
-        StructDef, is_legacy_device_include_ignored, resolve_include_target, to_kebab_case, to_shouty_snake_case,
-        to_snake_case,
+        AccessFlags, BitmapDef, ClusterDef, CommandDirection, EnumDef, GlobalDefs, ParsedDeviceType, StructDef,
+        is_legacy_device_include_ignored, resolve_include_target, to_kebab_case, to_shouty_snake_case, to_snake_case,
     },
 };
 
@@ -80,7 +79,7 @@ pub(crate) fn render_registry_tables(
         #[rustfmt::skip]
         static DEVICE_TYPES: &[DeviceTypeDescriptor] = &[
             $(for d in &sorted_devices join ($['\r']) =>
-                $(render_device_type_descriptor(d, &cluster_by_name))
+                $(render_device_type_descriptor(version, d, &cluster_by_name)?)
             )
         ];
 
@@ -187,20 +186,7 @@ fn render_cluster_descriptor(
                     c.attributes
                         .iter()
                         .find(|a| a.name == *m)
-                        .map(|a| format_hex(u64::from(a.code), 4))
-                        .or_else(|| {
-                            c.commands
-                                .iter()
-                                .find(|cmd| cmd.name == *m)
-                                .map(|cmd| format_hex(u64::from(cmd.code), 2))
-                        })
-                        .or_else(|| {
-                            c.events
-                                .iter()
-                                .find(|ev| ev.name == *m)
-                                .map(|ev| format_hex(u64::from(ev.code), 2))
-                        })
-                        .map(|hex| quote!($hex))
+                        .map(|a| quote!($(format_hex(u64::from(a.code), 4))))
                 })
                 .collect();
             if member_ids.is_empty() {
@@ -223,6 +209,12 @@ fn render_cluster_descriptor(
     let mut event_tokens = Vec::with_capacity(c.events.len());
     for ev in &c.events {
         let ev_prio = event_priority_expr(&ev.name, &ev.priority)?;
+        let mut ev_fields = Vec::with_capacity(ev.fields.len());
+        for f in &ev.fields {
+            ev_fields.push(field_descriptor_tokens(f, &ctx, Some(c), &mut visiting)?);
+        }
+        let ev_ctx = format!("{}::{}", c.name, ev.name);
+        let ev_conf = compile_conformance_slice(&ev.conformance, false, Some(c), &ev_ctx)?;
         event_tokens.push(quote! {
             EventDescriptor {
                 id: EventId::new($(format_hex(u64::from(ev.code), 2))),
@@ -230,11 +222,63 @@ fn render_cluster_descriptor(
                 priority: $ev_prio,
                 access: $(access_flags_expr(&ev.access)),
                 fields: &[
-                    $(for f in &ev.fields join ($['\r']) =>
-                        $(field_descriptor_tokens(f, &ctx, Some(c), &mut visiting)),
+                    $(for f_tok in &ev_fields join ($['\r']) =>
+                        $f_tok,
                     )
                 ],
-                conformance: $(compile_conformance_slice(&ev.conformance, false, Some(c))),
+                conformance: $ev_conf,
+            },
+        });
+    }
+
+    let mut attr_tokens = Vec::with_capacity(c.attributes.len());
+    for a in &c.attributes {
+        let constraint = value_constraint_tokens(
+            &a.type_str,
+            a.entry_type.as_deref(),
+            a.is_array,
+            a.is_nullable,
+            a.min.as_deref(),
+            a.max.as_deref(),
+            a.min_length,
+            a.length,
+            &ctx,
+            &mut visiting,
+        )?;
+        let attr_ctx = format!("{}::{}", c.name, a.name);
+        let conf = compile_conformance_slice(&a.conformance, a.is_optional, Some(c), &attr_ctx)?;
+        attr_tokens.push(quote! {
+            AttributeDescriptor {
+                id: AttributeId::new($(format_hex(u64::from(a.code), 4))),
+                name: $(quoted(&a.name)),
+                field_name: $(quoted(to_rust_field_name(&a.name))),
+                access: $(access_flags_expr(&a.access)),
+                constraint: $constraint,
+                conformance: $conf,
+            },
+        });
+    }
+
+    let mut cmd_tokens = Vec::with_capacity(c.commands.len());
+    for cmd in &c.commands {
+        let mut cmd_fields = Vec::with_capacity(cmd.args.len());
+        for f in &cmd.args {
+            cmd_fields.push(field_descriptor_tokens(f, &ctx, Some(c), &mut visiting)?);
+        }
+        let cmd_ctx = format!("{}::{}", c.name, cmd.name);
+        let conf = compile_conformance_slice(&cmd.conformance, false, Some(c), &cmd_ctx)?;
+        cmd_tokens.push(quote! {
+            CommandDescriptor {
+                id: CommandId::new($(format_hex(u64::from(cmd.code), 2))),
+                name: $(quoted(&cmd.name)),
+                direction: $(command_direction_expr(cmd.direction)),
+                access: $(access_flags_expr(&cmd.access)),
+                fields: &[
+                    $(for f_tok in &cmd_fields join ($['\r']) =>
+                        $f_tok,
+                    )
+                ],
+                conformance: $conf,
             },
         });
     }
@@ -245,43 +289,10 @@ fn render_cluster_descriptor(
             id: ClusterId::new($cid_hex),
             name: $(quoted(&c.name)),
             attributes: &[
-                $(for a in &c.attributes join ($['\r']) =>
-                    AttributeDescriptor {
-                        id: AttributeId::new($(format_hex(u64::from(a.code), 4))),
-                        name: $(quoted(&a.name)),
-                        field_name: $(quoted(to_rust_field_name(&a.name))),
-                        access: $(access_flags_expr(&a.access)),
-                        constraint: $(value_constraint_tokens(
-                            &a.type_str,
-                            a.entry_type.as_deref(),
-                            a.is_array,
-                            a.is_nullable,
-                            a.min.as_deref(),
-                            a.max.as_deref(),
-                            a.min_length,
-                            a.length,
-                            &ctx,
-                            &mut visiting,
-                        )),
-                        conformance: $(compile_conformance_slice(&a.conformance, a.is_optional, Some(c))),
-                    },
-                )
+                $(for a_tok in &attr_tokens join ($['\r']) => $a_tok)
             ],
             commands: &[
-                $(for cmd in &c.commands join ($['\r']) =>
-                    CommandDescriptor {
-                        id: CommandId::new($(format_hex(u64::from(cmd.code), 2))),
-                        name: $(quoted(&cmd.name)),
-                        direction: $(command_direction_expr(cmd.direction)),
-                        access: $(access_flags_expr(&cmd.access)),
-                        fields: &[
-                            $(for f in &cmd.args join ($['\r']) =>
-                                $(field_descriptor_tokens(f, &ctx, Some(c), &mut visiting)),
-                            )
-                        ],
-                        conformance: $(compile_conformance_slice(&cmd.conformance, false, Some(c))),
-                    },
-                )
+                $(for cmd_tok in &cmd_tokens join ($['\r']) => $cmd_tok)
             ],
             events: &[
                 $(for ev_tok in &event_tokens join ($['\r']) => $ev_tok)
@@ -293,7 +304,11 @@ fn render_cluster_descriptor(
     })
 }
 
-fn render_device_type_descriptor(d: &ParsedDeviceType, cluster_by_name: &BTreeMap<&str, &ClusterDef>) -> Tokens {
+fn render_device_type_descriptor(
+    version: &str,
+    d: &ParsedDeviceType,
+    cluster_by_name: &BTreeMap<&str, &ClusterDef>,
+) -> Result<Tokens, Error> {
     let ep_feat = format!("endpoint-{}", to_kebab_case(&d.name));
     let did_hex = format_hex(u64::from(d.device_id), 4);
 
@@ -351,47 +366,61 @@ fn render_device_type_descriptor(d: &ParsedDeviceType, cluster_by_name: &BTreeMa
             .iter()
             .map(|a| (a.define.as_deref(), a.name.as_str()))
             .collect();
-        let req_attrs: Vec<Tokens> = inc
-            .required_attributes
-            .iter()
-            .filter(|t| !is_legacy_device_include_ignored(t))
-            .filter_map(|t| {
-                resolve_include_target(t, &attr_cands, to_shouty_snake_case)
-                    .and_then(|name| c.attributes.iter().find(|a| a.name == name))
-                    .map(|a| quote!(AttributeId::new($(format_hex(u64::from(a.code), 4)))))
-            })
-            .collect();
+        let mut req_attrs = Vec::new();
+        for t in &inc.required_attributes {
+            let Some(attr) = resolve_include_target(t, &attr_cands, to_shouty_snake_case)
+                .and_then(|name| c.attributes.iter().find(|a| a.name == name))
+            else {
+                if !is_legacy_device_include_ignored(version, t) {
+                    return Err(Error::UnresolvedDeviceTypeInclude {
+                        device_type: d.name.clone(),
+                        kind: "attribute".to_owned(),
+                        target: t.clone(),
+                    });
+                }
+                continue;
+            };
+            req_attrs.push(quote!(AttributeId::new($(format_hex(u64::from(attr.code), 4)))));
+        }
 
-        let client_cmds: Vec<&CommandDef> = c
-            .commands
-            .iter()
-            .filter(|cm| cm.direction == CommandDirection::ClientToServer)
-            .collect();
-        let cmd_cands: Vec<(Option<&str>, &str)> = client_cmds.iter().map(|cm| (None, cm.name.as_str())).collect();
+        let all_cmd_cands: Vec<(Option<&str>, &str)> = c.commands.iter().map(|cm| (None, cm.name.as_str())).collect();
         let mut seen_cmd_ids = BTreeSet::new();
-        let req_cmds: Vec<Tokens> = inc
-            .required_commands
-            .iter()
-            .filter(|t| !is_legacy_device_include_ignored(t))
-            .filter_map(|t| {
-                resolve_include_target(t, &cmd_cands, to_shouty_snake_case)
-                    .and_then(|name| client_cmds.iter().find(|cm| cm.name == name))
-                    .filter(|cm| seen_cmd_ids.insert(cm.code))
-                    .map(|cm| quote!(CommandId::new($(format_hex(u64::from(cm.code), 2)))))
-            })
-            .collect();
+        let mut req_cmds = Vec::new();
+        for t in &inc.required_commands {
+            let Some(cmd) = resolve_include_target(t, &all_cmd_cands, to_shouty_snake_case)
+                .and_then(|name| c.commands.iter().find(|cm| cm.name == name))
+            else {
+                if !is_legacy_device_include_ignored(version, t) {
+                    return Err(Error::UnresolvedDeviceTypeInclude {
+                        device_type: d.name.clone(),
+                        kind: "command".to_owned(),
+                        target: t.clone(),
+                    });
+                }
+                continue;
+            };
+            if cmd.direction == CommandDirection::ClientToServer && seen_cmd_ids.insert(cmd.code) {
+                req_cmds.push(quote!(CommandId::new($(format_hex(u64::from(cmd.code), 2)))));
+            }
+        }
 
         let ev_cands: Vec<(Option<&str>, &str)> = c.events.iter().map(|ev| (None, ev.name.as_str())).collect();
-        let req_evs: Vec<Tokens> = inc
-            .required_events
-            .iter()
-            .filter(|t| !is_legacy_device_include_ignored(t))
-            .filter_map(|t| {
-                resolve_include_target(t, &ev_cands, to_shouty_snake_case)
-                    .and_then(|name| c.events.iter().find(|ev| ev.name == name))
-                    .map(|ev| quote!(EventId::new($(format_hex(u64::from(ev.code), 2)))))
-            })
-            .collect();
+        let mut req_evs = Vec::new();
+        for t in &inc.required_events {
+            let Some(ev) = resolve_include_target(t, &ev_cands, to_shouty_snake_case)
+                .and_then(|name| c.events.iter().find(|ev| ev.name == name))
+            else {
+                if !is_legacy_device_include_ignored(version, t) {
+                    return Err(Error::UnresolvedDeviceTypeInclude {
+                        device_type: d.name.clone(),
+                        kind: "event".to_owned(),
+                        target: t.clone(),
+                    });
+                }
+                continue;
+            };
+            req_evs.push(quote!(EventId::new($(format_hex(u64::from(ev.code), 2)))));
+        }
 
         if req_attrs.is_empty() && req_cmds.is_empty() && req_evs.is_empty() {
             continue;
@@ -409,7 +438,7 @@ fn render_device_type_descriptor(d: &ParsedDeviceType, cluster_by_name: &BTreeMa
         });
     }
 
-    quote! {
+    Ok(quote! {
         #[cfg(feature = $(quoted(&ep_feat)))]
         DeviceTypeDescriptor {
             id: DeviceTypeId::new($did_hex),
@@ -419,5 +448,5 @@ fn render_device_type_descriptor(d: &ParsedDeviceType, cluster_by_name: &BTreeMa
             choice_groups: &[],
             includes: &[$(for inc in &include_tokens join ($['\r']) => $inc,)],
         },
-    }
+    })
 }

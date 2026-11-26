@@ -6,9 +6,35 @@ use crate::{
     },
 };
 
-/// Legacy ZCL / renamed CSA attribute/command/event names in `matter-devices.xml`
-/// that are intentionally ignored when resolving `DeviceTypeIncludeItem`.
-const LEGACY_DEVICE_INCLUDE_IGNORES: &[&str] = &["Scenes", "ColorControl", "BarrierControl", "MoveColorTemperature"];
+/// Returns `true` when an unresolved `DeviceTypeIncludeItem` target (`requireAttribute`,
+/// `requireCommand`, or `requireEvent`) is a known upstream `matter-devices.xml` quirk for `version`.
+///
+/// Rule for adding entries here (checked *only* after `resolve_include_target` fails):
+/// 1. **Fix or alias in `resolve_include_target` instead** if the member exists in that release's cluster XML under a
+///    different casing, `@define`, or clear 1:1 rename.
+/// 2. **Add here (scoped to the exact affected `version`s) only** when verified in `xtask/spec-data/` that the target
+///    is genuinely absent from that release's cluster XML (stale ZCL names, cluster-level placeholders, or upstream
+///    typos on example device types).
+pub(crate) fn is_legacy_device_include_ignored(version: &str, target: &str) -> bool {
+    match target {
+        "Scenes"
+        | "ColorControl"
+        | "BarrierControl"
+        | "MoveColorTemperature"
+        | "IdentifyQuery"
+        | "SetCredentialStatus"
+        | "SetCredentialStatusResponse" => matches!(version, "1.0" | "1.1" | "1.2" | "1.3" | "1.4" | "1.5" | "1.6"),
+        "COLOR_CONTROL_COLOR_START_ENHANCED_HUE" | "COLOR_CONTROL_COLOR_STORED_ENHANCED_HUE" => {
+            matches!(version, "1.1" | "1.2" | "1.3" | "1.4" | "1.5" | "1.6")
+        }
+        "BINDING" => matches!(version, "1.2" | "1.3" | "1.4" | "1.5" | "1.6"),
+        "SCENE_NAME_SUPPORT" | "SCENE_COUNT" | "SCENE_VALID" | "CURRENT_SCENE" | "CURRENT_GROUP" => {
+            matches!(version, "1.3" | "1.4" | "1.5" | "1.6")
+        }
+        "COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN" | "COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX" => version == "1.6",
+        _ => false,
+    }
+}
 
 /// Privilege level for attribute/command/event access.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -136,7 +162,10 @@ pub(crate) enum ConformanceOp {
     Otherwise,
     Feature(String),
     Attribute(String),
+    /// External condition name (`Zigbee`, `Matter`, etc.).
     Condition(String),
+    /// Command presence reference (`[Start]`, `[Stop]`, etc.).
+    Command(String),
     Literal(String),
     Not,
     And(usize),
@@ -160,7 +189,8 @@ pub(crate) fn compile_conform_xml(conform: &ConformXml, out: &mut Vec<Conformanc
         match item {
             ConformItem::Feature(r) => out.push(ConformanceOp::Feature(r.name.clone())),
             ConformItem::Attribute(r) => out.push(ConformanceOp::Attribute(r.name.clone())),
-            ConformItem::Condition(r) | ConformItem::Command(r) => out.push(ConformanceOp::Condition(r.name.clone())),
+            ConformItem::Condition(r) => out.push(ConformanceOp::Condition(r.name.clone())),
+            ConformItem::Command(r) => out.push(ConformanceOp::Command(r.name.clone())),
             ConformItem::NotTerm(n) => compile_not_term(&n.items, out),
             ConformItem::OrTerm(o) => compile_or_term(&o.items, out),
             ConformItem::AndTerm(a) => compile_and_term(&a.items, out),
@@ -249,10 +279,6 @@ pub(crate) fn resolve_include_target<'a>(
     None
 }
 
-pub(crate) fn is_legacy_device_include_ignored(target: &str) -> bool {
-    LEGACY_DEVICE_INCLUDE_IGNORES.contains(&target)
-}
-
 fn compile_not_term(items: &[NotTermItem], out: &mut Vec<ConformanceOp>) {
     for item in items {
         match item {
@@ -279,7 +305,7 @@ fn compile_or_term(items: &[OrTermItem], out: &mut Vec<ConformanceOp>) {
             }
             OrTermItem::Command(r) => {
                 count = count.saturating_add(1);
-                out.push(ConformanceOp::Condition(r.name.clone()));
+                out.push(ConformanceOp::Command(r.name.clone()));
             }
             OrTermItem::AndTerm(a) => {
                 count = count.saturating_add(1);

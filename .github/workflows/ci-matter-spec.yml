@@ -191,7 +191,7 @@ jobs:
         run: just spec-doc ${{ matrix.version }}
 
       - name: Verify no_std (${{ matrix.version }})
-        run: cargo check -p matter-spec --locked --target thumbv7em-none-eabihf --no-default-features --features "${{ matrix.version }},general,registry,dispatch,serde,chrono,time,uom" --lib
+        run: cargo check -p matter-spec --locked --target thumbv7em-none-eabihf --no-default-features --features "${{ matrix.version }},general,registry,dispatch,serde,jiff,time,uom" --lib
 
       - name: Install cargo-semver-checks
         if: github.event_name == 'pull_request' && needs.discover.outputs.run_semver == 'true'
@@ -216,7 +216,7 @@ jobs:
           cargo semver-checks \
             -p matter-spec \
             --only-explicit-features \
-            --features "${VERSION},all,registry,dispatch,serde,schemars,chrono,time,uom" \
+            --features "${VERSION},all,registry,dispatch,serde,schemars,jiff,time,uom" \
             --baseline-rev "origin/${BASE_REF}"
           status=$?
           set -e
@@ -286,4 +286,4 @@ jobs:
         run: |
           sed -i -e '/^members = \[/{:a; /\]$/{s/.*/members = ["spec\/matter-data-model", "spec\/matter-spec"]/; b}; N; ba}' -e '/^default-members = \[/{:b; /\]$/d; N; bb}' Cargo.toml
           cargo minimal-versions check -p matter-data-model --direct --all-features
-          cargo minimal-versions check -p matter-spec --direct --jobs 1 --features "${{ needs.discover.outputs.latest }},all,registry,dispatch,serde,schemars,chrono,time,uom"
+          cargo minimal-versions check -p matter-spec --direct --jobs 1 --features "${{ needs.discover.outputs.latest }},all,registry,dispatch,serde,schemars,jiff,time,uom"

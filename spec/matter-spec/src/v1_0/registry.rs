@@ -8774,7 +8774,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionLiftPercentage",
                 field_name: "current_position_lift_percentage",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8782,7 +8782,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionTiltPercentage",
                 field_name: "current_position_tilt_percentage",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U8, bounds: ValueBounds::Unsigned { min: 0, max: 100 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8802,7 +8802,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "TargetPositionLiftPercent100ths",
                 field_name: "target_position_lift_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8810,7 +8810,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "TargetPositionTiltPercent100ths",
                 field_name: "target_position_tilt_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8830,7 +8830,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionLiftPercent100ths",
                 field_name: "current_position_lift_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8838,7 +8838,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "CurrentPositionTiltPercent100ths",
                 field_name: "current_position_tilt_percent100ths",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::None, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::U16, bounds: ValueBounds::Unsigned { min: 0, max: 10000 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -8997,7 +8997,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxPressure",
                 field_name: "max_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -9021,7 +9021,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinConstPressure",
                 field_name: "min_const_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9029,7 +9029,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxConstPressure",
                 field_name: "max_const_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9037,7 +9037,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinCompPressure",
                 field_name: "min_comp_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9045,7 +9045,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxCompPressure",
                 field_name: "max_comp_pressure",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 32769, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -32767, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9085,7 +9085,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinConstTemp",
                 field_name: "min_const_temp",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9093,7 +9093,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxConstTemp",
                 field_name: "max_const_temp",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9348,7 +9348,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "LocalTemperature",
                 field_name: "local_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -9356,7 +9356,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "OutdoorTemperature",
                 field_name: "outdoor_temperature",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9372,7 +9372,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMinHeatSetpointLimit",
                 field_name: "abs_min_heat_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9380,7 +9380,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMaxHeatSetpointLimit",
                 field_name: "abs_max_heat_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9388,7 +9388,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMinCoolSetpointLimit",
                 field_name: "abs_min_cool_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9396,7 +9396,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "AbsMaxCoolSetpointLimit",
                 field_name: "abs_max_cool_setpoint_limit",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9428,7 +9428,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "LocalTemperatureCalibration",
                 field_name: "local_temperature_calibration",
                 access: AccessFlags(3),
-                constraint: ValueConstraint { value_type: ValueType::I8, bounds: ValueBounds::Signed { min: 231, max: 25 }, nullable: false },
+                constraint: ValueConstraint { value_type: ValueType::I8, bounds: ValueBounds::Signed { min: -25, max: 25 }, nullable: false },
                 conformance: &[ConformanceOp::Optional],
             },
             AttributeDescriptor {
@@ -9981,7 +9981,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MeasuredValue",
                 field_name: "measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -9989,7 +9989,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MinMeasuredValue",
                 field_name: "min_measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38221, max: 32766 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27315, max: 32766 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {
@@ -9997,7 +9997,7 @@ static CLUSTERS: &[ClusterDescriptor] = &[
                 name: "MaxMeasuredValue",
                 field_name: "max_measured_value",
                 access: AccessFlags(1),
-                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: 38222, max: 32767 }, nullable: true },
+                constraint: ValueConstraint { value_type: ValueType::I16, bounds: ValueBounds::Signed { min: -27314, max: 32767 }, nullable: true },
                 conformance: &[ConformanceOp::Mandatory],
             },
             AttributeDescriptor {

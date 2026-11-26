@@ -30,7 +30,6 @@ pub(crate) fn validate_device_view(
         }
         if entry.id == device_type_id {
             found = true;
-            break;
         }
     }
     let Some(actual) = first_id else {
@@ -98,6 +97,24 @@ pub(crate) fn update_descriptor_cluster(
             Attribute::new(AttributeId::new(0x0001), server_list),
             Attribute::new(AttributeId::new(0x0002), client_list),
             Attribute::new(AttributeId::new(0x0003), parts_list),
+            Attribute::new(AttributeId::GENERATED_COMMAND_LIST, AttributeValue::List(Vec::new())),
+            Attribute::new(AttributeId::ACCEPTED_COMMAND_LIST, AttributeValue::List(Vec::new())),
+            Attribute::new(
+                AttributeId::ATTRIBUTE_LIST,
+                AttributeValue::List(vec![
+                    AttributeValue::U32(0x0000),
+                    AttributeValue::U32(0x0001),
+                    AttributeValue::U32(0x0002),
+                    AttributeValue::U32(0x0003),
+                    AttributeValue::U32(AttributeId::GENERATED_COMMAND_LIST.raw()),
+                    AttributeValue::U32(AttributeId::ACCEPTED_COMMAND_LIST.raw()),
+                    AttributeValue::U32(AttributeId::ATTRIBUTE_LIST.raw()),
+                    AttributeValue::U32(AttributeId::FEATURE_MAP.raw()),
+                    AttributeValue::U32(AttributeId::CLUSTER_REVISION.raw()),
+                ]),
+            ),
+            Attribute::new(AttributeId::FEATURE_MAP, AttributeValue::U32(0)),
+            Attribute::new(AttributeId::CLUSTER_REVISION, AttributeValue::U16(3)),
         ],
     );
 

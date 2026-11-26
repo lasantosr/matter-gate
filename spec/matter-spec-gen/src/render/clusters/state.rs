@@ -69,8 +69,11 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
     let features_ty = if has_features { "FeatureMap" } else { "u32" };
     let has_commands = !cluster.commands.is_empty();
     let has_events = !cluster.events.is_empty();
-    let has_client_commands = cluster.commands.iter().any(|c| c.source != "server");
-    let has_server_commands = cluster.commands.iter().any(|c| c.source == "server");
+    let has_client_commands = cluster
+        .commands
+        .iter()
+        .any(|c| !c.source.eq_ignore_ascii_case("server"));
+    let has_server_commands = cluster.commands.iter().any(|c| c.source.eq_ignore_ascii_case("server"));
 
     let patch_tokens = emit_cluster_patch_tokens(
         cluster_struct_name,

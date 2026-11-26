@@ -48,6 +48,10 @@ where
         where
             A: MapAccess<'de>,
         {
+            let mut cluster_name: Option<String> = None;
+            let mut cluster_id: Option<u32> = None;
+            let mut event_name: Option<String> = None;
+            let mut event_id: Option<u32> = None;
             let mut payload: Option<T> = None;
             while let Some(key) = map.next_key::<String>()? {
                 match key.as_str() {
@@ -57,8 +61,17 @@ where
                     "payload" => {
                         payload = Some(map.next_value::<T>()?);
                     }
-                    "cluster" | "cluster_id" | "event" | "event_id" => {
-                        let _ignored: de::IgnoredAny = map.next_value::<de::IgnoredAny>()?;
+                    "cluster" => {
+                        cluster_name = Some(map.next_value::<String>()?);
+                    }
+                    "cluster_id" => {
+                        cluster_id = Some(map.next_value::<u32>()?);
+                    }
+                    "event" => {
+                        event_name = Some(map.next_value::<String>()?);
+                    }
+                    "event_id" => {
+                        event_id = Some(map.next_value::<u32>()?);
                     }
                     #[cfg(feature = "deny-unknown-fields")]
                     other => {
@@ -73,7 +86,40 @@ where
                     }
                 }
             }
-            payload.ok_or_else(|| de::Error::missing_field("payload"))
+            let payload = payload.ok_or_else(|| de::Error::missing_field("payload"))?;
+            let desc = payload.descriptor();
+            let (expected_scope, expected_scope_id) = desc.scope();
+            if let Some(actual) = cluster_name.as_deref()
+                && actual != expected_scope
+            {
+                return Err(de::Error::custom(alloc::format!(
+                    "expected cluster '{expected_scope}', got '{actual}'"
+                )));
+            }
+            if let Some(actual) = cluster_id
+                && actual != expected_scope_id
+            {
+                return Err(de::Error::custom(alloc::format!(
+                    "expected cluster_id {expected_scope_id}, got {actual}"
+                )));
+            }
+            if let Some((expected_item, expected_item_id)) = desc.item() {
+                if let Some(actual) = event_name.as_deref()
+                    && actual != expected_item
+                {
+                    return Err(de::Error::custom(alloc::format!(
+                        "expected event '{expected_item}', got '{actual}'"
+                    )));
+                }
+                if let Some(actual) = event_id
+                    && actual != expected_item_id
+                {
+                    return Err(de::Error::custom(alloc::format!(
+                        "expected event_id {expected_item_id}, got {actual}"
+                    )));
+                }
+            }
+            Ok(payload)
         }
     }
 

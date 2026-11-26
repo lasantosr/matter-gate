@@ -169,7 +169,7 @@ fn cluster_envelope_routes_mei_and_rejects_unknown_standard_and_reserved() {
 fn event_envelope_verifies_priority_and_preserves_metadata() {
     assert_eq!(
         WireEvent::try_new(EventPriority::Debug, EventPriority::Critical, ()),
-        Err(MatterStatus::InvalidDataType)
+        Err(MatterStatus::ConstraintError)
     );
 
     let env = WireEvent::try_new(EventPriority::Info, EventPriority::Info, ())
