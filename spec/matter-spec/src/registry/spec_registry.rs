@@ -8,15 +8,21 @@ use super::{
         validate_descriptor_consistency, validate_device_type_reqs, validate_include_item,
         validate_node_parts_integrity,
     },
-    descriptors::{ClusterDescriptor, ConformanceResult, DeviceTypeDescriptor},
+    descriptors::{
+        AttributeDescriptor, ClusterDescriptor, CommandDescriptor, ConformanceResult, DeviceTypeDescriptor,
+        EventDescriptor, GLOBAL_ATTRIBUTES,
+    },
     value::{validate_global_attribute_value, validate_struct_fields, validate_value_with_ctx},
 };
 use crate::{
     error::{AttributeError, ClusterError, CommandError, EndpointError, EventError, NodeError},
-    model::{Attribute, AttributeId, Cluster, ClusterId, Command, DeviceTypeId, Endpoint, Event, MatterStatus, Node},
+    model::{
+        Attribute, AttributeId, Cluster, ClusterId, Command, CommandDirection, CommandId, DeviceTypeId, Endpoint,
+        Event, EventId, MatterStatus, Node,
+    },
 };
 
-/// Read-only static schema registry for zero-allocation validation.
+/// Read-only static specification metadata and validation registry.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct SpecRegistry {
     /// Whether `EventList` (`0xFFFA`) is defined in this release's global attributes and expected in `FullSnapshot`
@@ -58,6 +64,40 @@ impl SpecRegistry {
     pub fn find_cluster(&self, id: ClusterId) -> Option<&'static ClusterDescriptor> {
         let idx = self.clusters.binary_search_by_key(&id.raw(), |c| c.id.raw()).ok()?;
         self.clusters.get(idx)
+    }
+
+    /// Looks up a Matter §7.13 global attribute descriptor (`0xFFF8`–`0xFFFD`) by [`AttributeId`].
+    #[must_use]
+    pub fn find_global_attribute(&self, id: AttributeId) -> Option<&'static AttributeDescriptor> {
+        let idx = GLOBAL_ATTRIBUTES.binary_search_by_key(&id.raw(), |a| a.id.raw()).ok()?;
+        GLOBAL_ATTRIBUTES.get(idx)
+    }
+
+    /// Looks up an attribute descriptor by `(ClusterId, AttributeId)`, falling back to Matter §7.13
+    /// global attributes (`0xFFF8`–`0xFFFD`) when `cluster_id` is present in this registry.
+    #[must_use]
+    pub fn find_attribute(&self, cluster_id: ClusterId, attr_id: AttributeId) -> Option<&'static AttributeDescriptor> {
+        let cluster = self.find_cluster(cluster_id)?;
+        cluster
+            .find_attribute(attr_id)
+            .or_else(|| self.find_global_attribute(attr_id))
+    }
+
+    /// Looks up a command descriptor by `(ClusterId, CommandId, CommandDirection)`.
+    #[must_use]
+    pub fn find_command(
+        &self,
+        cluster_id: ClusterId,
+        cmd_id: CommandId,
+        direction: CommandDirection,
+    ) -> Option<&'static CommandDescriptor> {
+        self.find_cluster(cluster_id)?.find_command(cmd_id, direction)
+    }
+
+    /// Looks up an event descriptor by `(ClusterId, EventId)`.
+    #[must_use]
+    pub fn find_event(&self, cluster_id: ClusterId, event_id: EventId) -> Option<&'static EventDescriptor> {
+        self.find_cluster(cluster_id)?.find_event(event_id)
     }
 
     /// Looks up a device type descriptor by [`DeviceTypeId`] in `O(log N)` time.

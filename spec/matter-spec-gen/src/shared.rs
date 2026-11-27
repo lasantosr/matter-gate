@@ -4,7 +4,7 @@ use heck::ToSnakeCase as _;
 
 use crate::model::{
     AccessFlags, AccessPrivilege, AttributeDef, BitmapDef, ChoiceGroup, ClusterDef, CommandDef, CommandDirection,
-    ConformanceOp, EnumDef, EventDef, FeatureDef, FieldDef, GlobalDefs, ListLength, StructDef,
+    ConformanceOp, EnumDef, EventDef, FeatureDef, FieldDef, GlobalDefs, ListLength, QualityFlags, StructDef,
 };
 
 /// Kind of shared item in `crate::__shared::<hash>`.
@@ -419,6 +419,13 @@ fn hash_access(h: &mut DeterministicHasher, a: &AccessFlags) {
     h.write_u64(privilege_tag(a.invoke_privilege));
 }
 
+fn hash_quality(h: &mut DeterministicHasher, q: QualityFlags) {
+    h.write_bool(q.change_omitted);
+    h.write_bool(q.large_message);
+    h.write_bool(q.atomic_write);
+    h.write_bool(q.reportable);
+}
+
 fn hash_list_length(h: &mut DeterministicHasher, ll: Option<&ListLength>) {
     match ll {
         Some(l) => {
@@ -536,8 +543,10 @@ fn hash_attribute(h: &mut DeterministicHasher, a: &AttributeDef) {
     h.write_opt_u32(a.length);
     h.write_opt_u32(a.min_length);
     hash_list_length(h, a.list_length.as_ref());
+    h.write_opt_str(a.default.as_deref());
     h.write_opt_str(a.define.as_deref());
     hash_access(h, &a.access);
+    hash_quality(h, a.quality);
     hash_conformance(h, &a.conformance);
     h.write_opt_str(a.choice.as_deref());
 }
@@ -555,6 +564,7 @@ fn hash_command(h: &mut DeterministicHasher, c: &CommandDef) {
         hash_field(h, arg);
     }
     hash_access(h, &c.access);
+    hash_quality(h, c.quality);
     hash_conformance(h, &c.conformance);
     h.write_opt_str(c.choice.as_deref());
 }

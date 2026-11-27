@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// TemperatureMeasurement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -48,6 +48,17 @@ pub struct TemperatureMeasurementCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub tolerance: Optional<u16>,
+}
+
+impl Default for TemperatureMeasurementCluster {
+    fn default() -> Self {
+        Self {
+            measured_value: Nullable::default(),
+            min_measured_value: Nullable::NonNull(32768),
+            max_measured_value: Nullable::NonNull(32768),
+            tolerance: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

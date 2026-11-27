@@ -41,7 +41,7 @@ crate::define_matter_bitmap! {
 }
 
 /// GroupKeyManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -57,6 +57,18 @@ pub struct GroupKeyManagementCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub groupcast_adoption: Optional<Vec<GroupcastAdoptionStruct>>,
+}
+
+impl Default for GroupKeyManagementCluster {
+    fn default() -> Self {
+        Self {
+            group_key_map: Vec::default(),
+            group_table: Vec::default(),
+            max_groups_per_fabric: 0,
+            max_group_keys_per_fabric: 1,
+            groupcast_adoption: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

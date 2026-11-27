@@ -16,6 +16,16 @@ Every model crate is `#![no_std]` compatible (`alloc`) and completely independen
 
 Each crate's README covers its features and usage examples.
 
+## Why This Suite Exists (vs. `rs-matter-dm-clusters`)
+
+Official stack-integrated codegen such as [`rs-matter`](https://github.com/project-chip/rs-matter)'s `rs-matter-dm-clusters` is purpose-built for firmware and device handlers tightly coupled to `rs-matter`'s TLV codecs and Interaction Model traits. That design is ideal when a single binary owns both the network stack and every cluster implementation.
+
+Bridges, multi-protocol gateways, driver SDKs, controllers, and conformance tools face a different architectural problem:
+
+1. **Decoupling domain data from binary TLV & IM runtime machinery:** Device drivers, plugins, and application libraries should be able to construct, transform, and exchange Matter state without pulling in a full network stack, TLV encoder/decoder, or async runtime, or breaking whenever the underlying stack changes.
+2. **Preventing diamond-dependency conflicts:** Protocol stacks and drivers need a long-term stable shared vocabulary (`matter-data-model`) that does not break every time the CSA publishes a new Matter release. Keeping versioned cluster schemas in `matter-spec` lets `matter-spec` track new CSA releases freely while libraries and driver SDKs expose only `matter-data-model` in their public APIs.
+3. **Bridging plain data to any Interaction Model stack:** A decoupled runtime or stack adapter (targeting `rs-matter` or any alternative stack) can receive plain data-model payloads from drivers and query `matter-spec`'s static registry by cluster and member ID for everything the Interaction Model layer needs: access control privileges, access and quality flags, cluster revisions, command response mappings, and zero-allocation conformance validation.
+
 ## Architecture: Why Two Model Crates?
 
 Protocol libraries often tangle two things that evolve at completely different speeds:

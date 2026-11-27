@@ -756,7 +756,7 @@ mod schema_impls {
     use crate::{
         dispatch::traits::{CommandMeta, MatterDescribe, StaticEntitySchema},
         model::EndpointId,
-        validate::{ClusterDescriptor, ConformanceResult, eval_conformance},
+        registry::{ClusterDescriptor, ConformanceResult, eval_conformance},
     };
 
     fn insert_const_or_type_str(props: &mut Map<String, Value>, key: &str, val: Option<&'static str>) {
@@ -887,7 +887,7 @@ mod schema_impls {
     }
 
     /// Generates a JSON Schema for cluster `T` dynamically pruned against `feature_map`
-    /// using the static [`ClusterDescriptor`](crate::validate::ClusterDescriptor).
+    /// using the static [`ClusterDescriptor`](crate::registry::ClusterDescriptor).
     pub fn feature_pruned_cluster_schema<T: JsonSchema>(
         generator: &mut SchemaGenerator,
         descriptor: &ClusterDescriptor,

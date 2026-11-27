@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ClientMonitoring cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -45,6 +45,17 @@ pub struct ClientMonitoringCluster {
     pub active_mode_interval: u32,
     pub active_mode_threshold: u16,
     pub expected_clients: Vec<MonitoringRegistration>,
+}
+
+impl Default for ClientMonitoringCluster {
+    fn default() -> Self {
+        Self {
+            idle_mode_interval: 300,
+            active_mode_interval: 300,
+            active_mode_threshold: 4000,
+            expected_clients: Vec::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

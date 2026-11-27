@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// UnitTesting cluster.
-#[derive(Debug, Clone, PartialEq, Default)]
+#[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -132,6 +132,95 @@ pub struct UnitTestingCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub unsupported: Optional<Unsupported>,
+}
+
+impl Default for UnitTestingCluster {
+    fn default() -> Self {
+        Self {
+            boolean: false,
+            bitmap8: Bitmap8MaskMap::empty(),
+            bitmap16: Bitmap16MaskMap::empty(),
+            bitmap32: Bitmap32MaskMap::empty(),
+            bitmap64: Bitmap64MaskMap::empty(),
+            int8u: 0,
+            int16u: 0,
+            int24u: 0,
+            int32u: 0,
+            int40u: 0,
+            int48u: 0,
+            int56u: 0,
+            int64u: 0,
+            int8s: 0,
+            int16s: 0,
+            int24s: 0,
+            int32s: 0,
+            int40s: 0,
+            int48s: 0,
+            int56s: 0,
+            int64s: 0,
+            enum8: 0,
+            enum16: 0,
+            float_single: 0.0,
+            float_double: 0.0,
+            octet_string: crate::Bytes::default(),
+            list_int8u: Vec::default(),
+            list_octet_string: Vec::default(),
+            list_struct_octet_string: Vec::default(),
+            long_octet_string: crate::Bytes::default(),
+            char_string: String::default(),
+            long_char_string: String::default(),
+            epoch_us: types::EpochUs::default(),
+            epoch_s: types::EpochS::default(),
+            vendor_id: VendorId::new(0),
+            list_nullables_and_optionals_struct: Vec::default(),
+            enum_attr: SimpleEnum::default(),
+            struct_attr: SimpleStruct::default(),
+            range_restricted_int8u: 70,
+            range_restricted_int8s: -5,
+            range_restricted_int16u: 200,
+            range_restricted_int16s: -5,
+            list_long_octet_string: Vec::default(),
+            list_fabric_scoped: Vec::default(),
+            timed_write_boolean: bool::default(),
+            general_error_boolean: bool::default(),
+            cluster_error_boolean: bool::default(),
+            nullable_boolean: Nullable::NonNull(false),
+            nullable_bitmap8: Nullable::NonNull(Bitmap8MaskMap::empty()),
+            nullable_bitmap16: Nullable::NonNull(Bitmap16MaskMap::empty()),
+            nullable_bitmap32: Nullable::NonNull(Bitmap32MaskMap::empty()),
+            nullable_bitmap64: Nullable::NonNull(Bitmap64MaskMap::empty()),
+            nullable_int8u: Nullable::NonNull(0),
+            nullable_int16u: Nullable::NonNull(0),
+            nullable_int24u: Nullable::NonNull(0),
+            nullable_int32u: Nullable::NonNull(0),
+            nullable_int40u: Nullable::NonNull(0),
+            nullable_int48u: Nullable::NonNull(0),
+            nullable_int56u: Nullable::NonNull(0),
+            nullable_int64u: Nullable::NonNull(0),
+            nullable_int8s: Nullable::NonNull(0),
+            nullable_int16s: Nullable::NonNull(0),
+            nullable_int24s: Nullable::NonNull(0),
+            nullable_int32s: Nullable::NonNull(0),
+            nullable_int40s: Nullable::NonNull(0),
+            nullable_int48s: Nullable::NonNull(0),
+            nullable_int56s: Nullable::NonNull(0),
+            nullable_int64s: Nullable::NonNull(0),
+            nullable_enum8: Nullable::NonNull(0),
+            nullable_enum16: Nullable::NonNull(0),
+            nullable_float_single: Nullable::NonNull(0.0),
+            nullable_float_double: Nullable::NonNull(0.0),
+            nullable_octet_string: Nullable::default(),
+            nullable_char_string: Nullable::default(),
+            nullable_enum_attr: Nullable::default(),
+            nullable_struct: Nullable::default(),
+            nullable_range_restricted_int8u: Nullable::NonNull(70),
+            nullable_range_restricted_int8s: Nullable::NonNull(-5),
+            nullable_range_restricted_int16u: Nullable::NonNull(200),
+            nullable_range_restricted_int16s: Nullable::NonNull(-5),
+            write_only_int8u: Optional::Omitted,
+            unsupported: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Default)]

@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// Scenes cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -58,6 +58,21 @@ pub struct ScenesCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub last_configured_by: Optional<Nullable<NodeId>>,
+}
+
+impl Default for ScenesCluster {
+    fn default() -> Self {
+        Self {
+            scene_count: 0,
+            current_scene: 0,
+            current_group: GroupId::new(0),
+            scene_valid: SceneValid::default(),
+            name_support: 0,
+            scene_table_size: 16,
+            remaining_capacity: u8::default(),
+            last_configured_by: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

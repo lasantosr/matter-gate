@@ -10,11 +10,13 @@
 
 ## Why `matter-data-model`?
 
-Protocol stacks, bridges, and drivers need a shared language to exchange Matter state without pulling in an entire network engine or breaking whenever a new cluster specification lands.
+Protocol stacks, bridges, and drivers need a shared language to exchange Matter state without pulling in binary TLV/Interaction Model runtime machinery (such as `rs-matter` handler traits) or breaking whenever a new cluster specification lands.
 
 `matter-data-model` is that foundation. It models the Connectivity Standards Alliance (CSA) Data Model and Interaction Model status codes as plain data: no custom traits, no schema conformance validation, no message or path Information Blocks, and zero dependencies on async runtimes or transport stacks.
 
-Need strongly typed, versioned cluster and endpoint models? Pair it with [`matter-spec`](https://crates.io/crates/matter-spec) for seamless conversions to and from these wire types.
+Because it stays strictly version-independent, library crates and driver SDKs can expose `matter-data-model` in their public Rust APIs without creating diamond-dependency conflicts as [`matter-spec`](https://crates.io/crates/matter-spec) evolves to track new CSA Matter releases, or as runtimes swap or upgrade their underlying Interaction Model stack.
+
+Need strongly typed, versioned cluster and endpoint models or static Interaction Model metadata? Pair it with [`matter-spec`](https://crates.io/crates/matter-spec) for zero-clone owned conversions to and from these wire types.
 
 ## Features
 

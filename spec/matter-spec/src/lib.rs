@@ -11,8 +11,13 @@
 //! compile-time-checked models generated directly from the official CSA specification, organized into one module per
 //! supported Matter release.
 //!
-//! It is completely independent of any network stack, transport, or async runtime. Its only Matter dependency is
-//! [`matter-data-model`](model), which it re-exports and converts to and from seamlessly.
+//! Unlike stack-coupled cluster codegen such as `rs-matter-dm-clusters` (which binds directly to `rs-matter`'s TLV
+//! codecs and Interaction Model handler traits), `matter-spec` is completely independent of any network stack,
+//! transport, or async runtime. Its only Matter dependency is [`matter-data-model`](model), which it re-exports and
+//! converts to and from seamlessly. Drivers and libraries can depend solely on `matter-data-model` (avoiding
+//! diamond-dependency conflicts across Matter releases), while a decoupled runtime or stack adapter uses
+//! [`SpecRegistry`](registry::SpecRegistry) to look up ACL privileges, access/quality flags, cluster revisions,
+//! command responses, and conformance rules by `(ClusterId, MemberId)`.
 //!
 //! # Features
 //!
@@ -25,11 +30,13 @@
 //! - **Exhaustive enums & bitmaps:** Cluster enums are exhaustive for their Matter release so matches are
 //!   compiler-verified. Bitmaps provide named flag constants, bitwise operators, and set helpers. Error enums in
 //!   [`error`] are also exhaustive by design.
-//! - **Zero-alloc conformance validation.** Static read-only [`SpecRegistry`](validate::SpecRegistry) tables power
-//!   non-mutating, zero-allocation `Validator` (`validator()`, `partial_validator()`)
-//!   ([`ValidationMode::Partial`](validate::ValidationMode::Partial) for deltas and
-//!   [`ValidationMode::FullSnapshot`](validate::ValidationMode::FullSnapshot) with `Descriptor` `0x001D` cross-checks),
-//!   alongside [`DeviceTypeSpec::view`](traits::DeviceTypeSpec::view) for zero-alloc endpoint inspection.
+//! - **Static IM metadata & zero-alloc conformance validation:** Read-only [`SpecRegistry`](registry::SpecRegistry)
+//!   tables expose ACL privilege levels ([`AccessPrivilege`](registry::AccessPrivilege)),
+//!   [`AccessFlags`](registry::AccessFlags), [`QualityFlags`](registry::QualityFlags), cluster revisions, and command
+//!   response IDs by `(ClusterId, MemberId)`—and power non-mutating, zero-allocation `Validator` (`validator()`,
+//!   `partial_validator()`, [`ValidationMode::Partial`](registry::ValidationMode::Partial) /
+//!   [`ValidationMode::FullSnapshot`](registry::ValidationMode::FullSnapshot)) alongside
+//!   [`DeviceTypeSpec::view`](traits::DeviceTypeSpec::view).
 //! - **Semantic newtypes & ergonomics.** Unit, time, and address types in [`types`] (`Temperature`, `Percent100ths`,
 //!   `PowerMw`, `EpochS`, `MatterDate`, `IpAddress`, ...) enforce physical-unit safety via `Deref` on cluster
 //!   attributes, inherent [`Optional<Nullable<T>>`](model::Optional) combinators, and `#![no_std]` `jiff`, `time`, and
@@ -72,7 +79,7 @@
 //! | Feature | Default | Description |
 //! | :--- | :---: | :--- |
 //! | `std` | Yes | Standard library support across `matter-spec`, `matter-data-model`, `bytes`, and `serde`. |
-//! | `registry` | No | `#![no_std]` + `alloc` static `SpecRegistry` and zero-alloc `Validator` conformance validation. |
+//! | `registry` | No | `#![no_std]` + `alloc` static `SpecRegistry` metadata (ACL privileges, access/quality flags, cluster revisions, command responses) and zero-alloc `Validator` conformance validation. |
 //! | `dispatch` | No | Runtime `*Meta` traits, threshold-boxed boundary enums, and `Described<T>` / `Invocation<T>` self-describing JSON wrappers. |
 //! | `serde` | No | `#![no_std]` + `alloc` `Serialize` and `Deserialize` implementations for all models. |
 //! | `schemars` | No | Dynamic `FeatureMap`-pruned `JsonSchema` generation via `schemars` (enables `std` and `registry`). |
@@ -235,7 +242,7 @@ pub mod wire;
 pub mod error;
 
 #[cfg(feature = "registry")]
-pub mod validate;
+pub mod registry;
 
 pub mod traits;
 
@@ -250,7 +257,7 @@ pub mod prelude {
     #[cfg(feature = "dispatch")]
     pub use crate::dispatch::*;
     #[cfg(feature = "registry")]
-    pub use crate::validate::*;
+    pub use crate::registry::*;
     pub use crate::{error::*, extensions::*, model::*, traits::*, types::*, wire::*};
 
     #[cfg(feature = "v1_0")]

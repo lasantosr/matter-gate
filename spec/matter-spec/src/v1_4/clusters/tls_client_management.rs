@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// TlsClientManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -43,6 +43,15 @@ crate::define_matter_bitmap! {
 pub struct TlsClientManagementCluster {
     pub max_provisioned: u8,
     pub provisioned_endpoints: Vec<TlsEndpointStruct>,
+}
+
+impl Default for TlsClientManagementCluster {
+    fn default() -> Self {
+        Self {
+            max_provisioned: 5,
+            provisioned_endpoints: Vec::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

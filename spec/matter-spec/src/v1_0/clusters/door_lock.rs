@@ -57,7 +57,7 @@ crate::define_matter_bitmap! {
 }
 
 /// DoorLock cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -169,6 +169,49 @@ pub struct DoorLockCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub expiring_user_timeout: Optional<u16>,
+}
+
+impl Default for DoorLockCluster {
+    fn default() -> Self {
+        Self {
+            lock_state: Nullable::default(),
+            lock_type: DlLockType::default(),
+            actuator_enabled: ActuatorEnabled::default(),
+            auto_relock_time: u32::default(),
+            operating_mode: DlOperatingMode::default(),
+            supported_operating_modes: DlSupportedOperatingModes::from_bits_truncate(65526),
+            door_state: Optional::Omitted,
+            door_open_events: Optional::Omitted,
+            door_closed_events: Optional::Omitted,
+            open_period: Optional::Omitted,
+            number_of_total_users_supported: Optional::Omitted,
+            number_of_pin_users_supported: Optional::Omitted,
+            number_of_rfid_users_supported: Optional::Omitted,
+            number_of_week_day_schedules_supported_per_user: Optional::Omitted,
+            number_of_year_day_schedules_supported_per_user: Optional::Omitted,
+            number_of_holiday_schedules_supported: Optional::Omitted,
+            max_pin_code_length: Optional::Omitted,
+            min_pin_code_length: Optional::Omitted,
+            max_rfid_code_length: Optional::Omitted,
+            min_rfid_code_length: Optional::Omitted,
+            credential_rules_support: Optional::Omitted,
+            number_of_credentials_supported_per_user: Optional::Omitted,
+            language: Optional::Omitted,
+            led_settings: Optional::Omitted,
+            sound_volume: Optional::Omitted,
+            default_configuration_register: Optional::Omitted,
+            enable_local_programming: Optional::Omitted,
+            enable_one_touch_locking: Optional::Omitted,
+            enable_inside_status_led: Optional::Omitted,
+            enable_privacy_mode_button: Optional::Omitted,
+            local_programming_features: Optional::Omitted,
+            wrong_code_entry_limit: Optional::Omitted,
+            user_code_temporary_disable_time: Optional::Omitted,
+            send_pin_over_the_air: Optional::Omitted,
+            require_pin_for_remote_operation: Optional::Omitted,
+            expiring_user_timeout: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

@@ -71,6 +71,15 @@ pub(crate) struct AccessFlags {
     pub(crate) invoke_privilege: Option<AccessPrivilege>,
 }
 
+/// Parsed quality flags for an attribute or command.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
+pub(crate) struct QualityFlags {
+    pub(crate) change_omitted: bool,
+    pub(crate) large_message: bool,
+    pub(crate) atomic_write: bool,
+    pub(crate) reportable: bool,
+}
+
 pub(crate) fn parse_access_flags(
     access_items: &[AccessXml],
     default_read: bool,

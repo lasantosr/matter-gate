@@ -130,3 +130,96 @@ fn attribute_descriptor_emits_pascal_name_and_snake_field_name_and_event_priorit
     assert!(rendered.contains("field_name: \"identify_time\""), "{rendered}");
     assert!(rendered.contains("priority: EventPriority::Critical"), "{rendered}");
 }
+
+#[test]
+fn registry_renders_privileges_qualities_fabric_scoping_response_id_and_revision() {
+    use crate::model::parse_csa_clusters;
+
+    let xml = r#"
+<configurator>
+  <struct name="FabricEntryStruct" isFabricScoped="true">
+    <cluster code="0x00F0"/>
+    <item fieldId="0" name="Label" type="char_string"/>
+  </struct>
+  <cluster>
+    <name>SampleMeta</name>
+    <code>0x00F0</code>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <attribute side="server" code="0x0000" type="array" entryType="FabricEntryStruct" writable="true" reportable="true" mustUseAtomicWrite="true">
+      FabricEntries
+      <access op="read" privilege="administer"/>
+      <access op="write" privilege="manage"/>
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute side="server" code="0x0001" type="int8u" readable="false" writable="true">
+      WriteOnlySecret
+    </attribute>
+    <command source="client" code="0x00" name="DoWork" response="DoWorkResponse" mustUseTimedInvoke="true">
+      <access op="invoke" privilege="administer"/>
+      <quality largeMessage="true"/>
+    </command>
+    <command source="server" code="0x01" name="DoWorkResponse"/>
+    <event side="server" code="0x00" name="AdminAudit" priority="info" isFabricSensitive="true">
+      <access op="read" privilege="administer"/>
+    </event>
+  </cluster>
+</configurator>
+"#;
+    let clusters = parse_csa_clusters(xml).expect("parse xml");
+    let cluster_refs: Vec<&ClusterDef> = clusters.iter().collect();
+    let globals = GlobalDefs::default();
+    let empty_e = BTreeMap::new();
+    let empty_b = BTreeMap::new();
+    let empty_s = BTreeMap::new();
+
+    let rendered = render_registry_tables("1.6", &cluster_refs, &[], &globals, &empty_e, &empty_b, &empty_s)
+        .expect("render registry");
+
+    // Cluster revision
+    assert!(rendered.contains("revision: 5"), "{rendered}");
+
+    // FabricEntries: READ(1) | WRITE(2) | FABRIC_SCOPED(4) = 7; Quality: CHANGE_OMITTED(1) | ATOMIC_WRITE(4) |
+    // REPORTABLE(8) = 13
+    assert!(rendered.contains("access: AccessFlags(7)"), "{rendered}");
+    assert!(rendered.contains("quality: QualityFlags(13)"), "{rendered}");
+    assert!(
+        rendered.contains("read_privilege: Some(AccessPrivilege::Administer)"),
+        "{rendered}"
+    );
+    assert!(
+        rendered.contains("write_privilege: Some(AccessPrivilege::Manage)"),
+        "{rendered}"
+    );
+
+    // WriteOnlySecret: WRITE(2) only, read_privilege: None, write_privilege: Some(Operate)
+    assert!(rendered.contains("access: AccessFlags(2)"), "{rendered}");
+    assert!(rendered.contains("read_privilege: None"), "{rendered}");
+    assert!(
+        rendered.contains("write_privilege: Some(AccessPrivilege::Operate)"),
+        "{rendered}"
+    );
+
+    // DoWork: TIMED(16) | INVOKE(64) = 80; Quality: LARGE_MESSAGE(2); invoke_privilege: Administer; response_id:
+    // Some(0x01)
+    assert!(rendered.contains("access: AccessFlags(80)"), "{rendered}");
+    assert!(rendered.contains("quality: QualityFlags(2)"), "{rendered}");
+    assert!(
+        rendered.contains("invoke_privilege: Some(AccessPrivilege::Administer)"),
+        "{rendered}"
+    );
+    assert!(
+        rendered.contains("response_id: Some(CommandId::new(0x01))"),
+        "{rendered}"
+    );
+
+    // DoWorkResponse: invoke_privilege: None, response_id: None
+    assert!(rendered.contains("invoke_privilege: None"), "{rendered}");
+    assert!(rendered.contains("response_id: None"), "{rendered}");
+
+    // AdminAudit event: READ(1) | FABRIC_SENSITIVE(8) = 9; read_privilege: AccessPrivilege::Administer
+    assert!(rendered.contains("access: AccessFlags(9)"), "{rendered}");
+    assert!(
+        rendered.contains("read_privilege: AccessPrivilege::Administer"),
+        "{rendered}"
+    );
+}

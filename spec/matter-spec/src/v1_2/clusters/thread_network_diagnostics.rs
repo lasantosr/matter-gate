@@ -35,7 +35,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ThreadNetworkDiagnostics cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -222,6 +222,76 @@ pub struct ThreadNetworkDiagnosticsCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub delay: Optional<Nullable<u32>>,
+}
+
+impl Default for ThreadNetworkDiagnosticsCluster {
+    fn default() -> Self {
+        Self {
+            channel: Nullable::default(),
+            routing_role: Nullable::default(),
+            network_name: Nullable::default(),
+            pan_id: Nullable::NonNull(0),
+            extended_pan_id: Nullable::NonNull(0),
+            mesh_local_prefix: Nullable::default(),
+            neighbor_table: Vec::default(),
+            route_table: Vec::default(),
+            partition_id: Nullable::default(),
+            weighting: Nullable::default(),
+            data_version: Nullable::default(),
+            stable_data_version: Nullable::default(),
+            leader_router_id: Nullable::default(),
+            security_policy: Nullable::default(),
+            channel_page0_mask: Nullable::default(),
+            operational_dataset_components: Nullable::default(),
+            active_network_faults_list: Vec::default(),
+            overrun_count: Optional::Omitted,
+            detached_role_count: Optional::Omitted,
+            child_role_count: Optional::Omitted,
+            router_role_count: Optional::Omitted,
+            leader_role_count: Optional::Omitted,
+            attach_attempt_count: Optional::Omitted,
+            partition_id_change_count: Optional::Omitted,
+            better_partition_attach_attempt_count: Optional::Omitted,
+            parent_change_count: Optional::Omitted,
+            tx_total_count: Optional::Omitted,
+            tx_unicast_count: Optional::Omitted,
+            tx_broadcast_count: Optional::Omitted,
+            tx_ack_requested_count: Optional::Omitted,
+            tx_acked_count: Optional::Omitted,
+            tx_no_ack_requested_count: Optional::Omitted,
+            tx_data_count: Optional::Omitted,
+            tx_data_poll_count: Optional::Omitted,
+            tx_beacon_count: Optional::Omitted,
+            tx_beacon_request_count: Optional::Omitted,
+            tx_other_count: Optional::Omitted,
+            tx_retry_count: Optional::Omitted,
+            tx_direct_max_retry_expiry_count: Optional::Omitted,
+            tx_indirect_max_retry_expiry_count: Optional::Omitted,
+            tx_err_cca_count: Optional::Omitted,
+            tx_err_abort_count: Optional::Omitted,
+            tx_err_busy_channel_count: Optional::Omitted,
+            rx_total_count: Optional::Omitted,
+            rx_unicast_count: Optional::Omitted,
+            rx_broadcast_count: Optional::Omitted,
+            rx_data_count: Optional::Omitted,
+            rx_data_poll_count: Optional::Omitted,
+            rx_beacon_count: Optional::Omitted,
+            rx_beacon_request_count: Optional::Omitted,
+            rx_other_count: Optional::Omitted,
+            rx_address_filtered_count: Optional::Omitted,
+            rx_dest_addr_filtered_count: Optional::Omitted,
+            rx_duplicated_count: Optional::Omitted,
+            rx_err_no_frame_count: Optional::Omitted,
+            rx_err_unknown_neighbor_count: Optional::Omitted,
+            rx_err_invalid_src_addr_count: Optional::Omitted,
+            rx_err_sec_count: Optional::Omitted,
+            rx_err_fcs_count: Optional::Omitted,
+            rx_err_other_count: Optional::Omitted,
+            active_timestamp: Optional::Omitted,
+            pending_timestamp: Optional::Omitted,
+            delay: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

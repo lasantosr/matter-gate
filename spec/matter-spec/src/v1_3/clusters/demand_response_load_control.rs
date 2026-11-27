@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// DemandResponseLoadControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -49,6 +49,21 @@ pub struct DemandResponseLoadControlCluster {
     pub number_of_transitions: u8,
     pub default_random_start: u8,
     pub default_random_duration: u8,
+}
+
+impl Default for DemandResponseLoadControlCluster {
+    fn default() -> Self {
+        Self {
+            load_control_programs: Vec::default(),
+            number_of_load_control_programs: 5,
+            events: Vec::default(),
+            active_events: Vec::default(),
+            number_of_events_per_program: 10,
+            number_of_transitions: 3,
+            default_random_start: 30,
+            default_random_duration: 0,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

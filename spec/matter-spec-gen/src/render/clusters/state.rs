@@ -6,12 +6,18 @@ use super::{
     Result, attribute_enum::emit_attribute_enum_tokens, patch::emit_cluster_patch_tokens, resolve_cluster_attributes,
 };
 use crate::{
-    model::{ClusterDef, EnumDef, StructDef},
+    model::{
+        ClusterDef, EnumDef, ResolvedType, StructDef, lookup_boolean_semantics, parse_hex_or_dec, sanitize_identifier,
+        to_upper_camel_case,
+    },
     render::{
         commands::emit_command_enum_tokens,
         context::{PushLine as _, Tokens, TypeContext, format_hex},
         events::emit_event_enum_tokens,
-        record::{IdPrefix, MemberPartition, RecordConstructors, RecordStructDef, SingleMandatoryFrom, StructAttrs},
+        record::{
+            IdPrefix, MemberPartition, RecordConstructors, RecordStructDef, ResolvedMember, SingleMandatoryFrom,
+            StructAttrs,
+        },
     },
 };
 
@@ -29,8 +35,11 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
 
     let can_derive_eq_hash = partition.can_derive_eq_hash(ctx);
 
+    let custom_default_impl = emit_cluster_default_impl(cluster, cluster_struct_name, &partition, effective_enums, ctx);
     let attrs = if partition.is_empty() {
         StructAttrs::unit(true)
+    } else if custom_default_impl.is_some() {
+        StructAttrs::model(can_derive_eq_hash, true).without_default()
     } else {
         StructAttrs::model(can_derive_eq_hash, true)
     };
@@ -89,6 +98,10 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
     out.append(quote! {
         $cluster_struct_def
 
+        $(if let Some(default_impl) = custom_default_impl =>
+            $default_impl
+        )
+
         $patch_tokens
 
         impl $cluster_struct_name {
@@ -126,6 +139,164 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
     out.push_blank();
 
     Ok(())
+}
+
+fn emit_cluster_default_impl(
+    cluster: &ClusterDef,
+    cluster_struct_name: &str,
+    partition: &MemberPartition<'_>,
+    effective_enums: &[EnumDef],
+    ctx: &TypeContext<'_>,
+) -> Option<Tokens> {
+    if partition.is_empty() {
+        return None;
+    }
+
+    let mut has_non_trivial = false;
+    let mut mand_inits = Vec::with_capacity(partition.mandatory.len());
+    for m in &partition.mandatory {
+        let attr_def = cluster.attributes.iter().find(|a| a.code == m.id);
+        let custom = attr_def
+            .and_then(|a| a.default.as_deref())
+            .and_then(|raw| resolve_default_expr(m, raw, effective_enums, ctx));
+        let init_expr = if let Some((expr, is_non_zero)) = custom {
+            if m.is_nullable || is_non_zero {
+                has_non_trivial = true;
+            }
+            if m.is_nullable {
+                quote!(Nullable::NonNull($expr))
+            } else {
+                expr
+            }
+        } else if m.is_nullable {
+            quote!(Nullable::default())
+        } else if m.is_array || matches!(m.resolved, ResolvedType::Array { .. }) {
+            quote!(Vec::default())
+        } else {
+            quote!($(m.type_path.as_str())::default())
+        };
+        mand_inits.push(quote!($(&m.fname): $init_expr,));
+    }
+
+    if !has_non_trivial {
+        return None;
+    }
+
+    Some(quote! {
+        impl Default for $cluster_struct_name {
+            fn default() -> Self {
+                Self {
+                    $(for init in &mand_inits join ($['\r']) => $init)
+                    $(for opt in &partition.optional join ($['\r']) => $(&opt.fname): Optional::Omitted,)
+                }
+            }
+        }
+    })
+}
+
+/// Resolves an XML `default` string to `(expr_tokens, is_non_trivial)` where `is_non_trivial` is `false`
+/// when the expression equals `Default::default()` for the inner non-nullable type.
+fn resolve_default_expr(
+    member: &ResolvedMember,
+    raw: &str,
+    effective_enums: &[EnumDef],
+    ctx: &TypeContext<'_>,
+) -> Option<(Tokens, bool)> {
+    let trimmed = raw.trim();
+    match &member.resolved {
+        ResolvedType::Primitive { rust_type, .. } => match *rust_type {
+            "bool" => parse_bool_literal(trimmed).map(|b| (if b { quote!(true) } else { quote!(false) }, b)),
+            "u8" | "u16" | "u32" | "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+            "i8" | "i16" | "i32" | "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+            "f32" | "f64" => trimmed.parse::<f64>().ok().map(|v| {
+                let lit = if v.fract() == 0.0 {
+                    format!("{v:.1}")
+                } else {
+                    format!("{v}")
+                };
+                (quote!($lit), v != 0.0)
+            }),
+            "String" => {
+                if trimmed.is_empty() {
+                    None
+                } else {
+                    Some((quote!(String::from($(quoted(trimmed)))), true))
+                }
+            }
+            _ => None,
+        },
+        ResolvedType::IdType { rust_type, .. } => {
+            parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::new($v)), v != 0))
+        }
+        ResolvedType::SemanticType { rust_type, .. } => {
+            if *rust_type == "types::Temperature" || trimmed.starts_with('-') {
+                parse_i64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+            } else {
+                parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+            }
+        }
+        ResolvedType::Enum { name, .. } => {
+            if member.is_semantic_bool {
+                let b = parse_bool_literal(trimmed)?;
+                let pairs = lookup_boolean_semantics(&member.name);
+                let label = pairs.iter().find(|(_, val)| *val == b).map(|(v, _)| *v)?;
+                let variant = to_upper_camel_case(label);
+                return Some((quote!($(name.as_str())::$variant), b));
+            }
+            let enm = effective_enums
+                .iter()
+                .find(|e| e.name == *name)
+                .or_else(|| ctx.global_defs.enums.iter().find(|e| e.name == *name))
+                .or_else(|| ctx.all_enums.values().find(|e| e.name == *name))?;
+            let (variant, discr) = if let Some(num) = parse_hex_or_dec(trimmed) {
+                enm.items
+                    .iter()
+                    .find(|(_, v)| *v == num)
+                    .map(|(k, v)| (k.as_str(), *v))?
+            } else {
+                let clean = sanitize_identifier(trimmed);
+                enm.items
+                    .iter()
+                    .find(|(k, _)| k.eq_ignore_ascii_case(&clean))
+                    .map(|(k, v)| (k.as_str(), *v))?
+            };
+            let first_discr = enm.items.first().map(|(_, v)| *v);
+            Some((quote!($(name.as_str())::$variant), Some(discr) != first_discr))
+        }
+        ResolvedType::Bitmap { name, .. } => {
+            let bits = parse_u64_literal(trimmed)?;
+            if bits == 0 {
+                Some((quote!($(name.as_str())::empty()), false))
+            } else {
+                Some((quote!($(name.as_str())::from_bits_truncate($bits)), true))
+            }
+        }
+        ResolvedType::Struct { .. } | ResolvedType::Array { .. } => None,
+    }
+}
+
+fn parse_bool_literal(s: &str) -> Option<bool> {
+    match s.to_ascii_lowercase().as_str() {
+        "true" | "1" => Some(true),
+        "false" | "0" => Some(false),
+        _ => None,
+    }
+}
+
+fn parse_u64_literal(s: &str) -> Option<u64> {
+    if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        u64::from_str_radix(hex, 16).ok()
+    } else {
+        s.parse::<u64>().ok()
+    }
+}
+
+fn parse_i64_literal(s: &str) -> Option<i64> {
+    if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        i64::from_str_radix(hex, 16).ok()
+    } else {
+        s.parse::<i64>().ok()
+    }
 }
 
 fn emit_cluster_struct_definitions(

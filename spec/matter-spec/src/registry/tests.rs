@@ -64,6 +64,7 @@ static LIST_CONSTRAINT: ListLength = ListLength {
 
 static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
     id: ClusterId::new(0x0006),
+    revision: 6,
     name: "OnOff",
     attributes: &[
         AttributeDescriptor {
@@ -71,6 +72,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "OnOff",
             field_name: "on_off",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::Any,
                 bounds: ValueBounds::None,
@@ -83,6 +87,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "FeatureAttr",
             field_name: "feature_attr",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::U8,
                 bounds: ValueBounds::Unsigned { min: 0, max: 100 },
@@ -101,6 +108,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "ProvisionalAttr",
             field_name: "provisional_attr",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::Any,
                 bounds: ValueBounds::None,
@@ -113,6 +123,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "GreaterAttr",
             field_name: "greater_attr",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::Any,
                 bounds: ValueBounds::None,
@@ -130,6 +143,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "ChoiceA",
             field_name: "choice_a",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::Any,
                 bounds: ValueBounds::None,
@@ -142,6 +158,9 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
             name: "ChoiceB",
             field_name: "choice_b",
             access: AccessFlags::READ,
+            quality: QualityFlags::EMPTY,
+            read_privilege: Some(AccessPrivilege::View),
+            write_privilege: None,
             constraint: ValueConstraint {
                 value_type: ValueType::Any,
                 bounds: ValueBounds::None,
@@ -154,7 +173,10 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
         id: CommandId::new(0x00),
         name: "Off",
         direction: CommandDirection::ClientToServer,
-        access: AccessFlags::READ,
+        access: AccessFlags::INVOKE,
+        quality: QualityFlags::EMPTY,
+        invoke_privilege: Some(AccessPrivilege::Operate),
+        response_id: None,
         fields: &[FieldDescriptor {
             id: FieldId::new(0),
             name: "Arg",
@@ -172,6 +194,7 @@ static MOCK_CLUSTERS: &[ClusterDescriptor] = &[ClusterDescriptor {
         name: "StateChanged",
         priority: EventPriority::Info,
         access: AccessFlags::READ,
+        read_privilege: AccessPrivilege::View,
         fields: &[],
         conformance: &[ConformanceOp::PushBool(true), ConformanceOp::Optional],
     }],
@@ -485,10 +508,13 @@ fn validator_builder_and_descriptor_accessors() {
         name: "OnOff",
         field_name: "on_off",
         access: AccessFlags::READ,
+        quality: QualityFlags::CHANGE_OMITTED,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
         constraint: ValueConstraint {
             value_type: ValueType::Any,
             bounds: ValueBounds::None,
-            nullable: false,
+            nullable: true,
         },
         conformance: &[ConformanceOp::Mandatory],
     }];
@@ -496,7 +522,10 @@ fn validator_builder_and_descriptor_accessors() {
         id: CommandId::new(0x0000),
         name: "Off",
         direction: CommandDirection::ClientToServer,
-        access: AccessFlags::empty(),
+        access: AccessFlags::INVOKE,
+        quality: QualityFlags::LARGE_MESSAGE,
+        invoke_privilege: Some(AccessPrivilege::Operate),
+        response_id: Some(CommandId::new(0x0001)),
         fields: &[],
         conformance: &[ConformanceOp::Mandatory],
     }];
@@ -505,11 +534,13 @@ fn validator_builder_and_descriptor_accessors() {
         name: "StateChanged",
         priority: EventPriority::Info,
         access: AccessFlags::READ,
+        read_privilege: AccessPrivilege::Manage,
         fields: &[],
         conformance: &[ConformanceOp::Optional],
     }];
     static CLUSTERS: [ClusterDescriptor; 1] = [ClusterDescriptor {
         id: ClusterId::new(0x0006),
+        revision: 6,
         name: "OnOff",
         attributes: &ATTRS,
         commands: &CMDS,
@@ -594,7 +625,7 @@ fn validator_builder_and_descriptor_accessors() {
     assert_eq!(cmd.id(), CommandId::new(0x0000));
     assert_eq!(cmd.name(), "Off");
     assert_eq!(cmd.direction(), CommandDirection::ClientToServer);
-    assert_eq!(cmd.access(), AccessFlags::empty());
+    assert_eq!(cmd.access(), AccessFlags::INVOKE);
 
     let ev = cluster.find_event(EventId::new(0x0000)).unwrap();
     assert_eq!(ev.id(), EventId::new(0x0000));
@@ -1190,4 +1221,69 @@ fn device_type_list_and_tag_list_respect_integer_modes() {
             .endpoint(&ep_u8_dup_tag),
         Err(descriptor_attr_error(0x0004))
     );
+}
+
+#[test]
+fn privilege_ordering_quality_flags_and_member_lookups() {
+    assert!(AccessPrivilege::View < AccessPrivilege::Operate);
+    assert!(AccessPrivilege::Operate < AccessPrivilege::Manage);
+    assert!(AccessPrivilege::Manage < AccessPrivilege::Administer);
+    assert_eq!(AccessPrivilege::View.raw(), 1);
+    assert_eq!(u8::from(AccessPrivilege::Administer), 4);
+
+    let mut q = QualityFlags::CHANGE_OMITTED | QualityFlags::LARGE_MESSAGE;
+    assert!(q.contains(QualityFlags::CHANGE_OMITTED));
+    assert!(q.contains(QualityFlags::LARGE_MESSAGE));
+    assert!(!q.contains(QualityFlags::ATOMIC_WRITE));
+    q.insert(QualityFlags::ATOMIC_WRITE);
+    assert!(q.contains(QualityFlags::ATOMIC_WRITE));
+    q.remove(QualityFlags::LARGE_MESSAGE);
+    assert_eq!(q, QualityFlags::CHANGE_OMITTED | QualityFlags::ATOMIC_WRITE);
+    assert_eq!(QualityFlags::from_bits_truncate(0xFF).bits(), 0x0F);
+
+    let reg = mock_registry(false);
+    let cluster = reg.find_cluster(ClusterId::new(0x0006)).expect("OnOff");
+    assert_eq!(cluster.revision(), 6);
+
+    let on_off = reg
+        .find_attribute(ClusterId::new(0x0006), AttributeId::new(0x0000))
+        .expect("OnOff attr");
+    assert_eq!(on_off.read_privilege(), Some(AccessPrivilege::View));
+    assert_eq!(on_off.write_privilege(), None);
+    assert!(!on_off.is_nullable());
+    assert_eq!(on_off.quality(), QualityFlags::EMPTY);
+
+    // Global attribute fallback for known cluster
+    let rev = reg
+        .find_attribute(ClusterId::new(0x0006), AttributeId::CLUSTER_REVISION)
+        .expect("ClusterRevision global fallback");
+    assert_eq!(rev.name(), "ClusterRevision");
+    assert_eq!(rev.read_privilege(), Some(AccessPrivilege::View));
+    assert_eq!(rev.write_privilege(), None);
+    assert!(rev.access().contains(AccessFlags::READ));
+
+    // Unknown cluster does not resolve global attributes via find_attribute
+    assert!(
+        reg.find_attribute(ClusterId::new(0x9999), AttributeId::CLUSTER_REVISION)
+            .is_none()
+    );
+    // Direct global attribute lookup works without a cluster ID
+    assert!(reg.find_global_attribute(AttributeId::FEATURE_MAP).is_some());
+
+    let cmd = reg
+        .find_command(
+            ClusterId::new(0x0006),
+            CommandId::new(0x00),
+            CommandDirection::ClientToServer,
+        )
+        .expect("Off command");
+    assert!(cmd.access().contains(AccessFlags::INVOKE));
+    assert_eq!(cmd.invoke_privilege(), Some(AccessPrivilege::Operate));
+    assert_eq!(cmd.response_id(), None);
+
+    let ev = reg
+        .find_event(ClusterId::new(0x0006), EventId::new(0x00))
+        .expect("StateChanged event");
+    assert!(ev.access().contains(AccessFlags::READ));
+    assert_eq!(ev.read_privilege(), AccessPrivilege::View);
 }

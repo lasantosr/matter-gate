@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// TestHiddenManufacturerSpecific cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -42,6 +42,12 @@ crate::define_matter_bitmap! {
 )]
 pub struct TestHiddenManufacturerSpecificCluster {
     pub test_attribute: bool,
+}
+
+impl Default for TestHiddenManufacturerSpecificCluster {
+    fn default() -> Self {
+        Self { test_attribute: true }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

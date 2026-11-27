@@ -16,6 +16,7 @@ pub(super) struct StructAttrs {
     pub(super) eq: bool,
     pub(super) hash: bool,
     pub(super) has_fields: bool,
+    pub(super) default: bool,
 }
 
 impl StructAttrs {
@@ -26,6 +27,7 @@ impl StructAttrs {
             eq: true,
             hash,
             has_fields: false,
+            default: true,
         }
     }
 
@@ -36,7 +38,14 @@ impl StructAttrs {
             eq: eq_hash,
             hash: eq_hash,
             has_fields,
+            default: true,
         }
+    }
+
+    /// Omits `#[derive(Default)]` when a custom `impl Default` is emitted.
+    pub(super) const fn without_default(mut self) -> Self {
+        self.default = false;
+        self
     }
 }
 
@@ -53,7 +62,9 @@ impl FormatInto<Rust> for StructAttrs {
         if self.hash {
             derive_names.push("Hash");
         }
-        derive_names.push("Default");
+        if self.default {
+            derive_names.push("Default");
+        }
 
         let derives_joined = derive_names.join(", ");
 

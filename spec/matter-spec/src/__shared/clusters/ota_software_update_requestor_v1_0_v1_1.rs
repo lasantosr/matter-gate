@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// OtaSoftwareUpdateRequestor cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -45,6 +45,17 @@ pub struct OtaSoftwareUpdateRequestorCluster {
     pub update_possible: UpdatePossible,
     pub update_state: OtaUpdateStateEnum,
     pub update_state_progress: Nullable<u8>,
+}
+
+impl Default for OtaSoftwareUpdateRequestorCluster {
+    fn default() -> Self {
+        Self {
+            default_ota_providers: Vec::default(),
+            update_possible: UpdatePossible::Possible,
+            update_state: OtaUpdateStateEnum::Unknown,
+            update_state_progress: Nullable::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

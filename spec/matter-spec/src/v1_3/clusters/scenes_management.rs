@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ScenesManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -53,6 +53,16 @@ pub struct ScenesManagementCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub last_configured_by: Optional<Nullable<NodeId>>,
+}
+
+impl Default for ScenesManagementCluster {
+    fn default() -> Self {
+        Self {
+            scene_table_size: 16,
+            fabric_scene_info: Vec::default(),
+            last_configured_by: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

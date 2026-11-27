@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// IcdManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -59,6 +59,21 @@ pub struct IcdManagementCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub user_active_mode_trigger_instruction: Optional<String>,
+}
+
+impl Default for IcdManagementCluster {
+    fn default() -> Self {
+        Self {
+            idle_mode_duration: 1,
+            active_mode_duration: 300,
+            active_mode_threshold: 300,
+            registered_clients: Optional::Omitted,
+            icd_counter: Optional::Omitted,
+            clients_supported_per_fabric: Optional::Omitted,
+            user_active_mode_trigger_hint: Optional::Omitted,
+            user_active_mode_trigger_instruction: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// FanControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -73,6 +73,24 @@ pub struct FanControlCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub wind_setting: Optional<u8>,
+}
+
+impl Default for FanControlCluster {
+    fn default() -> Self {
+        Self {
+            fan_mode: FanModeType::Off,
+            fan_mode_sequence: FanModeSequenceType::OffLowMedHighAuto,
+            percent_setting: Nullable::NonNull(0),
+            percent_current: 0,
+            speed_max: Optional::Omitted,
+            speed_setting: Optional::Omitted,
+            speed_current: Optional::Omitted,
+            rock_support: Optional::Omitted,
+            rock_setting: Optional::Omitted,
+            wind_support: Optional::Omitted,
+            wind_setting: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

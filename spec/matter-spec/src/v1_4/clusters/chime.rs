@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// Chime cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -44,6 +44,16 @@ pub struct ChimeCluster {
     pub installed_chime_sounds: Vec<ChimeSoundStruct>,
     pub selected_chime: u8,
     pub enabled: Enabled,
+}
+
+impl Default for ChimeCluster {
+    fn default() -> Self {
+        Self {
+            installed_chime_sounds: Vec::default(),
+            selected_chime: 0,
+            enabled: Enabled::Enabled,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

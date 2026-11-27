@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// BallastConfiguration cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -108,6 +108,27 @@ pub struct BallastConfigurationCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub lamp_burn_hours_trip_point: Optional<Nullable<u32>>,
+}
+
+impl Default for BallastConfigurationCluster {
+    fn default() -> Self {
+        Self {
+            physical_min_level: 1,
+            physical_max_level: 254,
+            min_level: 1,
+            max_level: 254,
+            lamp_quantity: u8::default(),
+            ballast_status: Optional::Omitted,
+            intrinsic_ballast_factor: Optional::Omitted,
+            ballast_factor_adjustment: Optional::Omitted,
+            lamp_type: Optional::Omitted,
+            lamp_manufacturer: Optional::Omitted,
+            lamp_rated_hours: Optional::Omitted,
+            lamp_burn_hours: Optional::Omitted,
+            lamp_alarm_mode: Optional::Omitted,
+            lamp_burn_hours_trip_point: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

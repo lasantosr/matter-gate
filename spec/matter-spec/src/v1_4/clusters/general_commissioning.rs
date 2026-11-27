@@ -41,7 +41,7 @@ crate::define_matter_bitmap! {
 }
 
 /// GeneralCommissioning cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -63,6 +63,25 @@ pub struct GeneralCommissioningCluster {
     #[cfg_attr(feature = "schemars", schemars(with = "Vec<u8>"))]
     pub recovery_identifier: crate::Bytes,
     pub network_recovery_reason: Nullable<NetworkRecoveryReasonEnum>,
+}
+
+impl Default for GeneralCommissioningCluster {
+    fn default() -> Self {
+        Self {
+            breadcrumb: 0,
+            basic_commissioning_info: BasicCommissioningInfo::default(),
+            regulatory_config: RegulatoryLocationTypeEnum::IndoorOutdoor,
+            location_capability: RegulatoryLocationTypeEnum::IndoorOutdoor,
+            supports_concurrent_connection: SupportsConcurrentConnection::Supported,
+            tc_accepted_version: u16::default(),
+            tc_min_required_version: u16::default(),
+            tc_acknowledgements: u16::default(),
+            tc_acknowledgements_required: TcAcknowledgementsRequired::Required,
+            tc_update_deadline: Nullable::default(),
+            recovery_identifier: crate::Bytes::default(),
+            network_recovery_reason: Nullable::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

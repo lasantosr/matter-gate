@@ -51,7 +51,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ColorControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -276,6 +276,65 @@ pub struct ColorControlCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub color_temp_physical_max_mireds: Optional<u16>,
+}
+
+impl Default for ColorControlCluster {
+    fn default() -> Self {
+        Self {
+            color_mode: ColorModeEnum::CurrentXAndCurrentY,
+            options: OptionsBitmap::empty(),
+            number_of_primaries: Nullable::default(),
+            enhanced_color_mode: EnhancedColorModeEnum::CurrentXAndCurrentY,
+            color_capabilities: ColorCapabilitiesBitmap::empty(),
+            current_hue: Optional::Omitted,
+            current_saturation: Optional::Omitted,
+            remaining_time: Optional::Omitted,
+            current_x: Optional::Omitted,
+            current_y: Optional::Omitted,
+            drift_compensation: Optional::Omitted,
+            compensation_text: Optional::Omitted,
+            color_temperature_mireds: Optional::Omitted,
+            primary1_x: Optional::Omitted,
+            primary1_y: Optional::Omitted,
+            primary1_intensity: Optional::Omitted,
+            primary2_x: Optional::Omitted,
+            primary2_y: Optional::Omitted,
+            primary2_intensity: Optional::Omitted,
+            primary3_x: Optional::Omitted,
+            primary3_y: Optional::Omitted,
+            primary3_intensity: Optional::Omitted,
+            primary4_x: Optional::Omitted,
+            primary4_y: Optional::Omitted,
+            primary4_intensity: Optional::Omitted,
+            primary5_x: Optional::Omitted,
+            primary5_y: Optional::Omitted,
+            primary5_intensity: Optional::Omitted,
+            primary6_x: Optional::Omitted,
+            primary6_y: Optional::Omitted,
+            primary6_intensity: Optional::Omitted,
+            white_point_x: Optional::Omitted,
+            white_point_y: Optional::Omitted,
+            color_point_rx: Optional::Omitted,
+            color_point_ry: Optional::Omitted,
+            color_point_r_intensity: Optional::Omitted,
+            color_point_gx: Optional::Omitted,
+            color_point_gy: Optional::Omitted,
+            color_point_g_intensity: Optional::Omitted,
+            color_point_bx: Optional::Omitted,
+            color_point_by: Optional::Omitted,
+            color_point_b_intensity: Optional::Omitted,
+            couple_color_temp_to_level_min_mireds: Optional::Omitted,
+            start_up_color_temperature_mireds: Optional::Omitted,
+            enhanced_current_hue: Optional::Omitted,
+            color_loop_active: Optional::Omitted,
+            color_loop_direction: Optional::Omitted,
+            color_loop_time: Optional::Omitted,
+            color_loop_start_enhanced_hue: Optional::Omitted,
+            color_loop_stored_enhanced_hue: Optional::Omitted,
+            color_temp_physical_min_mireds: Optional::Omitted,
+            color_temp_physical_max_mireds: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

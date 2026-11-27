@@ -34,7 +34,7 @@ crate::define_matter_bitmap! {
 }
 
 /// BasicInformation cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -79,6 +79,33 @@ pub struct BasicInformationCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub unique_id: Optional<String>,
+}
+
+impl Default for BasicInformationCluster {
+    fn default() -> Self {
+        Self {
+            data_model_revision: u16::default(),
+            vendor_name: String::default(),
+            vendor_id: VendorId::default(),
+            product_name: String::default(),
+            product_id: u16::default(),
+            node_label: String::default(),
+            location: String::from("XX"),
+            hardware_version: 0,
+            hardware_version_string: String::default(),
+            software_version: 0,
+            software_version_string: String::default(),
+            capability_minima: CapabilityMinimaStruct::default(),
+            manufacturing_date: Optional::Omitted,
+            part_number: Optional::Omitted,
+            product_url: Optional::Omitted,
+            product_label: Optional::Omitted,
+            serial_number: Optional::Omitted,
+            local_config_disabled: Optional::Omitted,
+            reachable: Optional::Omitted,
+            unique_id: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
