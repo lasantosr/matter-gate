@@ -206,8 +206,26 @@ fn resolve_default_expr(
     match &member.resolved {
         ResolvedType::Primitive { rust_type, .. } => match *rust_type {
             "bool" => parse_bool_literal(trimmed).map(|b| (if b { quote!(true) } else { quote!(false) }, b)),
-            "u8" | "u16" | "u32" | "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
-            "i8" | "i16" | "i32" | "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+            "u8" => parse_u64_literal(trimmed)
+                .filter(|v| u8::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "u16" => parse_u64_literal(trimmed)
+                .filter(|v| u16::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "u32" => parse_u64_literal(trimmed)
+                .filter(|v| u32::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+            "i8" => parse_i64_literal(trimmed)
+                .filter(|v| i8::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "i16" => parse_i64_literal(trimmed)
+                .filter(|v| i16::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "i32" => parse_i64_literal(trimmed)
+                .filter(|v| i32::try_from(*v).is_ok())
+                .map(|v| (quote!($v), v != 0)),
+            "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
             "f32" | "f64" => trimmed.parse::<f64>().ok().map(|v| {
                 let lit = if v.fract() == 0.0 {
                     format!("{v:.1}")
@@ -229,19 +247,24 @@ fn resolve_default_expr(
             parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::new($v)), v != 0))
         }
         ResolvedType::SemanticType { rust_type, .. } => {
-            if *rust_type == "types::Temperature" || trimmed.starts_with('-') {
+            if *rust_type == "types::Temperature" {
+                parse_i64_literal(trimmed)
+                    .filter(|v| i16::try_from(*v).is_ok())
+                    .map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+            } else if trimmed.starts_with('-') {
                 parse_i64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
             } else {
                 parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
             }
         }
         ResolvedType::Enum { name, .. } => {
+            let type_path = member.type_path.as_str();
             if member.is_semantic_bool {
                 let b = parse_bool_literal(trimmed)?;
                 let pairs = lookup_boolean_semantics(&member.name);
                 let label = pairs.iter().find(|(_, val)| *val == b).map(|(v, _)| *v)?;
                 let variant = to_upper_camel_case(label);
-                return Some((quote!($(name.as_str())::$variant), b));
+                return Some((quote!($type_path::$variant), b));
             }
             let enm = effective_enums
                 .iter()
@@ -261,14 +284,15 @@ fn resolve_default_expr(
                     .map(|(k, v)| (k.as_str(), *v))?
             };
             let first_discr = enm.items.first().map(|(_, v)| *v);
-            Some((quote!($(name.as_str())::$variant), Some(discr) != first_discr))
+            Some((quote!($type_path::$variant), Some(discr) != first_discr))
         }
-        ResolvedType::Bitmap { name, .. } => {
+        ResolvedType::Bitmap { .. } => {
+            let type_path = member.type_path.as_str();
             let bits = parse_u64_literal(trimmed)?;
             if bits == 0 {
-                Some((quote!($(name.as_str())::empty()), false))
+                Some((quote!($type_path::empty()), false))
             } else {
-                Some((quote!($(name.as_str())::from_bits_truncate($bits)), true))
+                Some((quote!($type_path::from_bits_retain($bits)), true))
             }
         }
         ResolvedType::Struct { .. } | ResolvedType::Array { .. } => None,

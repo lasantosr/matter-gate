@@ -159,7 +159,7 @@ impl Default for WindowCoveringCluster {
     fn default() -> Self {
         Self {
             r#type: Type::RollerShade,
-            config_status: ConfigStatus::from_bits_truncate(3),
+            config_status: ConfigStatus::from_bits_retain(3),
             operational_status: OperationalStatus::empty(),
             end_product_type: EndProductType::RollerShade,
             wc_mode: Mode::empty(),

@@ -240,7 +240,7 @@ impl Default for DoorLockCluster {
             lock_type: DlLockType::default(),
             actuator_enabled: ActuatorEnabled::default(),
             operating_mode: OperatingModeEnum::default(),
-            supported_operating_modes: DlSupportedOperatingModes::from_bits_truncate(65526),
+            supported_operating_modes: DlSupportedOperatingModes::from_bits_retain(65526),
             door_state: Optional::Omitted,
             door_open_events: Optional::Omitted,
             door_closed_events: Optional::Omitted,
