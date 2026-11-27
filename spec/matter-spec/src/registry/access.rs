@@ -6,31 +6,31 @@ use core::{
 /// Matter Access Control privilege level required to perform an interaction.
 ///
 /// Discriminants match the normative Matter Core Specification `AccessControlEntryPrivilegeEnum`
-/// (`View = 1 < Operate = 2 < Manage = 3 < Administer = 4`), so callers can compare privileges
-/// directly with `>=`.
+/// (`View = 1 < Operate = 3 < Manage = 4 < Administer = 5`; `2` is `ProxyView`), so callers can
+/// compare privileges directly with `>=`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u8)]
 pub enum AccessPrivilege {
     /// Read-only visibility (`1`).
     View = 1,
-    /// Standard operational control (`2`).
-    Operate = 2,
-    /// Configuration and management (`3`).
-    Manage = 3,
-    /// Administrative / commissioning control (`4`).
-    Administer = 4,
+    /// Standard operational control (`3`).
+    Operate = 3,
+    /// Configuration and management (`4`).
+    Manage = 4,
+    /// Administrative / commissioning control (`5`).
+    Administer = 5,
 }
 
 impl AccessPrivilege {
-    /// Returns the normative Matter `AccessControlEntryPrivilegeEnum` discriminant (`1..=4`).
+    /// Returns the normative Matter `AccessControlEntryPrivilegeEnum` discriminant (`1..=5`).
     #[inline]
     #[must_use]
     pub const fn raw(self) -> u8 {
         match self {
             Self::View => 1,
-            Self::Operate => 2,
-            Self::Manage => 3,
-            Self::Administer => 4,
+            Self::Operate => 3,
+            Self::Manage => 4,
+            Self::Administer => 5,
         }
     }
 }

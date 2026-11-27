@@ -227,7 +227,7 @@ impl Default for ThreadNetworkDiagnosticsCluster {
         Self {
             channel: Nullable::default(),
             routing_role: Nullable::default(),
-            network_name: Nullable::default(),
+            network_name: Nullable::NonNull(String::new()),
             pan_id: Nullable::NonNull(0),
             extended_pan_id: Nullable::NonNull(0),
             mesh_local_prefix: Nullable::default(),

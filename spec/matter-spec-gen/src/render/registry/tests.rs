@@ -178,48 +178,65 @@ fn registry_renders_privileges_qualities_fabric_scoping_response_id_and_revision
     // Cluster revision
     assert!(rendered.contains("revision: 5"), "{rendered}");
 
-    // FabricEntries: READ(1) | WRITE(2) | FABRIC_SCOPED(4) = 7; Quality: CHANGE_OMITTED(1) | ATOMIC_WRITE(4) |
-    // REPORTABLE(8) = 13
-    assert!(rendered.contains("access: AccessFlags(7)"), "{rendered}");
-    assert!(rendered.contains("quality: QualityFlags(13)"), "{rendered}");
+    // FabricEntries block
+    let fabric_start = rendered
+        .find("name: \"FabricEntries\"")
+        .expect("FabricEntries descriptor");
+    let write_only_start = rendered
+        .find("name: \"WriteOnlySecret\"")
+        .expect("WriteOnlySecret descriptor");
+    let fabric_block = &rendered[fabric_start..write_only_start];
+    assert!(fabric_block.contains("access: AccessFlags(7)"), "{fabric_block}");
+    assert!(fabric_block.contains("quality: QualityFlags(13)"), "{fabric_block}");
     assert!(
-        rendered.contains("read_privilege: Some(AccessPrivilege::Administer)"),
-        "{rendered}"
+        fabric_block.contains("read_privilege: Some(AccessPrivilege::Administer)"),
+        "{fabric_block}"
     );
     assert!(
-        rendered.contains("write_privilege: Some(AccessPrivilege::Manage)"),
-        "{rendered}"
-    );
-
-    // WriteOnlySecret: WRITE(2) only, read_privilege: None, write_privilege: Some(Operate)
-    assert!(rendered.contains("access: AccessFlags(2)"), "{rendered}");
-    assert!(rendered.contains("read_privilege: None"), "{rendered}");
-    assert!(
-        rendered.contains("write_privilege: Some(AccessPrivilege::Operate)"),
-        "{rendered}"
+        fabric_block.contains("write_privilege: Some(AccessPrivilege::Manage)"),
+        "{fabric_block}"
     );
 
-    // DoWork: TIMED(16) | INVOKE(64) = 80; Quality: LARGE_MESSAGE(2); invoke_privilege: Administer; response_id:
-    // Some(0x01)
-    assert!(rendered.contains("access: AccessFlags(80)"), "{rendered}");
-    assert!(rendered.contains("quality: QualityFlags(2)"), "{rendered}");
+    // WriteOnlySecret block
+    let do_work_start = rendered.find("name: \"DoWork\"").expect("DoWork descriptor");
+    let write_only_block = &rendered[write_only_start..do_work_start];
     assert!(
-        rendered.contains("invoke_privilege: Some(AccessPrivilege::Administer)"),
-        "{rendered}"
+        write_only_block.contains("access: AccessFlags(2)"),
+        "{write_only_block}"
     );
+    assert!(write_only_block.contains("read_privilege: None"), "{write_only_block}");
     assert!(
-        rendered.contains("response_id: Some(CommandId::new(0x01))"),
-        "{rendered}"
+        write_only_block.contains("write_privilege: Some(AccessPrivilege::Operate)"),
+        "{write_only_block}"
     );
 
-    // DoWorkResponse: invoke_privilege: None, response_id: None
-    assert!(rendered.contains("invoke_privilege: None"), "{rendered}");
-    assert!(rendered.contains("response_id: None"), "{rendered}");
-
-    // AdminAudit event: READ(1) | FABRIC_SENSITIVE(8) = 9; read_privilege: AccessPrivilege::Administer
-    assert!(rendered.contains("access: AccessFlags(9)"), "{rendered}");
+    // DoWork block
+    let do_work_resp_start = rendered
+        .find("name: \"DoWorkResponse\"")
+        .expect("DoWorkResponse descriptor");
+    let do_work_block = &rendered[do_work_start..do_work_resp_start];
+    assert!(do_work_block.contains("access: AccessFlags(80)"), "{do_work_block}");
+    assert!(do_work_block.contains("quality: QualityFlags(2)"), "{do_work_block}");
     assert!(
-        rendered.contains("read_privilege: AccessPrivilege::Administer"),
-        "{rendered}"
+        do_work_block.contains("invoke_privilege: Some(AccessPrivilege::Administer)"),
+        "{do_work_block}"
+    );
+    assert!(
+        do_work_block.contains("response_id: Some(CommandId::new(0x01))"),
+        "{do_work_block}"
+    );
+
+    // DoWorkResponse block
+    let admin_audit_start = rendered.find("name: \"AdminAudit\"").expect("AdminAudit descriptor");
+    let resp_block = &rendered[do_work_resp_start..admin_audit_start];
+    assert!(resp_block.contains("invoke_privilege: None"), "{resp_block}");
+    assert!(resp_block.contains("response_id: None"), "{resp_block}");
+
+    // AdminAudit event block
+    let event_block = &rendered[admin_audit_start..];
+    assert!(event_block.contains("access: AccessFlags(9)"), "{event_block}");
+    assert!(
+        event_block.contains("read_privilege: AccessPrivilege::Administer"),
+        "{event_block}"
     );
 }

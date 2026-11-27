@@ -66,7 +66,7 @@ impl Default for ScenesCluster {
             scene_count: 0,
             current_scene: 0,
             current_group: GroupId::new(0),
-            scene_valid: SceneValid::default(),
+            scene_valid: SceneValid::Invalid,
             name_support: 0,
             scene_table_size: 16,
             remaining_capacity: u8::default(),

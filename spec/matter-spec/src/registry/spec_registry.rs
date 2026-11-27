@@ -67,8 +67,13 @@ impl SpecRegistry {
     }
 
     /// Looks up a Matter §7.13 global attribute descriptor (`0xFFF8`–`0xFFFD`) by [`AttributeId`].
+    ///
+    /// Returns `None` for [`AttributeId::EVENT_LIST`] when `expects_event_list` is `false` for this release.
     #[must_use]
     pub fn find_global_attribute(&self, id: AttributeId) -> Option<&'static AttributeDescriptor> {
+        if id == AttributeId::EVENT_LIST && !self.expects_event_list {
+            return None;
+        }
         let idx = GLOBAL_ATTRIBUTES.binary_search_by_key(&id.raw(), |a| a.id.raw()).ok()?;
         GLOBAL_ATTRIBUTES.get(idx)
     }

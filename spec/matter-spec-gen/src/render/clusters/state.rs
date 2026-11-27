@@ -6,6 +6,7 @@ use super::{
     Result, attribute_enum::emit_attribute_enum_tokens, patch::emit_cluster_patch_tokens, resolve_cluster_attributes,
 };
 use crate::{
+    error::Error,
     model::{
         ClusterDef, EnumDef, ResolvedType, StructDef, lookup_boolean_semantics, parse_hex_or_dec, sanitize_identifier,
         to_upper_camel_case,
@@ -35,7 +36,8 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
 
     let can_derive_eq_hash = partition.can_derive_eq_hash(ctx);
 
-    let custom_default_impl = emit_cluster_default_impl(cluster, cluster_struct_name, &partition, effective_enums, ctx);
+    let custom_default_impl =
+        emit_cluster_default_impl(cluster, cluster_struct_name, &partition, effective_enums, ctx)?;
     let attrs = if partition.is_empty() {
         StructAttrs::unit(true)
     } else if custom_default_impl.is_some() {
@@ -147,9 +149,9 @@ fn emit_cluster_default_impl(
     partition: &MemberPartition<'_>,
     effective_enums: &[EnumDef],
     ctx: &TypeContext<'_>,
-) -> Option<Tokens> {
+) -> Result<Option<Tokens>> {
     if partition.is_empty() {
-        return None;
+        return Ok(None);
     }
 
     let mut has_non_trivial = false;
@@ -158,7 +160,9 @@ fn emit_cluster_default_impl(
         let attr_def = cluster.attributes.iter().find(|a| a.code == m.id);
         let custom = attr_def
             .and_then(|a| a.default.as_deref())
-            .and_then(|raw| resolve_default_expr(m, raw, effective_enums, ctx));
+            .map(|raw| resolve_default_expr(&cluster.name, m, raw, effective_enums, ctx))
+            .transpose()?
+            .flatten();
         let init_expr = if let Some((expr, is_non_zero)) = custom {
             if m.is_nullable || is_non_zero {
                 has_non_trivial = true;
@@ -179,10 +183,10 @@ fn emit_cluster_default_impl(
     }
 
     if !has_non_trivial {
-        return None;
+        return Ok(None);
     }
 
-    Some(quote! {
+    Ok(Some(quote! {
         impl Default for $cluster_struct_name {
             fn default() -> Self {
                 Self {
@@ -191,118 +195,182 @@ fn emit_cluster_default_impl(
                 }
             }
         }
-    })
+    }))
 }
 
-/// Resolves an XML `default` string to `(expr_tokens, is_non_trivial)` where `is_non_trivial` is `false`
-/// when the expression equals `Default::default()` for the inner non-nullable type.
+fn is_known_null_sentinel(member: &ResolvedMember, trimmed: &str) -> bool {
+    if trimmed.eq_ignore_ascii_case("null") {
+        return true;
+    }
+    match &member.resolved {
+        ResolvedType::Primitive { rust_type, .. } if *rust_type == "i16" => trimmed.eq_ignore_ascii_case("0x8000"),
+        ResolvedType::SemanticType { rust_type, .. } if *rust_type == "types::Temperature" => {
+            trimmed.eq_ignore_ascii_case("0x8000")
+        }
+        _ => false,
+    }
+}
+
+/// Resolves an XML `default` string to `Ok(Some((expr_tokens, is_non_trivial)))` where `is_non_trivial`
+/// is `false` when the expression equals `Default::default()` for the inner non-nullable type,
+/// `Ok(None)` for a known ZCL null sentinel on a nullable field, or `Err` if invalid/out of range.
 fn resolve_default_expr(
+    cluster_name: &str,
     member: &ResolvedMember,
     raw: &str,
     effective_enums: &[EnumDef],
     ctx: &TypeContext<'_>,
-) -> Option<(Tokens, bool)> {
+) -> Result<Option<(Tokens, bool)>> {
     let trimmed = raw.trim();
+    if member.is_nullable && is_known_null_sentinel(member, trimmed) {
+        return Ok(None);
+    }
+
+    let invalid = || {
+        Error::Parse(format!(
+            "Invalid default '{trimmed}' for attribute '{}::{}' (type '{}')",
+            cluster_name, member.name, member.type_path
+        ))
+    };
+
     match &member.resolved {
-        ResolvedType::Primitive { rust_type, .. } => match *rust_type {
-            "bool" => parse_bool_literal(trimmed).map(|b| (if b { quote!(true) } else { quote!(false) }, b)),
-            "u8" => parse_u64_literal(trimmed)
-                .filter(|v| u8::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "u16" => parse_u64_literal(trimmed)
-                .filter(|v| u16::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "u32" => parse_u64_literal(trimmed)
-                .filter(|v| u32::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
-            "i8" => parse_i64_literal(trimmed)
-                .filter(|v| i8::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "i16" => parse_i64_literal(trimmed)
-                .filter(|v| i16::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "i32" => parse_i64_literal(trimmed)
-                .filter(|v| i32::try_from(*v).is_ok())
-                .map(|v| (quote!($v), v != 0)),
-            "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
-            "f32" | "f64" => trimmed.parse::<f64>().ok().map(|v| {
-                let lit = if v.fract() == 0.0 {
-                    format!("{v:.1}")
-                } else {
-                    format!("{v}")
-                };
-                (quote!($lit), v != 0.0)
-            }),
-            "String" => {
-                if trimmed.is_empty() {
-                    None
-                } else {
-                    Some((quote!(String::from($(quoted(trimmed)))), true))
-                }
-            }
-            _ => None,
-        },
-        ResolvedType::IdType { rust_type, .. } => {
-            parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::new($v)), v != 0))
-        }
+        ResolvedType::Primitive { rust_type, .. } => resolve_primitive_default(rust_type, trimmed)
+            .map(Some)
+            .ok_or_else(invalid),
+        ResolvedType::IdType { rust_type, .. } => parse_u64_literal(trimmed)
+            .map(|v| Some((quote!($(*rust_type)::new($v)), v != 0)))
+            .ok_or_else(invalid),
         ResolvedType::SemanticType { rust_type, .. } => {
             if *rust_type == "types::Temperature" {
                 parse_i64_literal(trimmed)
                     .filter(|v| i16::try_from(*v).is_ok())
-                    .map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
             } else if trimmed.starts_with('-') {
-                parse_i64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+                parse_i64_literal(trimmed)
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
             } else {
-                parse_u64_literal(trimmed).map(|v| (quote!($(*rust_type)::from_raw($v)), v != 0))
+                parse_u64_literal(trimmed)
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
             }
         }
         ResolvedType::Enum { name, .. } => {
             let type_path = member.type_path.as_str();
             if member.is_semantic_bool {
-                let b = parse_bool_literal(trimmed)?;
+                let b = parse_bool_literal(trimmed).ok_or_else(invalid)?;
                 let pairs = lookup_boolean_semantics(&member.name);
-                let label = pairs.iter().find(|(_, val)| *val == b).map(|(v, _)| *v)?;
+                let label = pairs
+                    .iter()
+                    .find(|(_, val)| *val == b)
+                    .map(|(v, _)| *v)
+                    .ok_or_else(invalid)?;
                 let variant = to_upper_camel_case(label);
-                return Some((quote!($type_path::$variant), b));
+                return Ok(Some((quote!($type_path::$variant), b)));
             }
             let enm = effective_enums
                 .iter()
                 .find(|e| e.name == *name)
                 .or_else(|| ctx.global_defs.enums.iter().find(|e| e.name == *name))
-                .or_else(|| ctx.all_enums.values().find(|e| e.name == *name))?;
+                .or_else(|| ctx.all_enums.values().find(|e| e.name == *name))
+                .ok_or_else(invalid)?;
             let (variant, discr) = if let Some(num) = parse_hex_or_dec(trimmed) {
                 enm.items
                     .iter()
                     .find(|(_, v)| *v == num)
-                    .map(|(k, v)| (k.as_str(), *v))?
+                    .map(|(k, v)| (k.as_str(), *v))
+                    .ok_or_else(invalid)?
             } else {
                 let clean = sanitize_identifier(trimmed);
                 enm.items
                     .iter()
                     .find(|(k, _)| k.eq_ignore_ascii_case(&clean))
-                    .map(|(k, v)| (k.as_str(), *v))?
+                    .map(|(k, v)| (k.as_str(), *v))
+                    .ok_or_else(invalid)?
             };
             let first_discr = enm.items.first().map(|(_, v)| *v);
-            Some((quote!($type_path::$variant), Some(discr) != first_discr))
+            Ok(Some((quote!($type_path::$variant), Some(discr) != first_discr)))
         }
         ResolvedType::Bitmap { .. } => {
             let type_path = member.type_path.as_str();
-            let bits = parse_u64_literal(trimmed)?;
+            let bits = parse_u64_literal(trimmed).ok_or_else(invalid)?;
             if bits == 0 {
-                Some((quote!($type_path::empty()), false))
+                Ok(Some((quote!($type_path::empty()), false)))
             } else {
-                Some((quote!($type_path::from_bits_retain($bits)), true))
+                Ok(Some((quote!($type_path::from_bits_retain($bits)), true)))
             }
         }
-        ResolvedType::Struct { .. } | ResolvedType::Array { .. } => None,
+        ResolvedType::Array { .. } => {
+            if trimmed.is_empty() || parse_u64_literal(trimmed) == Some(0) {
+                if member.is_nullable {
+                    Ok(None)
+                } else {
+                    Ok(Some((quote!(Vec::new()), false)))
+                }
+            } else {
+                Err(invalid())
+            }
+        }
+        ResolvedType::Struct { .. } => {
+            if member.is_nullable && parse_u64_literal(trimmed) == Some(0) {
+                Ok(None)
+            } else {
+                Err(invalid())
+            }
+        }
+    }
+}
+
+fn resolve_primitive_default(rust_type: &str, trimmed: &str) -> Option<(Tokens, bool)> {
+    match rust_type {
+        "bool" => parse_bool_literal(trimmed).map(|b| (if b { quote!(true) } else { quote!(false) }, b)),
+        "u8" => parse_u64_literal(trimmed)
+            .filter(|v| u8::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u16" => parse_u64_literal(trimmed)
+            .filter(|v| u16::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u32" => parse_u64_literal(trimmed)
+            .filter(|v| u32::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+        "i8" => parse_i64_literal(trimmed)
+            .filter(|v| i8::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i16" => parse_i64_literal(trimmed)
+            .filter(|v| i16::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i32" => parse_i64_literal(trimmed)
+            .filter(|v| i32::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+        "f32" | "f64" => trimmed.parse::<f64>().ok().map(|v| {
+            let lit = if v.fract() == 0.0 {
+                format!("{v:.1}")
+            } else {
+                format!("{v}")
+            };
+            (quote!($lit), v != 0.0)
+        }),
+        "String" => {
+            if trimmed.is_empty() {
+                Some((quote!(String::new()), false))
+            } else {
+                Some((quote!(String::from($(quoted(trimmed)))), true))
+            }
+        }
+        "crate::Bytes" => {
+            (trimmed.is_empty() || parse_u64_literal(trimmed) == Some(0)).then(|| (quote!(crate::Bytes::new()), false))
+        }
+        _ => None,
     }
 }
 
 fn parse_bool_literal(s: &str) -> Option<bool> {
     match s.to_ascii_lowercase().as_str() {
-        "true" | "1" => Some(true),
-        "false" | "0" => Some(false),
+        "true" | "1" | "0x01" | "0x1" => Some(true),
+        "false" | "0" | "0x00" | "0x0" => Some(false),
         _ => None,
     }
 }

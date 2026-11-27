@@ -78,7 +78,7 @@ impl Default for GeneralCommissioningCluster {
             tc_acknowledgements: u16::default(),
             tc_acknowledgements_required: TcAcknowledgementsRequired::Required,
             tc_update_deadline: Nullable::default(),
-            recovery_identifier: crate::Bytes::default(),
+            recovery_identifier: crate::Bytes::new(),
             network_recovery_reason: Nullable::default(),
         }
     }

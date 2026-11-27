@@ -94,7 +94,7 @@ impl Default for BasicInformationCluster {
             vendor_id: VendorId::default(),
             product_name: String::default(),
             product_id: u16::default(),
-            node_label: String::default(),
+            node_label: String::new(),
             location: String::from("XX"),
             hardware_version: 0,
             hardware_version_string: String::default(),

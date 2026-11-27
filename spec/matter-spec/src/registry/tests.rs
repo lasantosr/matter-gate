@@ -1229,7 +1229,9 @@ fn privilege_ordering_quality_flags_and_member_lookups() {
     assert!(AccessPrivilege::Operate < AccessPrivilege::Manage);
     assert!(AccessPrivilege::Manage < AccessPrivilege::Administer);
     assert_eq!(AccessPrivilege::View.raw(), 1);
-    assert_eq!(u8::from(AccessPrivilege::Administer), 4);
+    assert_eq!(AccessPrivilege::Operate.raw(), 3);
+    assert_eq!(AccessPrivilege::Manage.raw(), 4);
+    assert_eq!(u8::from(AccessPrivilege::Administer), 5);
 
     let mut q = QualityFlags::CHANGE_OMITTED | QualityFlags::LARGE_MESSAGE;
     assert!(q.contains(QualityFlags::CHANGE_OMITTED));
@@ -1267,8 +1269,11 @@ fn privilege_ordering_quality_flags_and_member_lookups() {
         reg.find_attribute(ClusterId::new(0x9999), AttributeId::CLUSTER_REVISION)
             .is_none()
     );
-    // Direct global attribute lookup works without a cluster ID
+    // Direct global attribute lookup works without a cluster ID, and gates EventList on expects_event_list.
     assert!(reg.find_global_attribute(AttributeId::FEATURE_MAP).is_some());
+    assert!(reg.find_global_attribute(AttributeId::EVENT_LIST).is_none());
+    let reg_ev = mock_registry(true);
+    assert!(reg_ev.find_global_attribute(AttributeId::EVENT_LIST).is_some());
 
     let cmd = reg
         .find_command(

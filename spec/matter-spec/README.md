@@ -173,7 +173,7 @@ Validator::full().endpoint(&light_ep).unwrap();
 
 ### Static IM Metadata Lookup (`SpecRegistry`)
 
-Decoupled runtimes and stack adapters can inspect ACL privileges, access/quality flags, cluster revisions, and command response IDs directly by `(ClusterId, MemberId)` without coupling drivers to any IM stack:
+Decoupled runtimes and stack adapters can inspect ACL privileges, access/quality flags, cluster revisions, and command response IDs directly by `(ClusterId, MemberId)` without coupling drivers to any IM stack (requires `v1_4`, `registry`, and `general` or `all`):
 
 ```rust
 use matter_spec::v1_4::prelude::*;
