@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// Thermostat cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -252,6 +252,62 @@ pub struct ThermostatCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub ac_capacity_format: Optional<u8>,
+}
+
+impl Default for ThermostatCluster {
+    fn default() -> Self {
+        Self {
+            local_temperature: Nullable::default(),
+            control_sequence_of_operation: 4,
+            system_mode: 1,
+            outdoor_temperature: Optional::Omitted,
+            occupancy: Optional::Omitted,
+            abs_min_heat_setpoint_limit: Optional::Omitted,
+            abs_max_heat_setpoint_limit: Optional::Omitted,
+            abs_min_cool_setpoint_limit: Optional::Omitted,
+            abs_max_cool_setpoint_limit: Optional::Omitted,
+            pi_cooling_demand: Optional::Omitted,
+            pi_heating_demand: Optional::Omitted,
+            hvac_system_type_configuration: Optional::Omitted,
+            local_temperature_calibration: Optional::Omitted,
+            occupied_cooling_setpoint: Optional::Omitted,
+            occupied_heating_setpoint: Optional::Omitted,
+            unoccupied_cooling_setpoint: Optional::Omitted,
+            unoccupied_heating_setpoint: Optional::Omitted,
+            min_heat_setpoint_limit: Optional::Omitted,
+            max_heat_setpoint_limit: Optional::Omitted,
+            min_cool_setpoint_limit: Optional::Omitted,
+            max_cool_setpoint_limit: Optional::Omitted,
+            min_setpoint_dead_band: Optional::Omitted,
+            remote_sensing: Optional::Omitted,
+            thermostat_running_mode: Optional::Omitted,
+            start_of_week: Optional::Omitted,
+            number_of_weekly_transitions: Optional::Omitted,
+            number_of_daily_transitions: Optional::Omitted,
+            temperature_setpoint_hold: Optional::Omitted,
+            temperature_setpoint_hold_duration: Optional::Omitted,
+            thermostat_programming_operation_mode: Optional::Omitted,
+            thermostat_running_state: Optional::Omitted,
+            setpoint_change_source: Optional::Omitted,
+            setpoint_change_amount: Optional::Omitted,
+            setpoint_change_source_timestamp: Optional::Omitted,
+            occupied_setback: Optional::Omitted,
+            occupied_setback_min: Optional::Omitted,
+            occupied_setback_max: Optional::Omitted,
+            unoccupied_setback: Optional::Omitted,
+            unoccupied_setback_min: Optional::Omitted,
+            unoccupied_setback_max: Optional::Omitted,
+            emergency_heat_delta: Optional::Omitted,
+            ac_type: Optional::Omitted,
+            ac_capacity: Optional::Omitted,
+            ac_refrigerant_type: Optional::Omitted,
+            ac_compressor_type: Optional::Omitted,
+            ac_error_code: Optional::Omitted,
+            ac_louver_position: Optional::Omitted,
+            ac_coil_temperature: Optional::Omitted,
+            ac_capacity_format: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

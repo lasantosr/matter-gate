@@ -1,4 +1,4 @@
-use super::access::AccessFlags;
+use super::access::{AccessFlags, AccessPrivilege, QualityFlags};
 use crate::model::{
     AttributeId, ClusterId, CommandDirection, CommandId, DeviceTypeId, EventId, EventPriority, FieldId,
 };
@@ -14,6 +14,12 @@ pub struct AttributeDescriptor {
     pub(crate) field_name: &'static str,
     /// Access flags.
     pub(crate) access: AccessFlags,
+    /// Quality and transport flags.
+    pub(crate) quality: QualityFlags,
+    /// Required ACL privilege for reading this attribute (`None` if write-only).
+    pub(crate) read_privilege: Option<AccessPrivilege>,
+    /// Required ACL privilege for writing this attribute (`None` if read-only).
+    pub(crate) write_privilege: Option<AccessPrivilege>,
     /// Value constraint.
     pub(crate) constraint: ValueConstraint,
     /// Conformance RPN program.
@@ -44,6 +50,30 @@ impl AttributeDescriptor {
     pub const fn access(&self) -> AccessFlags {
         self.access
     }
+
+    /// Returns the attribute quality and transport flags.
+    #[must_use]
+    pub const fn quality(&self) -> QualityFlags {
+        self.quality
+    }
+
+    /// Returns the required ACL privilege to read this attribute, or `None` if write-only.
+    #[must_use]
+    pub const fn read_privilege(&self) -> Option<AccessPrivilege> {
+        self.read_privilege
+    }
+
+    /// Returns the required ACL privilege to write this attribute, or `None` if read-only.
+    #[must_use]
+    pub const fn write_privilege(&self) -> Option<AccessPrivilege> {
+        self.write_privilege
+    }
+
+    /// Returns `true` if `AttributeValue::Null` is permitted by the specification.
+    #[must_use]
+    pub const fn is_nullable(&self) -> bool {
+        self.constraint.nullable
+    }
 }
 
 /// Static descriptor for a cluster command.
@@ -57,6 +87,12 @@ pub struct CommandDescriptor {
     pub(crate) direction: CommandDirection,
     /// Access flags.
     pub(crate) access: AccessFlags,
+    /// Quality and transport flags.
+    pub(crate) quality: QualityFlags,
+    /// Required ACL privilege to invoke this command (`None` for `ServerToClient` responses).
+    pub(crate) invoke_privilege: Option<AccessPrivilege>,
+    /// Expected `ServerToClient` response [`CommandId`], or `None` for `DefaultResponse` / responses.
+    pub(crate) response_id: Option<CommandId>,
     /// Payload struct fields (empty if no payload fields).
     pub(crate) fields: &'static [FieldDescriptor],
     /// Conformance RPN program.
@@ -87,6 +123,25 @@ impl CommandDescriptor {
     pub const fn access(&self) -> AccessFlags {
         self.access
     }
+
+    /// Returns the command quality and transport flags.
+    #[must_use]
+    pub const fn quality(&self) -> QualityFlags {
+        self.quality
+    }
+
+    /// Returns the required ACL privilege to invoke this command, or `None` for `ServerToClient` responses.
+    #[must_use]
+    pub const fn invoke_privilege(&self) -> Option<AccessPrivilege> {
+        self.invoke_privilege
+    }
+
+    /// Returns the expected `ServerToClient` response [`CommandId`], or `None` when the command
+    /// returns a status `DefaultResponse` (or is itself a response).
+    #[must_use]
+    pub const fn response_id(&self) -> Option<CommandId> {
+        self.response_id
+    }
 }
 
 /// Static descriptor for a cluster event.
@@ -100,6 +155,8 @@ pub struct EventDescriptor {
     pub(crate) priority: EventPriority,
     /// Access flags.
     pub(crate) access: AccessFlags,
+    /// Required ACL privilege to read/subscribe to this event.
+    pub(crate) read_privilege: AccessPrivilege,
     /// Payload struct fields.
     pub(crate) fields: &'static [FieldDescriptor],
     /// Conformance RPN program.
@@ -130,6 +187,12 @@ impl EventDescriptor {
     pub const fn access(&self) -> AccessFlags {
         self.access
     }
+
+    /// Returns the required ACL privilege to read/subscribe to this event.
+    #[must_use]
+    pub const fn read_privilege(&self) -> AccessPrivilege {
+        self.read_privilege
+    }
 }
 
 /// Static descriptor for a Matter cluster.
@@ -137,6 +200,8 @@ impl EventDescriptor {
 pub struct ClusterDescriptor {
     /// Cluster ID.
     pub(crate) id: ClusterId,
+    /// Specification cluster revision (`ClusterRevision` `0xFFFD`).
+    pub(crate) revision: u16,
     /// Cluster name.
     pub(crate) name: &'static str,
     /// Cluster attributes.
@@ -154,6 +219,12 @@ impl ClusterDescriptor {
     #[must_use]
     pub const fn id(&self) -> ClusterId {
         self.id
+    }
+
+    /// Returns the specification cluster revision (`ClusterRevision` `0xFFFD`).
+    #[must_use]
+    pub const fn revision(&self) -> u16 {
+        self.revision
     }
 
     /// Returns the cluster name.
@@ -462,3 +533,110 @@ pub(crate) struct DeviceTypeIncludeItem {
     /// Events required by this device type (checked when `EventList` is present).
     pub required_events: &'static [EventId],
 }
+
+static U32_CONSTRAINT: ValueConstraint = ValueConstraint {
+    value_type: ValueType::U32,
+    bounds: ValueBounds::None,
+    nullable: false,
+};
+
+static U32_LIST_LENGTH: ListLength = ListLength {
+    min: 0,
+    max: usize::MAX,
+    item_constraint: &U32_CONSTRAINT,
+};
+
+/// Static descriptors for Matter Core Specification §7.13 global attributes (`0xFFF8`–`0xFFFD`),
+/// sorted by [`AttributeId`].
+pub(super) static GLOBAL_ATTRIBUTES: &[AttributeDescriptor] = &[
+    AttributeDescriptor {
+        id: AttributeId::GENERATED_COMMAND_LIST,
+        name: "GeneratedCommandList",
+        field_name: "generated_command_list",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::List(&U32_LIST_LENGTH),
+            bounds: ValueBounds::None,
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Mandatory],
+    },
+    AttributeDescriptor {
+        id: AttributeId::ACCEPTED_COMMAND_LIST,
+        name: "AcceptedCommandList",
+        field_name: "accepted_command_list",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::List(&U32_LIST_LENGTH),
+            bounds: ValueBounds::None,
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Mandatory],
+    },
+    AttributeDescriptor {
+        id: AttributeId::EVENT_LIST,
+        name: "EventList",
+        field_name: "event_list",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::List(&U32_LIST_LENGTH),
+            bounds: ValueBounds::None,
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Optional],
+    },
+    AttributeDescriptor {
+        id: AttributeId::ATTRIBUTE_LIST,
+        name: "AttributeList",
+        field_name: "attribute_list",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::List(&U32_LIST_LENGTH),
+            bounds: ValueBounds::None,
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Mandatory],
+    },
+    AttributeDescriptor {
+        id: AttributeId::FEATURE_MAP,
+        name: "FeatureMap",
+        field_name: "feature_map",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::U32,
+            bounds: ValueBounds::None,
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Mandatory],
+    },
+    AttributeDescriptor {
+        id: AttributeId::CLUSTER_REVISION,
+        name: "ClusterRevision",
+        field_name: "cluster_revision",
+        access: AccessFlags::READ,
+        quality: QualityFlags::EMPTY,
+        read_privilege: Some(AccessPrivilege::View),
+        write_privilege: None,
+        constraint: ValueConstraint {
+            value_type: ValueType::U16,
+            bounds: ValueBounds::Unsigned { min: 1, max: 0xFFFF },
+            nullable: false,
+        },
+        conformance: &[ConformanceOp::Mandatory],
+    },
+];

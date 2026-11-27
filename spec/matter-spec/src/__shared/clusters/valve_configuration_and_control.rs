@@ -41,7 +41,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ValveConfigurationAndControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -61,6 +61,24 @@ pub struct ValveConfigurationAndControlCluster {
     pub default_open_level: types::Percent,
     pub valve_fault: ValveFaultBitmap,
     pub level_step: u8,
+}
+
+impl Default for ValveConfigurationAndControlCluster {
+    fn default() -> Self {
+        Self {
+            open_duration: Nullable::default(),
+            default_open_duration: Nullable::default(),
+            auto_close_time: Nullable::default(),
+            remaining_duration: Nullable::default(),
+            current_state: Nullable::default(),
+            target_state: Nullable::default(),
+            current_level: Nullable::default(),
+            target_level: Nullable::default(),
+            default_open_level: types::Percent::from_raw(100),
+            valve_fault: ValveFaultBitmap::empty(),
+            level_step: 1,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

@@ -39,11 +39,8 @@ pub(crate) mod binding_v1_0_v1_1;
 pub(crate) mod binding_v1_4_v1_6;
 #[cfg(all(cluster_boolean_state_configuration, any(feature = "v1_4", feature = "v1_5")))]
 pub(crate) mod boolean_state_configuration;
-#[cfg(all(
-    cluster_boolean_state,
-    any(feature = "v1_0", feature = "v1_1", feature = "v1_2", feature = "v1_3")
-))]
-pub(crate) mod boolean_state_v1_0_v1_3;
+#[cfg(all(cluster_boolean_state, any(feature = "v1_1", feature = "v1_2", feature = "v1_3")))]
+pub(crate) mod boolean_state_v1_1_v1_3;
 #[cfg(all(cluster_boolean_state, any(feature = "v1_4", feature = "v1_5")))]
 pub(crate) mod boolean_state_v1_4_v1_5;
 #[cfg(all(cluster_bridged_device_basic_information, any(feature = "v1_4", feature = "v1_5")))]
@@ -382,8 +379,6 @@ pub(crate) mod refrigerator_alarm;
     any(feature = "v1_4", feature = "v1_5")
 ))]
 pub(crate) mod refrigerator_and_temperature_controlled_cabinet_mode;
-#[cfg(all(cluster_relative_humidity_measurement, any(feature = "v1_0", feature = "v1_1")))]
-pub(crate) mod relative_humidity_measurement_v1_0_v1_1;
 #[cfg(all(cluster_relative_humidity_measurement, any(feature = "v1_2", feature = "v1_3")))]
 pub(crate) mod relative_humidity_measurement_v1_2_v1_3;
 #[cfg(all(

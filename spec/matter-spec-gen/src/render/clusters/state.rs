@@ -6,12 +6,19 @@ use super::{
     Result, attribute_enum::emit_attribute_enum_tokens, patch::emit_cluster_patch_tokens, resolve_cluster_attributes,
 };
 use crate::{
-    model::{ClusterDef, EnumDef, StructDef},
+    error::Error,
+    model::{
+        ClusterDef, EnumDef, ResolvedType, StructDef, lookup_boolean_semantics, parse_hex_or_dec, sanitize_identifier,
+        to_upper_camel_case,
+    },
     render::{
         commands::emit_command_enum_tokens,
         context::{PushLine as _, Tokens, TypeContext, format_hex},
         events::emit_event_enum_tokens,
-        record::{IdPrefix, MemberPartition, RecordConstructors, RecordStructDef, SingleMandatoryFrom, StructAttrs},
+        record::{
+            IdPrefix, MemberPartition, RecordConstructors, RecordStructDef, ResolvedMember, SingleMandatoryFrom,
+            StructAttrs,
+        },
     },
 };
 
@@ -29,8 +36,12 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
 
     let can_derive_eq_hash = partition.can_derive_eq_hash(ctx);
 
+    let custom_default_impl =
+        emit_cluster_default_impl(cluster, cluster_struct_name, &partition, effective_enums, ctx)?;
     let attrs = if partition.is_empty() {
         StructAttrs::unit(true)
+    } else if custom_default_impl.is_some() {
+        StructAttrs::model(can_derive_eq_hash, true).without_default()
     } else {
         StructAttrs::model(can_derive_eq_hash, true)
     };
@@ -89,6 +100,10 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
     out.append(quote! {
         $cluster_struct_def
 
+        $(if let Some(default_impl) = custom_default_impl =>
+            $default_impl
+        )
+
         $patch_tokens
 
         impl $cluster_struct_name {
@@ -126,6 +141,254 @@ pub(super) fn emit_cluster_struct_and_attribute_enum(
     out.push_blank();
 
     Ok(())
+}
+
+fn emit_cluster_default_impl(
+    cluster: &ClusterDef,
+    cluster_struct_name: &str,
+    partition: &MemberPartition<'_>,
+    effective_enums: &[EnumDef],
+    ctx: &TypeContext<'_>,
+) -> Result<Option<Tokens>> {
+    if partition.is_empty() {
+        return Ok(None);
+    }
+
+    let mut has_non_trivial = false;
+    let mut mand_inits = Vec::with_capacity(partition.mandatory.len());
+    for m in &partition.mandatory {
+        let attr_def = cluster.attributes.iter().find(|a| a.code == m.id);
+        let custom = attr_def
+            .and_then(|a| a.default.as_deref())
+            .map(|raw| resolve_default_expr(&cluster.name, m, raw, effective_enums, ctx))
+            .transpose()?
+            .flatten();
+        let init_expr = if let Some((expr, is_non_zero)) = custom {
+            if m.is_nullable || is_non_zero {
+                has_non_trivial = true;
+            }
+            if m.is_nullable {
+                quote!(Nullable::NonNull($expr))
+            } else {
+                expr
+            }
+        } else if m.is_nullable {
+            quote!(Nullable::default())
+        } else if m.is_array || matches!(m.resolved, ResolvedType::Array { .. }) {
+            quote!(Vec::default())
+        } else {
+            quote!($(m.type_path.as_str())::default())
+        };
+        mand_inits.push(quote!($(&m.fname): $init_expr,));
+    }
+
+    if !has_non_trivial {
+        return Ok(None);
+    }
+
+    Ok(Some(quote! {
+        impl Default for $cluster_struct_name {
+            fn default() -> Self {
+                Self {
+                    $(for init in &mand_inits join ($['\r']) => $init)
+                    $(for opt in &partition.optional join ($['\r']) => $(&opt.fname): Optional::Omitted,)
+                }
+            }
+        }
+    }))
+}
+
+fn is_known_null_sentinel(member: &ResolvedMember, trimmed: &str) -> bool {
+    if trimmed.eq_ignore_ascii_case("null") {
+        return true;
+    }
+    match &member.resolved {
+        ResolvedType::Primitive { rust_type, .. } if *rust_type == "i16" => trimmed.eq_ignore_ascii_case("0x8000"),
+        ResolvedType::SemanticType { rust_type, .. } if *rust_type == "types::Temperature" => {
+            trimmed.eq_ignore_ascii_case("0x8000")
+        }
+        _ => false,
+    }
+}
+
+/// Resolves an XML `default` string to `Ok(Some((expr_tokens, is_non_trivial)))` where `is_non_trivial`
+/// is `false` when the expression equals `Default::default()` for the inner non-nullable type,
+/// `Ok(None)` for a known ZCL null sentinel on a nullable field, or `Err` if invalid/out of range.
+fn resolve_default_expr(
+    cluster_name: &str,
+    member: &ResolvedMember,
+    raw: &str,
+    effective_enums: &[EnumDef],
+    ctx: &TypeContext<'_>,
+) -> Result<Option<(Tokens, bool)>> {
+    let trimmed = raw.trim();
+    if member.is_nullable && is_known_null_sentinel(member, trimmed) {
+        return Ok(None);
+    }
+
+    let invalid = || {
+        Error::Parse(format!(
+            "Invalid default '{trimmed}' for attribute '{}::{}' (type '{}')",
+            cluster_name, member.name, member.type_path
+        ))
+    };
+
+    match &member.resolved {
+        ResolvedType::Primitive { rust_type, .. } => resolve_primitive_default(rust_type, trimmed)
+            .map(Some)
+            .ok_or_else(invalid),
+        ResolvedType::IdType { rust_type, .. } => parse_u64_literal(trimmed)
+            .map(|v| Some((quote!($(*rust_type)::new($v)), v != 0)))
+            .ok_or_else(invalid),
+        ResolvedType::SemanticType { rust_type, .. } => {
+            if *rust_type == "types::Temperature" {
+                parse_i64_literal(trimmed)
+                    .filter(|v| i16::try_from(*v).is_ok())
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
+            } else if trimmed.starts_with('-') {
+                parse_i64_literal(trimmed)
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
+            } else {
+                parse_u64_literal(trimmed)
+                    .map(|v| Some((quote!($(*rust_type)::from_raw($v)), v != 0)))
+                    .ok_or_else(invalid)
+            }
+        }
+        ResolvedType::Enum { name, .. } => {
+            let type_path = member.type_path.as_str();
+            if member.is_semantic_bool {
+                let b = parse_bool_literal(trimmed).ok_or_else(invalid)?;
+                let pairs = lookup_boolean_semantics(&member.name);
+                let label = pairs
+                    .iter()
+                    .find(|(_, val)| *val == b)
+                    .map(|(v, _)| *v)
+                    .ok_or_else(invalid)?;
+                let variant = to_upper_camel_case(label);
+                return Ok(Some((quote!($type_path::$variant), b)));
+            }
+            let enm = effective_enums
+                .iter()
+                .find(|e| e.name == *name)
+                .or_else(|| ctx.global_defs.enums.iter().find(|e| e.name == *name))
+                .or_else(|| ctx.all_enums.values().find(|e| e.name == *name))
+                .ok_or_else(invalid)?;
+            let (variant, discr) = if let Some(num) = parse_hex_or_dec(trimmed) {
+                enm.items
+                    .iter()
+                    .find(|(_, v)| *v == num)
+                    .map(|(k, v)| (k.as_str(), *v))
+                    .ok_or_else(invalid)?
+            } else {
+                let clean = sanitize_identifier(trimmed);
+                enm.items
+                    .iter()
+                    .find(|(k, _)| k.eq_ignore_ascii_case(&clean))
+                    .map(|(k, v)| (k.as_str(), *v))
+                    .ok_or_else(invalid)?
+            };
+            let first_discr = enm.items.first().map(|(_, v)| *v);
+            Ok(Some((quote!($type_path::$variant), Some(discr) != first_discr)))
+        }
+        ResolvedType::Bitmap { .. } => {
+            let type_path = member.type_path.as_str();
+            let bits = parse_u64_literal(trimmed).ok_or_else(invalid)?;
+            if bits == 0 {
+                Ok(Some((quote!($type_path::empty()), false)))
+            } else {
+                Ok(Some((quote!($type_path::from_bits_retain($bits)), true)))
+            }
+        }
+        ResolvedType::Array { .. } => {
+            if trimmed.is_empty() || parse_u64_literal(trimmed) == Some(0) {
+                if member.is_nullable {
+                    Ok(None)
+                } else {
+                    Ok(Some((quote!(Vec::new()), false)))
+                }
+            } else {
+                Err(invalid())
+            }
+        }
+        ResolvedType::Struct { .. } => {
+            if member.is_nullable && parse_u64_literal(trimmed) == Some(0) {
+                Ok(None)
+            } else {
+                Err(invalid())
+            }
+        }
+    }
+}
+
+fn resolve_primitive_default(rust_type: &str, trimmed: &str) -> Option<(Tokens, bool)> {
+    match rust_type {
+        "bool" => parse_bool_literal(trimmed).map(|b| (if b { quote!(true) } else { quote!(false) }, b)),
+        "u8" => parse_u64_literal(trimmed)
+            .filter(|v| u8::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u16" => parse_u64_literal(trimmed)
+            .filter(|v| u16::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u32" => parse_u64_literal(trimmed)
+            .filter(|v| u32::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "u64" => parse_u64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+        "i8" => parse_i64_literal(trimmed)
+            .filter(|v| i8::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i16" => parse_i64_literal(trimmed)
+            .filter(|v| i16::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i32" => parse_i64_literal(trimmed)
+            .filter(|v| i32::try_from(*v).is_ok())
+            .map(|v| (quote!($v), v != 0)),
+        "i64" => parse_i64_literal(trimmed).map(|v| (quote!($v), v != 0)),
+        "f32" | "f64" => trimmed.parse::<f64>().ok().map(|v| {
+            let lit = if v.fract() == 0.0 {
+                format!("{v:.1}")
+            } else {
+                format!("{v}")
+            };
+            (quote!($lit), v != 0.0)
+        }),
+        "String" => {
+            if trimmed.is_empty() {
+                Some((quote!(String::new()), false))
+            } else {
+                Some((quote!(String::from($(quoted(trimmed)))), true))
+            }
+        }
+        "crate::Bytes" => {
+            (trimmed.is_empty() || parse_u64_literal(trimmed) == Some(0)).then(|| (quote!(crate::Bytes::new()), false))
+        }
+        _ => None,
+    }
+}
+
+fn parse_bool_literal(s: &str) -> Option<bool> {
+    match s.to_ascii_lowercase().as_str() {
+        "true" | "1" | "0x01" | "0x1" => Some(true),
+        "false" | "0" | "0x00" | "0x0" => Some(false),
+        _ => None,
+    }
+}
+
+fn parse_u64_literal(s: &str) -> Option<u64> {
+    if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        u64::from_str_radix(hex, 16).ok()
+    } else {
+        s.parse::<u64>().ok()
+    }
+}
+
+fn parse_i64_literal(s: &str) -> Option<i64> {
+    if let Some(hex) = s.strip_prefix("0x").or_else(|| s.strip_prefix("0X")) {
+        i64::from_str_radix(hex, 16).ok()
+    } else {
+        s.parse::<i64>().ok()
+    }
 }
 
 fn emit_cluster_struct_definitions(

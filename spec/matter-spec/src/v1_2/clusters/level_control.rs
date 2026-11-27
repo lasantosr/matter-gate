@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// LevelControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -105,6 +105,27 @@ pub struct LevelControlCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub start_up_current_level: Optional<Nullable<u8>>,
+}
+
+impl Default for LevelControlCluster {
+    fn default() -> Self {
+        Self {
+            current_level: Nullable::NonNull(0),
+            on_level: Nullable::default(),
+            options: LevelControlOptions::empty(),
+            remaining_time: Optional::Omitted,
+            min_level: Optional::Omitted,
+            max_level: Optional::Omitted,
+            current_frequency: Optional::Omitted,
+            min_frequency: Optional::Omitted,
+            max_frequency: Optional::Omitted,
+            on_off_transition_time: Optional::Omitted,
+            on_transition_time: Optional::Omitted,
+            off_transition_time: Optional::Omitted,
+            default_move_rate: Optional::Omitted,
+            start_up_current_level: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

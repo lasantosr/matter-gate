@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// ApplicationBasic cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -56,6 +56,21 @@ pub struct ApplicationBasicCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub product_id: Optional<u16>,
+}
+
+impl Default for ApplicationBasicCluster {
+    fn default() -> Self {
+        Self {
+            application_name: String::default(),
+            application: ApplicationBasicApplication::default(),
+            status: ApplicationStatusEnum::ActiveVisibleFocus,
+            application_version: String::default(),
+            allowed_vendor_list: Vec::default(),
+            vendor_name: Optional::Omitted,
+            vendor_id: Optional::Omitted,
+            product_id: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

@@ -49,7 +49,7 @@ crate::define_matter_bitmap! {
 }
 
 /// NetworkCommissioning cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -80,6 +80,24 @@ pub struct NetworkCommissioningCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub thread_version: Optional<u16>,
+}
+
+impl Default for NetworkCommissioningCluster {
+    fn default() -> Self {
+        Self {
+            max_networks: u8::default(),
+            networks: Vec::default(),
+            interface_enabled: InterfaceEnabled::Enabled,
+            last_networking_status: Nullable::default(),
+            last_network_id: Nullable::default(),
+            last_connect_error_value: Nullable::default(),
+            scan_max_time_seconds: Optional::Omitted,
+            connect_max_time_seconds: Optional::Omitted,
+            supported_wi_fi_bands: Optional::Omitted,
+            supported_thread_features: Optional::Omitted,
+            thread_version: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

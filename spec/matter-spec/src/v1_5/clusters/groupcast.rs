@@ -42,7 +42,7 @@ crate::define_matter_bitmap! {
 }
 
 /// Groupcast cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -53,6 +53,15 @@ crate::define_matter_bitmap! {
 pub struct GroupcastCluster {
     pub membership: Vec<MembershipStruct>,
     pub max_membership_count: u16,
+}
+
+impl Default for GroupcastCluster {
+    fn default() -> Self {
+        Self {
+            membership: Vec::default(),
+            max_membership_count: 10,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

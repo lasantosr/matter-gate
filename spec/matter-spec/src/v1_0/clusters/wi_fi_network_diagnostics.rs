@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// WiFiNetworkDiagnostics cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -128,6 +128,26 @@ pub struct WiFiNetworkDiagnosticsCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub overrun_count: Optional<Nullable<u64>>,
+}
+
+impl Default for WiFiNetworkDiagnosticsCluster {
+    fn default() -> Self {
+        Self {
+            bssid: Nullable::default(),
+            security_type: Nullable::default(),
+            wi_fi_version: Nullable::default(),
+            channel_number: Nullable::NonNull(0),
+            rssi: Nullable::default(),
+            beacon_lost_count: Optional::Omitted,
+            beacon_rx_count: Optional::Omitted,
+            packet_multicast_rx_count: Optional::Omitted,
+            packet_multicast_tx_count: Optional::Omitted,
+            packet_unicast_rx_count: Optional::Omitted,
+            packet_unicast_tx_count: Optional::Omitted,
+            current_max_rate: Optional::Omitted,
+            overrun_count: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

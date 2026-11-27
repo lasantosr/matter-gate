@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// WindowCovering cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -153,6 +153,35 @@ pub struct WindowCoveringCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub safety_status: Optional<SafetyStatus>,
+}
+
+impl Default for WindowCoveringCluster {
+    fn default() -> Self {
+        Self {
+            r#type: Type::RollerShade,
+            config_status: ConfigStatus::from_bits_retain(3),
+            operational_status: OperationalStatus::empty(),
+            end_product_type: EndProductType::RollerShade,
+            wc_mode: Mode::empty(),
+            physical_closed_limit_lift: Optional::Omitted,
+            physical_closed_limit_tilt: Optional::Omitted,
+            current_position_lift: Optional::Omitted,
+            current_position_tilt: Optional::Omitted,
+            number_of_actuations_lift: Optional::Omitted,
+            number_of_actuations_tilt: Optional::Omitted,
+            current_position_lift_percentage: Optional::Omitted,
+            current_position_tilt_percentage: Optional::Omitted,
+            target_position_lift_percent100ths: Optional::Omitted,
+            target_position_tilt_percent100ths: Optional::Omitted,
+            current_position_lift_percent100ths: Optional::Omitted,
+            current_position_tilt_percent100ths: Optional::Omitted,
+            installed_open_limit_lift: Optional::Omitted,
+            installed_closed_limit_lift: Optional::Omitted,
+            installed_open_limit_tilt: Optional::Omitted,
+            installed_closed_limit_tilt: Optional::Omitted,
+            safety_status: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

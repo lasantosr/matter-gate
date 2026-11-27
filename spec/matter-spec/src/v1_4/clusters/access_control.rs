@@ -43,7 +43,7 @@ crate::define_matter_bitmap! {
 }
 
 /// AccessControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -65,6 +65,20 @@ pub struct AccessControlCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub arl: Optional<Vec<AccessRestrictionEntryStruct>>,
+}
+
+impl Default for AccessControlCluster {
+    fn default() -> Self {
+        Self {
+            acl: Vec::default(),
+            subjects_per_access_control_entry: 4,
+            targets_per_access_control_entry: 3,
+            access_control_entries_per_fabric: 4,
+            extension: Optional::Omitted,
+            commissioning_arl: Optional::Omitted,
+            arl: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

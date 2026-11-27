@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// TlsCertificateManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -46,6 +46,17 @@ pub struct TlsCertificateManagementCluster {
     pub provisioned_root_certificates: Vec<TlsCertStruct>,
     pub max_client_certificates: u8,
     pub provisioned_client_certificates: Vec<TlsClientCertificateDetailStruct>,
+}
+
+impl Default for TlsCertificateManagementCluster {
+    fn default() -> Self {
+        Self {
+            max_root_certificates: 5,
+            provisioned_root_certificates: Vec::default(),
+            max_client_certificates: 5,
+            provisioned_client_certificates: Vec::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

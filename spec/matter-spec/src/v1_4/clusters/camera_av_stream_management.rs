@@ -80,7 +80,7 @@ crate::define_matter_bitmap! {
 }
 
 /// CameraAvStreamManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -130,6 +130,54 @@ pub struct CameraAvStreamManagementCluster {
     pub local_snapshot_recording_enabled: LocalSnapshotRecordingEnabled,
     pub status_light_enabled: StatusLightEnabled,
     pub status_light_brightness: globals::ThreeLevelAutoEnum,
+}
+
+impl Default for CameraAvStreamManagementCluster {
+    fn default() -> Self {
+        Self {
+            max_concurrent_encoders: u8::default(),
+            max_encoded_pixel_rate: u32::default(),
+            video_sensor_params: VideoSensorParamsStruct::default(),
+            night_vision_uses_infrared: bool::default(),
+            min_viewport: VideoResolutionStruct::default(),
+            rate_distortion_trade_off_points: Vec::default(),
+            max_content_buffer_size: u32::default(),
+            microphone_capabilities: AudioCapabilitiesStruct::default(),
+            speaker_capabilities: AudioCapabilitiesStruct::default(),
+            two_way_talk_support: TwoWayTalkSupportTypeEnum::default(),
+            snapshot_capabilities: Vec::default(),
+            max_network_bandwidth: u32::default(),
+            current_frame_rate: u16::default(),
+            hdr_mode_enabled: HdrModeEnabled::Disabled,
+            supported_stream_usages: Vec::default(),
+            allocated_video_streams: Vec::default(),
+            allocated_audio_streams: Vec::default(),
+            allocated_snapshot_streams: Vec::default(),
+            stream_usage_priorities: Vec::default(),
+            soft_recording_privacy_mode_enabled: SoftRecordingPrivacyModeEnabled::Disabled,
+            soft_livestream_privacy_mode_enabled: SoftLivestreamPrivacyModeEnabled::Disabled,
+            hard_privacy_mode_on: HardPrivacyModeOn::Off,
+            night_vision: TriStateAutoEnum::default(),
+            night_vision_illum: TriStateAutoEnum::default(),
+            viewport: globals::ViewportStruct::default(),
+            speaker_muted: SpeakerMuted::Unmuted,
+            speaker_volume_level: u8::default(),
+            speaker_max_level: u8::default(),
+            speaker_min_level: u8::default(),
+            microphone_muted: MicrophoneMuted::Unmuted,
+            microphone_volume_level: u8::default(),
+            microphone_max_level: u8::default(),
+            microphone_min_level: u8::default(),
+            microphone_agc_enabled: MicrophoneAgcEnabled::Enabled,
+            image_rotation: u16::default(),
+            image_flip_horizontal: ImageFlipHorizontal::Normal,
+            image_flip_vertical: ImageFlipVertical::Normal,
+            local_video_recording_enabled: LocalVideoRecordingEnabled::Disabled,
+            local_snapshot_recording_enabled: LocalSnapshotRecordingEnabled::Disabled,
+            status_light_enabled: StatusLightEnabled::Enabled,
+            status_light_brightness: globals::ThreeLevelAutoEnum::default(),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

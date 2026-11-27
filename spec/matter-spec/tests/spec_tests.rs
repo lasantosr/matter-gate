@@ -984,6 +984,7 @@ mod v1_6_regression_tests {
         use matter_spec::{
             error::AttributeError,
             model::{Attribute, AttributeId, AttributeValue, Cluster as ModelCluster, MatterStatus, Nullable},
+            registry::IntegerMode,
             v1_6::{
                 clusters::on_off::{
                     OnOffCluster, StartUpOnOffEnum,
@@ -992,7 +993,6 @@ mod v1_6_regression_tests {
                 globals::attributes::{ClusterRevision, FeatureMap},
                 registry::Validator,
             },
-            validate::IntegerMode,
             wire::{GlobalAttributes, WireCluster},
         };
 
@@ -1142,5 +1142,67 @@ mod cross_version_registry_parity_tests {
         v1_4::registry::Validator::full()
             .cluster(&basic_v1_4)
             .expect("v1_4 must not require EventList");
+    }
+
+    #[cfg(all(feature = "v1_6", feature = "general", feature = "hvac", feature = "registry"))]
+    #[test]
+    fn spec_registry_exposes_im_privileges_qualities_revisions_and_responses() {
+        use matter_spec::{
+            model::{AttributeId, ClusterId, CommandDirection, CommandId},
+            registry::{AccessFlags, AccessPrivilege, QualityFlags},
+            traits::ClusterSpec as _,
+            v1_6::{clusters::access_control::AccessControlCluster, registry::SPEC_REGISTRY},
+        };
+
+        // AccessControl (0x001F): cluster revision + fabric-scoped ACL attribute with Administer privilege.
+        let acl_cluster = SPEC_REGISTRY
+            .find_cluster(AccessControlCluster::CLUSTER_ID)
+            .expect("AccessControl cluster in v1.6 registry");
+        assert_eq!(acl_cluster.revision(), AccessControlCluster::CLUSTER_REVISION);
+
+        let acl_attr = SPEC_REGISTRY
+            .find_attribute(AccessControlCluster::CLUSTER_ID, AttributeId::new(0x0000))
+            .expect("ACL attribute");
+        assert_eq!(acl_attr.read_privilege(), Some(AccessPrivilege::Administer));
+        assert_eq!(acl_attr.write_privilege(), Some(AccessPrivilege::Administer));
+        assert!(acl_attr.access().contains(AccessFlags::READ));
+        assert!(acl_attr.access().contains(AccessFlags::WRITE));
+        assert!(acl_attr.access().contains(AccessFlags::FABRIC_SCOPED));
+
+        // Global attribute fallback via (ClusterId, AttributeId)
+        let rev_attr = SPEC_REGISTRY
+            .find_attribute(AccessControlCluster::CLUSTER_ID, AttributeId::CLUSTER_REVISION)
+            .expect("ClusterRevision global fallback");
+        assert_eq!(rev_attr.read_privilege(), Some(AccessPrivilege::View));
+        assert_eq!(rev_attr.write_privilege(), None);
+
+        // Groups (0x0004): AddGroup (0x00, C2S) -> Manage privilege, FABRIC_SCOPED, INVOKE, response_id 0x00.
+        let add_group = SPEC_REGISTRY
+            .find_command(
+                ClusterId::new(0x0004),
+                CommandId::new(0x00),
+                CommandDirection::ClientToServer,
+            )
+            .expect("AddGroup command");
+        assert!(add_group.access().contains(AccessFlags::INVOKE));
+        assert!(add_group.access().contains(AccessFlags::FABRIC_SCOPED));
+        assert_eq!(add_group.invoke_privilege(), Some(AccessPrivilege::Manage));
+        assert_eq!(add_group.response_id(), Some(CommandId::new(0x00)));
+
+        let add_group_resp = SPEC_REGISTRY
+            .find_command(
+                ClusterId::new(0x0004),
+                CommandId::new(0x00),
+                CommandDirection::ServerToClient,
+            )
+            .expect("AddGroupResponse");
+        assert_eq!(add_group_resp.invoke_privilege(), None);
+        assert_eq!(add_group_resp.response_id(), None);
+
+        // Thermostat (0x0201): Presets (0x0050) has ATOMIC_WRITE quality.
+        let presets = SPEC_REGISTRY
+            .find_attribute(ClusterId::new(0x0201), AttributeId::new(0x0050))
+            .expect("Thermostat Presets attribute");
+        assert!(presets.quality().contains(QualityFlags::ATOMIC_WRITE));
     }
 }

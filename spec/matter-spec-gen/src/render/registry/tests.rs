@@ -130,3 +130,113 @@ fn attribute_descriptor_emits_pascal_name_and_snake_field_name_and_event_priorit
     assert!(rendered.contains("field_name: \"identify_time\""), "{rendered}");
     assert!(rendered.contains("priority: EventPriority::Critical"), "{rendered}");
 }
+
+#[test]
+fn registry_renders_privileges_qualities_fabric_scoping_response_id_and_revision() {
+    use crate::model::parse_csa_clusters;
+
+    let xml = r#"
+<configurator>
+  <struct name="FabricEntryStruct" isFabricScoped="true">
+    <cluster code="0x00F0"/>
+    <item fieldId="0" name="Label" type="char_string"/>
+  </struct>
+  <cluster>
+    <name>SampleMeta</name>
+    <code>0x00F0</code>
+    <globalAttribute side="either" code="0xFFFD" value="5"/>
+    <attribute side="server" code="0x0000" type="array" entryType="FabricEntryStruct" writable="true" reportable="true" mustUseAtomicWrite="true">
+      FabricEntries
+      <access op="read" privilege="administer"/>
+      <access op="write" privilege="manage"/>
+      <quality changeOmitted="true"/>
+    </attribute>
+    <attribute side="server" code="0x0001" type="int8u" readable="false" writable="true">
+      WriteOnlySecret
+    </attribute>
+    <command source="client" code="0x00" name="DoWork" response="DoWorkResponse" mustUseTimedInvoke="true">
+      <access op="invoke" privilege="administer"/>
+      <quality largeMessage="true"/>
+    </command>
+    <command source="server" code="0x01" name="DoWorkResponse"/>
+    <event side="server" code="0x00" name="AdminAudit" priority="info" isFabricSensitive="true">
+      <access op="read" privilege="administer"/>
+    </event>
+  </cluster>
+</configurator>
+"#;
+    let clusters = parse_csa_clusters(xml).expect("parse xml");
+    let cluster_refs: Vec<&ClusterDef> = clusters.iter().collect();
+    let globals = GlobalDefs::default();
+    let empty_e = BTreeMap::new();
+    let empty_b = BTreeMap::new();
+    let empty_s = BTreeMap::new();
+
+    let rendered = render_registry_tables("1.6", &cluster_refs, &[], &globals, &empty_e, &empty_b, &empty_s)
+        .expect("render registry");
+
+    // Cluster revision
+    assert!(rendered.contains("revision: 5"), "{rendered}");
+
+    // FabricEntries block
+    let fabric_start = rendered
+        .find("name: \"FabricEntries\"")
+        .expect("FabricEntries descriptor");
+    let write_only_start = rendered
+        .find("name: \"WriteOnlySecret\"")
+        .expect("WriteOnlySecret descriptor");
+    let fabric_block = &rendered[fabric_start..write_only_start];
+    assert!(fabric_block.contains("access: AccessFlags(7)"), "{fabric_block}");
+    assert!(fabric_block.contains("quality: QualityFlags(13)"), "{fabric_block}");
+    assert!(
+        fabric_block.contains("read_privilege: Some(AccessPrivilege::Administer)"),
+        "{fabric_block}"
+    );
+    assert!(
+        fabric_block.contains("write_privilege: Some(AccessPrivilege::Manage)"),
+        "{fabric_block}"
+    );
+
+    // WriteOnlySecret block
+    let do_work_start = rendered.find("name: \"DoWork\"").expect("DoWork descriptor");
+    let write_only_block = &rendered[write_only_start..do_work_start];
+    assert!(
+        write_only_block.contains("access: AccessFlags(2)"),
+        "{write_only_block}"
+    );
+    assert!(write_only_block.contains("read_privilege: None"), "{write_only_block}");
+    assert!(
+        write_only_block.contains("write_privilege: Some(AccessPrivilege::Operate)"),
+        "{write_only_block}"
+    );
+
+    // DoWork block
+    let do_work_resp_start = rendered
+        .find("name: \"DoWorkResponse\"")
+        .expect("DoWorkResponse descriptor");
+    let do_work_block = &rendered[do_work_start..do_work_resp_start];
+    assert!(do_work_block.contains("access: AccessFlags(80)"), "{do_work_block}");
+    assert!(do_work_block.contains("quality: QualityFlags(2)"), "{do_work_block}");
+    assert!(
+        do_work_block.contains("invoke_privilege: Some(AccessPrivilege::Administer)"),
+        "{do_work_block}"
+    );
+    assert!(
+        do_work_block.contains("response_id: Some(CommandId::new(0x01))"),
+        "{do_work_block}"
+    );
+
+    // DoWorkResponse block
+    let admin_audit_start = rendered.find("name: \"AdminAudit\"").expect("AdminAudit descriptor");
+    let resp_block = &rendered[do_work_resp_start..admin_audit_start];
+    assert!(resp_block.contains("invoke_privilege: None"), "{resp_block}");
+    assert!(resp_block.contains("response_id: None"), "{resp_block}");
+
+    // AdminAudit event block
+    let event_block = &rendered[admin_audit_start..];
+    assert!(event_block.contains("access: AccessFlags(9)"), "{event_block}");
+    assert!(
+        event_block.contains("read_privilege: AccessPrivilege::Administer"),
+        "{event_block}"
+    );
+}

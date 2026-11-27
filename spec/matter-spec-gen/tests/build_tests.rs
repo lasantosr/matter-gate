@@ -285,4 +285,68 @@ mod tests {
              __shared"
         );
     }
+
+    #[test]
+    fn cluster_default_honors_xml_defaults_nullable_strings_sentinels_and_rejects_invalid() {
+        let chip_types = include_str!("fixtures/chip-types.xml");
+        let cluster_xml = r#"<configurator>
+            <cluster>
+                <name>SampleDefaults</name>
+                <code>0x00F1</code>
+                <attribute side="server" code="0x0000" type="int8u" default="10" optional="false">MinPower</attribute>
+                <attribute side="server" code="0x0001" type="char_string" isNullable="true" default="" optional="false">Label</attribute>
+                <attribute side="server" code="0x0002" type="int16s" isNullable="true" default="0x8000" optional="false">MinTemp</attribute>
+                <attribute side="server" code="0x0003" type="int8u" default="5" optional="true">OptVal</attribute>
+            </cluster>
+        </configurator>"#;
+
+        let spec = build(vec![SpecInput::new(
+            "v1_6",
+            "1.6",
+            vec![
+                XmlDocument::new("chip-types.xml", chip_types),
+                XmlDocument::new("sample.xml", cluster_xml),
+            ],
+        )])
+        .expect("build");
+        let rendered = spec.versions[0].clusters[0].render().expect("render");
+        assert!(
+            !rendered
+                .contains("#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]\npub struct SampleDefaultsCluster"),
+            "custom Default must omit #[derive(Default)]:\n{rendered}"
+        );
+        assert!(
+            rendered.contains("impl Default for SampleDefaultsCluster"),
+            "{rendered}"
+        );
+        assert!(rendered.contains("min_power: 10,"), "{rendered}");
+        assert!(
+            rendered.contains("label: Nullable::NonNull(String::new()),"),
+            "nullable empty string default must be NonNull(String::new()):\n{rendered}"
+        );
+        assert!(
+            rendered.contains("min_temp: Nullable::default(),"),
+            "0x8000 sentinel on nullable int16s must become Nullable::default():\n{rendered}"
+        );
+        assert!(rendered.contains("opt_val: Optional::Omitted,"), "{rendered}");
+
+        let bad_xml = r#"<configurator>
+            <cluster>
+                <name>BadDefault</name>
+                <code>0x00F2</code>
+                <attribute side="server" code="0x0000" type="int8u" default="999" optional="false">TooBig</attribute>
+            </cluster>
+        </configurator>"#;
+        let bad_spec = build(vec![SpecInput::new(
+            "v1_6",
+            "1.6",
+            vec![
+                XmlDocument::new("chip-types.xml", chip_types),
+                XmlDocument::new("bad.xml", bad_xml),
+            ],
+        )])
+        .expect("build bad");
+        let err = bad_spec.versions[0].clusters[0].render().unwrap_err();
+        assert!(err.to_string().contains("Invalid default '999'"), "{err}");
+    }
 }

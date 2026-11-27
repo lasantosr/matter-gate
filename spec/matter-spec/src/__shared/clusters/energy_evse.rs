@@ -51,7 +51,7 @@ crate::define_matter_bitmap! {
 }
 
 /// EnergyEvse cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -179,6 +179,36 @@ pub struct EnergyEvseCluster {
     )]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub session_energy_discharged: Optional<Nullable<types::EnergyMwh>>,
+}
+
+impl Default for EnergyEvseCluster {
+    fn default() -> Self {
+        Self {
+            state: Nullable::default(),
+            supply_state: SupplyStateEnum::default(),
+            fault_state: FaultStateEnum::default(),
+            charging_enabled_until: Nullable::NonNull(types::EpochS::from_raw(0)),
+            circuit_capacity: types::AmperageMa::from_raw(0),
+            minimum_charge_current: types::AmperageMa::from_raw(6000),
+            maximum_charge_current: types::AmperageMa::from_raw(0),
+            session_id: Nullable::default(),
+            session_duration: Nullable::default(),
+            session_energy_charged: Nullable::default(),
+            discharging_enabled_until: Optional::Omitted,
+            maximum_discharge_current: Optional::Omitted,
+            user_maximum_charge_current: Optional::Omitted,
+            randomization_delay_window: Optional::Omitted,
+            next_charge_start_time: Optional::Omitted,
+            next_charge_target_time: Optional::Omitted,
+            next_charge_required_energy: Optional::Omitted,
+            next_charge_target_so_c: Optional::Omitted,
+            approximate_ev_efficiency: Optional::Omitted,
+            state_of_charge: Optional::Omitted,
+            battery_capacity: Optional::Omitted,
+            vehicle_id: Optional::Omitted,
+            session_energy_discharged: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

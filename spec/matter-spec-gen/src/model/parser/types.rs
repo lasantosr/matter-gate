@@ -12,12 +12,14 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
         name_attr,
         define,
         type_attr,
+        // Ignored: `matter-spec` models server-side clusters; `side="client"` only appears on a few legacy ZCL
+        // attributes.
         side: _side,
         optional,
         writable,
-        readable: _readable,
-        reportable: _reportable,
-        default: _default,
+        readable,
+        reportable,
+        default,
         min,
         max,
         min_length,
@@ -26,8 +28,11 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
         is_nullable,
         is_fabric_sensitive,
         must_use_timed_write,
-        must_use_atomic_write: _must_use_atomic_write,
+        must_use_atomic_write,
+        // Ignored: `matter-spec` organizes schemas into per-release modules (`v1_0`..`v1_6`) with exact
+        // `ClusterRevision`.
         introduced_in: _introduced_in,
+        // Ignored: provisionality is tracked via `ConformanceOp::Provisional` rather than XML `apiMaturity`.
         api_maturity: _api_maturity,
         items,
     } = attr_xml;
@@ -35,6 +40,11 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
     let mut text_name = None;
     let mut description = String::new();
     let mut access_items = Vec::new();
+    let mut quality = super::QualityFlags {
+        atomic_write: must_use_atomic_write.as_deref() == Some("true"),
+        reportable: reportable.as_deref() == Some("true"),
+        ..Default::default()
+    };
     let mut conformance = Vec::new();
     let mut choice = None;
     for item in items {
@@ -46,9 +56,16 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
                 access_items.push(ax);
             }
             AttributeItem::Quality(QualityXml {
-                change_omitted: _change_omitted,
-                large_message: _large_message,
-            }) => {}
+                change_omitted,
+                large_message,
+            }) => {
+                if change_omitted.as_deref() == Some("true") {
+                    quality.change_omitted = true;
+                }
+                if large_message.as_deref() == Some("true") {
+                    quality.large_message = true;
+                }
+            }
             AttributeItem::MandatoryConform(c) => {
                 if choice.is_none() {
                     choice = c.choice.clone();
@@ -104,7 +121,8 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
         max: length_val,
         item_constraint: entry_type.clone(),
     });
-    let mut access = super::conformance::parse_access_flags(&access_items, true, is_writable);
+    let default_read = readable.as_deref() != Some("false");
+    let mut access = super::conformance::parse_access_flags(&access_items, default_read, is_writable);
     if is_fabric_sensitive.as_deref() == Some("true") {
         access.fabric_sensitive = true;
     }
@@ -126,8 +144,10 @@ pub(crate) fn parse_attribute_xml(attr_xml: AttributeXml) -> Option<AttributeDef
         length: length_val,
         min_length: min_length_val,
         list_length,
+        default,
         define,
         access,
+        quality,
         conformance,
         choice,
         description,
@@ -163,6 +183,7 @@ pub(crate) fn parse_command_xml(cmd_xml: CommandXml) -> Result<Option<CommandDef
     let mut seen_arg_ids = BTreeSet::new();
     let mut next_arg_id = 0;
     let mut access_items = Vec::new();
+    let mut quality = super::QualityFlags::default();
     let mut conformance = Vec::new();
     let mut choice = None;
 
@@ -174,9 +195,18 @@ pub(crate) fn parse_command_xml(cmd_xml: CommandXml) -> Result<Option<CommandDef
             CommandItem::Access(ax) => {
                 access_items.push(ax);
             }
-            CommandItem::Quality(QualityXml { .. })
-            | CommandItem::DescribedConform(EmptyConformXml)
-            | CommandItem::Text(_) => {}
+            CommandItem::Quality(QualityXml {
+                change_omitted,
+                large_message,
+            }) => {
+                if change_omitted.as_deref() == Some("true") {
+                    quality.change_omitted = true;
+                }
+                if large_message.as_deref() == Some("true") {
+                    quality.large_message = true;
+                }
+            }
+            CommandItem::DescribedConform(EmptyConformXml) | CommandItem::Text(_) => {}
             CommandItem::Arg(arg) => {
                 if let Some(parsed_arg) = parse_command_arg_xml(*arg, &mut seen_arg_ids, &mut next_arg_id)? {
                     args.push(parsed_arg);
@@ -207,6 +237,9 @@ pub(crate) fn parse_command_xml(cmd_xml: CommandXml) -> Result<Option<CommandDef
 
     let direction = super::conformance::parse_command_direction(&cmd_name, &source_str)?;
     let mut access = super::conformance::parse_access_flags(&access_items, false, false);
+    if direction == super::CommandDirection::ClientToServer {
+        access.invoke = true;
+    }
     if is_fabric_scoped.as_deref() == Some("true") {
         access.fabric_scoped = true;
     }
@@ -222,6 +255,7 @@ pub(crate) fn parse_command_xml(cmd_xml: CommandXml) -> Result<Option<CommandDef
         response: response_opt,
         args,
         access,
+        quality,
         conformance,
         choice,
         description,
@@ -306,7 +340,7 @@ pub(crate) fn parse_event_xml(event_xml: EventXml) -> Result<Option<EventDef>> {
         }
     }
 
-    let mut access = super::conformance::parse_access_flags(&access_items, false, false);
+    let mut access = super::conformance::parse_access_flags(&access_items, true, false);
     if is_fabric_sensitive.as_deref() == Some("true") {
         access.fabric_sensitive = true;
     }

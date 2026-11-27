@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// MicrowaveOvenControl cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -64,6 +64,22 @@ pub struct MicrowaveOvenControlCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub watt_rating: Optional<u16>,
+}
+
+impl Default for MicrowaveOvenControlCluster {
+    fn default() -> Self {
+        Self {
+            cook_time: types::ElapsedS::from_raw(30),
+            max_cook_time: types::ElapsedS::default(),
+            power_setting: Optional::Omitted,
+            min_power: Optional::Omitted,
+            max_power: Optional::Omitted,
+            power_step: Optional::Omitted,
+            supported_watts: Optional::Omitted,
+            selected_watt_index: Optional::Omitted,
+            watt_rating: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

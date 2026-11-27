@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// DeviceEnergyManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -70,6 +70,21 @@ pub struct DeviceEnergyManagementCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub opt_out_state: Optional<OptOutStateEnum>,
+}
+
+impl Default for DeviceEnergyManagementCluster {
+    fn default() -> Self {
+        Self {
+            esa_type: EsaTypeEnum::Other,
+            esa_can_generate: EsaCanGenerate::CannotGenerate,
+            esa_state: EsaStateEnum::Offline,
+            abs_min_power: types::PowerMw::from_raw(0),
+            abs_max_power: types::PowerMw::from_raw(0),
+            power_adjustment_capability: Optional::Omitted,
+            forecast: Optional::Omitted,
+            opt_out_state: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

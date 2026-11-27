@@ -12,7 +12,9 @@
 
 Working with raw cluster IDs and untyped wire values is error-prone. `matter-spec` gives you compile-time-checked models generated directly from the official CSA specification, organized into one module per supported Matter release.
 
-It is completely independent of any network stack, transport, or async runtime. Its only Matter dependency is [`matter-data-model`](https://crates.io/crates/matter-data-model), which it re-exports and converts to and from seamlessly.
+Unlike stack-coupled cluster codegen such as `rs-matter-dm-clusters` (which binds directly to `rs-matter`'s TLV codecs and Interaction Model handler traits), `matter-spec` is completely independent of any network stack, transport, or async runtime. Its only Matter dependency is [`matter-data-model`](https://crates.io/crates/matter-data-model), which it re-exports and converts to and from seamlessly.
+
+This separation lets drivers and libraries expose only `matter-data-model` in their public APIs (avoiding diamond-dependency conflicts as `matter-spec` tracks new CSA releases), while a decoupled runtime or stack adapter bridges plain data-model payloads into `rs-matter` (or any alternative stack) by looking up access control privileges, access and quality flags, cluster revisions, command responses, and conformance rules in the static registry.
 
 ## Features
 
@@ -20,7 +22,7 @@ It is completely independent of any network stack, transport, or async runtime. 
 - **Lossless wire wrappers:** Always-enabled wrappers preserve data versions, global attributes, event numbers, timestamps, and Manufacturer Extension Identifier (MEI) extra attributes without bloating your domain structs.
 - **Zero-clone owned conversions:** Owned wire payloads (strings, byte buffers, and vectors) convert into domain models with zero intermediate clones.
 - **Exhaustive enums & bitmaps:** Cluster enums are exhaustive for their Matter release so matches are compiler-verified. Bitmaps provide named flag constants, bitwise operators, and set helpers. Error enums are also exhaustive by design (see [Exhaustive Error Enums & SemVer](#exhaustive-error-enums--semver)).
-- **Zero-alloc conformance validation:** Static read-only specification tables power non-mutating, zero-allocation full-snapshot and partial-delta validation, alongside zero-alloc typed endpoint inspection.
+- **Static IM metadata & zero-alloc validation:** Static read-only registry tables expose access control privileges, access and quality flags, cluster revisions, and command response mappings by cluster and member ID, and power non-mutating, zero-allocation full-snapshot and partial-delta validation alongside typed endpoint inspection.
 - **Semantic unit & time newtypes:** Physical unit, time, and address types (temperature, percentage, power, epochs, dates, IP addresses, and more) with optional/nullable combinators and optional `jiff`, `time`, and `uom` bridges.
 - **Boundary dispatch & dynamic schemas:** Feature-gated boundary enums for dynamic dispatch, self-describing JSON wrappers, and feature-map-pruned JSON schemas.
 - **Embedded & `no_std` ready:** Compiles on bare-metal targets (using `alloc`) when default features are disabled, including the static registry and serialization.
@@ -50,7 +52,7 @@ Features are layered from coarse to fine. Pick the narrowest tier that fits your
 | Feature | Default | Description |
 | :--- | :---: | :--- |
 | `std` | Yes | Standard library support across `matter-spec`, `matter-data-model`, `bytes`, and `serde`. |
-| `registry` | No | `#![no_std]` + `alloc` static `SpecRegistry` and zero-alloc `Validator` conformance validation. |
+| `registry` | No | `#![no_std]` + `alloc` static specification metadata registry and zero-alloc conformance validation. |
 | `dispatch` | No | Runtime `*Meta` traits, threshold-boxed boundary enums, and `Described<T>` / `Invocation<T>` self-describing JSON wrappers. |
 | `serde` | No | `#![no_std]` + `alloc` `Serialize` and `Deserialize` implementations for all models. |
 | `schemars` | No | Dynamic `FeatureMap`-pruned `JsonSchema` generation via `schemars` (enables `std` and `registry`). |
@@ -167,6 +169,27 @@ let light_ep = OnOffLight::new(
 )
 .into_endpoint(EndpointId::new(2));
 Validator::full().endpoint(&light_ep).unwrap();
+```
+
+### Static IM Metadata Lookup (`SpecRegistry`)
+
+Decoupled runtimes and stack adapters can inspect ACL privileges, access/quality flags, cluster revisions, and command response IDs directly by `(ClusterId, MemberId)` without coupling drivers to any IM stack (requires `v1_4`, `registry`, and `general` or `all`):
+
+```rust
+use matter_spec::v1_4::prelude::*;
+
+let acl_attr = SPEC_REGISTRY
+    .find_attribute(AccessControlCluster::CLUSTER_ID, AccessControlCluster::ATTR_ACL)
+    .unwrap();
+assert_eq!(acl_attr.read_privilege(), Some(AccessPrivilege::Administer));
+assert_eq!(acl_attr.write_privilege(), Some(AccessPrivilege::Administer));
+assert!(acl_attr.access().contains(AccessFlags::FABRIC_SCOPED));
+
+// Global attributes (0xFFF8..=0xFFFD) resolve automatically for any known cluster
+let rev_attr = SPEC_REGISTRY
+    .find_attribute(AccessControlCluster::CLUSTER_ID, AttributeId::CLUSTER_REVISION)
+    .unwrap();
+assert_eq!(rev_attr.read_privilege(), Some(AccessPrivilege::View));
 ```
 
 ## Exhaustive Error Enums & SemVer

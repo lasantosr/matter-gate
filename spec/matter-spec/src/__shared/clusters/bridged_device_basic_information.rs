@@ -44,7 +44,7 @@ crate::define_matter_bitmap! {
 }
 
 /// BridgedDeviceBasicInformation cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -103,6 +103,31 @@ pub struct BridgedDeviceBasicInformationCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub configuration_version: Optional<u32>,
+}
+
+impl Default for BridgedDeviceBasicInformationCluster {
+    fn default() -> Self {
+        Self {
+            reachable: Reachable::Reachable,
+            unique_id: String::default(),
+            vendor_name: Optional::Omitted,
+            vendor_id: Optional::Omitted,
+            product_name: Optional::Omitted,
+            product_id: Optional::Omitted,
+            node_label: Optional::Omitted,
+            hardware_version: Optional::Omitted,
+            hardware_version_string: Optional::Omitted,
+            software_version: Optional::Omitted,
+            software_version_string: Optional::Omitted,
+            manufacturing_date: Optional::Omitted,
+            part_number: Optional::Omitted,
+            product_url: Optional::Omitted,
+            product_label: Optional::Omitted,
+            serial_number: Optional::Omitted,
+            product_appearance: Optional::Omitted,
+            configuration_version: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

@@ -37,7 +37,7 @@ crate::define_matter_bitmap! {
 }
 
 /// Switch cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -51,6 +51,16 @@ pub struct SwitchCluster {
     #[cfg_attr(feature = "serde", serde(default, skip_serializing_if = "Optional::is_omitted"))]
     #[cfg_attr(all(not(feature = "serde"), feature = "schemars"), schemars(default))]
     pub multi_press_max: Optional<u8>,
+}
+
+impl Default for SwitchCluster {
+    fn default() -> Self {
+        Self {
+            number_of_positions: 2,
+            current_position: u8::default(),
+            multi_press_max: Optional::Omitted,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

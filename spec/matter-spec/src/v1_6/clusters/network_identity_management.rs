@@ -33,7 +33,7 @@ crate::define_matter_bitmap! {
 }
 
 /// NetworkIdentityManagement cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -45,6 +45,16 @@ pub struct NetworkIdentityManagementCluster {
     pub active_network_identities: Vec<ActiveNetworkIdentityStruct>,
     pub clients: Vec<ClientStruct>,
     pub client_table_size: u16,
+}
+
+impl Default for NetworkIdentityManagementCluster {
+    fn default() -> Self {
+        Self {
+            active_network_identities: Vec::default(),
+            clients: Vec::default(),
+            client_table_size: 500,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

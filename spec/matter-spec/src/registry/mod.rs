@@ -1,20 +1,22 @@
-//! Zero-allocation, non-mutating static schema validation engine.
+//! Static specification metadata registry and zero-allocation conformance validation engine.
 //!
-//! Operates directly over immutable `'static` descriptor tables (`SpecRegistry`)
+//! Operates directly over immutable `'static` descriptor tables ([`SpecRegistry`])
 //! and borrowed [`matter_data_model`] wire types without heap allocation, cloning,
-//! or mutating valid payloads.
+//! or mutating valid payloads. Interaction Model stacks and bridge runtimes can look up
+//! ACL privileges, access/quality flags, cluster revisions, and command response IDs by
+//! `(ClusterId, MemberId)`, or run zero-alloc conformance validation via [`RegistryValidator`].
 
 mod access;
 mod conformance;
 mod descriptor_checks;
 mod descriptors;
-mod registry;
+mod spec_registry;
 mod value;
 
 #[cfg(test)]
 mod tests;
 
-pub use access::AccessFlags;
+pub use access::{AccessFlags, AccessPrivilege, QualityFlags};
 #[cfg(any(test, all(feature = "dispatch", feature = "schemars")))]
 pub(crate) use conformance::eval_conformance;
 #[cfg(any(test, all(feature = "dispatch", feature = "schemars")))]
@@ -26,7 +28,7 @@ pub(crate) use descriptors::{
     ChoiceGroup, ConformanceOp, DeviceClusterReq, DeviceTypeIncludeItem, FieldDescriptor, ListLength, StructDescriptor,
     ValueBounds, ValueConstraint, ValueType,
 };
-pub use registry::{RegistryValidator, SpecRegistry};
+pub use spec_registry::{RegistryValidator, SpecRegistry};
 #[cfg(test)]
 pub(crate) use value::validate_value;
 

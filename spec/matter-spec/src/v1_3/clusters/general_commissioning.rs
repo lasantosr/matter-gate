@@ -32,7 +32,7 @@ crate::define_matter_bitmap! {
 }
 
 /// GeneralCommissioning cluster.
-#[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "schemars", derive(schemars::JsonSchema))]
 #[cfg_attr(all(feature = "serde", feature = "deny-unknown-fields"), serde(deny_unknown_fields))]
@@ -46,6 +46,18 @@ pub struct GeneralCommissioningCluster {
     pub regulatory_config: RegulatoryLocationTypeEnum,
     pub location_capability: RegulatoryLocationTypeEnum,
     pub supports_concurrent_connection: SupportsConcurrentConnection,
+}
+
+impl Default for GeneralCommissioningCluster {
+    fn default() -> Self {
+        Self {
+            breadcrumb: 0,
+            basic_commissioning_info: BasicCommissioningInfo::default(),
+            regulatory_config: RegulatoryLocationTypeEnum::default(),
+            location_capability: RegulatoryLocationTypeEnum::default(),
+            supports_concurrent_connection: SupportsConcurrentConnection::Supported,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Default)]

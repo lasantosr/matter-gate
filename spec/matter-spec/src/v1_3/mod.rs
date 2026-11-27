@@ -718,7 +718,10 @@ pub mod prelude {
     #[cfg(feature = "dispatch")]
     pub use crate::dispatch::{CommandMeta, Described, Invocation, MatterDescribe};
     #[cfg(feature = "registry")]
-    pub use crate::validate::{RegistryValidator, ValidationMode};
+    pub use crate::registry::{
+        AccessFlags, AccessPrivilege, AttributeDescriptor, ClusterDescriptor, CommandDescriptor, DeviceTypeDescriptor,
+        EventDescriptor, IntegerMode, QualityFlags, RegistryValidator, SpecRegistry, ValidationMode,
+    };
     pub use crate::{
         error::*,
         extensions::{ModeClusterExt, ModeOptionExt},

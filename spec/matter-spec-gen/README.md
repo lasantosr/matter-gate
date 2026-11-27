@@ -8,7 +8,7 @@
 
 ## Overview
 
-`matter-spec-gen` parses Connectivity Standards Alliance (CSA) cluster and device-type XML definitions and compiles them into strongly typed Rust token streams and source strings targeting [`matter-data-model`](../matter-data-model/). Because it performs zero I/O and makes no assumptions about directory layout, orchestrators such as `xtask` stay in full control of where schemas come from and how generated code is written.
+`matter-spec-gen` parses Connectivity Standards Alliance (CSA) cluster and device-type XML definitions and compiles them into stack-agnostic, strongly typed Rust token streams and static specification metadata tables targeting [`matter-data-model`](../matter-data-model/), intentionally avoiding coupling to any specific Interaction Model runtime or TLV handler traits (unlike `rs-matter-dm-clusters`). Because it performs zero I/O and makes no assumptions about directory layout, orchestrators such as `xtask` stay in full control of where schemas come from and how generated code is written.
 
 ## Features
 

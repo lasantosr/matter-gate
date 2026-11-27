@@ -161,7 +161,11 @@ pub(in super::super) fn generate_version_mod(
             pub use crate::types::*;
             pub use crate::wire::{GlobalAttributes, WireCluster, WireEvent};
             #[cfg(feature = "registry")]
-            pub use crate::validate::{RegistryValidator, ValidationMode};
+            pub use crate::registry::{
+                AccessFlags, AccessPrivilege, AttributeDescriptor, ClusterDescriptor, CommandDescriptor,
+                DeviceTypeDescriptor, EventDescriptor, IntegerMode, QualityFlags, RegistryValidator, SpecRegistry,
+                ValidationMode,
+            };
             #[cfg(feature = "dispatch")]
             pub use crate::dispatch::{CommandMeta, Described, Invocation, MatterDescribe};
         }
